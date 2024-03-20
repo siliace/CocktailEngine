@@ -1,0 +1,24 @@
+[submodule "Vendor/volk"]
+	path = Vendor/volk
+	url = https://github.com/zeux/volk
+[submodule "Vendor/magic_enum"]
+	path = Vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "Vendor/Catch2"]
+	path = Vendor/Catch2
+	url = https://github.com/catchorg/Catch2
+[submodule "Vendor/SPIRV-Reflect"]
+	path = Vendor/SPIRV-Reflect
+	url = https://github.com/KhronosGroup/SPIRV-Reflect
+[submodule "Vendor/assimp"]
+	path = Vendor/assimp
+	url = https://github.com/assimp/assimp
+[submodule "Vendor/fmt"]
+	path = Vendor/fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "Vendor/cmrc"]
+	path = Vendor/cmrc
+	url = https://github.com/vector-of-bool/cmrc
+[submodule "Vendor/tinyxml2"]
+	path = Vendor/tinyxml2
+	url = https://github.com/leethomason/tinyxml2
