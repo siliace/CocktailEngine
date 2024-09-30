@@ -1,0 +1,118 @@
+#ifndef COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
+#define COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
+
+#include <Cocktail/Core/Application/Application.hpp>
+#include <Cocktail/Core/Utility/Cache/CachePool.hpp>
+
+#include <Cocktail/Graphic/Rendering/SceneViewer.hpp>
+#include <Cocktail/Graphic/Rendering/Resource/IndexBuffer.hpp>
+#include <Cocktail/Graphic/Rendering/Resource/VertexBuffer.hpp>
+#include <Cocktail/Graphic/Rendering/Engine/ResourceUploader.hpp>
+
+#include <Cocktail/Renderer/GraphicApi.hpp>
+#include <Cocktail/Renderer/RenderDevice.hpp>
+
+#include "Cocktail/Graphic/Material/MipMaps/MipMaps.hpp"
+
+namespace Ck
+{
+	/**
+     * \brief 
+     */
+	class COCKTAIL_GRAPHIC_API GraphicEngine : public Extends<GraphicEngine, Object>, public Observable
+	{
+	public:
+
+		/**
+	     * \brief 
+	     * \param application
+	     * \param api 
+	     */
+		GraphicEngine(Application& application, Renderer::GraphicApi api);
+
+		/**
+	     * \brief 
+	     * \param vertices 
+	     * \param updatable 
+	     * \param name 
+	     * \return 
+	     */
+		Ref<VertexBuffer> CreateVertexBuffer(Ref<VertexArray> vertices, bool updatable = false, std::string_view name = "");
+
+		/**
+		 * \brief
+		 * \param indices
+		 * \param updatable
+		 * \param name
+		 * \return
+		 */
+		Ref<IndexBuffer> CreateIndexBuffer(Ref<IndexArray> indices, bool updatable = false, std::string_view name = "");
+
+		/**
+		 * \brief 
+		 * \param mipMaps 
+		 * \return 
+		 */
+		Ref<TextureResource> CreateTextureSampler(Ref<MipMaps> mipMaps);
+
+		/**
+	     * \brief 
+	     * \param buffer 
+	     * \param offset 
+	     * \param length 
+	     * \param data 
+	     */
+		void UploadBuffer(Ref<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
+
+		/**
+		 * \brief 
+		 * \param texture 
+		 * \param arrayLayer 
+		 * \param mipMapLevel 
+		 * \param data 
+		 */
+		void UploadTexture(Ref<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
+
+		/**
+		 * \brief 
+		 */
+		void FlushTransfer();
+
+		/**
+		 * \brief 
+		 */
+		void Present();
+
+		/**
+	     * \brief 
+	     * \return 
+	     */
+		Ref<Renderer::RenderDevice> GetRenderDevice() const;
+
+		/**
+	     * \brief 
+	     * \return 
+	     */
+		Ref<Renderer::RenderContext> GetRenderContext() const;
+
+		Renderer::FrameContext* GetFrameContext() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Ref<MaterialProgramManager> GetMaterialProgramManager() const;
+
+	private:
+
+		Ref<Renderer::RenderDevice> mRenderDevice;
+		Ref<Renderer::RenderContext> mRenderContext;
+		Renderer::FrameContext* mFrameContext;
+		Ref<ResourceUploader> mResourceUploader;
+		Ref<MaterialProgramManager> mMaterialProgramManager;
+		CachePool<Ref<Window>, Ref<Renderer::RenderSurface>> mWindowRenderSurfaces;
+		std::vector<Ref<TextureResource>> mGeneratingMipMaps;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
