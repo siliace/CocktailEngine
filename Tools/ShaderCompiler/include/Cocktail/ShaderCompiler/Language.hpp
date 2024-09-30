@@ -1,0 +1,13 @@
+#ifndef COCKTAIL_TOOLS_SHADERCOMPILER_LANGUAGE_HPP
+#define COCKTAIL_TOOLS_SHADERCOMPILER_LANGUAGE_HPP
+
+namespace Ck::Tools::ShaderCompiler
+{
+	enum class Language
+	{
+		Glsl,
+		Hlsl,
+	};
+}
+
+#endif // COCKTAIL_TOOLS_SHADERCOMPILER_LANGUAGE_HPP
