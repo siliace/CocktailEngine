@@ -1,0 +1,85 @@
+#include <Cocktail/Graphic/Spatial/Transformable.hpp>
+
+namespace Ck
+{
+	void Transformable::Move(Vector3<float> offset)
+	{
+		Transformation transformation = GetLocalTransformation();
+
+		transformation.SetTranslation(transformation.GetTranslation() + offset);
+		mTransformationNode->SetLocalTransformation(transformation);
+	}
+
+	void Transformable::AttachTo(const Transformable& parent)
+	{
+		Ref<TransformationNode> transformationNode = parent.GetTransformationNode();
+		transformationNode->InsertChild(mTransformationNode);
+	}
+
+	Vector3<float> Transformable::GetRight() const
+	{
+		return mTransformationNode->GetRight();
+	}
+
+	Vector3<float> Transformable::GetUp() const
+	{
+		return mTransformationNode->GetUp();
+	}
+
+	Vector3<float> Transformable::GetFront() const
+	{
+		return mTransformationNode->GetFront();
+	}
+
+	Vector3<float> Transformable::GetPosition() const
+	{
+		return GetLocalTransformation().GetTranslation();
+	}
+
+	void Transformable::SetPosition(Vector3<float> position)
+	{
+		Transformation transformation = GetLocalTransformation();
+
+		transformation.SetTranslation(position);
+		mTransformationNode->SetLocalTransformation(transformation);
+	}
+
+	Quaternion<float> Transformable::GetRotation() const
+	{
+		return GetLocalTransformation().GetRotation();
+	}
+
+	void Transformable::SetRotation(Quaternion<float> rotation)
+	{
+		Transformation transformation = GetLocalTransformation();
+
+		transformation.SetRotation(rotation);
+		mTransformationNode->SetLocalTransformation(transformation);
+	}
+
+	const Transformation& Transformable::GetLocalTransformation() const
+	{
+		return mTransformationNode->GetLocalTransformation();
+	}
+
+	void Transformable::SetLocalTransformation(const Transformation& transformation)
+	{
+		mTransformationNode->SetLocalTransformation(transformation);
+	}
+
+	const Transformation& Transformable::GetWorldTransformation() const
+	{
+		return mTransformationNode->GetWorldTransformation();
+	}
+
+	Ref<TransformationNode> Transformable::GetTransformationNode() const
+	{
+		return mTransformationNode;
+	}
+
+	Transformable::Transformable(Ref<TransformationNode> transformationNode):
+		mTransformationNode(std::move(transformationNode))
+	{
+		assert(mTransformationNode);
+	}
+}

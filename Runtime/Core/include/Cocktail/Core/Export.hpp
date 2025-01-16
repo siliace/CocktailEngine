@@ -1,0 +1,12 @@
+#ifndef COCKTAIL_CORE_EXPORT_HPP
+#define COCKTAIL_CORE_EXPORT_HPP
+
+#include <Cocktail/Core/Cocktail.hpp>
+
+#ifdef COCKTAIL_CORE_BUILD
+	#define COCKTAIL_CORE_API COCKTAIL_EXPORT_API
+#else
+	#define COCKTAIL_CORE_API COCKTAIL_IMPORT_API
+#endif
+
+#endif // COCKTAIL_CORE_EXPORT_HPP
