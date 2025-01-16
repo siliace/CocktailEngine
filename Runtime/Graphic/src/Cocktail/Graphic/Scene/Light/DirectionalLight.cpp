@@ -1,0 +1,40 @@
+#include <Cocktail/Graphic/Scene/Scene.hpp>
+#include <Cocktail/Graphic/Scene/Light/DirectionalLight.hpp>
+
+namespace Ck
+{
+	Ref<DirectionalLight> DirectionalLight::Create(Ref<Scene> scene, LinearColor color, Vector3<float> direction)
+	{
+		Ref<DirectionalLight> light = DirectionalLight::New(color, direction);
+		scene->AddLight(light);
+
+		return light;
+	}
+
+	DirectionalLight::DirectionalLight(LinearColor color, Vector3<float> direction) :
+		mColor(color),
+		mDirection(direction)
+	{
+		/// Nothing
+	}
+
+	Intersection DirectionalLight::FrustumCull(const Frustum<float>& frustum) const
+	{
+		return Intersection::Inside;
+	}
+
+	Light::Type DirectionalLight::GetType() const
+	{
+		return Type::Directional;
+	}
+
+	LinearColor DirectionalLight::GetColor() const
+	{
+		return mColor;
+	}
+
+	Vector3<float> DirectionalLight::GetDirection() const
+	{
+		return mDirection;
+	}
+}
