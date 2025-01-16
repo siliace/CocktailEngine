@@ -1,0 +1,76 @@
+#ifndef COCKTAIL_GRAPHIC_SCENE_LIGHT_SPOTLIGHT_HPP
+#define COCKTAIL_GRAPHIC_SCENE_LIGHT_SPOTLIGHT_HPP
+
+#include <Cocktail/Graphic/Scene/Light/Light.hpp>
+#include <Cocktail/Graphic/Spatial/Transformable.hpp>
+
+#include <Cocktail/Core/Meta/Inherit.hpp>
+
+namespace Ck
+{
+	class Scene;
+
+	class SpotLight : public Inherit<SpotLight, Transformable, Light>
+	{
+	public:
+
+		/**
+		 * \brief
+		 * \param scene
+		 * \param color
+		 * \param direction
+		 * \param position
+		 * \param intensity
+		 * \return
+		 */
+		static Ref<SpotLight> Create(Ref<Scene> scene, LinearColor color, Vector3<float> direction, Vector3<float> position, float intensity = 100.f);
+
+		/**
+		 * \brief
+		 * \param transformationNode
+		 * \param color
+		 * \param direction
+		 * \param intensity
+		 */
+		SpotLight(Ref<TransformationNode> transformationNode, LinearColor color, Vector3<float> direction, float intensity = 100.f);
+
+		/**
+		 * \brief
+		 * \param frustum
+		 * \return
+		 */
+		Intersection FrustumCull(const Frustum<float>& frustum) const override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		Type GetType() const override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		LinearColor GetColor() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		float GetIntensity() const override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		Vector3<float> GetDirection() const;
+
+	private:
+
+		LinearColor mColor;
+		Vector3<float> mDirection;
+		float mIntensity;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_SCENE_LIGHT_SPOTLIGHT_HPP
