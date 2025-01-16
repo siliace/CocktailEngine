@@ -1,0 +1,38 @@
+{
+  "configurations": [
+    {
+      "name": "Sponza",
+      "type": "cppdbg",
+      "request": "launch",
+      "windows": {
+        "program": "${workspaceFolder}/Build/Samples/Sponza/Debug/cocktail-sample-sponza.exe"
+      },
+      "linux": {
+        "program": "${workspaceFolder}/Build/Samples/Sponza/cocktail-sample-sponza"
+      },
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Samples/Sponza",
+      "environment": [
+        {
+          "name": "COCKTAIL_VULKAN_DISABLED_EXTENSIONS",
+          "value": ""
+        }
+      ],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Activer l'impression en mode Pretty pour gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Définir la version désassemblage sur Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
