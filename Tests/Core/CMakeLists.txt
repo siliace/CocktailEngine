@@ -34,6 +34,12 @@ cocktail_source_directory(CORE_TEST_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/Signal/Observable.cpp
 )
 
+cocktail_source_directory(CORE_TEST_FILES    
+    FOLDER "System/Network/Address"
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/System/Network/Address/IpAddressV4.cpp
+)
+
 cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Utility"    
     SRC

@@ -24,6 +24,12 @@ namespace Ck::Detail::Win32
 	     */
 	    void DoRegister(Application* application) override;
 
+	    /**
+		 * \brief 
+		 * \param application 
+		 */
+		void DoBoot(Application* application) override;
+
     private:
 
         HINSTANCE mInstanceHandle;

@@ -11,8 +11,27 @@
 #include <Cocktail/Core/System/Window/Win32/WindowEventDispatcher.hpp>
 #include <Cocktail/Core/System/Window/Win32/WindowFactory.hpp>
 
+#include "Cocktail/Core/System/SystemError.hpp"
+
 namespace Ck::Detail::Win32
 {
+	class WsaService
+	{
+	public:
+
+		WsaService()
+		{
+			WSADATA data;
+			if (WSAStartup(MAKEWORD(1, 1), &data) != 0)
+				throw SystemError::GetLastError();
+		}
+
+		~WsaService()
+		{
+			WSACleanup();
+		}
+	};
+
 	WindowsServiceProvider::WindowsServiceProvider(Application* application) :
 		ServiceProvider(application)
 	{
@@ -45,5 +64,12 @@ namespace Ck::Detail::Win32
 		application->Singleton<Ck::WindowFactory>([&]() -> std::unique_ptr<Ck::WindowFactory> {
 			return std::make_unique<WindowFactory>(mInstanceHandle);
 		});
+
+		application->Singleton<WsaService>();
+	}
+
+	void WindowsServiceProvider::DoBoot(Application* application)
+	{
+		application->Resolve<WsaService>();
 	}
 }
