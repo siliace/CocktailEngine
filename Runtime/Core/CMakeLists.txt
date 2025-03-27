@@ -573,6 +573,55 @@ if (LINUX)
 endif ()
 
 cocktail_source_directory(CORE_FILES    
+    FOLDER "System/Network"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/Socket.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/SocketPoller.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/TcpClient.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/TcpServer.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/UdpSocket.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Socket.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/SocketAddress.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/SocketAddress.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/SocketHeader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/SocketPoller.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/TcpClient.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/TcpServer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/UdpSocket.cpp
+)
+
+if (WIN32)
+    cocktail_source_directory(CORE_FILES    
+        FOLDER "System/Network/Win32"
+        SRC
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Win32/SocketPollerImpl.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Win32/SocketPollerImpl.cpp
+    )
+endif ()
+
+if (LINUX)
+    cocktail_source_directory(CORE_FILES    
+        FOLDER "System/Network/Unix"
+        SRC
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Unix/SocketPollerImpl.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Unix/SocketPollerImpl.cpp
+    )
+endif ()
+
+cocktail_source_directory(CORE_FILES    
+    FOLDER "System/Network/Address"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/Address/IpAddress.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/Address/IpAddressV4.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Network/Address/IpAddressV6.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Address/IpAddress.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Address/IpAddressV4.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Network/Address/IpAddressV6.cpp
+)
+
+cocktail_source_directory(CORE_FILES    
     FOLDER "System/Window"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Window/Cursor.hpp
@@ -699,7 +748,7 @@ endif ()
 
 set (CORE_LINK_LIBRARIES stb_image stb_image_write tinyxml2::tinyxml2 cmrc::base)
 if (WIN32)
-    list (APPEND CORE_LINK_LIBRARIES winmm)
+    list (APPEND CORE_LINK_LIBRARIES winmm ws2_32)
 elseif (LINUX)
     find_package(X11 REQUIRED COMPONENTS Xrandr Xcursor)
     list (APPEND CORE_LINK_LIBRARIES dl pthread X11::X11 X11::Xrandr X11::Xcursor)

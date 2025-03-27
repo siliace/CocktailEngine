@@ -301,7 +301,15 @@ namespace Ck
 			std::basic_ostringstream<Char, Traits, Alloc> oss;
 			while (begin != end)
 			{
-				oss << *begin;
+				if constexpr (std::is_arithmetic_v<typename std::iterator_traits<It>::value_type>)
+				{
+					oss << std::to_string(*begin);
+				}
+				else
+				{
+					oss << *begin;
+				}
+
 				if (std::next(begin) != end)
 					oss << glue;
 
