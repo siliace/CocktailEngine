@@ -194,19 +194,6 @@ namespace Ck
 	{
 		return left = left ^ right;
 	}
-
-	template <typename T, typename U>
-	constexpr T UnionCast(const U& source)
-	{
-		union
-		{
-			U Source;
-			T Destination;
-		} utils;
-
-		utils.Source = source;
-		return utils.Destination;
-	}
 }
 
 #endif // COCKTAIL_CORE_COCKTAIL_HPP

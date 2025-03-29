@@ -9,7 +9,10 @@ namespace Ck
 
     IpAddressV4::IpAddressV4(Uint32 ipAddress)
     {
-        mBytes = UnionCast<std::array<Uint8, 4>>(ipAddress);
+        mBytes[0] = (ipAddress & 0xff000000) >> 24;
+        mBytes[1] = (ipAddress & 0x00ff0000) >> 16;
+        mBytes[2] = (ipAddress & 0x0000ff00) >> 8;
+        mBytes[3] = (ipAddress & 0x000000ff) >> 0;
     }
 
     IpAddressV4::IpAddressV4(Uint8 first, Uint8 second, Uint8 third, Uint8 forth) :
@@ -40,7 +43,7 @@ namespace Ck
 
     Uint32 IpAddressV4::ToInteger() const
     {
-        return UnionCast<Uint32>(mBytes);
+        return static_cast<std::uint32_t>((mBytes[0] << 24) | (mBytes[1] << 16) | (mBytes[2] << 8) | mBytes[3]);
     }
 
     IpAddressV4::Protocol IpAddressV4::GetProtocol() const
