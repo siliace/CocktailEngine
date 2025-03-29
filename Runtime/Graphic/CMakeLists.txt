@@ -346,6 +346,7 @@ cocktail_add_runtime_library(
     DEPENDS 
         Core 
         Renderer
+        Vulkan
     LINK 
         tinyobjloader 
         tinygltf

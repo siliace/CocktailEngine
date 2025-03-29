@@ -18,14 +18,10 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 * \param renderDevice
+		 * \param defaultChuckSize 
 		 */
-		static constexpr std::size_t DefaultChunkSize = 64 * 1024 * 1024;
-
-		/**
-		 * \brief 
-		 * \param renderDevice 
-		 */
-		DeviceMemoryAllocator(Ref<RenderDevice> renderDevice);
+		DeviceMemoryAllocator(Ref<RenderDevice> renderDevice, std::size_t defaultChuckSize);
 
 		/**
 		 * \brief 
@@ -107,7 +103,7 @@ namespace Ck::Vulkan
 
 				if (!block)
 				{
-					Ref<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, DefaultChunkSize), memoryTypeIndex);
+					Ref<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
 					mChunks.push_back(chunk);
 
 					block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
@@ -118,6 +114,7 @@ namespace Ck::Vulkan
 		}
 
 		Ref<RenderDevice> mRenderDevice;
+		std::size_t mDefaultChuckSize;
 		std::vector<Ref<DeviceMemoryChunk>> mChunks;
 		ObjectPool<DeviceMemoryChunk> mChunkPool;
 		ObjectPool<DeviceMemoryBlock> mBlockPool;

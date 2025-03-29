@@ -1,5 +1,4 @@
 #include <Cocktail/Core/Application/Application.hpp>
-#include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/System/Keyboard/Keyboard.hpp>
 #include <Cocktail/Core/System/Mouse/Mouse.hpp>
 #include <Cocktail/Core/System/Window/WindowFactory.hpp>
@@ -14,16 +13,11 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
-#include <Cocktail/Vulkan/Vulkan.hpp>
-
 using namespace Ck;
 
 Main::ExitCode ApplicationMain(Application* application)
 {
 	Extent2D windowSize = MakeExtent(800u, 600u);
-	Vulkan::ApiVersion vulkanVersion = Vulkan::GetSupportedApiVersion();
-	Log::Info("Starting sponza sampler using vulkan {}", Enum<Vulkan::ApiVersion>::ToString(vulkanVersion));
-
 	Ref<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
@@ -35,7 +29,7 @@ Main::ExitCode ApplicationMain(Application* application)
 		return windowFactory->CreateWindow(windowCreateInfo);
 	});
 
-	Ref<GraphicEngine> graphicEngine = GraphicEngine::New(*application, Renderer::GraphicApi::Vulkan);
+	Ref<GraphicEngine> graphicEngine = GraphicEngine::New(Renderer::GraphicApi::Vulkan);
 	Ref<Scene> scene = Scene::New(graphicEngine);
 
 	Ref<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {

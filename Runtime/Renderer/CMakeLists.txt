@@ -8,15 +8,10 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/GraphicApi.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDevice.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDeviceExtension.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDeviceFactory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDeviceObject.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Renderer.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RendererService.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RendererServiceProvider.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Format.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/RendererService.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/RendererServiceProvider.cpp
 )
 
 cocktail_source_directory(RENDERER_FILES    

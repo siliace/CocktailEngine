@@ -3,10 +3,11 @@
 #include <Cocktail/Graphic/Rendering/Engine/GraphicEngine.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/MipMapsTextureResource.hpp>
 
-#include <Cocktail/Renderer/RendererService.hpp>
 #include <Cocktail/Renderer/Context/RenderContext.hpp>
 #include <Cocktail/Renderer/Context/RenderContextCreateInfo.hpp>
 #include <Cocktail/Renderer/Texture/SamplerCreateInfo.hpp>
+
+#include <Cocktail/Vulkan/Vulkan.hpp>
 
 #ifdef NDEBUG
 static constexpr bool GraphicEngine_EnableDebug = false;
@@ -16,17 +17,37 @@ static constexpr bool GraphicEngine_EnableDebug = true;
 
 namespace Ck
 {
-	GraphicEngine::GraphicEngine(Application& application, Renderer::GraphicApi api) :
+	namespace
+	{
+		class RenderDeviceFactory
+		{
+		public:
+
+			static Ref<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
+			{
+				Vulkan::RenderDeviceCreateInfo createInfo;
+				createInfo.ApiVersion = Vulkan::GetSupportedApiVersion();
+				createInfo.EnableValidation = enableValidation;
+				return Vulkan::CreateRenderDevice(createInfo);
+			}
+		};
+	}
+
+	GraphicEngine::GraphicEngine(Renderer::GraphicApi api) :
 		mFrameContext(nullptr)
 	{
-		mRenderDevice = application.Invoke([&](Renderer::RendererService* rendererService) {
-			Ref<Renderer::RenderDevice> renderDevice = rendererService->CreateRenderDevice(api, GraphicEngine_EnableDebug);
+		switch (api)
+		{
+		case Renderer::GraphicApi::Vulkan:
+			mRenderDevice = RenderDeviceFactory::CreateVulkanRenderDevice(GraphicEngine_EnableDebug);
+			break;
 
-			Connect(renderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, std::string_view message) {
-				Log::Trace(logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
-			});
+		default:
+			assert(false);
+		}
 
-			return renderDevice;
+		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, std::string_view message) {
+			Log::Trace(logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
 		});
 
 		mRenderContext = mRenderDevice->CreateRenderContext({ 1, 3, "" });

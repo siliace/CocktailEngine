@@ -26,10 +26,9 @@ namespace Ck
 
 		/**
 	     * \brief 
-	     * \param application
 	     * \param api 
 	     */
-		GraphicEngine(Application& application, Renderer::GraphicApi api);
+		explicit GraphicEngine(Renderer::GraphicApi api);
 
 		/**
 		 * \brief Destructor

@@ -4,8 +4,9 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryAllocator::DeviceMemoryAllocator(Ref<RenderDevice> renderDevice) :
-		mRenderDevice(std::move(renderDevice))
+	DeviceMemoryAllocator::DeviceMemoryAllocator(Ref<RenderDevice> renderDevice, std::size_t defaultChuckSize) :
+		mRenderDevice(std::move(renderDevice)),
+		mDefaultChuckSize(defaultChuckSize)
 	{
 		/// Nothing
 	}

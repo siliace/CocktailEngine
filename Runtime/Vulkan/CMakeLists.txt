@@ -4,6 +4,7 @@ cocktail_source_directory(VULKAN_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/ApiVersion.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/Export.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/RenderDeviceCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/VersionDescriptor.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/Vulkan.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Vulkan/VulkanServiceProvider.hpp
@@ -12,7 +13,6 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/ExtensionManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/RenderDevice.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/RenderDevice.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/RenderDeviceCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Semaphore.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Semaphore.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/SemaphoreCreateInfo.hpp

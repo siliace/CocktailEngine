@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 #define COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 
+#include <string_view>
+
 #include <Cocktail/Vulkan/ApiVersion.hpp>
 #include <Cocktail/Vulkan/VersionDescriptor.hpp>
 
@@ -29,12 +31,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		unsigned int DeviceMemoryBlockSize = 1024 * 1024 * 256;
-
-		/**
-		 * \brief 
-		 */
-		unsigned int StagingBufferSize = 1024 * 1024 * 16;
+		unsigned int DeviceMemoryBlockSize = 1024 * 1024 * 16;
 
 		/**
 		 * \brief
