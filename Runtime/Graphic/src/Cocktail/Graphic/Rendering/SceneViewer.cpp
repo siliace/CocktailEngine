@@ -116,10 +116,12 @@ namespace Ck
 			for (Renderable* renderable : mScene->CollectRenderables())
 			{
 				Ref<Camera> camera = viewport->GetCamera();
-				renderable->AddToQueue(*mRenderQueue, *camera);
+				renderable->AddToQueue(*mOpaqueRenderQueue, *camera);
+				renderable->AddToQueue(*mBlendingRenderQueue, *camera);
 			}
 			
-			mRenderQueue->Flush(*commandList, drawContext);
+			mOpaqueRenderQueue->Flush(*commandList, drawContext);
+			mBlendingRenderQueue->Flush(*commandList, drawContext);
 		
 			commandList->EndRenderPass();
 		}
@@ -133,7 +135,8 @@ namespace Ck
 	SceneViewer::SceneViewer(Ref<Scene> scene) :
 		mScene(std::move(scene))
 	{
-		mRenderQueue = RenderQueue::New(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong);
+		mOpaqueRenderQueue = RenderQueue::New(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Opaque);
+		mBlendingRenderQueue = RenderQueue::New(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Transparent);
 	}
 
 	Ref<Scene> SceneViewer::GetScene() const

@@ -122,7 +122,8 @@ namespace Ck
 
 		Ref<Scene> mScene;
 		std::set<ViewportEntry, ViewportComparator> mViewports;
-		Ref<RenderQueue> mRenderQueue;
+		Ref<RenderQueue> mOpaqueRenderQueue;
+		Ref<RenderQueue> mBlendingRenderQueue;
 		Signal<Renderer::FrameContext&, Renderer::Framebuffer&> mOnRendered;
 	};
 }

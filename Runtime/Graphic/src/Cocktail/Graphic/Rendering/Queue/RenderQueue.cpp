@@ -6,8 +6,9 @@
 
 namespace Ck
 {
-	RenderQueue::RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode) :
-		mShadingMode(shadingMode)
+	RenderQueue::RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
+		mShadingMode(shadingMode),
+		mBlendingMode(blendingMode)
 	{
 		mMaterialProgramSet = MaterialProgramSet::New(materialProgramManager, mShadingMode);
 	}
@@ -19,6 +20,7 @@ namespace Ck
 
 	void RenderQueue::PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Uint64 sortingKey)
 	{
+		// Todo: move this outside of RenderQueue class
 		Flags<VertexAttributeSemantic> vertexAttributes;
 		for (unsigned int i = 0; i < recordInfo.VertexBufferCount; i++)
 		{
@@ -70,6 +72,11 @@ namespace Ck
 	void RenderQueue::Clear()
 	{
 		mRecords.clear();
+	}
+
+	RenderQueue::BlendingMode RenderQueue::GetBlendingMode() const
+	{
+		return mBlendingMode;
 	}
 
 	Material::ShadingMode RenderQueue::GetShadingMode() const

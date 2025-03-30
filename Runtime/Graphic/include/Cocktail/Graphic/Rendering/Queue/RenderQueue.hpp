@@ -17,12 +17,19 @@ namespace Ck
 	{
 	public:
 
+		enum class BlendingMode
+		{
+			Opaque,
+			Transparent,
+			Ignore,
+		};
+
 		/**
 		 * \brief 
 		 * \param materialProgramManager 
 		 * \param shadingMode 
 		 */
-		RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode);
+		RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode = BlendingMode::Ignore);
 
 		/**
 		 * \brief 
@@ -52,6 +59,12 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
+		BlendingMode GetBlendingMode() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
 		Material::ShadingMode GetShadingMode() const;
 
 	private:
@@ -65,6 +78,7 @@ namespace Ck
 		void Emplace(Ref<RenderRecord> record, Uint64 sortingKey);
 
 		Material::ShadingMode mShadingMode;
+		BlendingMode mBlendingMode;
 		Ref<MaterialProgramSet> mMaterialProgramSet;
 		std::vector<RecordInfo> mRecords;
 	};
