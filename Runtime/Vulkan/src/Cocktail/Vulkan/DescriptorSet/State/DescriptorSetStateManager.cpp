@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 	bool DescriptorSetStateManager::BindTextureSampler(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
 	{
 		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillImageState(state, Renderer::DescriptorType::TextureSampler, textureView, sampler);
+ 		bool dirty = FillImageState(state, Renderer::DescriptorType::TextureSampler, textureView, sampler);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);

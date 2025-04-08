@@ -1076,8 +1076,7 @@ namespace Ck::Vulkan
 
 	void CommandList::Reset(bool releaseResources)
 	{
-		if (!mAllocator->IsCommandListResetable())
-			throw std::runtime_error("CommandList is not resetable");
+		assert(mAllocator->IsCommandListResetable());
 
 		vkResetCommandBuffer(mHandle, releaseResources ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0);
 

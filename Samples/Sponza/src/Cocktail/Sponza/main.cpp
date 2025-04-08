@@ -1,3 +1,4 @@
+#include <cmrc/cmrc.hpp>
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/System/Keyboard/Keyboard.hpp>
 #include <Cocktail/Core/System/Mouse/Mouse.hpp>
@@ -13,10 +14,19 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
+#include "ImGuiOverlay.hpp"
+#include "Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp"
+
 using namespace Ck;
+
+CMRC_DECLARE(sponza);
 
 Main::ExitCode ApplicationMain(Application* application)
 {
+	application->Invoke([](EmbeddedFileSystemDriver* embeddedDriver) {
+		embeddedDriver->Register(cmrc::sponza::get_filesystem());
+	});
+
 	Extent2D windowSize = MakeExtent(800u, 600u);
 	Ref<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
@@ -96,6 +106,8 @@ Main::ExitCode ApplicationMain(Application* application)
 	Ref<Viewport> viewport = Viewport::New(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
 	viewer->AttachViewport(viewport, 0);
 
+	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());
+
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
 		windowSize = event.Size;
@@ -109,6 +121,7 @@ Main::ExitCode ApplicationMain(Application* application)
 		Duration frameBegin = application->Uptime();
 
 		cameraController->Update(Duration::Between(lastFrameBegin, frameBegin));
+		overlay.Update();
 
 		viewer->Render();
 
