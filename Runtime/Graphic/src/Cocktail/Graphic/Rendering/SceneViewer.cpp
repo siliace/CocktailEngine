@@ -126,10 +126,10 @@ namespace Ck
 			commandList->EndRenderPass();
 		}
 		commandList->End();
-
-		mOnRendered.Emit(*frameContext, *framebuffer);
 		
 		graphicEngine->GetRenderContext()->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
+
+		mOnRendered.Emit(*graphicEngine->GetRenderContext(), *frameContext, *framebuffer);
 	}
 
 	SceneViewer::SceneViewer(Ref<Scene> scene) :
@@ -144,7 +144,7 @@ namespace Ck
 		return mScene;
 	}
 
-	Signal<Renderer::FrameContext&, Renderer::Framebuffer&>& SceneViewer::OnRendered()
+	Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&>& SceneViewer::OnRendered()
 	{
 		return mOnRendered;
 	}

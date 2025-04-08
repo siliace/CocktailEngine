@@ -10,7 +10,7 @@ namespace Ck::Vulkan
 		mUsage(usage),
 		mBufferSize(bufferSize),
 		mMemoryType(memoryType),
-		mMinAlignment(0)
+		mMinAlignment(4)
 	{
 		if (mUsage & Renderer::BufferUsageFlagBits::Storage | Renderer::BufferUsageFlagBits::Uniform)
 		{

@@ -15,12 +15,12 @@ namespace Ck::Vulkan
 				attachmentDescription.format = ToVkType(format);
 				attachmentDescription.samples = ToVkType(samples);
 				attachmentDescription.loadOp = loadOp;
-				attachmentDescription.storeOp = isMultisample ? VK_ATTACHMENT_STORE_OP_DONT_CARE : VK_ATTACHMENT_STORE_OP_STORE;
+				attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
 				if (format.IsStencil() || format.IsDepthStencil())
 				{
 					attachmentDescription.stencilLoadOp = isMultisample ? VK_ATTACHMENT_LOAD_OP_DONT_CARE : loadOp;
-					attachmentDescription.stencilStoreOp = isMultisample ? VK_ATTACHMENT_STORE_OP_DONT_CARE : VK_ATTACHMENT_STORE_OP_STORE;
+					attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 				}
 				else
 				{

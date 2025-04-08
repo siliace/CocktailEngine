@@ -9,6 +9,7 @@
 #include <Cocktail/Graphic/Rendering/Viewport.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
 
+#include <Cocktail/Renderer/Context/RenderContext.hpp>
 #include <Cocktail/Renderer/Context/RenderSurface.hpp>
 
 namespace Ck
@@ -71,7 +72,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Signal<Renderer::FrameContext&, Renderer::Framebuffer&>& OnRendered();
+		Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&>& OnRendered();
 
 	protected:
 
@@ -124,7 +125,7 @@ namespace Ck
 		std::set<ViewportEntry, ViewportComparator> mViewports;
 		Ref<RenderQueue> mOpaqueRenderQueue;
 		Ref<RenderQueue> mBlendingRenderQueue;
-		Signal<Renderer::FrameContext&, Renderer::Framebuffer&> mOnRendered;
+		Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&> mOnRendered;
 	};
 }
 
