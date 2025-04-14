@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 	{
 		bool Enable = false;
 		unsigned int AttributeCount = 0;
-		Renderer::VertexInputAttribute Attributes[MaxInputBindings] = {};
+		Renderer::VertexInputAttribute Attributes[MaxVertexAttributes] = {};
 		unsigned int Stride = 0;
 		bool Instanced = false;
 		unsigned int Divisor = 0;

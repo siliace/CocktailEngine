@@ -6,70 +6,148 @@ namespace Ck::Vulkan
 {
 	namespace
 	{
-		uint32_t MurmurHash(const void* key, uint32_t len, uint32_t seed)
+		std::size_t HashShaderStageState(const ShaderStageState& state)
 		{
-			uint32_t c1 = 0xcc9e2d51;
-			uint32_t c2 = 0x1b873593;
-			uint32_t r1 = 15;
-			uint32_t r2 = 13;
-			uint32_t m = 5;
-			uint32_t n = 0xe6546b64;
-			uint32_t h = 0;
-			uint32_t k = 0;
-			uint8_t* d = (uint8_t*)key; // 32 bit extract from `key'
-			const uint32_t* chunks = NULL;
-			const uint8_t* tail = NULL; // tail - last 8 bytes
-			int i = 0;
-			int l = len / 4; // chunk length
+			std::size_t hash = 0;
+			HashCombine(hash, static_cast<void*>(state.Shader->GetHandle()));
 
-			h = seed;
+			std::string_view entryPoint(state.EntryPoint);
+			HashCombine(hash, entryPoint);
 
-			chunks = (const uint32_t*)(d + l * 4); // body
-			tail = (const uint8_t*)(d + l * 4); // last 8 byte chunk of `key'
+			return hash;
+		}
 
-			// for each 4 byte chunk of `key'
-			for (i = -l; i != 0; ++i)
+		PipelineStateHash HashComputeState(const ComputeState& computeState)
+		{
+			PipelineStateHash hash = 0;
+			HashMerge(hash, HashShaderStageState(computeState.ComputeStageState));
+
+			return hash;
+		}
+
+		PipelineStateHash HashGraphicState(const GraphicState& graphicState)
+		{
+			PipelineStateHash hash = 0;
+
 			{
-				// next 4 byte chunk of `key'
-				k = chunks[i];
+				for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
+				{
+					if (graphicState.ShaderStages[shaderType].Shader == nullptr)
+						continue;
 
-				// encode next 4 byte chunk of `key'
-				k *= c1;
-				k = (k << r1) | (k >> (32 - r1));
-				k *= c2;
-
-				// append to hash
-				h ^= k;
-				h = (h << r2) | (h >> (32 - r2));
-				h = h * m + n;
+					HashMerge(hash, HashShaderStageState(graphicState.ShaderStages[shaderType]));
+				}
 			}
 
-			k = 0;
-
-			// remainder
-			switch (len & 3)
+			// VertexInputState
 			{
-			// `len % 4'
-			case 3: k ^= (tail[2] << 16);
-			case 2: k ^= (tail[1] << 8);
+				for (unsigned int i = 0; i < MaxInputBindings; i++)
+				{
+					if (!graphicState.VertexInput.Bindings[i].Enable)
+						continue;
 
-			case 1:
-				k ^= tail[0];
-				k *= c1;
-				k = (k << r1) | (k >> (32 - r1));
-				k *= c2;
-				h ^= k;
+					HashCombine(hash, graphicState.VertexInput.Bindings[i].AttributeCount);
+					for (unsigned int j = 0; j < MaxVertexAttributes; j++)
+					{
+						HashCombine(hash, graphicState.VertexInput.Bindings[i].Attributes[j].Location);
+						HashCombine(hash, ToVkType(graphicState.VertexInput.Bindings[i].Attributes[j].Format));
+						HashCombine(hash, graphicState.VertexInput.Bindings[i].Attributes[j].Offset);
+					}
+
+					HashCombine(hash, graphicState.VertexInput.Bindings[i].Stride);
+					HashCombine(hash, graphicState.VertexInput.Bindings[i].Instanced);
+					HashCombine(hash, graphicState.VertexInput.Bindings[i].Divisor);
+				}
 			}
 
-			h ^= len;
+			// InputAssemblyState
+			{
+				HashCombine(hash, graphicState.InputAssembly.PrimitiveTopology);
+				HashCombine(hash, graphicState.InputAssembly.PrimitiveRestartEnable);
+			}
 
-			h ^= (h >> 16);
-			h *= 0x85ebca6b;
-			h ^= (h >> 13);
-			h *= 0xc2b2ae35;
-			h ^= (h >> 16);
+			// ViewportState
+			{
+				HashCombine(hash, graphicState.Viewport.ViewportCount);
+				for (unsigned int i = 0; i < graphicState.Viewport.ViewportCount; i++)
+				{
+					HashCombine(hash, graphicState.Viewport.Viewports[i].X);
+					HashCombine(hash, graphicState.Viewport.Viewports[i].Y);
+					HashCombine(hash, graphicState.Viewport.Viewports[i].Width);
+					HashCombine(hash, graphicState.Viewport.Viewports[i].Height);
+					HashCombine(hash, graphicState.Viewport.Viewports[i].MinDepth);
+					HashCombine(hash, graphicState.Viewport.Viewports[i].MaxDepth);
+				}
 
-			return h;
+				HashCombine(hash, graphicState.Viewport.ScissorCount);
+				for (unsigned int i = 0; i < graphicState.Viewport.ScissorCount; i++)
+				{
+					HashCombine(hash, graphicState.Viewport.Scissors[i].Position.Width);
+					HashCombine(hash, graphicState.Viewport.Scissors[i].Position.Width);
+					HashCombine(hash, graphicState.Viewport.Scissors[i].Size.Width);
+					HashCombine(hash, graphicState.Viewport.Scissors[i].Size.Height);
+				}
+			}
+
+			// RasterizationState
+			{
+				HashCombine(hash, graphicState.Rasterization.RasterizerDiscardEnable);
+				HashCombine(hash, graphicState.Rasterization.PolygonMode);
+				HashCombine(hash, graphicState.Rasterization.CullMode);
+				HashCombine(hash, graphicState.Rasterization.FrontFace);
+				HashCombine(hash, graphicState.Rasterization.DepthBiasEnable);
+				HashCombine(hash, graphicState.Rasterization.DepthBiasConstantFactor);
+				HashCombine(hash, graphicState.Rasterization.DepthBiasClamp);
+				HashCombine(hash, graphicState.Rasterization.DepthBiasSlopeFactor);
+				HashCombine(hash, graphicState.Rasterization.LineWidth);
+			}
+
+			// MultisampleState
+			{
+				HashCombine(hash, graphicState.Multisample.Samples);
+				HashCombine(hash, graphicState.Multisample.SampleShadingEnable);
+				HashCombine(hash, graphicState.Multisample.MinSampleShading);
+				HashCombine(hash, graphicState.Multisample.AlphaToCoverageEnable);
+				HashCombine(hash, graphicState.Multisample.AlphaToOneEnable);
+			}
+
+			// DepthStencilState
+			{
+				HashCombine(hash, graphicState.DepthStencil.DepthTestEnable);
+				HashCombine(hash, graphicState.DepthStencil.DepthWriteEnable);
+				HashCombine(hash, graphicState.DepthStencil.DepthCompareOp);
+				HashCombine(hash, graphicState.DepthStencil.DepthBoundsTestEnable);
+				HashCombine(hash, graphicState.DepthStencil.MinDepthBounds);
+				HashCombine(hash, graphicState.DepthStencil.MaxDepthBounds);
+			}
+
+			// ColorBlendState
+			{
+				HashCombine(hash, graphicState.ColorBlend.LogicOpEnable);
+				HashCombine(hash, graphicState.ColorBlend.LogicOp);
+				HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachmentCount);
+				for (unsigned int i = 0; i < graphicState.ColorBlend.ColorBlendAttachmentCount; i++)
+				{
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].BlendEnable);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].SourceColorBlendFactor);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].DestinationColorBlendFactor);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].ColorBlendOp);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].SourceAlphaBlendFactor);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].DestinationAlphaBlendFactor);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].AlphaBlendOp);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].ColorWriteMask[0]);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].ColorWriteMask[1]);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].ColorWriteMask[2]);
+					HashCombine(hash, graphicState.ColorBlend.ColorBlendAttachments[i].ColorWriteMask[3]);
+				}
+
+				HashCombine(hash, graphicState.ColorBlend.BlendConstants.R);
+				HashCombine(hash, graphicState.ColorBlend.BlendConstants.G);
+				HashCombine(hash, graphicState.ColorBlend.BlendConstants.B);
+				HashCombine(hash, graphicState.ColorBlend.BlendConstants.A);
+			}
+
+			return hash;
 		}
 	}
 
@@ -97,7 +175,7 @@ namespace Ck::Vulkan
 
 	Ref<ComputePipeline> PipelineCache::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 	{
-		PipelineStateHash stateHash = MurmurHash(&createInfo.ComputeState, sizeof(ComputeState), sizeof(ComputeState));
+		PipelineStateHash stateHash = HashComputeState(createInfo.ComputeState);
 		if (auto it = mCache.find(stateHash); it != mCache.end())
 			return ComputePipeline::Cast(it->second);
 
@@ -109,7 +187,7 @@ namespace Ck::Vulkan
 
 	Ref<GraphicPipeline> PipelineCache::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
 	{
-		PipelineStateHash stateHash = MurmurHash(&createInfo.GraphicState, sizeof(GraphicState), sizeof(GraphicState));
+		PipelineStateHash stateHash = HashGraphicState(createInfo.GraphicState);
 		if (auto it = mCache.find(stateHash); it != mCache.end())
 			return GraphicPipeline::Cast(it->second);
 
