@@ -24,6 +24,11 @@ namespace Ck
 		}
 	}
 
+	const Ref<Mesh>& Shape::GetMesh() const
+	{
+		return mMesh;
+	}
+
 	const Ref<VertexBuffer>& Shape::GetVertexBuffer() const
 	{
 		return mVertexBuffer;
@@ -118,30 +123,6 @@ namespace Ck
 				}
 			}
 		}
-	}
-
-	Box<float> SceneNode::ComputeBoundingBox() const
-	{
-		Vector3<float> min(std::numeric_limits<float>::max()), max(std::numeric_limits<float>::min());
-		for (Ref<Shape> shape : mShapes)
-		{
-			Ref<VertexArray> vertices = shape->GetVertexBuffer()->GetVertexArray();
-			for (std::size_t i = 0; i < vertices->GetVertexCount(); i++)
-			{
-				VertexRef vertex = vertices->At(i);
-				const float* position = static_cast<const float*>(vertex.Get(VertexAttributeSemantic::Position));
-
-				min.X() = std::min(min.X(), position[0]); max.X() = std::max(max.X(), position[0]);
-				min.Y() = std::min(min.Y(), position[1]); max.Y() = std::max(max.Y(), position[1]);
-				min.Z() = std::min(min.Z(), position[2]); max.Z() = std::max(max.Z(), position[2]);
-			}
-		}
-
-		const Transformation& worldTransformation = GetWorldTransformation();
-		Vector3<float> worldMin = worldTransformation.Apply(min);
-		Vector3<float> worldMax = worldTransformation.Apply(max);
-
-		return Box<float>::WithMinMax(worldMin, worldMax);
 	}
 
 	bool SceneNode::IsVisible() const

@@ -50,6 +50,11 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 */
+		Rectangle() = default;
+
+		/**
+		 * \brief 
 		 * \param position 
 		 * \param extent 
 		 */

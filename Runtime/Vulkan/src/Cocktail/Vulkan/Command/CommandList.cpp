@@ -957,7 +957,7 @@ namespace Ck::Vulkan
 
 	void CommandList::SetCullMode(Renderer::CullMode cullMode)
 	{
-		GetGraphicStateManager()->SetCullMode(cullMode);
+			GetGraphicStateManager()->SetCullMode(cullMode);
 	}
 
 	void CommandList::SetFrontFace(Renderer::FrontFace frontFace)

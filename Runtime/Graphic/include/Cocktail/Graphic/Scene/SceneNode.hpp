@@ -47,6 +47,8 @@ namespace Ck
 
 		Shape(GraphicEngine& graphicEngine, Ref<Mesh> mesh, const std::vector<Ref<Material>>& materials);
 
+		const Ref<Mesh>& GetMesh() const;
+
 		const Ref<VertexBuffer>& GetVertexBuffer() const;
 
 		const Ref<IndexBuffer>& GetIndexBuffer() const;
@@ -82,15 +84,10 @@ namespace Ck
 
 		/**
 		 * \brief
-		 * \param queue 
+		 * \param queue
+		 * \param camera 
 		 */
 		void AddToQueue(RenderQueue& queue, const Camera& camera) override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Box<float> ComputeBoundingBox() const;
 
 		/**
 		 * \brief

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20.5)
 project(CocktailEngine)
 
 if(MSVC)
-    add_definitions(/MP)
+	add_definitions(/MP)
 endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
