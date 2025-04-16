@@ -59,7 +59,14 @@ namespace Ck
 	template <typename T>
 	bool operator==(const Extent2D<T>& lhs, const Extent2D<T>& rhs)
 	{
-		return lhs.Width == rhs.Width && lhs.Height != rhs.Height;
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return NearlyEqual(lhs.Width, rhs.Width) && NearlyEqual(lhs.Height, rhs.Height);
+		}
+		else
+		{
+			return lhs.Width == rhs.Width && lhs.Height == rhs.Height;
+		}
 	}
 
 	/**
