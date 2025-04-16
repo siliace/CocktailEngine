@@ -42,6 +42,17 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 * \return 
+		 */
+		static VectorType Infinite()
+		{
+			return VectorType(
+				std::numeric_limits<float>::max()
+			);
+		}
+
+		/**
+		 * \brief 
 		 * \param value 
 		 * \return 
 		 */
@@ -88,14 +99,18 @@ namespace Ck
 		}
 		
 		/**
-		 * \brief Compute the distance between two points
+		 * \brief Compute the squared distance between two points
 		 * \param lhs 
 		 * \param rhs 
 		 * \return 
 		 */
 		static T SquaredDistanceBetween(const Vector<TVector, T, S>& lhs, const Vector<TVector, T, S>& rhs)
 		{
-			return (lhs - rhs).GetSquaredLength();
+			VectorType difference;
+			for (std::size_t i = 0; i < S; i++)
+				difference.At(i) = AbsoluteDifference(lhs.At(i), rhs.At(i));
+
+			return difference.GetSquaredLength();
 		}
 		
 		/**
@@ -107,6 +122,36 @@ namespace Ck
 		static T DistanceBetween(const Vector<TVector, T, S>& lhs, const Vector<TVector, T, S>& rhs)
 		{
 			return std::sqrt(SquaredDistanceBetween(lhs, rhs));
+		}
+
+		/**
+		 * \brief 
+		 * \param lhs 
+		 * \param rhs 
+		 * \return 
+		 */
+		static TVector<T> Min(const Vector<TVector, T, S>& lhs, const Vector<TVector, T, S>& rhs)
+		{
+			TVector<T> result;
+			for (std::size_t i = 0; i < S; i++)
+				result.At(i) = std::min(lhs.At(i), rhs.At(i));
+
+			return result;
+		}
+
+		/**
+		 * \brief 
+		 * \param lhs 
+		 * \param rhs 
+		 * \return 
+		 */
+		static TVector<T> Max(const Vector<TVector, T, S>& lhs, const Vector<TVector, T, S>& rhs)
+		{
+			TVector<T> result;
+			for (std::size_t i = 0; i < S; i++)
+				result.At(i) = std::max(lhs.At(i), rhs.At(i));
+
+			return result;
 		}
 
 		/**

@@ -21,6 +21,14 @@ cocktail_source_directory(CORE_TEST_FILES
 )
 
 cocktail_source_directory(CORE_TEST_FILES
+    FOLDER "Math/Volume"    
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Math/Volume/Box.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Math/Volume/Cylinder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Math/Volume/Sphere.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Memory"    
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Memory/Ref.cpp

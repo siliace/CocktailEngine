@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include <Cocktail/Core/Meta/Extends.hpp>
+#include <Cocktail/Core/Math/Volume/Box.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
 
@@ -100,12 +101,24 @@ namespace Ck
 		 */
 		const std::unordered_set<unsigned int>& GetMaterialIndices() const;
 
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Box<float> GetBoundingBox() const;
+
 	private:
+
+		/**
+		 * \brief 
+		 */
+		void GenerateBoundingBox();
 
 		Ref<VertexArray> mVertices;
 		Ref<IndexArray> mIndices;
 		std::vector<SubMesh> mSubMeshes;
 		std::unordered_set<unsigned int> mMaterialIndices;
+		Box<float> mBoundingBox;
 	};
 }
 
