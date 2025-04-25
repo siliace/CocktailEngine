@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_EXTENT2D_HPP
 #define COCKTAIL_CORE_EXTENT2D_HPP
 
+#include <type_traits>
+
 namespace Ck
 {
 	/**

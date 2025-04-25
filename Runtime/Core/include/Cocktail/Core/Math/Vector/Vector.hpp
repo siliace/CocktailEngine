@@ -484,6 +484,24 @@ namespace Ck
 
 		return result;
 	}
+
+	/**
+	 * \brief
+	 * \tparam TVector
+	 * \tparam T
+	 * \tparam S
+	 * \param lhs
+	 * \param rhs
+	 * \return
+	 */
+	template <template <class> class TVector, typename T, std::size_t S>
+	TVector<T>& operator/=(Vector<TVector, T, S>& lhs, T rhs)
+	{
+		for (std::size_t i = 0; i < S; i++)
+			lhs.At(i) = lhs.At(i) / rhs;
+
+		return static_cast<TVector<T>&>(lhs);
+	}
 }
 
 #endif // COCKTAIL_CORE_MATH_VECTOR_VECTOR_HPP

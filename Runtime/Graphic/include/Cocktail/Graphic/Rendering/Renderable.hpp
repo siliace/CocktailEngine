@@ -21,6 +21,12 @@ namespace Ck
 		 * \param camera
 		 */
 		virtual void AddToQueue(RenderQueue& queue, const Camera& camera) = 0;
+
+		/**
+		 * \brief Get the volume encompassing every point of the object
+		 * \return The bounding volume
+		 */
+		virtual const Volume<float>& GetBoundingVolume() const = 0;
 	};
 }
 

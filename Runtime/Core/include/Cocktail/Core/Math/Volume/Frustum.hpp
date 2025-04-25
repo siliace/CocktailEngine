@@ -2,87 +2,60 @@
 #define COCKTAIL_CORE_MATH_VOLUME_FRUSTUM_HPP
 
 #include <Cocktail/Core/Math/Angle.hpp>
-#include <Cocktail/Core/Math/BoxCorner.hpp>
 #include <Cocktail/Core/Math/Plane.hpp>
 #include <Cocktail/Core/Math/Vector/Vector2.hpp>
 #include <Cocktail/Core/Math/Vector/Vector3.hpp>
+#include <Cocktail/Core/Math/Volume/Volume.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 namespace Ck
 {
 	/**
 	 * \brief
-	 */
-	enum class FrustumPlane
-	{
-		Bottom,
-		Far,
-		Left,
-		Near,
-		Right,
-		Top,
-	};
-
-	/**
-	 * \brief
 	 * \tparam T
 	 */
 	template <typename T>
-	class Frustum
+	class Frustum : public Volume<T>
 	{
 	public:
 
-		/**
-		 * \brief
-		 * \param angle
-		 * \param ratio
-		 * \param zBounds
-		 * \param eye
-		 * \param target
-		 * \param up
-		 * \return
-		 */
-		static Frustum Perspective(const Angle<T>& angle, T ratio, const Vector2<T>& zBounds, const Vector3<T>& eye, const Vector3<T>& target, const Vector3<T>& up = Vector3<T>::Up())
+		enum class Face
 		{
-			Angle<T> halfAngle = angle / T(2.0);
+			Near,
+			Far,
+			Right,
+			Left,
+			Top,
+			Bottom,
+		};
 
-			T tangent = std::tan(halfAngle);
+		/**
+		 * \brief Create a frustum from perspective parameter
+		 * \param angle The horizontal field of view opening angle
+		 * \param ratio The aspect ratio
+		 * \param zBounds The distance to the near and far planes from the \p eye
+		 * \param position The position of the eye
+		 * \param front The front vector
+		 * \param right The right vector
+		 * \param up The up vector
+		 * \return The created frustum
+		 */
+		static Frustum Perspective(const Angle<T>& angle, T ratio, const Vector2<T>& zBounds, const Vector3<T>& position, const Vector3<T>& front, const Vector3<T>& right, const Vector3<T>& up = Vector3<T>::Up())
+		{
+			Frustum<T> frustum;
+			T zNear = zBounds.X();
+			T zFar = zBounds.Y();
 
-			T nearH = zBounds.X() * tangent;
-			T nearW = nearH * ratio;
+			T halfVSide = zFar * std::tan(angle / 2.f);
+			T halfHSide = halfVSide * ratio;
+			Vector3<T> targetToFar = zFar * front;
 
-			T farH = zBounds.Y() * tangent;
-			T farW = farH * ratio;
-
-			Vector3<T> forward = Vector3<T>::Normalize(target - eye);
-			Vector3<T> normalizedUp = Vector3<T>::Normalize(up);
-			Vector3<T> side = Vector3<T>::Normalize(Vector3<T>::CrossProduct(forward, normalizedUp));
-			normalizedUp = Vector3<T>::CrossProduct(side, forward);
-
-			Vector3<T> nc = eye + forward * zBounds.X();
-			Vector3<T> fc = eye + forward * zBounds.Y();
-
-			// Computing the frustum
-			EnumMap<BoxCorner, Vector3<T>> corners;
-			corners[BoxCorner::FarLeftBottom] = fc - normalizedUp * farH - side * farW;
-			corners[BoxCorner::FarLeftTop] = fc + normalizedUp * farH - side * farW;
-			corners[BoxCorner::FarRightTop] = fc + normalizedUp * farH + side * farW;
-			corners[BoxCorner::FarRightBottom] = fc - normalizedUp * farH + side * farW;
-
-			corners[BoxCorner::NearLeftBottom] = nc - normalizedUp * nearH - side * nearW;
-			corners[BoxCorner::NearLeftTop] = nc + normalizedUp * nearH - side * nearW;
-			corners[BoxCorner::NearRightTop] = nc + normalizedUp * nearH + side * nearW;
-			corners[BoxCorner::NearRightBottom] = nc - normalizedUp * nearH + side * nearW;
-
-			// Construction of frustum's planes
-
-			Frustum frustum;
-			frustum.Planes[FrustumPlane::Bottom] = Plane(corners[BoxCorner::NearLeftBottom], corners[BoxCorner::NearRightBottom], corners[BoxCorner::FarRightBottom]);
-			frustum.Planes[FrustumPlane::Far] = Plane(corners[BoxCorner::FarRightTop], corners[BoxCorner::FarLeftTop], corners[BoxCorner::FarLeftBottom]);
-			frustum.Planes[FrustumPlane::Left] = Plane(corners[BoxCorner::NearLeftTop], corners[BoxCorner::NearLeftBottom], corners[BoxCorner::FarLeftBottom]);
-			frustum.Planes[FrustumPlane::Near] = Plane(corners[BoxCorner::NearLeftTop], corners[BoxCorner::NearRightTop], corners[BoxCorner::NearRightBottom]);
-			frustum.Planes[FrustumPlane::Right] = Plane(corners[BoxCorner::NearRightBottom], corners[BoxCorner::NearRightTop], corners[BoxCorner::FarRightBottom]);
-			frustum.Planes[FrustumPlane::Top] = Plane(corners[BoxCorner::NearRightTop], corners[BoxCorner::NearLeftTop], corners[BoxCorner::FarLeftTop]);
+			frustum.mPlanes[Face::Near] = Plane<T>(position + zNear * front, front);
+			frustum.mPlanes[Face::Far] = Plane<T>(position + targetToFar, -front);
+			frustum.mPlanes[Face::Right] = Plane<T>(position, Vector3<T>::CrossProduct(targetToFar - right * halfHSide, up));
+			frustum.mPlanes[Face::Left] = Plane<T>(position, Vector3<T>::CrossProduct(up, targetToFar + right * halfHSide));
+			frustum.mPlanes[Face::Top] = Plane<T>(position, Vector3<T>::CrossProduct(right, targetToFar - up * halfVSide));
+			frustum.mPlanes[Face::Bottom] = Plane<T>(position, Vector3<T>::CrossProduct(targetToFar + up * halfVSide, right));
 
 			return frustum;
 		}
@@ -94,28 +67,117 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param planes 
+		 * \return 
 		 */
-		explicit Frustum(const EnumMap<FrustumPlane, Plane<T>>& planes) :
-			Planes(planes)
+		bool IsNull() const override
 		{
-			/// Nothing
+			return false;
 		}
 
 		/**
 		 * \brief 
-		 * \param other 
+		 * \param point 
+		 * \return 
 		 */
-		Frustum(const Frustum& other) = default;
+		bool Extend(Vector3<T> point) override
+		{
+			return false;
+		}
+
+		/**
+		 * \brief
+		 * \param vertex
+		 * \return
+		 */
+		bool Contains(const Vector3<T>& vertex) const override
+		{
+			for (Face face : Enum<Face>::Values)
+			{
+				if (mPlanes[face].DistanceTo(vertex) < 0.f)
+					return false;
+			}
+
+			return true;
+		}
 
 		/**
 		 * \brief 
-		 * \param other 
 		 * \return 
 		 */
-		Frustum& operator=(const Frustum& other) = default;
+		std::size_t GetVertexCount() const override
+		{
+			return 8;
+		}
 
-		EnumMap<FrustumPlane, Plane<T>> Planes;
+		/**
+		 * \brief 
+		 * \param index 
+		 * \return 
+		 */
+		Vector3<T> GetVertex(std::size_t index) const override
+		{
+			Optional<Vector3<T>> point;
+			switch (index)
+			{
+			case 0:
+				point = Plane<T>::Intersect(mPlanes[Face::Near], mPlanes[Face::Bottom], mPlanes[Face::Left]);
+				break;
+
+			case 1:
+				point = Plane<T>::Intersect(mPlanes[Face::Near], mPlanes[Face::Bottom], mPlanes[Face::Right]);
+				break;
+
+			case 2:
+				point = Plane<T>::Intersect(mPlanes[Face::Near], mPlanes[Face::Top], mPlanes[Face::Left]);
+				break;
+
+			case 3:
+				point = Plane<T>::Intersect(mPlanes[Face::Near], mPlanes[Face::Top], mPlanes[Face::Right]);
+				break;
+
+			case 4:
+				point = Plane<T>::Intersect(mPlanes[Face::Far], mPlanes[Face::Bottom], mPlanes[Face::Left]);
+				break;
+
+			case 5:
+				point = Plane<T>::Intersect(mPlanes[Face::Far], mPlanes[Face::Bottom], mPlanes[Face::Right]);
+				break;
+
+			case 6:
+				point = Plane<T>::Intersect(mPlanes[Face::Far], mPlanes[Face::Top], mPlanes[Face::Left]);
+				break;
+
+			case 7:
+				point = Plane<T>::Intersect(mPlanes[Face::Far], mPlanes[Face::Top], mPlanes[Face::Right]);
+				break;
+			}
+
+			assert(!point.IsEmpty());
+			return point.Get();
+		}
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Vector3<T> GetCenter() const override
+		{
+			return Vector3<float>::Zero();
+		}
+
+		/**
+		 * \brief 
+		 * \param face 
+		 * \return 
+		 */
+		Plane<T> GetPlane(Face face) const
+		{
+			return mPlanes[face];
+		}
+
+	private:
+
+		EnumMap<Face, Plane<T>> mPlanes;
 	};
 }
 

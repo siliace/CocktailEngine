@@ -73,9 +73,10 @@ namespace Ck
 
 		/**
 		 * \brief
+		 * \param camera
 		 * \return
 		 */
-		std::vector<Renderable*> CollectRenderables() const;
+		std::vector<Renderable*> CollectRenderables(const Camera& camera) const;
 
 		/**
 		 * \brief 

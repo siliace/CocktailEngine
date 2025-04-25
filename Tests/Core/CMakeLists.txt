@@ -10,6 +10,7 @@ cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Math"    
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Math/Angle.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Math/Plane.cpp
 )
 
 cocktail_source_directory(CORE_TEST_FILES
