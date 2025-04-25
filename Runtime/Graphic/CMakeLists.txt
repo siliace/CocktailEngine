@@ -105,8 +105,10 @@ cocktail_source_directory(GRAPHIC_FILES
     FOLDER "Mesh"  
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Mesh/Mesh.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Mesh/MeshFactory.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Mesh/Mesh.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Mesh/MeshFactory.cpp
 )
 
 cocktail_source_directory(GRAPHIC_FILES  
