@@ -112,7 +112,7 @@ namespace Ck
 
 			drawContext.BindPersistentData(*commandList, "lightsInfo", Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
 
-			for (Renderable* renderable : mScene->CollectRenderables())
+			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
 			{
 				Ref<Camera> camera = viewport->GetCamera();
 				renderable->AddToQueue(*mOpaqueRenderQueue, *camera);

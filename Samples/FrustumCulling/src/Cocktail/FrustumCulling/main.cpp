@@ -1,9 +1,9 @@
-#include <cmrc/cmrc.hpp>
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/System/Keyboard/Keyboard.hpp>
 #include <Cocktail/Core/System/Mouse/Mouse.hpp>
 #include <Cocktail/Core/System/Window/WindowFactory.hpp>
 
+#include <Cocktail/Graphic/Mesh/MeshFactory.hpp>
 #include <Cocktail/Graphic/Rendering/WindowSceneViewer.hpp>
 #include <Cocktail/Graphic/Scene/Scene.hpp>
 #include <Cocktail/Graphic/Scene/SceneLoader.hpp>
@@ -14,26 +14,17 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
-#include "ImGuiOverlay.hpp"
-#include "Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp"
-
 using namespace Ck;
-
-CMRC_DECLARE(sponza);
 
 Main::ExitCode ApplicationMain(Application* application)
 {
-	application->Invoke([](EmbeddedFileSystemDriver* embeddedDriver) {
-		embeddedDriver->Register(cmrc::sponza::get_filesystem());
-	});
-
 	Extent2D windowSize = MakeExtent(800u, 600u);
 	Ref<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
-		windowCreateInfo.Title = "Hello Sponza";
-		windowCreateInfo.Style = Flags<WindowStyle>::All(); 
+		windowCreateInfo.Title = "Frustum Culling";
+		windowCreateInfo.Style = Flags<WindowStyle>::All();
 		windowCreateInfo.Position = MakeExtent(100, 100);
 
 		return windowFactory->CreateWindow(windowCreateInfo);
@@ -42,17 +33,30 @@ Main::ExitCode ApplicationMain(Application* application)
 	Ref<GraphicEngine> graphicEngine = GraphicEngine::New(Renderer::GraphicApi::Vulkan);
 	Ref<Scene> scene = Scene::New(graphicEngine);
 
-	Ref<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
-		return sceneLoader->LoadFromPath("./resources/Models/Sponza/Sponza.gltf", {})->AddToScene(*scene);
-	});
+	Ref<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor(1.f, 1.f, 1.f));
+	Ref<Material> material = Material::New("default-cube", Material::ShadingMode::Phong, SamplerType::NearestClamp, true);
+	material->SetEmissiveColor(LinearColor(1.f, 1.f, 1.f));
+	Ref<Shape> shape = Shape::New(*graphicEngine, std::move(cubeMesh), std::vector<Ref<Material>>{ std::move(material) });
+
+	for (unsigned int i = 0; i < 30; i++)
+	{
+		for (unsigned int j = 0; j < 30; j++)
+		{
+			Ref<SceneNode> sceneNode = scene->CreateSceneNode();
+			sceneNode->SetPosition(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
+			sceneNode->AddShape(shape);
+		}
+	}
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
 	Ref<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
-	Vector2<float> zBounds(0.1f, 4500.f);
-	Ref<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), aspectRatio, zBounds);
-	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
+	Vector2<float> zBounds(0.1f, 1000.f);
+
+	Ref<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
+	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
+	
 	Ref<FreeFlyCameraViewController> cameraController = FreeFlyCameraViewController::New(camera);
 
 	float move = 1.f;
@@ -107,8 +111,6 @@ Main::ExitCode ApplicationMain(Application* application)
 	Ref<Viewport> viewport = Viewport::New(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
 	viewer->AttachViewport(viewport, 0);
 
-	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());
-
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
 		windowSize = event.Size;
@@ -122,7 +124,6 @@ Main::ExitCode ApplicationMain(Application* application)
 		Duration frameBegin = application->Uptime();
 
 		cameraController->Update(Duration::Between(lastFrameBegin, frameBegin));
-		overlay.Update();
 
 		viewer->Render();
 

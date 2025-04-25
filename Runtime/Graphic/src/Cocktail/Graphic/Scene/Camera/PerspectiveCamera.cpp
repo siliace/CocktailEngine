@@ -43,7 +43,7 @@ namespace Ck
 
 	Frustum<float> PerspectiveCamera::ComputeFrustum() const
 	{
-		return Frustum<float>::Perspective(mFov, mAspectRatio, mZBounds, GetPosition(), GetPosition() + GetFront(), GetUp());
+		return Frustum<float>::Perspective(mFov, mAspectRatio, mZBounds, GetPosition(), -GetFront(), GetRight(), GetUp());
 	}
 
 	Matrix4<float> PerspectiveCamera::ComputeProjectionViewMatrix()

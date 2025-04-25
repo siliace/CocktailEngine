@@ -27,10 +27,22 @@ namespace Ck
 
 		/**
 		 * \brief Constructor
+		 * Create a sphere encompassing a volume
+		 * \param other The volume to encompass
+		 */
+		explicit Sphere(const Volume<T>& other)
+		{
+			Extent3D<T> extents = other.GetExtents();
+			mCenter = other.GetCenter();
+			mRadius = std::max(extents.Width, std::max(extents.Height, extents.Depth)) / static_cast<T>(2);
+		}
+
+		/**
+		 * \brief Constructor
 		 * \param radius 
 		 * \param center 
 		 */
-		explicit Sphere(T radius, const Vector3<T>& center = Vector3<T>::Zero()) :
+		Sphere(T radius, const Vector3<T>& center) :
 			mRadius(radius),
 			mCenter(center)
 		{

@@ -8,6 +8,14 @@
 
 namespace Ck
 {
+	Ref<Mesh> MeshFactory::CreateCube(float size, const LinearColor& color)
+	{
+		float halfExtent = size / 2.f;
+		Vector3<float> minPoint(-halfExtent), maxPoint(halfExtent);
+		Box<float> box(minPoint, maxPoint);
+		return CreateBox(box, color);
+	}
+
 	Ref<Mesh> MeshFactory::CreateBox(const Box<float>& box, const LinearColor& color)
 	{
 		Ref<VertexLayout> vertexLayout = VertexLayout::Builder()

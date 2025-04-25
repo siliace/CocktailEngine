@@ -60,6 +60,29 @@ namespace Ck
 
 	void SceneNode::AddShape(Ref<Shape> shape)
 	{
+		Ref<VertexArray> vertices = shape->GetVertexBuffer()->GetVertexArray();
+		const Ref<VertexLayout>& vertexLayout = vertices->GetVertexLayout();
+
+		const VertexAttribute* positionAttribute = vertexLayout->FindAttribute(VertexAttributeSemantic::Position);
+		if (positionAttribute)
+		{
+			const bool isFlat = positionAttribute->GetElementCount() == 2;
+			assert(isFlat || positionAttribute->GetElementCount() == 3);
+
+			for (std::size_t i = 0; i < vertices->GetVertexCount(); i++)
+			{
+				VertexRef vertex = vertices->At(i);
+				const float* vertexPosition = static_cast<const float*>(vertex.Get(VertexAttributeSemantic::Position));
+
+				Vector3<float> point;
+				point.X() = vertexPosition[0];
+				point.Y() = vertexPosition[1];
+				point.Z() = !isFlat ? vertexPosition[2] : 0.f;
+
+				mBoundingBox.Extend(point);
+			}
+		}
+
 		mShapes.emplace_back(std::move(shape));
 	}
 
@@ -133,5 +156,10 @@ namespace Ck
 	void SceneNode::SetVisible(bool visible)
 	{
 		mVisible = visible;
+	}
+
+	const Volume<float>& SceneNode::GetBoundingVolume() const
+	{
+		return mBoundingBox;
 	}
 }

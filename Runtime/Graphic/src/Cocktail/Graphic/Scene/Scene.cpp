@@ -4,6 +4,58 @@
 
 namespace Ck
 {
+	class FrustumCullAction
+	{
+	public:
+
+		explicit FrustumCullAction(const Frustum<float>& frustum) :
+			mFrustum(frustum)
+		{
+			mRenderables.reserve(1024);
+		}
+
+		void ProcessSceneNode(SceneNode* sceneNode)
+		{
+			if (!sceneNode->IsVisible())
+				return;
+
+			const Volume<float>& boundingVolume = sceneNode->GetBoundingVolume();
+			if (boundingVolume.IsNull())
+			{
+				for (const Ref<SceneNode>& childSceneNode : sceneNode->GetChildren())
+					ProcessSceneNode(childSceneNode.Get());
+			}
+			else
+			{
+				Box<float> obb;
+				const Transformation& worldTransformation = sceneNode->GetWorldTransformation();
+				for (std::size_t i = 0; i < boundingVolume.GetVertexCount(); i++)
+				{
+					Vector3<float> vertex = boundingVolume.GetVertex(i);
+					Vector3<float> worldVertex = worldTransformation.Apply(vertex);
+					obb.Extend(worldVertex);
+				}
+
+				if (mFrustum.Intersect(obb) != Intersection::Outside || obb.Intersect(mFrustum) != Intersection::Outside)
+				{
+					mRenderables.push_back(sceneNode);
+					for (const Ref<SceneNode>& childSceneNode : sceneNode->GetChildren())
+						ProcessSceneNode(childSceneNode.Get());
+				}
+			}
+		}
+
+		const std::vector<Renderable*>& GetRenderables() const
+		{
+			return mRenderables;
+		}
+
+	private:
+
+		Frustum<float> mFrustum;
+		std::vector<Renderable*> mRenderables;
+	};
+
 	Scene::Scene(Ref<GraphicEngine> graphicEngine, Ref<TransformationGraph> transformationGraph) :
 		mGraphicEngine(std::move(graphicEngine)),
 		mTransformationGraph(std::move(transformationGraph))
@@ -67,15 +119,12 @@ namespace Ck
 		return mOnSceneNodeAdded;
 	}
 
-	std::vector<Renderable*> Scene::CollectRenderables() const
+	std::vector<Renderable*> Scene::CollectRenderables(const Camera& camera) const
 	{
-		std::vector<Renderable*> renderables;
-		mSceneGraph->Visit([&](SceneNode* node) {
-			if (node->IsVisible())
-				renderables.push_back(node);
-		});
+		FrustumCullAction action(camera.ComputeFrustum());
+		action.ProcessSceneNode(mSceneGraph->GetRoot().Get());
 
-		return renderables;
+		return action.GetRenderables();
 	}
 
 	std::vector<Light*> Scene::CollectLights(const Camera& camera) const

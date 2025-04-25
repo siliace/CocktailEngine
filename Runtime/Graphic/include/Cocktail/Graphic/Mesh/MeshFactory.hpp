@@ -15,6 +15,14 @@ namespace Ck
 	public:
 
 		/**
+		 * \brief Create a colored cube mesh
+		 * \param size The size of the cube's edge to create
+		 * \param color The color of the cube to create
+		 * \return The mesh of the cube
+		 */
+		static Ref<Mesh> CreateCube(float size, const LinearColor& color = LinearColor(0.f, 0.f, 0.f, 1.f));
+
+		/**
 		 * \brief 
 		 * \param box 
 		 * \param color 

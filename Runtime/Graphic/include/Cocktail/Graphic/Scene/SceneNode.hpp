@@ -101,11 +101,18 @@ namespace Ck
 		 */
 		void SetVisible(bool visible = true);
 
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const Volume<float>& GetBoundingVolume() const override;
+
 	private:
 
 		Scene* mScene;
 		bool mVisible;
 		std::vector<Ref<Shape>> mShapes;
+		Box<float> mBoundingBox;
 	};
 }
 
