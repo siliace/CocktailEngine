@@ -317,40 +317,26 @@ namespace Ck::Vulkan
 		return mType;
 	}
 
-	std::size_t Shader::GetInputAttributeCount() const
+	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(std::string_view name) const
 	{
-		return mInputAttributeLocations.size();
-	}
-
-	std::size_t Shader::GetInputAttributes(Renderer::VertexAttributeLocation** locations, std::size_t count, std::size_t first) const
-	{
-		std::size_t i = 0;
-		const std::size_t total = mInputAttributeLocations.size();
-		if (first < total)
+		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mInputAttributeLocations)
 		{
-			for (; i < count && i + first < total; i++)
-				locations[i] = mInputAttributeLocations[i + first].get();
+			if (vertexAttributeLocation->GetName() == name)
+				return vertexAttributeLocation.get();
 		}
 
-		return i;
+		return nullptr;
 	}
 
-	std::size_t Shader::GetOutputAttributeCount() const
+	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(std::string_view name) const
 	{
-		return mOutputAttributeLocations.size();
-	}
-
-	std::size_t Shader::GetOutputAttributes(Renderer::VertexAttributeLocation** locations, std::size_t count, std::size_t first) const
-	{
-		std::size_t i = 0;
-		const std::size_t total = mOutputAttributeLocations.size();
-		if (first < total)
+		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mOutputAttributeLocations)
 		{
-			for (; i < count && i + first < total; i++)
-				locations[i] = mOutputAttributeLocations[i + first].get();
+			if (vertexAttributeLocation->GetName() == name)
+				return vertexAttributeLocation.get();
 		}
 
-		return i;
+		return nullptr;
 	}
 
 	unsigned int Shader::GetDescriptorSetInfoCount() const

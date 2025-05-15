@@ -58,33 +58,17 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 * \param name 
 		 * \return 
 		 */
-		std::size_t GetInputAttributeCount() const override;
+		Renderer::VertexAttributeLocation* FindInputAttribute(std::string_view name) const override;
 
 		/**
 		 * \brief 
-		 * \param locations 
-		 * \param count 
-		 * \param first 
+		 * \param name 
 		 * \return 
 		 */
-		std::size_t GetInputAttributes(Renderer::VertexAttributeLocation** locations, std::size_t count, std::size_t first) const override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		std::size_t GetOutputAttributeCount() const override;
-
-		/**
-		 * \brief 
-		 * \param locations 
-		 * \param count 
-		 * \param first 
-		 * \return 
-		 */
-		std::size_t GetOutputAttributes(Renderer::VertexAttributeLocation** locations, std::size_t count, std::size_t first) const override;
+		Renderer::VertexAttributeLocation* FindOutputAttribute(std::string_view name) const override;
 
 		/**
 		 * \brief

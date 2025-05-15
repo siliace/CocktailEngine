@@ -16,7 +16,7 @@ namespace Ck
 			if (vertexAttributeName.empty())
 				continue;
 
-			mVertexAttributeLocations[vertexAttribute] = FindVertexAttributeLocation(Renderer::ShaderType::Vertex, vertexAttributeName);
+			mVertexAttributeLocations[vertexAttribute] = mShaderProgram->GetStage(Renderer::ShaderType::Vertex)->FindInputAttribute(vertexAttributeName);
 		}
 
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
@@ -42,19 +42,5 @@ namespace Ck
 	const Ref<Renderer::ShaderProgram>& MaterialProgramVariant::GetShaderProgram() const
 	{
 		return mShaderProgram;
-	}
-
-	Renderer::VertexAttributeLocation* MaterialProgramVariant::FindVertexAttributeLocation(Renderer::ShaderType stage, std::string_view name) const
-	{
-		Ref<Renderer::Shader> vertexStage = mShaderProgram->GetStage(stage);
-		Renderer::VertexAttributeLocation* vertexAttributeLocation;
-		for (unsigned int i = 0; i < vertexStage->GetInputAttributeCount(); i++)
-		{
-			vertexStage->GetInputAttributes(&vertexAttributeLocation, 1, i);
-			if (vertexAttributeLocation->GetName() == name)
-				return vertexAttributeLocation;
-		}
-
-		return nullptr;
 	}
 }

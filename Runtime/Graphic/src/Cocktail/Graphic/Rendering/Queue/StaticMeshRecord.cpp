@@ -1,10 +1,9 @@
+#include <Cocktail/Core/Math/Matrix/Matrix3.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 #include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
-
-#include "Cocktail/Graphic/Spatial/Transformation.hpp"
 
 namespace Ck
 {

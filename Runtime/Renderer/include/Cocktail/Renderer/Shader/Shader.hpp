@@ -28,33 +28,17 @@ namespace Ck::Renderer
 
 	    /**
          * \brief 
+         * \param name 
          * \return 
          */
-        virtual std::size_t GetInputAttributeCount() const = 0;
+        virtual VertexAttributeLocation* FindInputAttribute(std::string_view name) const = 0;
 
 	    /**
          * \brief 
-         * \param attributeLocations 
-         * \param attributeLocationCount 
-         * \param firstAttributeLocation 
+         * \param name 
          * \return 
          */
-        virtual std::size_t GetInputAttributes(VertexAttributeLocation** attributeLocations, std::size_t attributeLocationCount, std::size_t firstAttributeLocation = 0) const = 0;
-
-	    /**
-         * \brief 
-         * \return 
-         */
-        virtual std::size_t GetOutputAttributeCount() const = 0;
-
-	    /**
-         * \brief 
-         * \param attributeLocations 
-         * \param attributeLocationCount 
-         * \param firstAttributeLocation 
-         * \return 
-         */
-        virtual std::size_t GetOutputAttributes(VertexAttributeLocation** attributeLocations, std::size_t attributeLocationCount, std::size_t firstAttributeLocation = 0) const = 0;
+        virtual VertexAttributeLocation* FindOutputAttribute(std::string_view name) const = 0;
     };
 }
 

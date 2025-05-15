@@ -1,4 +1,4 @@
-#include <Cocktail/Vulkan/Shader/Location/VertexAttributeLocation.hpp>
+#include <Cocktail/Vulkan/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck::Vulkan
 {
