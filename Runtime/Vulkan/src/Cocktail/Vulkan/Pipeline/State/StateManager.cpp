@@ -23,6 +23,12 @@ namespace Ck::Vulkan
 		mPipelineConstantStorage = std::make_unique<unsigned char[]>(mPipelineConstantStorageSize);
 	}
 
+	void StateManager::SetShaderProgram(const ShaderProgram* shaderProgram)
+	{
+		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
+			mShaderStages[shaderType] = Shader::Cast(shaderProgram->GetStage(shaderType));
+	}
+
 	void StateManager::BindSampler(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Sampler* sampler)
 	{
 		bool dirty = mDescriptorSetStateManagers[set].BindSampler(binding, arrayIndex, sampler);
@@ -85,22 +91,29 @@ namespace Ck::Vulkan
 
 	void StateManager::UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int size, const void* data)
 	{
-		assert(offset + size < mPipelineConstantStorageSize);
-
-		mDirtyFlags |= DirtyFlagBits::PipelineConstant;
-		std::memcpy(mPipelineConstantStorage.get() + offset, data, size);
-
-		PipelineConstantRangeState& range = mPipelineConstantRanges[shaderType];
-		if (range.Dirty)
+		if (const Ref<Shader>& shader = mShaderStages[shaderType])
 		{
-			range.Offset = std::min(range.Offset, offset);
-			range.Size = std::max(range.Size,offset + size);
-		}
-		else
-		{
-			range.Offset = offset;
-			range.Size = size;
-			range.Dirty = true;
+			if (const PushConstantBlockInfo* pushConstantBlock = shader->GetPushConstantBlock(0))
+			{
+				offset += pushConstantBlock->BaseOffset;
+				assert(offset + size < mPipelineConstantStorageSize);
+
+				mDirtyFlags |= DirtyFlagBits::PipelineConstant;
+				std::memcpy(mPipelineConstantStorage.get() + offset, data, size);
+
+				PipelineConstantRangeState& range = mPipelineConstantRanges[shaderType];
+				if (range.Dirty)
+				{
+					range.Offset = std::min(range.Offset, offset);
+					range.Size = std::max(range.Size, offset + size);
+				}
+				else
+				{
+					range.Offset = offset;
+					range.Size = size;
+					range.Dirty = true;
+				}
+			}
 		}
 	}
 

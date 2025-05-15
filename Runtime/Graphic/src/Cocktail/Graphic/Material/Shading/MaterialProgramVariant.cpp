@@ -25,7 +25,7 @@ namespace Ck
 			if (textureSlotName.empty())
 				continue;
 
-			mTextureUniformSlots[textureType] = FindUniformSlot(textureSlotName);
+			mTextureUniformSlots[textureType] = mShaderProgram->FindUniformSlot(textureSlotName);
 		}
 	}
 
@@ -53,19 +53,6 @@ namespace Ck
 			vertexStage->GetInputAttributes(&vertexAttributeLocation, 1, i);
 			if (vertexAttributeLocation->GetName() == name)
 				return vertexAttributeLocation;
-		}
-
-		return nullptr;
-	}
-
-	Renderer::UniformSlot* MaterialProgramVariant::FindUniformSlot(std::string_view name) const
-	{
-		Renderer::UniformSlot* slot;
-		for (unsigned int i = 0; i < mShaderProgram->GetUniformSlotCount(); i++)
-		{
-			mShaderProgram->GetUniformSlots(&slot, 1, i);
-			if (slot->GetName() == name)
-				return slot;
 		}
 
 		return nullptr;

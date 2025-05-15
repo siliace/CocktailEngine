@@ -8,7 +8,7 @@
 
 #include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
-#include <Cocktail/Vulkan/Shader/Slot/UniformSlot.hpp>
+#include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
 
 namespace Ck::Vulkan
 {
@@ -55,19 +55,11 @@ namespace Ck::Vulkan
 		Ref<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
 
 		/**
-		 * \brief
-		 * \return
+		 * \brief 
+		 * \param name 
+		 * \return 
 		 */
-		std::size_t GetUniformSlotCount() const override;
-
-		/**
-		 * \brief
-		 * \param slots
-		 * \param slotCount
-		 * \param firstSlot
-		 * \return
-		 */
-		std::size_t GetUniformSlots(Renderer::UniformSlot** slots, std::size_t slotCount, std::size_t firstSlot) const override;
+		Renderer::UniformSlot* FindUniformSlot(std::string_view name) const override;
 
 		/**
 		 * \brief 

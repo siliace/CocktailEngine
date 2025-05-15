@@ -22,20 +22,12 @@ namespace Ck
 			std::string name = std::get<0>(key);
 			unsigned int arrayIndex = std::get<1>(key);
 
-			Renderer::UniformSlot* slot = FindUniformSlot(name);
+			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
 			if (!slot)
 				continue;
 
 			commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
 		}
-	}
-
-	void RecordDrawContext::BindPipelineConstantsData(Renderer::CommandList& commandList, Renderer::ShaderType stage, unsigned int offset, unsigned int size, const void* data) const
-	{
-		Renderer::UniformSlot* slot = FindPipelineConstantsSlot(stage);
-		assert(slot);
-
-		commandList.UpdatePipelineConstant(slot, offset, size, data);
 	}
 
 	void RecordDrawContext::BindVertexData(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout& vertexLayout, unsigned vertexCount, const void* data) const
@@ -63,7 +55,7 @@ namespace Ck
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mFrameContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
-		Renderer::UniformSlot* slot = FindUniformSlot(name);
+		Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
 		assert(slot);
 
 		commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
@@ -79,7 +71,7 @@ namespace Ck
 
 		if (mCurrentMaterialProgram)
 		{
-			Renderer::UniformSlot* slot = FindUniformSlot(name);
+			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
 			if (slot)
 				commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
 		}
@@ -108,34 +100,6 @@ namespace Ck
 		}
 
 		commandList.SetVertexInputAttributes(binding, attributeCount, vertexInputAttributes);
-	}
-
-	Renderer::UniformSlot* RecordDrawContext::FindPipelineConstantsSlot(Renderer::ShaderType stage) const
-	{
-		assert(mCurrentMaterialProgram);
-		Renderer::UniformSlot* slot = nullptr;
-		for (unsigned int i = 0; i < mCurrentMaterialProgram->GetShaderProgram()->GetUniformSlotCount(); i++)
-		{
-			mCurrentMaterialProgram->GetShaderProgram()->GetUniformSlots(&slot, 1, i);
-			if (slot->GetDescriptorType() == Renderer::DescriptorType::PipelineConstants && slot->GetShaderStages() & stage)
-				return slot;
-		}
-
-		return nullptr;
-	}
-
-	Renderer::UniformSlot* RecordDrawContext::FindUniformSlot(std::string_view name) const
-	{
-		assert(mCurrentMaterialProgram);
-		Renderer::UniformSlot* slot = nullptr;
-		for (unsigned int i = 0; i < mCurrentMaterialProgram->GetShaderProgram()->GetUniformSlotCount(); i++)
-		{
-			mCurrentMaterialProgram->GetShaderProgram()->GetUniformSlots(&slot, 1, i);
-			if (slot->GetName() == name)
-				return slot;
-		}
-
-		return nullptr;
 	}
 
 	RecordDrawContext::RenderingModifiers RecordDrawContext::GetModifiers() const

@@ -55,7 +55,6 @@ private:
 	int mLastMouseCursor = -1;
 	Ck::Ref<Ck::Renderer::ShaderProgram> mShaderProgram;
 	Ck::Renderer::UniformSlot* mTextureUniformSlot;
-	Ck::Renderer::UniformSlot* mPipelineConstantsSlot;
 	Ck::Ref<Ck::Renderer::TextureView> mFontTextureView;
 	Ck::Ref<Ck::Renderer::Sampler> mTextureSampler;
 };

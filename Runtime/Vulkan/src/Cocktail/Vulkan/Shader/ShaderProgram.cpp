@@ -1,9 +1,8 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
+#include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
 #include <Cocktail/Vulkan/Shader/Reflection/DescriptorSetInfo.hpp>
-#include <Cocktail/Vulkan/Shader/Slot/DescriptorSetSlot.hpp>
-#include <Cocktail/Vulkan/Shader/Slot/PipelineConstantSlot.hpp>
 
 namespace Ck::Vulkan
 {
@@ -88,22 +87,15 @@ namespace Ck::Vulkan
 		return mShaders[type];
 	}
 
-	std::size_t ShaderProgram::GetUniformSlotCount() const
-	{
-		return mUniformSlots.size();
-	}
-
-	std::size_t ShaderProgram::GetUniformSlots(Renderer::UniformSlot** slots, std::size_t slotCount, std::size_t firstSlot) const
-	{
-		std::size_t i = 0;
-		const std::size_t total = mUniformSlots.size();
-		if (firstSlot < total)
+	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(std::string_view name) const
+	{	
+		for (const std::unique_ptr<UniformSlot>& uniformSlot : mUniformSlots)
 		{
-			for (; i < slotCount && i + firstSlot < total; i++)
-				slots[i] = mUniformSlots[i + firstSlot].get();
+			if (uniformSlot->GetName() == name)
+				return uniformSlot.get();
 		}
 
-		return i;
+		return nullptr;
 	}
 
 	Ref<PipelineLayout> ShaderProgram::GetPipelineLayout() const
@@ -222,15 +214,8 @@ namespace Ck::Vulkan
 					break;
 				}
 
-				mUniformSlots.emplace_back(new DescriptorSetSlot(mType, members, std::move(name), binding, i));
+				mUniformSlots.emplace_back(new UniformSlot(mType, members, std::move(name), *binding, i));
 			}
-		}
-
-		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-		{
-			mPipelineLayout->GetPipelineConstantBlock(shaderType).Then([&](const PushConstantBlockInfo& pipelineConstantBlock) {
-				mUniformSlots.emplace_back(new PipelineConstantSlot(mType, shaderType, pipelineConstantBlock));
-			});
 		}
 	}
 }

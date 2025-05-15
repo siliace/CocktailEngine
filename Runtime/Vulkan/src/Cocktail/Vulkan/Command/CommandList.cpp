@@ -6,8 +6,7 @@
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
 #include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
-#include <Cocktail/Vulkan/Shader/Slot/DescriptorSetSlot.hpp>
-#include <Cocktail/Vulkan/Shader/Slot/PipelineConstantSlot.hpp>
+#include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
 
 namespace Ck::Vulkan
 {
@@ -830,7 +829,7 @@ namespace Ck::Vulkan
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::Sampler);
 
-		if (auto descriptorSetSlot = DescriptorSetSlot::TryCast(slot))
+		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
 		{
 			unsigned int set = descriptorSetSlot->GetSet();
 			unsigned int binding = descriptorSetSlot->GetBinding();
@@ -843,7 +842,7 @@ namespace Ck::Vulkan
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::TextureSampler);
 
-		if (auto descriptorSetSlot = DescriptorSetSlot::TryCast(slot))
+		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
 		{
 			unsigned int set = descriptorSetSlot->GetSet();
 			unsigned int binding = descriptorSetSlot->GetBinding();
@@ -856,7 +855,7 @@ namespace Ck::Vulkan
 		const TextureView* textureView = TextureView::Cast(inTextureView);
 		assert(!inUniformSlot->IsArray() || arrayIndex < inUniformSlot->GetArrayLength());
 
-		if (auto uniformSlot = DescriptorSetSlot::TryCast(inUniformSlot))
+		if (auto uniformSlot = UniformSlot::TryCast(inUniformSlot))
 		{
 			unsigned int set = uniformSlot->GetSet();
 			unsigned int binding = uniformSlot->GetBinding();
@@ -877,7 +876,7 @@ namespace Ck::Vulkan
 	{
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 
-		if (auto descriptorSetSlot = DescriptorSetSlot::TryCast(slot))
+		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
 		{
 			unsigned int set = descriptorSetSlot->GetSet();
 			unsigned int binding = descriptorSetSlot->GetBinding();
@@ -896,19 +895,13 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void CommandList::UpdatePipelineConstant(Renderer::UniformSlot* slot, unsigned int offset, unsigned int length, const void* data)
+	void CommandList::UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int length, const void* data)
 	{
-		assert(slot->GetDescriptorType() == Renderer::DescriptorType::PipelineConstants);
+		Renderer::ShaderProgramType programType = shaderType == Renderer::ShaderType::Compute ? Renderer::ShaderProgramType::Compute : Renderer::ShaderProgramType::Graphic;
 
-		if (auto pipelineConstantSlot = PipelineConstantSlot::TryCast(slot))
-		{
-			StateManager* stateManager = GetStateManager(pipelineConstantSlot->GetProgramType());
-			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-			{
-				if (pipelineConstantSlot->GetShaderStages() & shaderType)
-					stateManager->UpdatePipelineConstant(shaderType, pipelineConstantSlot->ComputeOffset(offset), length, data);
-			}
-		}
+		StateManager* stateManager = GetStateManager(programType);
+		if (stateManager)
+			stateManager->UpdatePipelineConstant(shaderType, offset, length, data);
 	}
 
 	void CommandList::EnableVertexBinding(unsigned int binding, bool enable)

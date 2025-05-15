@@ -3,7 +3,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
-#include <Cocktail/Vulkan/Shader/Location/VertexAttributeLocation.hpp>
+#include <Cocktail/Vulkan/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck::Vulkan
 {

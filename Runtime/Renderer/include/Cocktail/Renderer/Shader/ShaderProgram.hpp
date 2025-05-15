@@ -30,19 +30,11 @@ namespace Ck::Renderer
         virtual Ref<Shader> GetStage(ShaderType type) const = 0;
 
 	    /**
-         * \brief 
-         * \return 
+         * \brief Find a UniformSlot by its name in the shader's sources
+         * \param name The name of the uniform
+         * \return The UniformSlot if found, nullptr otherwise
          */
-        virtual std::size_t GetUniformSlotCount() const = 0;
-
-	    /**
-         * \brief 
-         * \param slots 
-         * \param slotCount 
-         * \param firstSlot 
-         * \return 
-         */
-        virtual std::size_t GetUniformSlots(UniformSlot** slots, std::size_t slotCount, std::size_t firstSlot) const = 0;
+        virtual UniformSlot* FindUniformSlot(std::string_view name) const = 0;
     };
 }
 

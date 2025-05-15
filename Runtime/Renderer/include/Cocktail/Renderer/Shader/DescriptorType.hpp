@@ -37,11 +37,6 @@ namespace Ck::Renderer
 		 * \brief 
 		 */
 		StorageBuffer,
-
-		/**
-		 * \brief 
-		 */
-		PipelineConstants,
 	};
 }
 

@@ -54,7 +54,7 @@ namespace Ck::Vulkan
 		void BindTexture(Renderer::UniformSlot* inUniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView) override;
 		void BindBuffer(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range) override;
 
-		void UpdatePipelineConstant(Renderer::UniformSlot* slot, unsigned int offset, unsigned int length, const void* data) override;
+		void UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int length, const void* data) override;
 
 		void EnableVertexBinding(unsigned int binding, bool enable) override;
 		void SetVertexInputAttributes(unsigned int binding, unsigned int attributeCount, const Renderer::VertexInputAttribute* attributes) override;

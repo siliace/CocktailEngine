@@ -7,28 +7,9 @@
 
 namespace Ck::Vulkan
 {
-	class ShaderProgramUtils
-	{
-	public:
-
-		static Renderer::UniformSlot* FindUniformSlot(const Renderer::ShaderProgram& shaderProgram, Renderer::DescriptorType descriptorType, std::string_view name)
-		{
-			Renderer::UniformSlot* slot;
-			for (unsigned int i = 0; i < shaderProgram.GetUniformSlotCount(); i++)
-			{
-				shaderProgram.GetUniformSlots(&slot, 1, i);
-				if (slot->GetName() == name && slot->GetDescriptorType() == descriptorType)
-					return slot;
-			}
-
-			return nullptr;
-		}
-	};
-
 	DepthResolver::DepthResolver(Ref<RenderDevice> renderDevice) :
 		mRenderDevice(std::move(renderDevice)),
-		mDepthSamplerSlot(nullptr),
-		mPipelineConstantsSlot(nullptr)
+		mDepthSamplerSlot(nullptr)
 	{
 		Renderer::ShaderProgramCreateInfo shaderProgramCreateInfo;
 		shaderProgramCreateInfo.Type = Renderer::ShaderProgramType::Graphic;
@@ -38,10 +19,8 @@ namespace Ck::Vulkan
 
 		mShaderProgram = mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo);
 
-		mDepthSamplerSlot = ShaderProgramUtils::FindUniformSlot(*mShaderProgram, Renderer::DescriptorType::Texture, "inTexture");
-		mPipelineConstantsSlot = ShaderProgramUtils::FindUniformSlot(*mShaderProgram, Renderer::DescriptorType::PipelineConstants, "fragmentInfo");
-
-		assert(mPipelineConstantsSlot && mDepthSamplerSlot);
+		mDepthSamplerSlot = mShaderProgram->FindUniformSlot("inTexture");
+		assert(mDepthSamplerSlot);
 	}
 
 	void DepthResolver::Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, Ref<Renderer::TextureView> multisampleAttachment, Ref<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode)
@@ -63,7 +42,7 @@ namespace Ck::Vulkan
 		resolveInfo.SampleCount = static_cast<unsigned int>(multisampleTexture->GetSamples());
 		resolveInfo.DepthResolveMode = static_cast<unsigned int>(depthResolveMode);
 
-		commandList.UpdatePipelineConstant(mPipelineConstantsSlot, 0, sizeof(ResolveInfo), &resolveInfo);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(ResolveInfo), &resolveInfo);
 
 		commandList.EnableVertexBinding(0, false);
 		commandList.SetCullMode(Renderer::CullMode::None);

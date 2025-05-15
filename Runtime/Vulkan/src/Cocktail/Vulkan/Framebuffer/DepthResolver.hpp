@@ -59,7 +59,6 @@ namespace Ck::Vulkan
 
 		Ref<RenderDevice> mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
-		Renderer::UniformSlot* mPipelineConstantsSlot;
 		Ref<Renderer::ShaderProgram> mShaderProgram;
 		std::unordered_map<Ref<Renderer::TextureView>, Ref<Renderer::Framebuffer>> mFramebuffers;
 	};

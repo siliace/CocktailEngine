@@ -17,8 +17,10 @@ namespace Ck::Vulkan
 
 		if (CheckedAssign(mShaderProgram, shaderProgram))
 		{
+			StateManager::SetShaderProgram(mShaderProgram);
+
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
-			mState.ComputeStageState.Shader = Shader::Cast(shaderProgram->GetStage(Renderer::ShaderType::Compute)).Get();
+			mState.ComputeStageState.Shader = mShaderStages[Renderer::ShaderType::Compute].Get();
 		}
 	}
 

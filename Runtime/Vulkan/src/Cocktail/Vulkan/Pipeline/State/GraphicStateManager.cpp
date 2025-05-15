@@ -43,9 +43,11 @@ namespace Ck::Vulkan
 
 		if (CheckedAssign(mShaderProgram, shaderProgram))
 		{
+			StateManager::SetShaderProgram(mShaderProgram);
+
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-				mState.ShaderStages[shaderType].Shader = Shader::Cast(shaderProgram->GetStage(shaderType)).Get();
+				mState.ShaderStages[shaderType].Shader = mShaderStages[shaderType].Get();
 		}
 	}
 

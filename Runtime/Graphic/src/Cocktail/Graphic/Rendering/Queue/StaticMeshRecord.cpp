@@ -68,8 +68,8 @@ namespace Ck
 		materialColors.Specular = mRecordInfo.MaterialSpecularColor;
 		materialColors.Emissive = mRecordInfo.MaterialEmissiveColor;
 
-		drawContext.BindPipelineConstantsData(commandList, Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
-		drawContext.BindPipelineConstantsData(commandList, Renderer::ShaderType::Fragment, 0, sizeof(MaterialColors), &materialColors);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialColors), &materialColors);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
 			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))

@@ -46,16 +46,6 @@ namespace Ck
 		/**
 		 * \brief 
 		 * \param commandList 
-		 * \param stage 
-		 * \param offset 
-		 * \param size 
-		 * \param data 
-		 */
-		void BindPipelineConstantsData(Renderer::CommandList& commandList, Renderer::ShaderType stage, unsigned int offset, unsigned int size, const void* data) const;
-
-		/**
-		 * \brief 
-		 * \param commandList 
 		 * \param binding 
 		 * \param vertexLayout 
 		 * \param vertexCount 
@@ -97,20 +87,6 @@ namespace Ck
 		 * \param vertexLayout 
 		 */
 		void SetVertexInputAttributes(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout& vertexLayout) const;
-
-		/**
-		 * \brief
-		 * \param stage
-		 * \return
-		 */
-		Renderer::UniformSlot* FindPipelineConstantsSlot(Renderer::ShaderType stage) const;
-
-		/**
-		 * \brief
-		 * \param name
-		 * \return
-		 */
-		Renderer::UniformSlot* FindUniformSlot(std::string_view name) const;
 
 		/**
 		 * \brief 

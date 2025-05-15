@@ -1,4 +1,4 @@
-#include <Cocktail/Vulkan/Shader/Slot/UniformSlot.hpp>
+#include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
 
 namespace Ck::Vulkan
 {
@@ -70,9 +70,35 @@ namespace Ck::Vulkan
 		std::vector<Ref<MyUniformMember>> mMembers;
 	};
 
+	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const std::vector<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
+		mProgramType(programType),
+		mName(std::move(name)),
+		mLayoutBindingInfo(layoutBindingInfo),
+		mSet(set)
+	{
+		mMembers.reserve(members.size());
+		for (unsigned int i = 0; i < members.size(); i++)
+			mMembers.emplace_back(MyUniformMember::New(this, members[i]));
+	}
+
 	Renderer::ShaderProgramType UniformSlot::GetProgramType() const
 	{
 		return mProgramType;
+	}
+
+	Renderer::DescriptorType UniformSlot::GetDescriptorType() const
+	{
+		return mLayoutBindingInfo.Type;
+	}
+
+	bool UniformSlot::IsArray() const
+	{
+		return mLayoutBindingInfo.DescriptorCount > 1;
+	}
+
+	unsigned int UniformSlot::GetArrayLength() const
+	{
+		return mLayoutBindingInfo.DescriptorCount;
 	}
 
 	std::size_t UniformSlot::GetMemberCount() const
@@ -93,17 +119,23 @@ namespace Ck::Vulkan
 		return i;
 	}
 
+	Flags<Renderer::ShaderType> UniformSlot::GetShaderStages() const
+	{
+		return mLayoutBindingInfo.ShaderStages;
+	}
+
 	const std::string& UniformSlot::GetName() const
 	{
 		return mName;
 	}
 
-	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const std::vector<BlockMember>& members, std::string name) :
-		mProgramType(programType),
-		mName(std::move(name))
+	unsigned int UniformSlot::GetBinding() const
 	{
-		mMembers.reserve(members.size());
-		for (unsigned int i = 0; i < members.size(); i++)
-			mMembers.emplace_back(MyUniformMember::New(this, members[i]));
+		return mLayoutBindingInfo.Binding;
+	}
+	
+	unsigned int UniformSlot::GetSet() const
+	{
+		return mSet;
 	}
 }

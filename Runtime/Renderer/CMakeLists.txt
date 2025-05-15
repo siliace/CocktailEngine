@@ -101,6 +101,7 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Shader/ShaderProgramType.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Shader/ShaderType.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Shader/UniformSlot.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Shader/VertexAttributeLocation.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Shader/ShaderProgramType.cpp
 )

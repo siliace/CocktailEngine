@@ -49,13 +49,6 @@ namespace Ck
 		 */
 		Renderer::VertexAttributeLocation* FindVertexAttributeLocation(Renderer::ShaderType stage, std::string_view name) const;
 
-		/**
-		 * \brief
-		 * \param name
-		 * \return
-		 */
-		Renderer::UniformSlot* FindUniformSlot(std::string_view name) const;
-
 		Ref<Renderer::ShaderProgram> mShaderProgram;
 		EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
 		EnumMap<Material::TextureType, Renderer::UniformSlot*> mTextureUniformSlots;

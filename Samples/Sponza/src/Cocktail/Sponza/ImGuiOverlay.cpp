@@ -28,31 +28,9 @@
 
 using namespace Ck;
 
-namespace
-{
-	class ShaderProgramUtils
-	{
-	public:
-
-		static Renderer::UniformSlot* FindUniformSlot(const Renderer::ShaderProgram& shaderProgram, Renderer::DescriptorType descriptorType, std::string_view name)
-		{
-			Renderer::UniformSlot* slot;
-			for (unsigned int i = 0; i < shaderProgram.GetUniformSlotCount(); i++)
-			{
-				shaderProgram.GetUniformSlots(&slot, 1, i);
-				if (slot->GetName() == name && slot->GetDescriptorType() == descriptorType)
-					return slot;
-			}
-
-			return nullptr;
-		}
-	};
-}
-
 ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::RenderDevice& renderDevice, Renderer::RenderContext& renderContext) :
 	mWindow(&window),
-	mTextureUniformSlot(nullptr),
-	mPipelineConstantsSlot(nullptr)
+	mTextureUniformSlot(nullptr)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -133,8 +111,8 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		shaderProgramCreateInfo.Shaders[1] = loadShader(Renderer::ShaderType::Fragment, "builtin://sponza/resources/Shaders/ImGui/default.frag.spv");
 		mShaderProgram = renderDevice.CreateShaderProgram(shaderProgramCreateInfo);
 
-		mTextureUniformSlot = ShaderProgramUtils::FindUniformSlot(*mShaderProgram, Renderer::DescriptorType::TextureSampler, "inTexture");
-		mPipelineConstantsSlot = ShaderProgramUtils::FindUniformSlot(*mShaderProgram, Renderer::DescriptorType::PipelineConstants, "vertexInfo");
+		mTextureUniformSlot = mShaderProgram->FindUniformSlot("inTexture");
+		assert(mTextureUniformSlot);
 	}
 
 	Connect(sceneViewer.OnRendered(), [&](Renderer::RenderContext& rc, Renderer::FrameContext& fc, Renderer::Framebuffer& fb) {
@@ -255,7 +233,7 @@ void ImGuiOverlay::SetupRenderState(Renderer::CommandList* commandList, Extent2D
 	vertexInfo.Translate.X() = -1.0f - drawData->DisplayPos.x * vertexInfo.Scale.X();
 	vertexInfo.Translate.Y() = -1.0f - drawData->DisplayPos.y * vertexInfo.Scale.Y();
 
-	commandList->UpdatePipelineConstant(mPipelineConstantsSlot, 0, sizeof(VertexInfo), &vertexInfo);
+	commandList->UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
 }
 
 void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::FrameContext& frameContext, Renderer::Framebuffer& framebuffer)

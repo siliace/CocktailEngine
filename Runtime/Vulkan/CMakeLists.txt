@@ -232,15 +232,12 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Shader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/ShaderProgram.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/ShaderProgram.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/UniformSlot.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/UniformSlot.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/ValidationCache.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/ValidationCache.cpp
-)
-
-cocktail_source_directory(VULKAN_FILES    
-    FOLDER "Shader/Location"
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Location/VertexAttributeLocation.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Location/VertexAttributeLocation.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/VertexAttributeLocation.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/VertexAttributeLocation.cpp
 )
 
 cocktail_source_directory(VULKAN_FILES    
@@ -250,17 +247,6 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Reflection/DescriptorSetInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Reflection/DescriptorSetBindingInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Reflection/PushConstantBlock.hpp
-)
-
-cocktail_source_directory(VULKAN_FILES    
-    FOLDER "Shader/Slot"
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/DescriptorSetSlot.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/DescriptorSetSlot.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/PipelineConstantSlot.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/PipelineConstantSlot.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/UniformSlot.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Shader/Slot/UniformSlot.cpp
 )
 
 cocktail_source_directory(VULKAN_FILES    

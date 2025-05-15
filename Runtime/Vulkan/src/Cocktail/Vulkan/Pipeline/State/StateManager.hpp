@@ -70,7 +70,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param shaderProgram
 		 */
-		virtual void SetShaderProgram(const ShaderProgram* shaderProgram) = 0;
+		virtual void SetShaderProgram(const ShaderProgram* shaderProgram);
 
 		/**
 		 * \brief 

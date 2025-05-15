@@ -10,6 +10,7 @@
 #include <Cocktail/Renderer/Command/GpuBarrier.hpp>
 #include <Cocktail/Renderer/Command/RenderPassBeginInfo.hpp>
 #include <Cocktail/Renderer/Command/TextureUploadInfo.hpp>
+#include <Cocktail/Renderer/Shader/ShaderType.hpp>
 #include <Cocktail/Renderer/Texture/TextureSubResource.hpp>
 
 namespace Ck::Renderer
@@ -77,7 +78,7 @@ namespace Ck::Renderer
         virtual void BindTexture(UniformSlot* slot, unsigned int arrayIndex, const TextureView* textureView) = 0;
         virtual void BindBuffer(UniformSlot* slot, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range) = 0;
 
-    	virtual void UpdatePipelineConstant(UniformSlot* slot, unsigned int offset, unsigned int length, const void* data) = 0;
+    	virtual void UpdatePipelineConstant(ShaderType shaderType, unsigned int offset, unsigned int length, const void* data) = 0;
 
         virtual void EnableVertexBinding(unsigned int binding, bool enable) = 0;
         virtual void SetVertexInputAttributes(unsigned int binding, unsigned int attributeCount, const VertexInputAttribute* attribute) = 0;
