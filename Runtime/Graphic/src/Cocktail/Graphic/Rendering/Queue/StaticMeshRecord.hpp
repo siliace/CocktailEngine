@@ -2,7 +2,6 @@
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_STATICMESHRECORD_HPP
 
 #include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Math/Matrix/Matrix3.hpp>
 #include <Cocktail/Core/Meta/Inherit.hpp>
 
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
@@ -40,15 +39,15 @@ namespace Ck
 
 		struct VertexInfo
 		{
-			alignas(16) Matrix4<float> Model;
-			alignas(16) Vector4<float> Normal[3]; // Alignment mess
+			Matrix4<float> Model;
+			Vector4<float> Normal[3]; // Alignment mess
 		};
 		
 		struct MaterialColors
 		{
-			alignas(16) LinearColor Base;
-			alignas(16) LinearColor Specular;
-			alignas(16) LinearColor Emissive;
+			LinearColor Base;
+			LinearColor Specular;
+			LinearColor Emissive;
 		};
 
 		StaticMeshRecordInfo mRecordInfo;

@@ -2,13 +2,12 @@
 #include <Cocktail/Graphic/Rendering/WindowSceneViewer.hpp>
 #include <Cocktail/Graphic/Rendering/Engine/GraphicEngine.hpp>
 #include <Cocktail/Graphic/Scene/Scene.hpp>
+#include <Cocktail/Graphic/Scene/Light/DirectionalLight.hpp>
 #include <Cocktail/Graphic/Scene/Light/PointLight.hpp>
 #include <Cocktail/Graphic/Scene/Light/SpotLight.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
 #include <Cocktail/Renderer/Context/RenderContext.hpp>
-
-#include "Cocktail/Graphic/Scene/Light/DirectionalLight.hpp"
 
 namespace Ck
 {
@@ -45,7 +44,7 @@ namespace Ck
 
 		struct SceneInfo
 		{
-			alignas(16) float AmbientFactor;
+			float AmbientFactor;
 		};
 
 		SceneInfo sceneInfo;
