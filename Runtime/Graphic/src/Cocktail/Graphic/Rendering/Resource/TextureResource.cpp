@@ -43,6 +43,7 @@ namespace Ck
         createInfo.Type = TextureTypeFromSize(size);
         createInfo.Format = format;
         createInfo.Size = size;
+        createInfo.Usage = Renderer::TextureUsageFlagBits::Sampled;
         createInfo.ArrayLayerCount = layerCount;
         createInfo.MipMapsCount = levelCount;
         createInfo.Name = name.data();

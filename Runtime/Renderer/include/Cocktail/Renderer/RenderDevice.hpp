@@ -6,6 +6,7 @@
 #include <Cocktail/Core/Signal/Signal.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceExtension.hpp>
+#include <Cocktail/Renderer/Texture/TextureCreateInfo.hpp>
 
 namespace Ck::Renderer
 {
@@ -140,6 +141,14 @@ namespace Ck::Renderer
          * \return 
          */
         virtual bool IsExtensionSupported(RenderDeviceExtension extension) const = 0;
+
+	    /**
+         * \brief Get texture usage flags supported for a given \p format and a \p MemoryType
+         * \param format The PixelFormat to check
+         * \param memoryType The MemoryType to check
+         * \return The supported texture usage
+         */
+        virtual TextureUsageFlags GetTextureFormatSupport(const PixelFormat& format, MemoryType memoryType) const = 0;
 
 	    /**
          * \brief 

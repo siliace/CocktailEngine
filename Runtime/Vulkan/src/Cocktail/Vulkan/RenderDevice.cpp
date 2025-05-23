@@ -204,6 +204,34 @@ namespace Ck::Vulkan
 		return mSupportedExtensions[extension];
 	}
 
+	Renderer::TextureUsageFlags RenderDevice::GetTextureFormatSupport(const PixelFormat& format, Renderer::MemoryType memoryType) const
+	{
+		VkFormatProperties formatProperties;
+		vkGetPhysicalDeviceFormatProperties(mPhysicalDevice, ToVkType(format), &formatProperties);
+
+		Renderer::TextureUsageFlags usage;
+		VkFormatFeatureFlags formatFeatures = memoryType != Renderer::MemoryType::Streamed ? formatProperties.optimalTilingFeatures : formatProperties.linearTilingFeatures;
+
+		if (formatFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
+			usage |= Renderer::TextureUsageFlagBits::Sampled;
+
+		if (formatFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT)
+			usage |= Renderer::TextureUsageFlagBits::Storage;
+
+		if (format.IsColor())
+		{
+			if (formatFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT)
+				usage |= Renderer::TextureUsageFlagBits::Attachment;
+		}
+		else
+		{
+			if (formatFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT)
+				usage |= Renderer::TextureUsageFlagBits::Attachment;
+		}
+
+		return usage;
+	}
+
 	Signal<LogLevel, Renderer::MessageType, std::string_view>& RenderDevice::OnDebugMessage()
 	{
 		return mOnDebugMessage;

@@ -249,6 +249,14 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 * \param format 
+		 * \param memoryType 
+		 * \return 
+		 */
+		Renderer::TextureUsageFlags GetTextureFormatSupport(const PixelFormat& format, Renderer::MemoryType memoryType) const override;
+
+		/**
+		 * \brief 
 		 * \return 
 		 */
 		Signal<LogLevel, Renderer::MessageType, std::string_view>& OnDebugMessage() override;

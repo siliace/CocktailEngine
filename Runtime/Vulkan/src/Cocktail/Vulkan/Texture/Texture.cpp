@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
 		std::vector<unsigned int> queueIndexes = queueFamilyContext.FindFamilyIndexes();
 
-		const bool hasAttachmentFlag = createInfo.Flags & Renderer::TextureCreateFlagBits::FramebufferAttachment;
+		const bool hasAttachmentFlag = createInfo.Usage & Renderer::TextureUsageFlagBits::Attachment;
 		if (mFormat.IsCompressed() && hasAttachmentFlag)
 			throw std::invalid_argument("Cannot create a texture with FramebufferAttachment flag and a compressed format");
 
@@ -40,8 +40,14 @@ namespace Ck::Vulkan
 			vkCreateInfo.arrayLayers = mArrayLayerCount;
 			vkCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 			// TODO: Handle unified memory type 
-			vkCreateInfo.tiling = createInfo.MemoryType == Renderer::MemoryType::Dynamic ? VK_IMAGE_TILING_LINEAR : VK_IMAGE_TILING_OPTIMAL;
-			vkCreateInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+			vkCreateInfo.tiling = createInfo.MemoryType != Renderer::MemoryType::Streamed ? VK_IMAGE_TILING_OPTIMAL : VK_IMAGE_TILING_LINEAR;
+			vkCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
+			if (createInfo.Usage & Renderer::TextureUsageFlagBits::Sampled)
+				vkCreateInfo.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
+
+			if (createInfo.Usage & Renderer::TextureUsageFlagBits::Storage)
+				vkCreateInfo.usage |= VK_IMAGE_USAGE_STORAGE_BIT;
 
 			if (hasAttachmentFlag)
 			{

@@ -39,23 +39,41 @@ namespace Ck::Renderer
          * \brief Specifies that the Texture can be used to create a TextureView of type TextureViewType::Cube or TextureViewType::CubeArray
          * This flag can be applied only on a texture with type TextureType::e2D
          */
-        CubemapCompatible = Bit(2),
+        CubemapCompatible = Bit(0),
 
         /**
          * \brief Specifies that the Texture can be used to create a TextureView of type TextureViewType::Array2D
          * This flag can be applied only on a texture with type TextureType::e3D
          * If the extension TextureView2DArrayCompatible is not supported, this flags is ignored
          */
-        Array2DCompatible = Bit(3),
-        
-        /**
-         * \brief Specifies that the Texture can be used to create a TextureView suitable as attachment in a RenderTarget
-         */
-        FramebufferAttachment = Bit(4),
+        Array2DCompatible = Bit(1),
     };
 
     using TextureCreateFlags = Flags<TextureCreateFlagBits>;
-	
+
+    /**
+     * \brief 
+     */
+    enum class TextureUsageFlagBits
+    {
+        /**
+         * \brief Specifies the Texture can be sampled from a shader
+         */
+        Sampled = Bit(0),
+
+        /**
+         * \brief Specifies the Texture can be written from a shader
+         */
+        Storage = Bit(1),
+
+        /**
+         * \brief Specifies that the Texture can be used to create a TextureView suitable as attachment in a RenderTarget
+         */
+        Attachment = Bit(2)
+    };
+
+    using TextureUsageFlags = Flags<TextureUsageFlagBits>;
+
 	/**
 	 * \brief Mutable format descriptor structure
 	 * Describe the formats a Texture must be compatible with
@@ -102,6 +120,11 @@ namespace Ck::Renderer
          * If the \p Type is not TextureType::e3D, the depth parameter is ignored
          */
         Extent3D<unsigned int> Size;
+
+        /**
+         * \brief Specifies usages of the Texture to create
+         */
+        TextureUsageFlags Usage;
 
         /**
          * \brief Specifies the type of memory where store Texture's texels

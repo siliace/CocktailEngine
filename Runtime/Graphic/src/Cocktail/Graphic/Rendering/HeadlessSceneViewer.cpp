@@ -16,10 +16,10 @@ namespace Ck
 		for (unsigned int i = 0; i < parameters.FrameCount; i++)
 		{
 			Renderer::TextureCreateInfo colorAttachmentCreateInfo;
-			colorAttachmentCreateInfo.Flags = Renderer::TextureCreateFlagBits::FramebufferAttachment;
 			colorAttachmentCreateInfo.Type = Renderer::TextureType::e2D;
 			colorAttachmentCreateInfo.Format = PixelFormat::Color(PixelFormat::Layout::RGBA, DataType::UnsignedInt8);
 			colorAttachmentCreateInfo.Size = MakeExtent(size, 1u);
+			colorAttachmentCreateInfo.Usage = Renderer::TextureUsageFlagBits::Attachment;
 			Ref<Renderer::Texture> colorAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
 
 			Renderer::TextureViewCreateInfo colorAttachmentViewCreateInfo;
@@ -31,10 +31,10 @@ namespace Ck
 			if (parameters.DepthStencilFormat != PixelFormat::Undefined())
 			{
 				Renderer::TextureCreateInfo depthStencilAttachmentCreateInfo;
-				depthStencilAttachmentCreateInfo.Flags = Renderer::TextureCreateFlagBits::FramebufferAttachment;
 				depthStencilAttachmentCreateInfo.Type = Renderer::TextureType::e2D;
 				depthStencilAttachmentCreateInfo.Format = PixelFormat::DepthStencil(24, 8);
 				depthStencilAttachmentCreateInfo.Size = MakeExtent(size, 1u);
+				depthStencilAttachmentCreateInfo.Usage = Renderer::TextureUsageFlagBits::Attachment;
 				Ref<Renderer::Texture> depthStencilAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
 
 				Renderer::TextureViewCreateInfo depthStencilAttachmentViewCreateInfo;

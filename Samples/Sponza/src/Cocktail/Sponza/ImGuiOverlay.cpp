@@ -43,6 +43,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		Renderer::TextureCreateInfo textureCreateInfo;
 		textureCreateInfo.Type = Renderer::TextureType::e2D;
 		textureCreateInfo.Size = MakeExtent(static_cast<unsigned int>(width), static_cast<unsigned int>(height), 1u);
+		textureCreateInfo.Usage = Renderer::TextureUsageFlagBits::Sampled;
 		textureCreateInfo.Format = PixelFormat::Color(PixelFormat::Layout::RGBA, DataType::UnsignedInt8);
 		textureCreateInfo.ArrayLayerCount = 1;
 		textureCreateInfo.MipMapsCount = 1;
