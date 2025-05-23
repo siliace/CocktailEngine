@@ -9,11 +9,6 @@ namespace Ck::Vulkan
 	struct DescriptorSetLayoutSignature
 	{
 		/**
-		 * \brief 
-		 */
-		static constexpr unsigned int SizeCount = 4;
-
-		/**
 		 * \brief Specifies whether the DescriptorSetLayout use push descriptors
 		 */
 		bool SupportPushDescriptor = false;

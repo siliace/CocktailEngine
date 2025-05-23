@@ -14,12 +14,13 @@ namespace Ck::Vulkan
 		mSupportFree = createInfo.SupportFree;
 
 		unsigned int sizeCount = 0;
-		VkDescriptorPoolSize poolSizes[DescriptorSetLayoutSignature::SizeCount];
+		VkDescriptorPoolSize poolSizes[Enum<Renderer::DescriptorType>::ValueCount];
 		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::Sampler, createInfo.LayoutSignature.SamplerCount, createInfo.MaxSet);
 		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::TextureSampler, createInfo.LayoutSignature.TextureSamplerCount, createInfo.MaxSet);
 		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::Texture, createInfo.LayoutSignature.TextureCount, createInfo.MaxSet);
 		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::StorageTexture, createInfo.LayoutSignature.StorageTextureCount, createInfo.MaxSet);
 		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::UniformBuffer, createInfo.LayoutSignature.UniformBufferCount, createInfo.MaxSet);
+		PushPoolSize(poolSizes, sizeCount, Renderer::DescriptorType::StorageBuffer, createInfo.LayoutSignature.StorageBufferCount, createInfo.MaxSet);
 		
 		VkDescriptorPoolCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr };
 		{
@@ -29,7 +30,7 @@ namespace Ck::Vulkan
 			vkCreateInfo.pPoolSizes = poolSizes;
 		}
 
-		vkCreateDescriptorPool(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle);
+		COCKTAIL_VK_CHECK(vkCreateDescriptorPool(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
 
 		DescriptorPool::SetObjectName(createInfo.Name);
 	}
@@ -58,7 +59,7 @@ namespace Ck::Vulkan
 
 	void DescriptorPool::Reset() const
 	{
-		vkResetDescriptorPool(mRenderDevice->GetHandle(), mHandle, 0);
+		COCKTAIL_VK_CHECK(vkResetDescriptorPool(mRenderDevice->GetHandle(), mHandle, 0));
 	}
 
 	bool DescriptorPool::SupportFree() const
@@ -76,6 +77,7 @@ namespace Ck::Vulkan
 		if (!descriptorCount)
 			return;
 
-		sizes[index++] = { ToVkType(type), descriptorCount * setCount };
+		sizes[index] = { ToVkType(type), descriptorCount * setCount };
+		++index;
 	}
 }

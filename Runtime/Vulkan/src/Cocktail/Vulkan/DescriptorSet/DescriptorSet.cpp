@@ -23,13 +23,13 @@ namespace Ck::Vulkan
 			allocateInfo.pSetLayouts = layouts;
 		}
 
-		vkAllocateDescriptorSets(mRenderDevice->GetHandle(), &allocateInfo, &mHandle);
+		COCKTAIL_VK_CHECK(vkAllocateDescriptorSets(mRenderDevice->GetHandle(), &allocateInfo, &mHandle));
 	}
 
 	DescriptorSet::~DescriptorSet()
 	{
 		if (mPool->SupportFree())
-			vkFreeDescriptorSets(mRenderDevice->GetHandle(), mPool->GetHandle(), 1, &mHandle);
+			COCKTAIL_VK_CHECK(vkFreeDescriptorSets(mRenderDevice->GetHandle(), mPool->GetHandle(), 1, &mHandle));
 	}
 
 	void DescriptorSet::SetObjectName(const char* name) const
