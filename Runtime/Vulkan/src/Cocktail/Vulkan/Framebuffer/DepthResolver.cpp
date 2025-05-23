@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		resolveInfo.SampleCount = static_cast<unsigned int>(multisampleTexture->GetSamples());
 		resolveInfo.DepthResolveMode = static_cast<unsigned int>(depthResolveMode);
 
-		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(ResolveInfo), &resolveInfo);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(ResolveInfo), &resolveInfo);
 
 		commandList.EnableVertexBinding(0, false);
 		commandList.SetCullMode(Renderer::CullMode::None);
