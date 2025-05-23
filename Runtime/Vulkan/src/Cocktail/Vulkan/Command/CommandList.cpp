@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 			return levelSize;
 		}
 
-		VkImageLayout GetResourceStateImageLayout(Renderer::ResourceState resourceState)
+		VkImageLayout GetResourceStateImageLayout(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
 			{
@@ -35,6 +35,9 @@ namespace Ck::Vulkan
 
 			case Renderer::ResourceState::General:
 				return VK_IMAGE_LAYOUT_GENERAL;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 			case Renderer::ResourceState::GraphicShaderResource:
 			case Renderer::ResourceState::ComputeShaderResource:
@@ -71,16 +74,17 @@ namespace Ck::Vulkan
 			return 0;
 		}
 
-		VkPipelineStageFlags GetResourceStatePipelineStage(Renderer::ResourceState resourceState)
+		VkPipelineStageFlags GetResourceStatePipelineStage(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
 			{
 			case Renderer::ResourceState::Undefined:
 				return VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
-			case Renderer::ResourceState::General:
-				return VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT : VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 
+			case Renderer::ResourceState::General:
 			case Renderer::ResourceState::UniformBuffer:
 			case Renderer::ResourceState::GraphicShaderResource:
 			case Renderer::ResourceState::ComputeShaderResource:
@@ -99,30 +103,31 @@ namespace Ck::Vulkan
 			return {};
 		}
 
-		VkPipelineStageFlags2 GetResourceStatePipelineStage2(Renderer::ResourceState resourceState)
+		VkPipelineStageFlags2 GetResourceStatePipelineStage2(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
 			{
 			case Renderer::ResourceState::Undefined:
-				return VK_PIPELINE_STAGE_2_NONE;
+				return VK_PIPELINE_STAGE_2_NONE_KHR;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR : VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR;
 
 			case Renderer::ResourceState::General:
-				return VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
-
 			case Renderer::ResourceState::UniformBuffer:
 			case Renderer::ResourceState::GraphicShaderResource:
 			case Renderer::ResourceState::ComputeShaderResource:
-				return VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;
+				return VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT_KHR;
 
 			case Renderer::ResourceState::CopySource:
 			case Renderer::ResourceState::CopyDestination:
-				return VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+				return VK_PIPELINE_STAGE_2_TRANSFER_BIT_KHR;
 
 			case Renderer::ResourceState::VertexBuffer:
-				return VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT;
+				return VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT_KHR;
 
 			case Renderer::ResourceState::IndexBuffer:
-				return VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT;
+				return VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT_KHR;
 			}
 
 			COCKTAIL_UNREACHABLE();
@@ -152,6 +157,77 @@ namespace Ck::Vulkan
 			subresourceRange.layerCount = subResource.ArrayLayerCount;
 
 			return subresourceRange;
+		}
+
+		template <typename T>
+		void PopulateBufferMemoryBarrier(const QueueFamilyContext& queueFamilyContext, T& bufferMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		{
+			Renderer::ResourceState oldState = barrier.Buffer.OldState;
+			Renderer::ResourceState newState = barrier.Buffer.NewState;
+			const Renderer::Buffer* resource = barrier.Buffer.Resource;
+
+			bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
+			bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
+			{
+				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
+				Renderer::CommandQueueType destinationQueue = queueTransfer->DestinationQueueType;
+
+				if (!queueFamilyContext.IsUnified() && sourceQueue != destinationQueue)
+				{
+					bufferMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(sourceQueue).GetIndex();
+					bufferMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(destinationQueue).GetIndex();
+				}
+				else
+				{
+					bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+					bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				}
+			}
+			else
+			{
+				bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			}
+			bufferMemoryBarrier.buffer = Buffer::Cast(resource)->GetHandle();
+			bufferMemoryBarrier.offset = barrier.Buffer.Offset;
+			bufferMemoryBarrier.size = barrier.Buffer.Size;
+		}
+
+		template <typename T>
+		void PopulateImageMemoryBarrier(const QueueFamilyContext& queueFamilyContext, T& imageMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		{
+			Renderer::ResourceState oldState = barrier.Texture.OldState;
+			Renderer::ResourceState newState = barrier.Texture.NewState;
+			const Renderer::Texture* resource = barrier.Texture.Resource;
+
+			imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
+			imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState, resource->GetFormat());
+			imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState, resource->GetFormat());
+			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
+			{
+				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
+				Renderer::CommandQueueType destinationQueue = queueTransfer->DestinationQueueType;
+
+				if (!queueFamilyContext.IsUnified() && sourceQueue != destinationQueue)
+				{
+					imageMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(sourceQueue).GetIndex();
+					imageMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(destinationQueue).GetIndex();
+				}
+				else
+				{
+					imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+					imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				}
+			}
+			else
+			{
+				imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			}
+			imageMemoryBarrier.image = AbstractTexture::Cast(resource)->GetHandle();
+			imageMemoryBarrier.subresourceRange = GetImageSubResourceRange(resource->GetFormat(), barrier.Texture.SubResource);
 		}
 	}
 
@@ -269,7 +345,6 @@ namespace Ck::Vulkan
 	{
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::Synchronization2))
 		{
-			/// TODO: allocate the right number of strcture per type of barrier ?
 			unsigned int memoryBarrierCount = 0;
 			VkMemoryBarrier2KHR* memoryBarriers = COCKTAIL_STACK_ALLOC(VkMemoryBarrier2KHR, barrierCount);
 
@@ -297,75 +372,27 @@ namespace Ck::Vulkan
 					}
 					else if (barrier.Type == Renderer::GpuBarrierType::Buffer)
 					{
-						Renderer::ResourceState oldState = barriers[i].Buffer.OldState;
-						Renderer::ResourceState newState = barriers[i].Buffer.NewState;
+						Renderer::ResourceState oldState = barrier.Buffer.OldState;
+						Renderer::ResourceState newState = barrier.Buffer.NewState;
 
 						VkBufferMemoryBarrier2KHR bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR, nullptr };
-						bufferMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState);
-						bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState);
-						bufferMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState);
-						bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
-						if (barrier.QueueTransfer)
-						{
-							const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-
-							if (!queueFamilyContext.IsUnified() && barriers[i].QueueTransfer->SourceQueueType != barriers[i].QueueTransfer->DestinationQueueType)
-							{
-								bufferMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->SourceQueueType).GetIndex();
-								bufferMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->DestinationQueueType).GetIndex();
-							}
-							else
-							{
-								bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-								bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							}
-						}
-						else
-						{
-							bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						}
-						bufferMemoryBarrier.buffer = Buffer::Cast(barriers[i].Buffer.Resource)->GetHandle();
-						bufferMemoryBarrier.offset = barriers[i].Buffer.Offset;
-						bufferMemoryBarrier.size = barriers[i].Buffer.Size;
+						PopulateBufferMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
+						bufferMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, PixelFormat::Undefined());
+						bufferMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, PixelFormat::Undefined());
 
 						bufferMemoryBarriers[bufferMemoryBarrierCount] = bufferMemoryBarrier;
 						bufferMemoryBarrierCount++;
 					}
 					else if (barrier.Type == Renderer::GpuBarrierType::Texture)
 					{
-						Renderer::ResourceState oldState = barriers[i].Texture.OldState;
-						Renderer::ResourceState newState = barriers[i].Texture.NewState;
+						const Renderer::Texture* resource = barrier.Texture.Resource;
+						Renderer::ResourceState oldState = barrier.Texture.OldState;
+						Renderer::ResourceState newState = barrier.Texture.NewState;
 
 						VkImageMemoryBarrier2KHR imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR, nullptr };
-						imageMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState);
-						imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState);
-						imageMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState);
-						imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState);
-						imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState);
-						imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState);
-						if (barrier.QueueTransfer)
-						{
-							const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-
-							if (!queueFamilyContext.IsUnified() && barriers[i].QueueTransfer->SourceQueueType != barriers[i].QueueTransfer->DestinationQueueType)
-							{
-								imageMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->SourceQueueType).GetIndex();
-								imageMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->DestinationQueueType).GetIndex();
-							}
-							else
-							{
-								imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-								imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							}
-						}
-						else
-						{
-							imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						}
-						imageMemoryBarrier.image = Texture::Cast(barriers[i].Texture.Resource)->GetHandle();
-						imageMemoryBarrier.subresourceRange = GetImageSubResourceRange(barriers[i].Texture.Resource->GetFormat(), barriers[i].Texture.SubResource);
+						PopulateImageMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
+						imageMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, resource->GetFormat());
+						imageMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, resource->GetFormat());
 
 						imageMemoryBarriers[imageMemoryBarrierCount] = imageMemoryBarrier;
 						imageMemoryBarrierCount++;
@@ -387,7 +414,8 @@ namespace Ck::Vulkan
 		{
 			for (unsigned int i = 0; i < barrierCount; i++)
 			{
-				if (barriers[i].Type == Renderer::GpuBarrierType::Memory)
+				const Renderer::GpuBarrier& barrier = barriers[i];
+				if (barrier.Type == Renderer::GpuBarrierType::Memory)
 				{
 					VkMemoryBarrier memoryBarrier;
 					memoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
@@ -401,81 +429,34 @@ namespace Ck::Vulkan
 						0, nullptr
 					);
 				}
-				else if (barriers[i].Type == Renderer::GpuBarrierType::Buffer)
+				else if (barrier.Type == Renderer::GpuBarrierType::Buffer)
 				{
-					Renderer::ResourceState oldState = barriers[i].Buffer.OldState;
-					Renderer::ResourceState newState = barriers[i].Buffer.NewState;
-
 					VkBufferMemoryBarrier bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER, nullptr };
-					bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-					bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
-					if (barriers[i].QueueTransfer)
-					{
-						const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
+					PopulateBufferMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
 
-						if (!queueFamilyContext.IsUnified() && barriers[i].QueueTransfer->SourceQueueType != barriers[i].QueueTransfer->DestinationQueueType)
-						{
-							bufferMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->SourceQueueType).GetIndex();
-							bufferMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->DestinationQueueType).GetIndex();
-						}
-						else
-						{
-							bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						}
-					}
-					else
-					{
-						bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-					}
-					bufferMemoryBarrier.buffer = Buffer::Cast(barriers[i].Buffer.Resource)->GetHandle();
-					bufferMemoryBarrier.offset = barriers[i].Buffer.Offset;
-					bufferMemoryBarrier.size = barriers[i].Buffer.Size;
+					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, PixelFormat::Undefined());
+					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, PixelFormat::Undefined());
 
 					vkCmdPipelineBarrier(mHandle,
-						GetResourceStatePipelineStage(oldState), GetResourceStatePipelineStage(newState),
+						sourceStages, destinationStages,
 						0,
 						0, nullptr,
 						1, &bufferMemoryBarrier,
 						0, nullptr
 					);
 				}
-				else if (barriers[i].Type == Renderer::GpuBarrierType::Texture)
+				else if (barrier.Type == Renderer::GpuBarrierType::Texture)
 				{
-					Renderer::ResourceState oldState = barriers[i].Texture.OldState;
-					Renderer::ResourceState newState = barriers[i].Texture.NewState;
+					const Renderer::Texture* resource = barrier.Texture.Resource;
 
 					VkImageMemoryBarrier imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, nullptr };
-					imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-					imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
-					imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState);
-					imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState);
-					if (barriers[i].QueueTransfer)
-					{
-						const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
+					PopulateImageMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
 
-						if (!queueFamilyContext.IsUnified() && barriers[i].QueueTransfer->SourceQueueType != barriers[i].QueueTransfer->DestinationQueueType)
-						{
-							imageMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->SourceQueueType).GetIndex();
-							imageMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(barriers[i].QueueTransfer->DestinationQueueType).GetIndex();
-						}
-						else
-						{
-							imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-							imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						}
-					}
-					else
-					{
-						imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-						imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-					}
-					imageMemoryBarrier.image = Texture::Cast(barriers[i].Texture.Resource)->GetHandle();
-					imageMemoryBarrier.subresourceRange = GetImageSubResourceRange(barriers[i].Texture.Resource->GetFormat(), barriers[i].Texture.SubResource);
+					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, resource->GetFormat());
+					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, resource->GetFormat());
 
 					vkCmdPipelineBarrier(mHandle,
-						GetResourceStatePipelineStage(oldState), GetResourceStatePipelineStage(newState),
+						sourceStages, destinationStages,
 						0,
 						0, nullptr,
 						0, nullptr,
@@ -622,7 +603,8 @@ namespace Ck::Vulkan
 		PixelFormat format = vkTexture->GetFormat();
 		const std::size_t alignment = format.GetBlockSize();
 
-		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState);
+		// Use undefined on purpose, why should be upload framebuffers attachments?
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined()); 
 
 		unsigned int regionCount = 0;
 		VkBufferImageCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferImageCopy, uploadCount);

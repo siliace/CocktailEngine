@@ -30,13 +30,18 @@ namespace Ck::Vulkan
 		renderPassBeginInfo.Framebuffer = GetOrCreateFramebuffer(attachment);
 		renderPassBeginInfo.DepthClearValue = 1.f;
 
+		Ref<AbstractTexture> multisampleTexture = AbstractTexture::Cast(multisampleAttachment->GetTexture());
+		assert(multisampleTexture->GetSamples() != Renderer::RasterizationSamples::e1);
+
+		Renderer::GpuBarrier preBarriers[] = {
+			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::FramebufferAttachment, Renderer::ResourceState::GraphicShaderResource, Renderer::TextureSubResource::All(*multisampleTexture)),
+		};
+		commandList.Barrier(1, preBarriers);
+
 		commandList.BeginRenderPass(renderPassBeginInfo);
 
 		commandList.BindShaderProgram(mShaderProgram.Get());
 		commandList.BindTexture(mDepthSamplerSlot, 0, multisampleAttachment.Get());
-
-		Ref<AbstractTexture> multisampleTexture = AbstractTexture::Cast(multisampleAttachment->GetTexture());
-		assert(multisampleTexture->GetSamples() != Renderer::RasterizationSamples::e1);
 
 		ResolveInfo resolveInfo;
 		resolveInfo.SampleCount = static_cast<unsigned int>(multisampleTexture->GetSamples());
@@ -53,6 +58,11 @@ namespace Ck::Vulkan
 		commandList.Draw(3, 1, 0, 0);
 
 		commandList.EndRenderPass();
+
+		Renderer::GpuBarrier postBarriers[] = {
+			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::GraphicShaderResource, Renderer::ResourceState::FramebufferAttachment, Renderer::TextureSubResource::All(*multisampleTexture)),
+		};
+		commandList.Barrier(1, postBarriers);
 	}
 
 	Ref<Renderer::Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)

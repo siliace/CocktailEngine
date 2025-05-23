@@ -7,6 +7,7 @@ namespace Ck::Renderer
     {
         Undefined,
         General,
+        FramebufferAttachment,
         GraphicShaderResource,
         ComputeShaderResource,
         CopySource,
