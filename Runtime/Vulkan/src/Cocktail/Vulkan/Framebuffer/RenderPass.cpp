@@ -135,8 +135,8 @@ namespace Ck::Vulkan
 					vkGetPhysicalDeviceProperties2KHR(mRenderDevice->GetPhysicalDeviceHandle(), &physicalDeviceProperties);
 
 					mResolveDepthStencil &= depthStencilResolveProperties.independentResolve == VK_TRUE || mDepthResolveMode == mStencilResolveMode;
-					mResolveDepthStencil &= depthStencilResolveProperties.supportedDepthResolveModes & ToVkType(mDepthResolveMode);
-					mResolveDepthStencil &= depthStencilResolveProperties.supportedStencilResolveModes & ToVkType(mStencilResolveMode);
+					mResolveDepthStencil &= (depthStencilResolveProperties.supportedDepthResolveModes & ToVkType(mDepthResolveMode)) > 0;
+					mResolveDepthStencil &= (depthStencilResolveProperties.supportedStencilResolveModes & ToVkType(mStencilResolveMode)) > 0;
 				}
 
 				for (unsigned int i = 0; i < mColorAttachmentCount; i++)
