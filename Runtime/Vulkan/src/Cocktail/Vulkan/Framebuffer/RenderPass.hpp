@@ -50,6 +50,12 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
+		bool ResolveDepthStencil() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
 		unsigned int GetColorAttachmentCount() const;
 
 		/**
@@ -83,6 +89,7 @@ namespace Ck::Vulkan
 		EnumMap<Renderer::RenderPassMode, VkRenderPass> mHandle;
 		unsigned int mColorAttachmentCount;
 		Renderer::RasterizationSamples mSamples;
+		bool mResolveDepthStencil;
 		Renderer::ResolveMode mDepthResolveMode;
 		Renderer::ResolveMode mStencilResolveMode;
 	};

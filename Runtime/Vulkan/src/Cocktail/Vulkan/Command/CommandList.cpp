@@ -738,8 +738,7 @@ namespace Ck::Vulkan
 		vkCmdEndRenderPass(mHandle);
 		mState = Renderer::CommandListState::Recording;
 
-		bool hasResolveExtension = mRenderDevice->IsFeatureSupported(RenderDeviceFeature::RenderPass2) && mRenderDevice->IsFeatureSupported(RenderDeviceFeature::RenderPassDepthStencilResolve);
-		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !hasResolveExtension)
+		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !mCurrentFramebuffer->GetRenderPass()->ResolveDepthStencil())
 		{
 			Ref<Renderer::TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment();
 			if (depthStencilAttachment)

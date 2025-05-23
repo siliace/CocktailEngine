@@ -127,6 +127,18 @@ namespace Ck::Vulkan
 				VkAttachmentReference2KHR multiSampleDephtStencilAttachmentReference;
 				VkAttachmentReference2KHR dephtStencilAttachmentReference;
 
+				mResolveDepthStencil = mRenderDevice->IsFeatureSupported(RenderDeviceFeature::RenderPassDepthStencilResolve);
+				if (mResolveDepthStencil)
+				{
+					VkPhysicalDeviceProperties2KHR physicalDeviceProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, nullptr };
+					VkPhysicalDeviceDepthStencilResolvePropertiesKHR depthStencilResolveProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, nullptr };
+					vkGetPhysicalDeviceProperties2KHR(mRenderDevice->GetPhysicalDeviceHandle(), &physicalDeviceProperties);
+
+					mResolveDepthStencil &= depthStencilResolveProperties.independentResolve == VK_TRUE || mDepthResolveMode == mStencilResolveMode;
+					mResolveDepthStencil &= depthStencilResolveProperties.supportedDepthResolveModes & ToVkType(mDepthResolveMode);
+					mResolveDepthStencil &= depthStencilResolveProperties.supportedStencilResolveModes & ToVkType(mStencilResolveMode);
+				}
+
 				for (unsigned int i = 0; i < mColorAttachmentCount; i++)
 				{
 					const PixelFormat& depthStencilFormat = createInfo.FramebufferLayout.ColorAttachmentFormats[i];
@@ -169,7 +181,7 @@ namespace Ck::Vulkan
 					subpassDescription.colorAttachmentCount = static_cast<unsigned int>(colorAttachmentReferences.size());
 					if (mSamples != Renderer::RasterizationSamples::e1)
 					{
-						if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::RenderPassDepthStencilResolve))
+						if (mResolveDepthStencil)
 							Chain(subpassDescription, resolveDepthStencil);
 
 						subpassDescription.pColorAttachments = multisampleColorAttachmentReferences.data();
@@ -204,6 +216,8 @@ namespace Ck::Vulkan
 			}
 			else
 			{
+				mResolveDepthStencil = false;
+
 				RenderPassBuilder builder(mSamples);
 
 				for (unsigned int i = 0; i < createInfo.FramebufferLayout.ColorAttachmentCount; i++)
@@ -221,6 +235,7 @@ namespace Ck::Vulkan
 
 				VkRenderPassCreateInfo renderPassCreateInfo = builder.ToCreateInfo();
 				COCKTAIL_VK_CHECK(vkCreateRenderPass(mRenderDevice->GetHandle(), &renderPassCreateInfo, mAllocationCallbacks, &mHandle[renderPassMode]));
+
 			}
 		}
 	}
@@ -249,6 +264,11 @@ namespace Ck::Vulkan
 	Ref<Renderer::RenderDevice> RenderPass::GetRenderDevice() const
 	{
 		return mRenderDevice;
+	}
+
+	bool RenderPass::ResolveDepthStencil() const
+	{
+		return mResolveDepthStencil;
 	}
 
 	unsigned int RenderPass::GetColorAttachmentCount() const
