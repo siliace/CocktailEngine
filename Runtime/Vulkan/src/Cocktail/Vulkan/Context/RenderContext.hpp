@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class RenderContext : public Inherit<RenderContext, Object, Renderer::RenderContext>, public Observable
+	class RenderContext : public Renderer::RenderContext, public Observable
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param createInfo 
 		 */
-		RenderContext(Ref<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -39,14 +39,14 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<Renderer::CommandListPool> CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo) override;
+		std::shared_ptr<Renderer::CommandListPool> CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
@@ -65,14 +65,14 @@ namespace Ck::Vulkan
 		 * \param commandQueue The command queue where signal the Fence
 		 * \param fence The fence to signal
 		 */
-		void SignalFence(Renderer::CommandQueueType commandQueue, const Ref<Fence>& fence);
+		void SignalFence(Renderer::CommandQueueType commandQueue, std::shared_ptr<Fence> fence);
 
 		/**
 		 * \brief Add a Semaphore to be signaled by the current submit
 		 * \param commandQueue The command queue where signal the Semaphore
 		 * \param semaphore The Semaphore to signal
 		 */
-		void SignalSemaphore(Renderer::CommandQueueType commandQueue, const Ref<Semaphore>& semaphore);
+		void SignalSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore);
 
 		/**
 		 * \brief 
@@ -87,7 +87,7 @@ namespace Ck::Vulkan
 		 * \param semaphore The Semaphore to wait
 		 * \param waitStages The pipeline stages blocked by the wait operation
 		 */
-		void WaitSemaphore(Renderer::CommandQueueType commandQueue, const Ref<Semaphore>& semaphore, VkPipelineStageFlags waitStages);
+		void WaitSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
 
 		/**
 		 * \brief 
@@ -96,7 +96,7 @@ namespace Ck::Vulkan
 		 * \param commandLists 
 		 * \param fence 
 		 */
-		void ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Ref<Renderer::CommandList>* commandLists, Ref<Renderer::Fence> fence) override;
+		void ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence) override;
 
 		/**
 		 * \brief 
@@ -115,13 +115,13 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		VkQueue mPresentationQueue;
-		Ref<SubmitScheduler> mScheduler;
-		EnumMap<Renderer::CommandQueueType, Ref<QueueSubmitter>> mSubmitters;
+		std::unique_ptr<SubmitScheduler> mScheduler;
+		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;
 		unsigned int mFrameContextCount;
 		unsigned int mCurrentFrameContext;
-		Ref<FrameContext> mFrameContexts[Swapchain::MaxSwapchainTexture];
+		std::unique_ptr<FrameContext> mFrameContexts[Swapchain::MaxSwapchainTexture];
 		Signal<Renderer::FrameContext*> mOnBeforeRedraw;
 		Signal<Renderer::FrameContext*, const Renderer::Framebuffer*> mOnRedraw;
 	};

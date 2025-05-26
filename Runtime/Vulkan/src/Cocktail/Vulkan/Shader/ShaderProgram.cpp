@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	ShaderProgram::ShaderProgram(const Ref<RenderDevice>& renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	ShaderProgram::ShaderProgram(std::shared_ptr<RenderDevice> renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks)
 	{
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 
 		for (unsigned int i = 0; i < createInfo.ShaderCount; i++)
 		{
-			Ref<Shader> shader = Shader::Cast(createInfo.Shaders[i]);
+			std::shared_ptr<Shader> shader = std::static_pointer_cast<Shader>(createInfo.Shaders[i]);
 			if (!shader)
 				continue;
 
@@ -72,7 +72,7 @@ namespace Ck::Vulkan
 	{
 	}
 
-	Ref<Renderer::RenderDevice> ShaderProgram::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> ShaderProgram::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -82,7 +82,7 @@ namespace Ck::Vulkan
 		return mType;
 	}
 
-	Ref<Renderer::Shader> ShaderProgram::GetStage(Renderer::ShaderType type) const
+	std::shared_ptr<Renderer::Shader> ShaderProgram::GetStage(Renderer::ShaderType type) const
 	{
 		return mShaders[type];
 	}
@@ -98,7 +98,7 @@ namespace Ck::Vulkan
 		return nullptr;
 	}
 
-	Ref<PipelineLayout> ShaderProgram::GetPipelineLayout() const
+	std::shared_ptr<PipelineLayout> ShaderProgram::GetPipelineLayout() const
 	{
 		return mPipelineLayout;
 	}
@@ -130,7 +130,7 @@ namespace Ck::Vulkan
 
 		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
 		{
-			Ref<Shader> shader = mShaders[shaderType];
+			std::shared_ptr<Shader> shader = mShaders[shaderType];
 			if (!shader)
 				continue;
 
@@ -179,7 +179,7 @@ namespace Ck::Vulkan
 			layoutCreateInfo.BindingCount = static_cast<unsigned>(layoutBindings.size());
 			layoutCreateInfo.Bindings = layoutBindings.data();
 
-			Ref<DescriptorSetLayout> descriptorSetLayout = mRenderDevice->CreateDescriptorSetLayout(layoutCreateInfo);
+			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mRenderDevice->CreateDescriptorSetLayout(layoutCreateInfo);
 			pipelineLayoutCreateInfo.DescriptorSetLayouts.push_back(descriptorSetLayout);
 		}
 
@@ -190,7 +190,7 @@ namespace Ck::Vulkan
 	{
 		for (unsigned int i = 0; i < mPipelineLayout->GetDescriptorSetLayoutCount(); i++)
 		{
-			const Ref<DescriptorSetLayout>& descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
+			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
 
 			for (unsigned int j = 0; j < descriptorSetLayout->GetBindingCount(); j++)
 			{
@@ -201,7 +201,7 @@ namespace Ck::Vulkan
 				std::vector<BlockMember> members;
 				for (Renderer::ShaderType type : Enum<Renderer::ShaderType>::Values)
 				{
-					const Ref<Shader>& shader = mShaders[type];
+					std::shared_ptr<Shader> shader = mShaders[type];
 					if (!shader)
 						continue;
 

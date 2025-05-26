@@ -3,17 +3,17 @@
 
 namespace Ck
 {
-	Ref<OrthographicCamera> OrthographicCamera::Create(Ref<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds)
+	std::shared_ptr<OrthographicCamera> OrthographicCamera::Create(std::shared_ptr<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds)
 	{
-		Ref<TransformationNode> transformationNode = scene->CreateTransformationNode();
-		Ref<OrthographicCamera> camera = OrthographicCamera::New(std::move(transformationNode), area, zBounds);
+		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
+		std::shared_ptr<OrthographicCamera> camera = std::make_shared<OrthographicCamera>(std::move(transformationNode), area, zBounds);
 		scene->AddCamera(camera);
 
 		return camera;
 	}
 
-	OrthographicCamera::OrthographicCamera(Ref<TransformationNode> transformationNode, Rectangle<unsigned int> area, Vector2<float> zBounds) :
-		Super(std::move(transformationNode)),
+	OrthographicCamera::OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<unsigned int> area, Vector2<float> zBounds) :
+		Camera(std::move(transformationNode)),
 		mArea(area),
 		mZBounds(zBounds)
 	{

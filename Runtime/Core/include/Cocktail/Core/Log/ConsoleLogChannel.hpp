@@ -2,7 +2,6 @@
 #define COCKTAIL_CORE_LOG_CONSOLELOGCHANNEL_HPP
 
 #include <Cocktail/Core/Log/LogChannel.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/System/Console/Console.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 

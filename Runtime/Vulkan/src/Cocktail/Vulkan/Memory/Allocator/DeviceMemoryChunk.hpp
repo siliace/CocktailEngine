@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_MEMORY_ALLOCATOR_DEVICEMEMORYCHUNK_HPP
 #define COCKTAIL_VULKAN_MEMORY_ALLOCATOR_DEVICEMEMORYCHUNK_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
-
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
 #include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryBlock.hpp>
@@ -14,7 +11,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class DeviceMemoryChunk : public Extends<DeviceMemoryChunk, Object>
+	class DeviceMemoryChunk
 	{
 	public:
 
@@ -24,7 +21,7 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief
@@ -33,7 +30,7 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief
@@ -42,7 +39,7 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief 
@@ -84,7 +81,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		const Ref<DeviceMemory>& GetDeviceMemory() const;
+		std::shared_ptr<DeviceMemory> GetDeviceMemory() const;
 
 	private:
 		
@@ -95,14 +92,14 @@ namespace Ck::Vulkan
 		 */
 		void AllocateDeviceMemory(const AbstractTexture* texture, const Buffer* buffer);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		ObjectPool<DeviceMemoryBlock>& mBlockPool;
 		std::size_t mSize;
 		unsigned int mMemoryTypeIndex;
 		bool mDedicated;
 		void* mPtr;
-		Ref<DeviceMemory> mDeviceMemory;
-		std::vector<Ref<DeviceMemoryBlock>> mBlocks;
+		std::shared_ptr<DeviceMemory> mDeviceMemory;
+		std::vector<std::shared_ptr<DeviceMemoryBlock>> mBlocks;
 	};
 }
 

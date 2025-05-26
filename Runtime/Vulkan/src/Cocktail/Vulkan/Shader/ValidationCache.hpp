@@ -3,11 +3,6 @@
 
 #include <volk.h>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
-#include <Cocktail/Renderer/RenderDeviceObject.hpp>
-
 namespace Ck::Vulkan
 {
 	class RenderDevice;
@@ -45,7 +40,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		ValidationCache(Ref<RenderDevice> renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		ValidationCache(std::shared_ptr<RenderDevice> renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -68,7 +63,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		Ref<RenderDevice> GetRenderDevice() const;
+		std::shared_ptr<RenderDevice> GetRenderDevice() const;
 
 		/**
 		 * \brief 
@@ -84,7 +79,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkValidationCacheEXT mHandle;
 	};

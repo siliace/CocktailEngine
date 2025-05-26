@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-    class COCKTAIL_GRAPHIC_API MipMapsTextureResource : public Extends<MipMapsTextureResource, TextureResource>
+    class COCKTAIL_GRAPHIC_API MipMapsTextureResource : public TextureResource
     {
     public:
 		
@@ -16,7 +16,7 @@ namespace Ck
          * \param mipMaps 
          * \param name 
          */
-        MipMapsTextureResource(Ref<GraphicEngine> graphicEngine, Ref<MipMaps> mipMaps, std::string_view name = "");
+        MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, std::string_view name = "");
 
 	    /**
          * \brief
@@ -30,11 +30,11 @@ namespace Ck
          * 
          * @return 
          */
-        Ref<MipMaps> GetMipMaps() const;
+        std::shared_ptr<MipMaps> GetMipMaps() const;
 
     private:    
 
-        Ref<MipMaps> mMipMaps;
+        std::shared_ptr<MipMaps> mMipMaps;
     };
 }
 

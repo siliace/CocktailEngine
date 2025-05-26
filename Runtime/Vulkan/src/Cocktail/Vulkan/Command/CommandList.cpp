@@ -189,7 +189,7 @@ namespace Ck::Vulkan
 				bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 				bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			}
-			bufferMemoryBarrier.buffer = Buffer::Cast(resource)->GetHandle();
+			bufferMemoryBarrier.buffer = static_cast<const Buffer*>(resource)->GetHandle();
 			bufferMemoryBarrier.offset = barrier.Buffer.Offset;
 			bufferMemoryBarrier.size = barrier.Buffer.Size;
 		}
@@ -226,12 +226,12 @@ namespace Ck::Vulkan
 				imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 				imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			}
-			imageMemoryBarrier.image = AbstractTexture::Cast(resource)->GetHandle();
+			imageMemoryBarrier.image = static_cast<const AbstractTexture*>(resource)->GetHandle();
 			imageMemoryBarrier.subresourceRange = GetImageSubResourceRange(resource->GetFormat(), barrier.Texture.SubResource);
 		}
 	}
 
-	CommandList::CommandList(Ref<RenderDevice> renderDevice, Ref<CommandListPool> allocator, const Ref<DescriptorSetAllocator>& descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
+	CommandList::CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocator(std::move(allocator)),
 		mHandle(VK_NULL_HANDLE),
@@ -284,7 +284,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> CommandList::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> CommandList::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -297,7 +297,7 @@ namespace Ck::Vulkan
 		{
 			if (mSecondary && primary)
 			{
-				CommandList* vkCommandList = CommandList::Cast(primary);
+				CommandList* vkCommandList = static_cast<CommandList*>(primary);
 				const Framebuffer* framebuffer = vkCommandList->mCurrentFramebuffer;
 
 				inheritanceInfo.renderPass = framebuffer ? framebuffer->GetRenderPass()->GetHandle(Renderer::RenderPassMode::Initial) : VK_NULL_HANDLE;
@@ -474,7 +474,7 @@ namespace Ck::Vulkan
 		assert(subResource.BaseMipMapLevel + subResource.MipMapLevelCount <= texture->GetMipMapCount());
 		assert(subResource.BaseArrayLayer + subResource.ArrayLayerCount <= texture->GetArrayLayerCount());
 
-		const Texture* vkTexture = Texture::Cast(texture);
+		const Texture* vkTexture = static_cast<const Texture*>(texture);
 
 		auto rootSubResource = Renderer::TextureSubResource::AllLayersOneLevel(*texture, subResource.BaseMipMapLevel - 1);
 
@@ -545,7 +545,7 @@ namespace Ck::Vulkan
 		VkCommandBuffer* commandBufferHandles = COCKTAIL_STACK_ALLOC(VkCommandBuffer, commandListCount);
 		for (unsigned int i = 0; i < commandListCount; i++)
 		{
-			CommandList* vkCommandList = CommandList::Cast(commandLists[i]);
+			CommandList* vkCommandList = static_cast<CommandList*>(commandLists[i]);
 			assert(vkCommandList->IsSecondary());
 			assert(vkCommandList->GetUsage() == mUsage);
 			assert(vkCommandList->GetState() == Renderer::CommandListState::Executable);
@@ -560,15 +560,15 @@ namespace Ck::Vulkan
 	{
 		assert(mState == Renderer::CommandListState::Recording);
 
-		const Buffer* vkBuffer = Buffer::Cast(buffer);
+		const Buffer* vkBuffer = static_cast<const Buffer*>(buffer);
 
 		unsigned int regionCount = 0;
 		VkBufferCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferCopy, uploadCount);
 
-		Ref<StagingBuffer> currentStagingBuffer;
+		std::shared_ptr<StagingBuffer> currentStagingBuffer;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
-			Ref<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(0, uploads[i].Length);
+			std::shared_ptr<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(0, uploads[i].Length);
 
 			if (currentStagingBuffer != stagingBuffer)
 			{
@@ -599,7 +599,7 @@ namespace Ck::Vulkan
 		assert(mState == Renderer::CommandListState::Recording);
 		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
 
-		const Texture* vkTexture = Texture::Cast(texture);
+		const Texture* vkTexture = static_cast<const Texture*>(texture);
 		PixelFormat format = vkTexture->GetFormat();
 		const std::size_t alignment = format.GetBlockSize();
 
@@ -609,13 +609,13 @@ namespace Ck::Vulkan
 		unsigned int regionCount = 0;
 		VkBufferImageCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferImageCopy, uploadCount);
 
-		Ref<StagingBuffer> currentStagingBuffer;
+		std::shared_ptr<StagingBuffer> currentStagingBuffer;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
 			Extent3D<unsigned int> levelSize = ComputeLevelSize(vkTexture->GetSize(), uploads[i].Level);
 			const size_t length = format.ComputeAllocationSize(levelSize);
 
-			Ref<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+			std::shared_ptr<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
 			if (currentStagingBuffer != stagingBuffer)
 			{
 				if (currentStagingBuffer)
@@ -657,7 +657,7 @@ namespace Ck::Vulkan
 
 	void CommandList::BeginRenderPass(const Renderer::RenderPassBeginInfo& begin)
 	{
-		mCurrentFramebuffer = Framebuffer::Cast(begin.Framebuffer);
+		mCurrentFramebuffer = static_cast<const Framebuffer*>(begin.Framebuffer);
 		assert(mCurrentFramebuffer);
 
 		Extent3D<unsigned int> size = mCurrentFramebuffer->GetSize();
@@ -725,7 +725,7 @@ namespace Ck::Vulkan
 		mState = Renderer::CommandListState::RecordingRenderPass;
 
 		mCurrentRenderPassMode = Optional<Renderer::RenderPassMode>::Of(begin.Mode);
-		GetGraphicStateManager()->SetRenderPass(mCurrentFramebuffer->GetRenderPass().Get());
+		GetGraphicStateManager()->SetRenderPass(mCurrentFramebuffer->GetRenderPass());
 
 		SetViewport(viewport);
 		SetScissor(scissor);
@@ -740,7 +740,7 @@ namespace Ck::Vulkan
 
 		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !mCurrentFramebuffer->GetRenderPass()->ResolveDepthStencil())
 		{
-			Ref<Renderer::TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment();
+			std::shared_ptr<Renderer::TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment();
 			if (depthStencilAttachment)
 			{
 				PixelFormat attachmentFormat = depthStencilAttachment->GetFormat();
@@ -764,20 +764,20 @@ namespace Ck::Vulkan
 
 	void CommandList::BindShaderProgram(const Renderer::ShaderProgram* inShaderProgram)
 	{
-		const ShaderProgram* shaderProgram = ShaderProgram::Cast(inShaderProgram);
+		const ShaderProgram* shaderProgram = static_cast<const ShaderProgram*>(inShaderProgram);
 		Renderer::ShaderProgramType programType = shaderProgram->GetType();
 
 		StateManager* stateManager = GetStateManager(programType);
 
-		Ref<Pipeline> pipeline = mCurrentPipelines[programType];
+		std::shared_ptr<Pipeline> pipeline = mCurrentPipelines[programType];
 		if (pipeline)
 		{
-			Ref<PipelineLayout> pipelineLayout = pipeline->GetLayout();
-			Ref<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
+			std::shared_ptr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
+			std::shared_ptr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
 			for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
 			{
-				Ref<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
-				Ref<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
+				std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
+				std::shared_ptr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
 
 				if (!nextDescriptorSetLayout || !nextDescriptorSetLayout->IsCompatibleWith(*descriptorSetLayout))
 					stateManager->ResetBindings(set);
@@ -789,7 +789,7 @@ namespace Ck::Vulkan
 
 	void CommandList::BindVertexBuffer(unsigned int binding, const Renderer::Buffer* inVertexBuffer, std::size_t offset, unsigned int stride, bool instanced, unsigned int divisor)
 	{
-		const Buffer* vertexBuffer = Buffer::Cast(inVertexBuffer);
+		const Buffer* vertexBuffer = static_cast<const Buffer*>(inVertexBuffer);
 		assert(vertexBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Vertex);
 
 		GraphicStateManager* graphicStateManager = GetGraphicStateManager();
@@ -799,7 +799,7 @@ namespace Ck::Vulkan
 
 	void CommandList::BindIndexBuffer(const Renderer::Buffer* inIndexBuffer, std::size_t offset, Renderer::IndexType indexType)
 	{
-		const Buffer* indexBuffer = Buffer::Cast(inIndexBuffer);
+		const Buffer* indexBuffer = static_cast<const Buffer*>(inIndexBuffer);
 		assert(indexBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Index);
 
 		GetGraphicStateManager()->BindIndexBuffer(indexBuffer, offset, indexType);
@@ -810,12 +810,10 @@ namespace Ck::Vulkan
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::Sampler);
 
-		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
-		{
-			unsigned int set = descriptorSetSlot->GetSet();
-			unsigned int binding = descriptorSetSlot->GetBinding();
-			mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, arrayIndex, Sampler::Cast(sampler));
-		}
+		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, arrayIndex, static_cast<const Sampler*>(sampler));
 	}
 
 	void CommandList::BindTextureSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler)
@@ -823,56 +821,50 @@ namespace Ck::Vulkan
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::TextureSampler);
 
-		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
+		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, arrayIndex, static_cast<const TextureView*>(textureView), static_cast<const Sampler*>(sampler));
+	}
+
+	void CommandList::BindTexture(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
+	{
+		const TextureView* textureView = static_cast<const TextureView*>(inTextureView);
+		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
+
+		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(uniformSlot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
+
+		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::Texture)
 		{
-			unsigned int set = descriptorSetSlot->GetSet();
-			unsigned int binding = descriptorSetSlot->GetBinding();
-			mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, arrayIndex, TextureView::Cast(textureView), Sampler::Cast(sampler));
+			stateManager->BindTexture(set, binding, arrayIndex, textureView);
+		}
+		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageTexture)
+		{
+			stateManager->BindStorageTexture(set, binding, arrayIndex, textureView);
 		}
 	}
 
-	void CommandList::BindTexture(Renderer::UniformSlot* inUniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
+	void CommandList::BindBuffer(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range)
 	{
-		const TextureView* textureView = TextureView::Cast(inTextureView);
-		assert(!inUniformSlot->IsArray() || arrayIndex < inUniformSlot->GetArrayLength());
+		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
 
-		if (auto uniformSlot = UniformSlot::TryCast(inUniformSlot))
+		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(uniformSlot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
+
+		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::UniformBuffer)
 		{
-			unsigned int set = uniformSlot->GetSet();
-			unsigned int binding = uniformSlot->GetBinding();
-			StateManager* stateManager = GetStateManager(uniformSlot->GetProgramType());
-
-			if (inUniformSlot->GetDescriptorType() == Renderer::DescriptorType::Texture)
-			{
-				stateManager->BindTexture(set, binding, arrayIndex, textureView);
-			}
-			else if (inUniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageTexture)
-			{
-				stateManager->BindStorageTexture(set, binding, arrayIndex, textureView);
-			}
+			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Uniform);
+			stateManager->BindUniformBuffer(set, binding, arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
 		}
-	}
-
-	void CommandList::BindBuffer(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range)
-	{
-		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
-
-		if (auto descriptorSetSlot = UniformSlot::TryCast(slot))
+		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageBuffer)
 		{
-			unsigned int set = descriptorSetSlot->GetSet();
-			unsigned int binding = descriptorSetSlot->GetBinding();
-			StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
-
-			if (slot->GetDescriptorType() == Renderer::DescriptorType::UniformBuffer)
-			{
-				assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Uniform);
-				stateManager->BindUniformBuffer(set, binding, arrayIndex, Buffer::Cast(uniformBuffer), offset, range);
-			}
-			else if (slot->GetDescriptorType() == Renderer::DescriptorType::StorageBuffer)
-			{
-				assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Storage);
-				stateManager->BindStorageBuffer(set, binding, arrayIndex, Buffer::Cast(uniformBuffer), offset, range);
-			}
+			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Storage);
+			stateManager->BindStorageBuffer(set, binding, arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
 		}
 	}
 
@@ -1159,19 +1151,20 @@ namespace Ck::Vulkan
 	void CommandList::FlushState(Renderer::ShaderProgramType programType)
 	{
 		StateManager* stateManager = GetStateManager(programType);
-		const Ref<Pipeline>& currentPipeline = mCurrentPipelines[programType];
+		std::shared_ptr<Pipeline> currentPipeline = mCurrentPipelines[programType];
 
 		if (!currentPipeline || stateManager->IsDirty(StateManager::DirtyFlagBits::Pipeline))
 		{
-			Ref<Pipeline> pipeline = stateManager->CompilePipeline();
+			std::shared_ptr<Pipeline> pipeline = stateManager->CompilePipeline();
 			if (currentPipeline != pipeline)
 			{
 				vkCmdBindPipeline(mHandle, pipeline->GetLayout()->GetBindPoint(), pipeline->GetHandle());
 				mCurrentPipelines[programType] = pipeline;
+				currentPipeline = pipeline;
 			}
 		}
 
-		const Ref<PipelineLayout>& pipelineLayout = currentPipeline->GetLayout();
+		std::shared_ptr<PipelineLayout> pipelineLayout = currentPipeline->GetLayout();
 
 		if (stateManager->IsDirty(StateManager::DirtyFlagBits::DescriptorSet))
 		{
@@ -1180,7 +1173,7 @@ namespace Ck::Vulkan
 				if (!stateManager->IsDescriptorSetDirty(set))
 					continue;
 
-				const Ref<DescriptorSetLayout>& setLayout = pipelineLayout->GetDescriptorSetLayout(set);
+				std::shared_ptr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
 				if (setLayout->SupportPushDescriptor())
 				{
 					if (auto descriptorUpdateTemplate = pipelineLayout->GetDescriptorUpdateTemplate(set))

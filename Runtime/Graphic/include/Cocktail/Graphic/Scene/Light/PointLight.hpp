@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_SCENE_LIGHT_POINTLIGHT_HPP
 #define COCKTAIL_GRAPHIC_SCENE_LIGHT_POINTLIGHT_HPP
 
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Graphic/Scene/Light/Light.hpp>
 #include <Cocktail/Graphic/Spatial/Transformable.hpp>
 
@@ -10,7 +8,7 @@ namespace Ck
 {
 	class Scene;
 
-	class COCKTAIL_GRAPHIC_API PointLight : public Inherit<PointLight, Transformable, Light>
+	class COCKTAIL_GRAPHIC_API PointLight : public Light, public Transformable
 	{
 	public:
 
@@ -22,7 +20,7 @@ namespace Ck
 		 * \param intensity 
 		 * \return 
 		 */
-		static Ref<PointLight> Create(Ref<Scene> scene, LinearColor color = LinearColor(1.f, 1.f, 1.f), Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
+		static std::shared_ptr<PointLight> Create(std::shared_ptr<Scene> scene, LinearColor color = LinearColor(1.f, 1.f, 1.f), Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
 
 		/**
 		 * \brief 
@@ -30,7 +28,7 @@ namespace Ck
 		 * \param color
 		 * \param intensity 
 		 */
-		PointLight(Ref<TransformationNode> transformationNode, LinearColor color, float intensity = 100.f);
+		PointLight(std::shared_ptr<TransformationNode> transformationNode, LinearColor color, float intensity = 100.f);
 
 		/**
 		 * \brief 

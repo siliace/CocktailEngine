@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		Ref<T> LoadFromPath(const std::filesystem::path& path, const ImportParam& parameters) const
+		std::shared_ptr<T> LoadFromPath(const std::filesystem::path& path, const ImportParam& parameters) const
 		{
 			std::string extension = path.extension().string();
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
@@ -37,7 +37,7 @@ namespace Ck
 				if (!importer->SupportParameters(parameters))
 					continue;
 
-				Ref<T> asset = importer->LoadFromPath(path, parameters);
+				std::shared_ptr<T> asset = importer->LoadFromPath(path, parameters);
 				if (!asset)
 					continue;
 
@@ -75,14 +75,14 @@ namespace Ck
 		 * \param parameters
 		 * \return
 		 */
-		Ref<T> LoadFromStream(InputStream& inputStream, const ImportParam& parameters = {}) const
+		std::shared_ptr<T> LoadFromStream(InputStream& inputStream, const ImportParam& parameters = {}) const
 		{
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
 			{
 				if (!importer->SupportParameters(parameters))
 					continue;
 
-				Ref<T> asset = importer->LoadFromStream(inputStream, parameters);
+				std::shared_ptr<T> asset = importer->LoadFromStream(inputStream, parameters);
 				if (!asset)
 				{
 					inputStream.Rewind();
@@ -120,14 +120,14 @@ namespace Ck
 		 * \param parameters
 		 * \return
 		 */
-		Ref<T> LoadFromMemory(const void* buffer, std::size_t length, const ImportParam& parameters = {}) const
+		std::shared_ptr<T> LoadFromMemory(const void* buffer, std::size_t length, const ImportParam& parameters = {}) const
 		{
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
 			{
 				if (!importer->SupportParameters(parameters))
 					continue;
 
-				Ref<T> asset = importer->LoadFromMemory(buffer, length, parameters);
+				std::shared_ptr<T> asset = importer->LoadFromMemory(buffer, length, parameters);
 				if (!asset)
 					continue;
 

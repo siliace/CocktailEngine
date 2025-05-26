@@ -8,9 +8,14 @@ namespace Ck
 	/**
 	 * \brief Utility base class of object with a 3D position in the world
 	 */
-	class COCKTAIL_GRAPHIC_API Transformable : public Extends<Transformable, Object>
+	class COCKTAIL_GRAPHIC_API Transformable
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~Transformable() = default;
 
 		/**
 		 * \brief 
@@ -90,17 +95,17 @@ namespace Ck
 		 * \brief
 		 * \param transformationNode
 		 */
-		explicit Transformable(Ref<TransformationNode> transformationNode);
+		explicit Transformable(std::shared_ptr<TransformationNode> transformationNode);
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Ref<TransformationNode> GetTransformationNode() const;
+		std::shared_ptr<TransformationNode> GetTransformationNode() const;
 
 	private:
 
-		Ref<TransformationNode> mTransformationNode;
+		std::shared_ptr<TransformationNode> mTransformationNode;
 	};
 }
 

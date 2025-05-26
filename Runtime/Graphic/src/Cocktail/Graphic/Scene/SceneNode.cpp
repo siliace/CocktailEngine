@@ -4,7 +4,7 @@
 
 namespace Ck
 {
-	Shape::Shape(GraphicEngine& graphicEngine, Ref<Mesh> mesh, const std::vector<Ref<Material>>& materials):
+	Shape::Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const std::vector<std::shared_ptr<Material>>& materials):
 		mMesh(std::move(mesh))
 	{
 		mMaterials.reserve(materials.size());
@@ -17,29 +17,29 @@ namespace Ck
 		{
 			unsigned int materialIndex = subMesh.MaterialIndex;
 
-			Ref<Material> material = materials[materialIndex];
+			std::shared_ptr<Material> material = materials[materialIndex];
 
 			mMaterials.insert(material);
-			mGeometries[material.Get()].push_back({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
+			mGeometries[material.get()].push_back({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
 		}
 	}
 
-	const Ref<Mesh>& Shape::GetMesh() const
+	const std::shared_ptr<Mesh>& Shape::GetMesh() const
 	{
 		return mMesh;
 	}
 
-	const Ref<VertexBuffer>& Shape::GetVertexBuffer() const
+	const std::shared_ptr<VertexBuffer>& Shape::GetVertexBuffer() const
 	{
 		return mVertexBuffer;
 	}
 
-	const Ref<IndexBuffer>& Shape::GetIndexBuffer() const
+	const std::shared_ptr<IndexBuffer>& Shape::GetIndexBuffer() const
 	{
 		return mIndexBuffer;
 	}
 
-	const std::unordered_set<Ref<Material>>& Shape::GetMaterials() const
+	const std::unordered_set<std::shared_ptr<Material>>& Shape::GetMaterials() const
 	{
 		return mMaterials;
 	}
@@ -50,18 +50,18 @@ namespace Ck
 		return mGeometries.at(material);
 	}
 
-	SceneNode::SceneNode(Scene* scene, Ref<TransformationNode> transformationNode) :
-		Inherit(std::move(transformationNode)),
+	SceneNode::SceneNode(Scene* scene, std::shared_ptr<TransformationNode> transformationNode) :
+		Transformable(std::move(transformationNode)),
 		mScene(scene),
 		mVisible(true)
 	{
 		/// Nothing
 	}
 
-	void SceneNode::AddShape(Ref<Shape> shape)
+	void SceneNode::AddShape(std::shared_ptr<Shape> shape)
 	{
-		Ref<VertexArray> vertices = shape->GetVertexBuffer()->GetVertexArray();
-		const Ref<VertexLayout>& vertexLayout = vertices->GetVertexLayout();
+		std::shared_ptr<VertexArray> vertices = shape->GetVertexBuffer()->GetVertexArray();
+		const std::shared_ptr<VertexLayout>& vertexLayout = vertices->GetVertexLayout();
 
 		const VertexAttribute* positionAttribute = vertexLayout->FindAttribute(VertexAttributeSemantic::Position);
 		if (positionAttribute)
@@ -97,11 +97,11 @@ namespace Ck
 		StaticMeshRecordInfo recordInfo;
 		recordInfo.Model = worldTransformation.ToMatrix();
 
-		for (Ref<Shape> shape : mShapes)
+		for (std::shared_ptr<Shape> shape : mShapes)
 		{
-			Ref<VertexBuffer> vertexBuffer = shape->GetVertexBuffer();
+			std::shared_ptr<VertexBuffer> vertexBuffer = shape->GetVertexBuffer();
 
-			if (Ref<IndexBuffer> indexBuffer = shape->GetIndexBuffer())
+			if (std::shared_ptr<IndexBuffer> indexBuffer = shape->GetIndexBuffer())
 			{
 				recordInfo.IndexBuffer = indexBuffer->GetUnderlyingResource();
 				recordInfo.IndexType = indexBuffer->GetIndexArray()->GetIndexType();
@@ -111,9 +111,9 @@ namespace Ck
 			recordInfo.VertexBufferCount = 1;
 			recordInfo.VertexBuffers[0].Buffer = vertexBuffer->GetUnderlyingResource();
 			recordInfo.VertexBuffers[0].Offset = 0;
-			recordInfo.VertexBuffers[0].VertexLayout = vertexBuffer->GetVertexArray()->GetVertexLayout().Get();
+			recordInfo.VertexBuffers[0].VertexLayout = vertexBuffer->GetVertexArray()->GetVertexLayout().get();
 
-			for (const Ref<Material>& material : shape->GetMaterials())
+			for (const std::shared_ptr<Material>& material : shape->GetMaterials())
 			{
 				if (material->GetShadingMode() != queue.GetShadingMode())
 					continue;
@@ -132,11 +132,11 @@ namespace Ck
 				recordInfo.Sampler = mScene->GetGraphicEngine()->GetSampler(material->GetSamplerType());
 				for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 				{
-					if (Ref<TextureResource> texture = material->GetTexture(textureType))
+					if (std::shared_ptr<TextureResource> texture = material->GetTexture(textureType))
 						recordInfo.MaterialTextures[textureType] = texture->GetView();
 				}
 
-				for (const Shape::Geometry& geometry : shape->GetGeometries(material.Get()))
+				for (const Shape::Geometry& geometry : shape->GetGeometries(material.get()))
 				{
 					recordInfo.Count = geometry.Count;
 					recordInfo.FirstVertex = geometry.FirstVertex;

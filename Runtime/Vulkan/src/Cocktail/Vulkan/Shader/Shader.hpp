@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_SHADER_SHADER_HPP
 #define COCKTAIL_VULKAN_SHADER_SHADER_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Shader/Shader.hpp>
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 
@@ -20,7 +17,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Shader : public Inherit<Shader, Object, Renderer::Shader>
+	class Shader : public Renderer::Shader
 	{
 	public:
 
@@ -31,7 +28,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Shader(const Ref<RenderDevice>& renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Shader(std::shared_ptr<RenderDevice> renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -48,7 +45,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief
@@ -112,7 +109,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkShaderModule mHandle;
 		Renderer::ShaderType mType;

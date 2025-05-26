@@ -6,7 +6,7 @@
 
 namespace Ck::Vulkan
 {
-	Framebuffer::Framebuffer(const Ref<RenderDevice>& renderDevice, const Ref<RenderPass>& renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Framebuffer::Framebuffer(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mRenderPass(renderPass),
 		mAllocationCallbacks(allocationCallbacks),
@@ -17,7 +17,11 @@ namespace Ck::Vulkan
 		mColorBufferCount = createInfo.ColorAttachmentCount;
 		for (unsigned int i = 0; i < mColorBufferCount; i++)
 		{
-			std::unique_ptr<AttachmentBuffer> buffer = std::make_unique<AttachmentBuffer>(*mRenderDevice, TextureView::Cast(createInfo.ColorAttachments[i]), samples);
+			std::unique_ptr<AttachmentBuffer> buffer = std::make_unique<AttachmentBuffer>(
+				*mRenderDevice, 
+				std::static_pointer_cast<TextureView>(createInfo.ColorAttachments[i]), 
+				samples
+			);
 
 			Extent3D<unsigned int> bufferSize = buffer->GetSize();
 			mSize.Width = std::max(mSize.Width, bufferSize.Width);
@@ -29,7 +33,11 @@ namespace Ck::Vulkan
 
 		if (createInfo.DepthStencilAttachment)
 		{
-			mDepthStencilBuffer = std::make_unique<AttachmentBuffer>(*mRenderDevice, TextureView::Cast(createInfo.DepthStencilAttachment), samples);
+			mDepthStencilBuffer = std::make_unique<AttachmentBuffer>(
+				*mRenderDevice, 
+				std::static_pointer_cast<TextureView>(createInfo.DepthStencilAttachment),
+				samples
+			);
 
 			Extent3D<unsigned int> bufferSize = mDepthStencilBuffer->GetSize();
 			mSize.Width = std::max(mSize.Width, bufferSize.Width);
@@ -88,7 +96,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> Framebuffer::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> Framebuffer::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -103,7 +111,7 @@ namespace Ck::Vulkan
 		return mRenderPass->GetSamples();
 	}
 
-	Ref<Renderer::TextureView> Framebuffer::GetColorMultisampleAttachment(unsigned index) const
+	std::shared_ptr<Renderer::TextureView> Framebuffer::GetColorMultisampleAttachment(unsigned index) const
 	{
 		if (index >= mColorBufferCount)
 			return nullptr;
@@ -111,7 +119,7 @@ namespace Ck::Vulkan
 		return mColorBuffers[index]->GetMultisampleAttachment();
 	}
 
-	Ref<Renderer::TextureView> Framebuffer::GetColorAttachment(unsigned int index) const
+	std::shared_ptr<Renderer::TextureView> Framebuffer::GetColorAttachment(unsigned int index) const
 	{
 		if (index >= mColorBufferCount)
 			return nullptr;
@@ -124,7 +132,7 @@ namespace Ck::Vulkan
 		return mColorBufferCount;
 	}
 
-	Ref<Renderer::TextureView> Framebuffer::GetDepthStencilMultisampleAttachment() const
+	std::shared_ptr<Renderer::TextureView> Framebuffer::GetDepthStencilMultisampleAttachment() const
 	{
 		if (!mDepthStencilBuffer)
 			return nullptr;
@@ -132,7 +140,7 @@ namespace Ck::Vulkan
 		return mDepthStencilBuffer->GetMultisampleAttachment();
 	}
 
-	Ref<Renderer::TextureView> Framebuffer::GetDepthStencilAttachment() const
+	std::shared_ptr<Renderer::TextureView> Framebuffer::GetDepthStencilAttachment() const
 	{
 		if (!mDepthStencilBuffer)
 			return nullptr;
@@ -140,7 +148,7 @@ namespace Ck::Vulkan
 		return mDepthStencilBuffer->GetResolveAttachment();
 	}
 
-	Ref<RenderPass> Framebuffer::GetRenderPass() const
+	std::shared_ptr<RenderPass> Framebuffer::GetRenderPass() const
 	{
 		return mRenderPass;
 	}

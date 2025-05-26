@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	GraphicStateManager::GraphicStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
+	GraphicStateManager::GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
 		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
 		mDynamicState(dynamicState),
 		mShaderProgram(nullptr),
@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-				mState.ShaderStages[shaderType].Shader = mShaderStages[shaderType].Get();
+				mState.ShaderStages[shaderType].Shader = mShaderStages[shaderType].get();
 		}
 	}
 
@@ -260,8 +260,10 @@ namespace Ck::Vulkan
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 	}
 
-	void GraphicStateManager::SetRenderPass(const RenderPass* renderPass)
+	void GraphicStateManager::SetRenderPass(const std::shared_ptr<RenderPass>& renderPass)
 	{
+		assert(renderPass);
+
 		if (CheckedAssign(mRenderPass, renderPass))
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 
@@ -309,7 +311,7 @@ namespace Ck::Vulkan
 		mIndexBufferBinding = {};
 	}
 
-	Ref<Pipeline> GraphicStateManager::CompilePipeline()
+	std::shared_ptr<Pipeline> GraphicStateManager::CompilePipeline()
 	{
 		assert(mShaderProgram);
 		assert(mRenderPass);
@@ -323,7 +325,7 @@ namespace Ck::Vulkan
 
 		mDirtyFlags &= ~DirtyFlagBits::Pipeline;
 
-		return mRenderDevice->Invoke([&](PipelineCache* pipelineCache) -> Ref<Pipeline> {
+		return mRenderDevice->Invoke([&](PipelineCache* pipelineCache) -> std::shared_ptr<Pipeline> {
 			return pipelineCache->CreateGraphicPipeline(createInfo);
 		});
 	}

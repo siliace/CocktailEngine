@@ -3,9 +3,6 @@
 
 #include <memory>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 namespace Ck
@@ -15,7 +12,7 @@ namespace Ck
      * \tparam T 
      */
     template <typename T>
-	class AcyclicGraph : public Extends<AcyclicGraph<T>, Object>
+	class AcyclicGraph
 	{
 	public:
 
@@ -63,7 +60,7 @@ namespace Ck
 		 * \return 
 		 */
 		template <typename... Args>
-		Ref<T> CreateNode(Args&&... args)
+		std::shared_ptr<T> CreateNode(Args&&... args)
 		{
 			return mNodePool.Allocate(std::forward<Args>(args)...);
 		}
@@ -88,14 +85,14 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Ref<T> GetRoot() const
+		std::shared_ptr<T> GetRoot() const
 		{
 			return mRoot;
 		}
 
     protected:
 
-		Ref<T> mRoot;
+		std::shared_ptr<T> mRoot;
 
 	private:
 
@@ -107,15 +104,17 @@ namespace Ck
 	 * \tparam T 
 	 */
 	template <typename T>
-	class AcyclicGraphNode : public Implements<AcyclicGraphNode<T>, Interface>
+	class AcyclicGraphNode
 	{
 	public:
+
+		virtual ~AcyclicGraphNode() = default;
 
 		/**
 		 * \brief 
 		 * \param child 
 		 */
-		void InsertChild(Ref<T> child)
+		void InsertChild(std::shared_ptr<T> child)
 		{
 			if (auto parent = child->GetParent())
 				parent->RemoveChild(child);
@@ -129,7 +128,7 @@ namespace Ck
 		 * \param child 
 		 * \return 
 		 */
-		void RemoveChild(const Ref<T>& child)
+		void RemoveChild(const std::shared_ptr<T>& child)
 		{
 			for (auto it = mChildren.begin(); it != mChildren.end();)
 			{
@@ -153,7 +152,7 @@ namespace Ck
 		void Visit(TCallable callable)
 		{
 			callable(static_cast<T*>(this));
-			for (const Ref<T>& child : mChildren)
+			for (const std::shared_ptr<T>& child : mChildren)
 				child->Visit(callable);
 		}
 
@@ -162,7 +161,7 @@ namespace Ck
 			return mParent;
 		}
 
-		const std::vector<Ref<T>>& GetChildren() const
+		const std::vector<std::shared_ptr<T>>& GetChildren() const
 		{
 			return mChildren;
 		}
@@ -170,7 +169,7 @@ namespace Ck
 	private:
 
 		T* mParent = nullptr;
-		std::vector<Ref<T>> mChildren;
+		std::vector<std::shared_ptr<T>> mChildren;
 	};
 }
 

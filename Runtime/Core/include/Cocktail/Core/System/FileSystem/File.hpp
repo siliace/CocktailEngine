@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-#include <Cocktail/Core/Meta/Implements.hpp>
+#include <Cocktail/Core/Cocktail.hpp>
 #include <Cocktail/Core/System/FileSystem/FileCursorMode.hpp>
 
 namespace Ck
@@ -11,9 +11,14 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class File : public Implements<File, Interface>
+	class File
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~File() = default;
 
 		/**
 		 * \brief 

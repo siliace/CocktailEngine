@@ -3,7 +3,6 @@
 
 #include <Cocktail/Core/Asset/AssetExporter.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 
 namespace Ck
 {

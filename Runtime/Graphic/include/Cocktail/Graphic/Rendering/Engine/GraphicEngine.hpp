@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
 
-#include <Cocktail/Core/Application/Application.hpp>
-
 #include <Cocktail/Graphic/Material/MipMaps/MipMaps.hpp>
 #include <Cocktail/Graphic/Rendering/SceneViewer.hpp>
 #include <Cocktail/Graphic/Rendering/Engine/ResourceUploader.hpp>
@@ -20,7 +18,7 @@ namespace Ck
 	/**
      * \brief 
      */
-	class COCKTAIL_GRAPHIC_API GraphicEngine : public Extends<GraphicEngine, Object>, public Observable
+	class COCKTAIL_GRAPHIC_API GraphicEngine : public Observable, public std::enable_shared_from_this<GraphicEngine>
 	{
 	public:
 
@@ -42,7 +40,7 @@ namespace Ck
 	     * \param name 
 	     * \return 
 	     */
-		Ref<VertexBuffer> CreateVertexBuffer(Ref<VertexArray> vertices, bool updatable = false, std::string_view name = "");
+		std::shared_ptr<VertexBuffer> CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable = false, std::string_view name = "");
 
 		/**
 		 * \brief
@@ -51,14 +49,14 @@ namespace Ck
 		 * \param name
 		 * \return
 		 */
-		Ref<IndexBuffer> CreateIndexBuffer(Ref<IndexArray> indices, bool updatable = false, std::string_view name = "");
+		std::shared_ptr<IndexBuffer> CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable = false, std::string_view name = "");
 
 		/**
 		 * \brief 
 		 * \param mipMaps 
 		 * \return 
 		 */
-		Ref<TextureResource> CreateTextureSampler(Ref<MipMaps> mipMaps, std::string_view name = "");
+		std::shared_ptr<TextureResource> CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, std::string_view name = "");
 
 		/**
 	     * \brief 
@@ -67,7 +65,7 @@ namespace Ck
 	     * \param length 
 	     * \param data 
 	     */
-		void UploadBuffer(Ref<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
+		void UploadBuffer(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
 
 		/**
 		 * \brief 
@@ -76,7 +74,7 @@ namespace Ck
 		 * \param mipMapLevel 
 		 * \param data 
 		 */
-		void UploadTexture(Ref<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
+		void UploadTexture(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
 
 		/**
 		 * \brief 
@@ -92,13 +90,13 @@ namespace Ck
 	     * \brief 
 	     * \return 
 	     */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const;
 
 		/**
 	     * \brief 
 	     * \return 
 	     */
-		Ref<Renderer::RenderContext> GetRenderContext() const;
+		std::shared_ptr<Renderer::RenderContext> GetRenderContext() const;
 
 		Renderer::FrameContext* GetFrameContext() const;
 
@@ -106,25 +104,25 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Ref<MaterialProgramManager> GetMaterialProgramManager() const;
+		std::shared_ptr<MaterialProgramManager> GetMaterialProgramManager() const;
 
 		/**
 		 * \brief
 		 * \param
 		 * \return
 		 */
-		Ref<Renderer::Sampler> GetSampler(SamplerType samplerType) const;
+		std::shared_ptr<Renderer::Sampler> GetSampler(SamplerType samplerType) const;
 
 	private:
 
-		Ref<Renderer::RenderDevice> mRenderDevice;
-		Ref<Renderer::RenderContext> mRenderContext;
+		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
+		std::shared_ptr<Renderer::RenderContext> mRenderContext;
 		Renderer::FrameContext* mFrameContext;
-		Ref<ResourceUploader> mResourceUploader;
-		Ref<MaterialProgramManager> mMaterialProgramManager;
-		std::unordered_map<Ref<Window>, Ref<Renderer::RenderSurface>> mWindowRenderSurfaces;
-		std::vector<Ref<TextureResource>> mGeneratingMipMaps;
-		EnumMap<SamplerType, Ref<Renderer::Sampler>> mSamplers;
+		std::shared_ptr<ResourceUploader> mResourceUploader;
+		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
+		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<Renderer::RenderSurface>> mWindowRenderSurfaces;
+		std::vector<std::shared_ptr<TextureResource>> mGeneratingMipMaps;
+		EnumMap<SamplerType, std::shared_ptr<Renderer::Sampler>> mSamplers;
 	};
 }
 

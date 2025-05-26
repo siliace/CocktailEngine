@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITORSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITORSERVICE_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/System/Monitor/Monitor.hpp>
 
 namespace Ck
@@ -25,7 +27,7 @@ namespace Ck
 		 * On Linux, the primary monitor is usually chosen by the window manager
 		 * \return The primary monitor
 		 */
-		virtual Ref<Monitor> GetPrimaryMonitor() const = 0;
+		virtual std::shared_ptr<Monitor> GetPrimaryMonitor() const = 0;
 
 		/**
 		 * \brief 
@@ -38,14 +40,14 @@ namespace Ck
 		 * \param index 
 		 * \return 
 		 */
-		virtual Ref<Monitor> GetMonitor(std::size_t index) const = 0;
+		virtual std::shared_ptr<Monitor> GetMonitor(std::size_t index) const = 0;
 
 		/**
 		 * \brief 
 		 * \param window 
 		 * \return 
 		 */
-		virtual Ref<Monitor> GetWindowMonitor(const Window& window) const = 0;
+		virtual std::shared_ptr<Monitor> GetWindowMonitor(const Window& window) const = 0;
 	};
 }
 

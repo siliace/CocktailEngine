@@ -82,7 +82,7 @@ namespace Ck
 		}
 	}
 
-	Ref<MipMaps> DDSImporter::LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters)
+	std::shared_ptr<MipMaps> DDSImporter::LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters)
 	{
 		static Flags RequiredFileFlags = DDSHeader::FlagBits::Caps | DDSHeader::FlagBits::Height |
 			DDSHeader::FlagBits::Width | DDSHeader::FlagBits::PixelFormat;
@@ -127,7 +127,7 @@ namespace Ck
 			if (!(header.Caps2 & RequiredCubeFlags))
 				throw DDSImportException("Missing face in DDS cubemap");
 
-			Ref<CubeMipMaps> mipMaps = CubeMipMaps::New(MakeExtent(baseSize.Width, baseSize.Height), pixelFormat, arrayLayerCount, mipMapCount);
+			std::shared_ptr<CubeMipMaps> mipMaps = std::make_shared<CubeMipMaps>(MakeExtent(baseSize.Width, baseSize.Height), pixelFormat, arrayLayerCount, mipMapCount);
 			for (unsigned int slice = 0; slice < arrayLayerCount; slice++)
 			{
 				for (CubeMipMaps::Face face : Enum<CubeMipMaps::Face>::Values)
@@ -149,7 +149,7 @@ namespace Ck
 			return mipMaps;
 		}
 
-		Ref<MipMaps> mipMaps = MipMaps::New(baseSize, pixelFormat, arrayLayerCount, mipMapCount);
+		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseSize, pixelFormat, arrayLayerCount, mipMapCount);
 		for (unsigned int slice = 0; slice < arrayLayerCount; slice++)
 		{
 			for (unsigned level = 0; level < mipMapCount; level++)

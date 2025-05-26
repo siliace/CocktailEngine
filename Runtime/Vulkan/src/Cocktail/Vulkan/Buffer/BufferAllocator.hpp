@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_BUFFER_BUFFERALLOCATOR_HPP
 #define COCKTAIL_VULKAN_BUFFER_BUFFERALLOCATOR_HPP
 
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
 #include <Cocktail/Renderer/Memory/MemoryType.hpp>
@@ -16,7 +14,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class BufferAllocator : public Inherit<BufferAllocator, Object, Renderer::BufferAllocator>
+	class BufferAllocator : public Renderer::BufferAllocator
 	{
 	public:
 
@@ -27,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param bufferSize
 		 * \param memoryType
 		 */
-		BufferAllocator(Ref<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType);
+		BufferAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType);
 
 		/**
 		 * \brief
@@ -67,15 +65,15 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \return
 		 */
-		Ref<BufferPool> AcquirePool(std::size_t size);
+		std::shared_ptr<BufferPool> AcquirePool(std::size_t size);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::BufferUsageFlags mUsage;
 		std::size_t mBufferSize;
 		Renderer::MemoryType mMemoryType;
 		std::size_t mMinAlignment;
-		std::vector<Ref<BufferPool>> mAcquiredBufferPools;
-		std::vector<Ref<BufferPool>> mAvailableBufferPools;
+		std::vector<std::shared_ptr<BufferPool>> mAcquiredBufferPools;
+		std::vector<std::shared_ptr<BufferPool>> mAvailableBufferPools;
 		TlsObjectPool<BufferPool> mBufferPool;
 	};
 }

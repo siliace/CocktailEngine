@@ -14,7 +14,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class MaterialProgramLibrary : public Extends<MaterialProgramLibrary, Object>
+	class MaterialProgramLibrary
 	{
 	public:
 

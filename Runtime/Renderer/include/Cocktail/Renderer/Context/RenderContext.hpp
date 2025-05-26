@@ -14,7 +14,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief 
 	 */
-	class RenderContext : public Implements<RenderContext, RenderDeviceObject>
+	class RenderContext : public RenderDeviceObject
 	{
 	public:
 			
@@ -23,7 +23,7 @@ namespace Ck::Renderer
 		 * \param createInfo 
 		 * \return 
 		 */
-		virtual Ref<CommandListPool> CreateCommandListPool(const CommandListPoolCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<CommandListPool> CreateCommandListPool(const CommandListPoolCreateInfo& createInfo) = 0;
 
 		/**
 		 * \brief 
@@ -50,7 +50,7 @@ namespace Ck::Renderer
 		 * \param commandLists Command lists to execute
 		 * \param fence A fence to signal when every command list as been completed
 		 */
-		virtual void ExecuteCommandLists(CommandQueueType queue, unsigned int commandListCount, Ref<CommandList>* commandLists, Ref<Fence> fence) = 0;
+		virtual void ExecuteCommandLists(CommandQueueType queue, unsigned int commandListCount, CommandList** commandLists, Fence* fence) = 0;
 
 		/**
 		 * \brief 

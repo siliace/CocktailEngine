@@ -6,7 +6,7 @@
 
 namespace Ck::Vulkan
 {
-	Swapchain::Swapchain(Ref<RenderDevice> renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
+	Swapchain::Swapchain(std::shared_ptr<RenderDevice> renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 		{
 			mTextureCount = swapchainImageCount;
 			for (unsigned int i = 0; i < mTextureCount; i++)
-				mTextures[i] = SwapchainTexture::New(mRenderDevice, createInfo.Format, createInfo.Size, swapchainImages[i]);
+				mTextures[i] = std::make_shared<SwapchainTexture>(mRenderDevice, createInfo.Format, createInfo.Size, swapchainImages[i]);
 		}
 	}
 
@@ -97,7 +97,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> Swapchain::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> Swapchain::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -107,7 +107,7 @@ namespace Ck::Vulkan
 		return mTextureCount;
 	}
 
-	Ref<SwapchainTexture> Swapchain::GetTexture(unsigned int index) const
+	std::shared_ptr<SwapchainTexture> Swapchain::GetTexture(unsigned int index) const
 	{
 		if (index >= mTextureCount)
 			return nullptr;

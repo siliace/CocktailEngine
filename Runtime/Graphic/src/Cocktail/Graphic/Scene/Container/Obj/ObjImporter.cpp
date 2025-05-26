@@ -12,7 +12,7 @@ namespace Ck
 {
 	COCKTAIL_DECLARE_EXCEPTION_BASE(ObjParseError, "Failed to parse obj file", std::runtime_error);
 
-	Ref<SceneContainer> ObjImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
+	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
 	{
 		SceneImportParameters importParameters = parameters;
 		importParameters.BaseDirectory = path.parent_path();
@@ -25,10 +25,10 @@ namespace Ck
 		if (!reader.ParseFromFile(path.string(), readerConfig))
 			throw ObjParseError(reader.Error());
 
-		return ObjSceneContainer::New(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
+		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
 
-	Ref<SceneContainer> ObjImporter::LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters)
+	std::shared_ptr<SceneContainer> ObjImporter::LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters)
 	{
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
@@ -57,7 +57,7 @@ namespace Ck
 		if (!reader.ParseFromString(objText, mtlText, readerConfig))
 			throw ObjParseError(reader.Error());
 
-		return ObjSceneContainer::New(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
+		return std::make_shared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
 
 	bool ObjImporter::SupportExtension(std::string_view extension) const

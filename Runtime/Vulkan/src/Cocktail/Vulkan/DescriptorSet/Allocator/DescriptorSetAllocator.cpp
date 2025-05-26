@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorSetAllocator::DescriptorSetAllocator(const Ref<RenderDevice>& renderDevice, const DescriptorSetAllocatorCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	DescriptorSetAllocator::DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice, const DescriptorSetAllocatorCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks)
 	{
@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 	{
 		mAcquiredSets.clear();
 		mVacantSets.clear();
-		for (const Ref<DescriptorPool>& descriptorPool : mDescriptorPools)
+		for (std::shared_ptr<DescriptorPool> descriptorPool : mDescriptorPools)
 			descriptorPool->Reset();
 	}
 
@@ -23,18 +23,18 @@ namespace Ck::Vulkan
 	{
 	}
 
-	Ref<Renderer::RenderDevice> DescriptorSetAllocator::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> DescriptorSetAllocator::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
 
-	Ref<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo)
+	std::shared_ptr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo)
 	{
-		auto it = std::find_if(mVacantSets.begin(), mVacantSets.end(), [&](const Ref<DescriptorSet>& set) {
+		auto it = std::find_if(mVacantSets.begin(), mVacantSets.end(), [&](std::shared_ptr<DescriptorSet> set) {
 			return createInfo.Layout->IsCompatibleWith(*set->GetLayout());
 		});
 
-		Ref<DescriptorSet> descriptorSet;
+		std::shared_ptr<DescriptorSet> descriptorSet;
 		if (it != mVacantSets.end())
 		{
 			descriptorSet = std::move(*it);
@@ -43,9 +43,9 @@ namespace Ck::Vulkan
 		}
 		else
 		{
-			Ref<DescriptorPool> descriptorPool = CreateDescriptorPool(createInfo.Layout);
+			std::shared_ptr<DescriptorPool> descriptorPool = CreateDescriptorPool(createInfo.Layout);
 
-			Ref<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
+			std::shared_ptr<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
 			for (unsigned int i = 0; i < MaxSetPerDescriptorPool; i++)
 				descriptorSets[i] = mDescriptorSetPool.Allocate(mRenderDevice, descriptorPool, createInfo, mAllocationCallbacks);
 
@@ -61,19 +61,19 @@ namespace Ck::Vulkan
 
 	void DescriptorSetAllocator::Reset()
 	{
-		for (Ref<DescriptorSet>& descriptorSet : mAcquiredSets)
+		for (std::shared_ptr<DescriptorSet>& descriptorSet : mAcquiredSets)
 			mVacantSets.push_back(std::move(descriptorSet));
 
 		mAcquiredSets.clear();
 	}
 
-	Ref<DescriptorPool> DescriptorSetAllocator::CreateDescriptorPool(const Ref<DescriptorSetLayout>& layout)
+	std::shared_ptr<DescriptorPool> DescriptorSetAllocator::CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout)
 	{
 		DescriptorPoolCreateInfo createInfo;
 		createInfo.MaxSet = MaxSetPerDescriptorPool;
 		createInfo.LayoutSignature = layout->ToSignature();
 
-		Ref<DescriptorPool> descriptorPool = mRenderDevice->CreateDescriptorPool(createInfo);
+		std::shared_ptr<DescriptorPool> descriptorPool = mRenderDevice->CreateDescriptorPool(createInfo);
 		mDescriptorPools.push_back(descriptorPool);
 
 		return descriptorPool;

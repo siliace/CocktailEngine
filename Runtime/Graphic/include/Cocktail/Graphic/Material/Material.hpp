@@ -1,10 +1,10 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP
 
+#include <memory>
 #include <string>
 
 #include <Cocktail/Core/Color.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
@@ -14,7 +14,7 @@ namespace Ck
 {
 	class TextureResource;
 
-	class COCKTAIL_GRAPHIC_API Material : public Extends<Material, Object>
+	class COCKTAIL_GRAPHIC_API Material
 	{
 	public:
 
@@ -77,14 +77,14 @@ namespace Ck
 		 * \param textureType 
 		 * \param textureResource 
 		 */
-		void SetTexture(TextureType textureType, Ref<TextureResource> textureResource);
+		void SetTexture(TextureType textureType, std::shared_ptr<TextureResource> textureResource);
 
 		/**
 		 * \brief 
 		 * \param textureType 
 		 * \return 
 		 */
-		Ref<TextureResource> GetTexture(TextureType textureType) const;
+		std::shared_ptr<TextureResource> GetTexture(TextureType textureType) const;
 
 		/**
 		 * \brief 
@@ -127,7 +127,7 @@ namespace Ck
 		std::string mName;
 		ShadingMode mShadingMode;
 		UniformColors mUniformColors;
-		EnumMap<TextureType, Ref<TextureResource>> mTextures;
+		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;
 		SamplerType mSamplerType;
 		bool mDoubleSided;
 		bool mOpaque;

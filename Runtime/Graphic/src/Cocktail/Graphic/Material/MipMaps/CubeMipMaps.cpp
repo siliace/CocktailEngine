@@ -3,7 +3,7 @@
 namespace Ck
 {
 	CubeMipMaps::CubeMipMaps(const Extent2D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int levelCount):
-		Super(MakeExtent(baseSize, 1u), pixelFormat, arrayLayerCount * 6, levelCount)
+		MipMaps(MakeExtent(baseSize, 1u), pixelFormat, arrayLayerCount * 6, levelCount)
 	{
 		/// Nothing	
 	}

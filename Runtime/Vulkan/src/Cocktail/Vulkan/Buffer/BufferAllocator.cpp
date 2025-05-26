@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	BufferAllocator::BufferAllocator(Ref<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType) :
+	BufferAllocator::BufferAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType) :
 		mRenderDevice(std::move(renderDevice)),
 		mUsage(usage),
 		mBufferSize(bufferSize),
@@ -34,10 +34,10 @@ namespace Ck::Vulkan
 
     Renderer::BufferArea BufferAllocator::PushData(std::size_t size, const void *data)
     {
-		Ref<BufferPool> bufferPool = AcquirePool(size);
+		std::shared_ptr<BufferPool> bufferPool = AcquirePool(size);
 
 		Renderer::BufferArea bufferArea;
-		bufferArea.Buffer = bufferPool.Get();
+		bufferArea.Buffer = bufferPool.get();
 		bufferArea.BaseOffset = bufferPool->PushData(mMinAlignment, size, data);
 		bufferArea.Range = size;
 
@@ -46,13 +46,13 @@ namespace Ck::Vulkan
 
 	void BufferAllocator::Reserve(std::size_t size)
 	{
-		for (const Ref<BufferPool>& acquiredBufferPools : mAcquiredBufferPools)
+		for (std::shared_ptr<BufferPool> acquiredBufferPools : mAcquiredBufferPools)
 		{
 			if (size < acquiredBufferPools->GetRemainingCapacity())
 				return;
 		}
 
-		for (const Ref<BufferPool>& availableBufferPool : mAvailableBufferPools)
+		for (std::shared_ptr<BufferPool> availableBufferPool : mAvailableBufferPools)
 		{
 			if (size < availableBufferPool->GetRemainingCapacity())
 				return;
@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 	{
 		if (!release)
 		{
-			for (Ref<BufferPool> bufferPool : mAcquiredBufferPools)
+			for (std::shared_ptr<BufferPool> bufferPool : mAcquiredBufferPools)
 			{
 				bufferPool->Reset();
 				mAvailableBufferPools.push_back(bufferPool);
@@ -85,20 +85,20 @@ namespace Ck::Vulkan
 		return mBufferSize;
 	}
 
-	Ref<BufferPool> BufferAllocator::AcquirePool(std::size_t size)
+	std::shared_ptr<BufferPool> BufferAllocator::AcquirePool(std::size_t size)
 	{
-		for (Ref<BufferPool> buffer : mAcquiredBufferPools)
+		for (std::shared_ptr<BufferPool> buffer : mAcquiredBufferPools)
 		{
 			std::size_t padding = buffer->ComputePadding(mMinAlignment);
 			if (padding + size <= buffer->GetRemainingCapacity())
 				return buffer;
 		}
 
-		auto itBuffer = std::find_if(mAvailableBufferPools.begin(), mAvailableBufferPools.end(), [&](const Ref<BufferPool>& bufferPool) {
+		auto itBuffer = std::find_if(mAvailableBufferPools.begin(), mAvailableBufferPools.end(), [&](std::shared_ptr<BufferPool> bufferPool) {
 			return bufferPool->GetRemainingCapacity() + bufferPool->ComputePadding(mMinAlignment) > size;
 		});
 
-		Ref<BufferPool> buffer;
+		std::shared_ptr<BufferPool> buffer;
 		if (itBuffer != mAvailableBufferPools.end())
 		{
 			buffer = std::move(*itBuffer);

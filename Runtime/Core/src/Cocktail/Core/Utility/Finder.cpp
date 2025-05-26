@@ -60,7 +60,7 @@ namespace Ck
 	std::vector<std::filesystem::path> Finder::Get(const std::filesystem::path& source, unsigned int depth) const
 	{
 		std::vector<std::filesystem::path> content;
-		Ref<Directory> directory = Storage::OpenDirectory(source);
+		std::shared_ptr<Directory> directory = Storage::OpenDirectory(source);
 
 		for (const std::filesystem::path& child : directory->GetContent())
 		{

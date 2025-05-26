@@ -33,7 +33,7 @@ namespace Ck
         }
     }
 
-    TextureResource::TextureResource(Ref<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube, std::string_view name) :
+    TextureResource::TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube, std::string_view name) :
         mGraphicEngine(std::move(graphicEngine))
     {
         Renderer::TextureCreateInfo createInfo;
@@ -58,10 +58,10 @@ namespace Ck
     void TextureResource::GenerateMipMaps(Renderer::CommandList& commandList) const
     {
         Renderer::TextureSubResource subResource = Renderer::TextureSubResource::AllLayersAllLevels(*mTexture, 0, 1);
-        commandList.GenerateMipMaps(mTexture.Get(), Renderer::ResourceState::GraphicShaderResource, subResource);
+        commandList.GenerateMipMaps(mTexture.get(), Renderer::ResourceState::GraphicShaderResource, subResource);
     }
 
-    Ref<Renderer::TextureView> TextureResource::GetView() const
+    std::shared_ptr<Renderer::TextureView> TextureResource::GetView() const
     {
         return mView;
     }
@@ -93,10 +93,10 @@ namespace Ck
 
     Renderer::Texture* TextureResource::GetUnderlyingResource() const
     {
-        return mTexture.Get();
+        return mTexture.get();
     }
 
-    Ref<GraphicEngine> TextureResource::GetGraphicEngine() const
+    std::shared_ptr<GraphicEngine> TextureResource::GetGraphicEngine() const
     {
         return mGraphicEngine;
     }

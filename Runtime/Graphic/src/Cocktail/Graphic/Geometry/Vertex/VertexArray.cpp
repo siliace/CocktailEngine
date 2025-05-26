@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	VertexArray::VertexArray(Ref<VertexLayout> layout, std::size_t vertexCount, bool interlaced) :
+	VertexArray::VertexArray(std::shared_ptr<VertexLayout> layout, std::size_t vertexCount, bool interlaced) :
 		mVertexLayout(std::move(layout)),
 		mVertexCount(vertexCount),
 		mInterlaced(interlaced)
@@ -44,16 +44,16 @@ namespace Ck
 	VertexRef VertexArray::At(std::size_t index)
 	{
 		assert(index < mVertexCount);
-		return VertexRef(mVertexLayout.Get(), &mVertices, index, mVertexCount, mInterlaced);
+		return VertexRef(mVertexLayout.get(), &mVertices, index, mVertexCount, mInterlaced);
 	}
 
 	VertexConstRef VertexArray::At(std::size_t index) const
 	{
 		assert(index < mVertexCount);
-		return VertexConstRef(mVertexLayout.Get(), &mVertices, index, mVertexCount, mInterlaced);
+		return VertexConstRef(mVertexLayout.get(), &mVertices, index, mVertexCount, mInterlaced);
 	}
 
-	const Ref<VertexLayout>& VertexArray::GetVertexLayout() const
+	const std::shared_ptr<VertexLayout>& VertexArray::GetVertexLayout() const
 	{
 		return mVertexLayout;
 	}

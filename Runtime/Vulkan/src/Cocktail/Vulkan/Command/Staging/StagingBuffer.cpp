@@ -4,8 +4,8 @@
 
 namespace Ck::Vulkan
 {
-	StagingBuffer::StagingBuffer(Ref<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		Super(std::move(renderDevice), createInfo, allocationCallbacks),
+	StagingBuffer::StagingBuffer(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+		Buffer(std::move(renderDevice), createInfo, allocationCallbacks),
 		mRemainingCapacity(createInfo.Size)
 	{
 		/// Nothing

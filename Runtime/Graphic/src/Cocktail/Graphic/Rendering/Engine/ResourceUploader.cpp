@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	void ResourceUploader::RequestBufferUpload(Ref<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
+	void ResourceUploader::RequestBufferUpload(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
 	{
 		for (auto& bufferUploadRequest : mBufferUploadRequests)
 		{
@@ -18,7 +18,7 @@ namespace Ck
 		mBufferUploadRequests.push_back(std::move(bufferUploadRequest));
 	}
 
-	void ResourceUploader::RequestTextureUpload(Ref<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
+	void ResourceUploader::RequestTextureUpload(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
 	{
 		Extent3D<unsigned int> textureSize = texture->GetSize();
 		Extent3D<unsigned int> uploadSize = MakeExtent(textureSize.Width, textureSize.Height, 1u);

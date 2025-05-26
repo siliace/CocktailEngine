@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_XLIB_SYSTEMCURSOR_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_XLIB_SYSTEMCURSOR_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/Unix/Xlib/Xlib.hpp>
 #include <Cocktail/Core/System/Window/SystemCursor.hpp>
 
@@ -11,7 +9,7 @@ namespace Ck::Detail::Xlib
 	/**
 	 * \brief 
 	 */
-	class SystemCursor : public Inherit<SystemCursor, Object, Ck::SystemCursor>
+	class SystemCursor : public Ck::SystemCursor
 	{
 	public:
 

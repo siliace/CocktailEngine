@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API IndexBuffer : public Extends<IndexBuffer, BufferResource>
+	class COCKTAIL_GRAPHIC_API IndexBuffer : public BufferResource
 	{
 	public:
 
@@ -16,7 +16,7 @@ namespace Ck
 		 * \param indices
 		 * \param name 
 		 */
-		IndexBuffer(Ref<GraphicEngine> graphicEngine, Ref<IndexArray> indices, std::string_view name = "");
+		IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, std::string_view name = "");
 
 		/**
 		 * \brief
@@ -32,11 +32,11 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Ref<IndexArray> GetIndexArray() const;
+		std::shared_ptr<IndexArray> GetIndexArray() const;
 
     private:
 
-        Ref<IndexArray> mIndices;
+        std::shared_ptr<IndexArray> mIndices;
 	};
 }
 

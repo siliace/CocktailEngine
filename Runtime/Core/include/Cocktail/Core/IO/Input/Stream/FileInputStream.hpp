@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_IO_INPUT_STREAM_FILEINPUTSTREAM_HPP
 #define COCKTAIL_CORE_IO_INPUT_STREAM_FILEINPUTSTREAM_HPP
 
+#include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/IO/Input/Stream/InputStream.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 
@@ -17,7 +18,7 @@ namespace Ck
 		 * \brief Constructor
 		 * \param file The file to read from
 		 */
-		explicit FileInputStream(const Ref<File>& file);
+		explicit FileInputStream(const std::shared_ptr<File>& file);
 
 		/**
 		 * \brief 
@@ -69,7 +70,7 @@ namespace Ck
 
 	private:
 
-		Ref<File> mFile;
+		std::shared_ptr<File> mFile;
 	};
 }
 

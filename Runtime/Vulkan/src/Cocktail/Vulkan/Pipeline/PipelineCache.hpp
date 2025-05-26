@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		PipelineCache(const Ref<RenderDevice>& renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		PipelineCache(std::shared_ptr<RenderDevice> renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -37,14 +37,14 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<ComputePipeline> CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
+		std::shared_ptr<ComputePipeline> CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<GraphicPipeline> CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo);
+		std::shared_ptr<GraphicPipeline> CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief 
@@ -56,7 +56,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<RenderDevice> GetRenderDevice() const;
+		std::shared_ptr<RenderDevice> GetRenderDevice() const;
 
 		/**
 		 * \brief 
@@ -72,10 +72,10 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipelineCache mHandle;
-		std::unordered_map<PipelineStateHash, Ref<Pipeline>> mCache;
+		std::unordered_map<PipelineStateHash, std::shared_ptr<Pipeline>> mCache;
 	};
 }
 

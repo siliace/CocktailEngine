@@ -5,8 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include <Cocktail/Core/Memory/Ref.hpp>
-#include <Cocktail/Core/Memory/Detail/StorageRefCounter.hpp>
 #include <Cocktail/Core/System/Concurrency/NullMutex.hpp>
 #include <Cocktail/Core/System/Concurrency/SpinMutex.hpp>
 
@@ -14,44 +12,6 @@ namespace Ck
 {
 	namespace Detail
 	{
-		template <typename, typename>
-		class ObjectPoolBase;
-
-		/**
-		 * \brief 
-		 * \tparam T 
-		 */
-		template <typename T, typename Lockable>
-		class ObjectPoolRefCounter : public StorageRefCounter<T>
-		{
-		public:
-
-			/**
-			 * \brief 
-			 * \tparam Args 
-			 * \param owner 
-			 * \param args 
-			 */
-			template <typename... Args>
-			explicit ObjectPoolRefCounter(ObjectPoolBase<T, Lockable>* owner, Args&&... args) :
-				StorageRefCounter<T>(std::forward<Args>(args)...),
-				mOwner(owner)
-			{
-				/// Nothing
-			}
-
-		protected:
-
-			void Suicide() override
-			{
-				mOwner->Recycle(this);
-			}
-
-		private:
-
-			ObjectPoolBase<T, Lockable>* mOwner;
-		};
-
 		/**
 		 * \brief 
 		 * \tparam T 
@@ -61,8 +21,6 @@ namespace Ck
 		class ObjectPoolBase
 		{
 		public:
-
-			using PoolRefCounter = ObjectPoolRefCounter<T, Lockable>;
 
 			/**
 			 * \brief Constructor
@@ -134,7 +92,7 @@ namespace Ck
 			 * \return 
 			 */
 			template <typename... Args>
-			Ref<T> Allocate(Args&&... args)
+			std::shared_ptr<T> Allocate(Args&&... args)
 			{
 				std::lock_guard<Lockable> lg(mMutex);
 				if (mVacants.empty())
@@ -143,15 +101,15 @@ namespace Ck
 					AllocatePage((mPages.size() + 1) * 32);
 				}
 
-				PoolRefCounter* location = mVacants.back();
+				T* location = mVacants.back();
 				mVacants.pop_back();
 
-				PoolRefCounter* refCounter = new (location) PoolRefCounter(this, std::forward<Args>(args)...);
+				auto deleter = [this](T* object) {
+					object->~T();
+					Recycle(object);
+				};
 
-				T* pointer = refCounter->GetPointer();
-				Object::AssignRefCounter(pointer, refCounter);
-
-				return Ref<T>(pointer, refCounter);
+				return std::shared_ptr<T>(new (location) T(std::forward<Args>(args)...), deleter);
 			}
 
 			/**
@@ -167,16 +125,14 @@ namespace Ck
 
 		private:
 
-			friend class ObjectPoolRefCounter<T, Lockable>;
-
 			/**
 			 * \brief 
 			 * \param objectCount 
 			 */
 			void AllocatePage(std::size_t objectCount)
 			{
-				auto page = std::make_unique<unsigned char[]>(sizeof(PoolRefCounter) * objectCount);
-				PoolRefCounter* vacants = reinterpret_cast<PoolRefCounter*>(page.get());
+				auto page = std::make_unique<unsigned char[]>(sizeof(T) * objectCount);
+				T* vacants = reinterpret_cast<T*>(page.get());
 				for (std::size_t i = 0; i < objectCount; i++)
 					mVacants.emplace_back(&vacants[i]);
 
@@ -187,7 +143,7 @@ namespace Ck
 			 * \brief
 			 * \param object
 			 */
-			void Recycle(PoolRefCounter* object)
+			void Recycle(T* object)
 			{
 				std::lock_guard<Lockable> lg(mMutex);
 				mVacants.emplace_back(object);
@@ -195,7 +151,7 @@ namespace Ck
 
 			bool mGrowable;
 			Lockable mMutex;
-			std::vector<PoolRefCounter*> mVacants;
+			std::vector<T*> mVacants;
 			std::vector<std::unique_ptr<unsigned char[]>> mPages;
 		};
 	}

@@ -11,7 +11,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class RenderSurface : public Implements<RenderSurface, RenderDeviceObject>
+    class RenderSurface : public RenderDeviceObject
     {
     public:
 

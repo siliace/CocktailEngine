@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Renderer/Command/CommandQueueType.hpp>
@@ -17,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class QueueFamilyContext : public Extends<QueueFamilyContext, Object>
+	class QueueFamilyContext
 	{
 	public:
 

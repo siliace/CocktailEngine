@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
      * \brief
      */
-	class QueueSubmitBatch : public Extends<QueueSubmitBatch, Object>, public Observable
+	class QueueSubmitBatch : public Observable
 	{
 	public:
 
@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		QueueSubmitBatch(Ref<RenderDevice> renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex);
+		QueueSubmitBatch(std::shared_ptr<RenderDevice> renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex);
 
 		/**
 		 * \brief 
@@ -49,26 +49,26 @@ namespace Ck::Vulkan
 		 * \param semaphore
 		 * \param pipelineWaitStages
 		 */
-		void WaitSemaphore(const Ref<Semaphore>& semaphore, VkPipelineStageFlags pipelineWaitStages);
+		void WaitSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages);
 
 		/**
 		 * \brief
 		 * \param commandListCount
 		 * \param commandLists
 		 */
-		void ExecuteCommandLists(unsigned int commandListCount, Ref<CommandList>* commandLists);
+		void ExecuteCommandLists(unsigned int commandListCount, CommandList** commandLists);
 
 		/**
 		 * \brief
 		 * \param semaphore
 		 */
-		void SignalSemaphore(const Ref<Semaphore>& semaphore);
+		void SignalSemaphore(std::shared_ptr<Semaphore> semaphore);
 
 		/**
 		 * \brief
 		 * \param fence
 		 */
-		void AssignFence(const Ref<Fence>& fence);
+		void AssignFence(std::shared_ptr<Fence> fence);
 
 		/**
 		 * \brief
@@ -105,10 +105,10 @@ namespace Ck::Vulkan
 		 */
 		void PushSubmit();
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::CommandQueueType mQueue;
 		unsigned int mQueueIndex;
-		Ref<Fence> mFence;
+		std::shared_ptr<Fence> mFence;
 		unsigned int mSubmitCount;
 		QueueSubmit mSubmits[MaxSubmit];
 		QueueSubmit* mCurrentSubmit;

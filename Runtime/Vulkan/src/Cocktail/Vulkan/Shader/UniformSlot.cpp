@@ -2,7 +2,7 @@
 
 namespace Ck::Vulkan
 {
-	class MyUniformMember : public Inherit<MyUniformMember, Object, Renderer::UniformMember>
+	class MyUniformMember : public Renderer::UniformMember
 	{
 	public:
 
@@ -12,7 +12,7 @@ namespace Ck::Vulkan
 		{
 			mMembers.reserve(blockMember.Members.size());
 			for (unsigned int i = 0; i < mMembers.size(); i++)
-				mMembers.emplace_back(MyUniformMember::New(mSlot, mBlock.Members[i]));
+				mMembers.emplace_back(new MyUniformMember(mSlot, mBlock.Members[i]));
 		}
 
 		const std::string& GetName() const override
@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 			if (firstMember < total)
 			{
 				for (; i < memberCount && i + firstMember < total; i++)
-					members[i] = mMembers[i + firstMember].Get();
+					members[i] = mMembers[i + firstMember].get();
 			}
 
 			return i;
@@ -67,7 +67,7 @@ namespace Ck::Vulkan
 
 		UniformSlot* mSlot;
 		BlockMember mBlock;
-		std::vector<Ref<MyUniformMember>> mMembers;
+		std::vector<std::unique_ptr<MyUniformMember>> mMembers;
 	};
 
 	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const std::vector<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
@@ -78,7 +78,7 @@ namespace Ck::Vulkan
 	{
 		mMembers.reserve(members.size());
 		for (unsigned int i = 0; i < members.size(); i++)
-			mMembers.emplace_back(MyUniformMember::New(this, members[i]));
+			mMembers.emplace_back(new MyUniformMember(this, members[i]));
 	}
 
 	Renderer::ShaderProgramType UniformSlot::GetProgramType() const
@@ -113,7 +113,7 @@ namespace Ck::Vulkan
 		if (firstMember < total)
 		{
 			for (; i < memberCount && i + firstMember < total; i++)
-				members[i] = mMembers[i + firstMember].Get();
+				members[i] = mMembers[i + firstMember].get();
 		}
 
 		return i;

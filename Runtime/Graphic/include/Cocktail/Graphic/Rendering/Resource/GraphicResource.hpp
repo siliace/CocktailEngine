@@ -10,10 +10,12 @@ namespace Ck
 	/**
      * \brief 
      */
-    class GraphicResource : public Implements<GraphicResource, Interface>
+    class GraphicResource
     {
     public:
-        
+
+	    virtual ~GraphicResource() = default;
+
 	    /**
          * \brief 
          * \return 
@@ -24,7 +26,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        virtual Ref<GraphicEngine> GetGraphicEngine() const = 0;
+        virtual std::shared_ptr<GraphicEngine> GetGraphicEngine() const = 0;
     };
 }
 

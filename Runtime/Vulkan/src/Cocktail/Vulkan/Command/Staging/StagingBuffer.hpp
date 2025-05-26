@@ -2,11 +2,10 @@
 #define COCKTAIL_VULKAN_COMMAND_STAGING_STAGINGBUFFER_HPP
 
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
-#include <Cocktail/Vulkan/Command/Staging/StagingBuffer.hpp>
 
 namespace Ck::Vulkan
 {
-	class StagingBuffer : public Extends<StagingBuffer, Buffer>
+	class StagingBuffer : public Buffer
 	{
 	public:
 
@@ -16,7 +15,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		StagingBuffer(Ref<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		StagingBuffer(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

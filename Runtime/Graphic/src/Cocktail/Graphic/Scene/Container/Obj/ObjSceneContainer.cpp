@@ -47,7 +47,7 @@ namespace Ck
 		mRoot.MeshIndices = { 0 }; /// Obj format support only one mesh with many sub mesh
 	}
 
-	Ref<MipMaps> ObjSceneContainer::LoadMipMaps(const std::filesystem::path& path)
+	std::shared_ptr<MipMaps> ObjSceneContainer::LoadMipMaps(const std::filesystem::path& path)
 	{
         if (path.empty())
             return nullptr;
@@ -66,14 +66,14 @@ namespace Ck
             return nullptr;
         }
 
-		Ref<MipMaps> mipMaps;
+		std::shared_ptr<MipMaps> mipMaps;
         if (mipMapLoader->SupportExtensionImport(extension))
         {
 			mipMaps = mipMapLoader->LoadFromPath(fullpath, {});
         }
         else if (imageLoader->SupportExtensionImport(extension))
         {
-            Ref<Image> image = imageLoader->LoadFromPath(fullpath, { ImageImportParameters::Format::RedGreenBlueAlpha });
+			std::shared_ptr<Image> image = imageLoader->LoadFromPath(fullpath, { ImageImportParameters::Format::RedGreenBlueAlpha });
 			mipMaps = MipMaps::FromImage(*image);
         }
 		else

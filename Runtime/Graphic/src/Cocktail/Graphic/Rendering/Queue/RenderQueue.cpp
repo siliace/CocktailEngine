@@ -6,16 +6,16 @@
 
 namespace Ck
 {
-	RenderQueue::RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
+	RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
 		mShadingMode(shadingMode),
 		mBlendingMode(blendingMode)
 	{
-		mMaterialProgramSet = MaterialProgramSet::New(materialProgramManager, mShadingMode);
+		mMaterialProgramSet = std::make_shared<MaterialProgramSet>(materialProgramManager, mShadingMode);
 	}
 
 	void RenderQueue::PushCustom(const CustomRecordInfo& recordInfo, Uint64 sortingKey)
 	{
-		Emplace(CustomRecord::New(recordInfo), sortingKey);
+		Emplace(std::make_shared<CustomRecord>(recordInfo), sortingKey);
 	}
 
 	void RenderQueue::PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Uint64 sortingKey)
@@ -47,14 +47,14 @@ namespace Ck
 			materialTextures |= textureType;
 		}
 
-		Ref<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Mesh)->GetVariant(vertexAttributes, materialTextures);
+		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Mesh)->GetVariant(vertexAttributes, materialTextures);
 		if (!materialProgramVariant)
 		{
 			Log::Error("No MaterialProgram found for Material");
 			return;
 		}
 
-		Emplace(StaticMeshRecord::New(recordInfo, materialProgramVariant.Get()), sortingKey);
+		Emplace(std::make_shared<StaticMeshRecord>(recordInfo, materialProgramVariant.get()), sortingKey);
 	}
 
 	void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)
@@ -84,7 +84,7 @@ namespace Ck
 		return mShadingMode;
 	}
 
-	void RenderQueue::Emplace(Ref<RenderRecord> record, Uint64 sortingKey)
+	void RenderQueue::Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey)
 	{
 		mRecords.emplace_back(RecordInfo{ std::move(record), sortingKey });
 	}

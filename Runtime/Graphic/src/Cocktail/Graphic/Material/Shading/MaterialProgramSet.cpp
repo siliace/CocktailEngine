@@ -4,15 +4,15 @@
 
 namespace Ck
 {
-	MaterialProgramSet::MaterialProgramSet(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode) :
+	MaterialProgramSet::MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode) :
 		mMaterialProgramManager(std::move(materialProgramManager))
 	{
-		mMaterialProgramManager->SelectMaterialPrograms(shadingMode, [&](RenderableType renderableType, Ref<MaterialProgram> materialProgram) {
+		mMaterialProgramManager->SelectMaterialPrograms(shadingMode, [&](RenderableType renderableType, std::shared_ptr<MaterialProgram> materialProgram) {
 			mMaterialPrograms[renderableType] = std::move(materialProgram);
 		});
 	}
 
-	Ref<MaterialProgram> MaterialProgramSet::GetMaterialProgram(RenderableType renderableType) const
+	std::shared_ptr<MaterialProgram> MaterialProgramSet::GetMaterialProgram(RenderableType renderableType) const
 	{
 		return mMaterialPrograms[renderableType];
 	}

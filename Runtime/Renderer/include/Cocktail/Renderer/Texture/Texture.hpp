@@ -11,7 +11,7 @@ namespace Ck::Renderer
     /**
      * \brief 
      */
-    class Texture : public Implements<Texture, MemoryResource>
+    class Texture : public MemoryResource
     {
     public:
 

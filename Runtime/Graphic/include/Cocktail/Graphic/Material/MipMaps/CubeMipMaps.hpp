@@ -8,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API CubeMipMaps : public Extends<CubeMipMaps, MipMaps>
+	class COCKTAIL_GRAPHIC_API CubeMipMaps : public MipMaps
 	{
 	public:
 

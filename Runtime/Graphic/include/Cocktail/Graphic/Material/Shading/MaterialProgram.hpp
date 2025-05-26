@@ -11,7 +11,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API MaterialProgram : public Extends<MaterialProgram, Object>
+	class COCKTAIL_GRAPHIC_API MaterialProgram
 	{
 	public:
 
@@ -20,9 +20,9 @@ namespace Ck
 		 * \param renderDevice
 		 * \param createInfo
 		 */
-		MaterialProgram(const Ref<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo);
+		MaterialProgram(const std::shared_ptr<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo);
 
-		Ref<MaterialProgramVariant> GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
+		std::shared_ptr<MaterialProgramVariant> GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
 
 		const std::string& GetName() const;
 
@@ -31,7 +31,7 @@ namespace Ck
 		using VariantKey = CompositeKey<Flags<VertexAttributeSemantic>, Flags<Material::TextureType>>;
 
 		std::string mName;
-		std::unordered_map<VariantKey, Ref<MaterialProgramVariant>> mVariants;
+		std::unordered_map<VariantKey, std::shared_ptr<MaterialProgramVariant>> mVariants;
 	};
 }
 

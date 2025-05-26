@@ -25,9 +25,9 @@ namespace Ck
 		return *this;
 	}
 
-	Ref<VertexLayout> VertexLayout::Builder::Get()
+	std::shared_ptr<VertexLayout> VertexLayout::Builder::Get()
 	{
-		return VertexLayout::New(mCreateInfo);
+		return std::make_shared<VertexLayout>(mCreateInfo);
 	}
 
 	const VertexLayoutCreateInfo& VertexLayout::Builder::ToCreateInfo() const
@@ -37,7 +37,8 @@ namespace Ck
 
 	VertexLayout::VertexLayout(const VertexLayoutCreateInfo& createInfo) :
 		mInstanced(createInfo.Instanced),
-		mDivisor(createInfo.Divisor)
+		mDivisor(createInfo.Divisor),
+		mStride(0)
 	{
 		assert(!mInstanced || mDivisor > 0);
 

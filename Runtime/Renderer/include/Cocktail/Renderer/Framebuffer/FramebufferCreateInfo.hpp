@@ -48,7 +48,7 @@ namespace Ck::Renderer
     	/**
          * \brief Specifies the color attachments of the Framebuffer to create
          */
-        Ref<TextureView> ColorAttachments[Framebuffer::MaxColorAttachmentCount];
+        std::shared_ptr<TextureView> ColorAttachments[Framebuffer::MaxColorAttachmentCount];
 
     	/**
          * \brief Specifies the number of color attachments of the Framebuffer to create
@@ -58,7 +58,7 @@ namespace Ck::Renderer
     	/**
          * \brief Specifies the depth stencil attachment of the Framebuffer to create
          */
-        Ref<TextureView> DepthStencilAttachment = nullptr;
+        std::shared_ptr<TextureView> DepthStencilAttachment = nullptr;
 
         /**
          * \brief

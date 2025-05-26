@@ -14,7 +14,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API Scene : public Extends<Scene, Object>
+	class COCKTAIL_GRAPHIC_API Scene
 	{
 	public:
 
@@ -22,54 +22,54 @@ namespace Ck
 		 * \brief 
 		 * \param transformationGraph 
 		 */
-		Scene(Ref<GraphicEngine> graphicEngine, Ref<TransformationGraph> transformationGraph = TransformationGraph::New());
+		explicit Scene(std::shared_ptr<GraphicEngine> graphicEngine);
 
 		/**
 		 * \brief
 		 */
-		~Scene() override;
+		~Scene();
 
 		/**
 		 * \brief 
 		 * \param camera
 		 */
-		void AddCamera(const Ref<Camera>& camera);
+		void AddCamera(const std::shared_ptr<Camera>& camera);
 
 		/**
 		 * \brief 
 		 * \param light 
 		 */
-		void AddLight(const Ref<Light>& light);
+		void AddLight(const std::shared_ptr<Light>& light);
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Ref<SceneNode> CreateSceneNode();
+		std::shared_ptr<SceneNode> CreateSceneNode();
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Ref<TransformationNode> CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
+		std::shared_ptr<TransformationNode> CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Signal<Ref<Camera>>& OnCameraAdded();
+		Signal<std::shared_ptr<Camera>>& OnCameraAdded();
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Signal<Ref<Light>>& OnLightAdded();
+		Signal<std::shared_ptr<Light>>& OnLightAdded();
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Signal<Ref<SceneNode>>& OnSceneNodeAdded();
+		Signal<std::shared_ptr<SceneNode>>& OnSceneNodeAdded();
 
 		/**
 		 * \brief
@@ -89,18 +89,18 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Ref<GraphicEngine> GetGraphicEngine() const;
+		std::shared_ptr<GraphicEngine> GetGraphicEngine() const;
 
 	private:
 
-		Ref<GraphicEngine> mGraphicEngine;
-		Ref<TransformationGraph> mTransformationGraph;
-		Ref<SceneGraph> mSceneGraph;
-		std::vector<Ref<Camera>> mCameras;
-		std::vector<Ref<Light>> mLights;
-		Signal<Ref<Camera>> mOnCameraAdded;
-		Signal<Ref<Light>> mOnLightAdded;
-		Signal<Ref<SceneNode>> mOnSceneNodeAdded;
+		std::shared_ptr<GraphicEngine> mGraphicEngine;
+		std::unique_ptr<TransformationGraph> mTransformationGraph;
+		std::unique_ptr<SceneGraph> mSceneGraph;
+		std::vector<std::shared_ptr<Camera>> mCameras;
+		std::vector<std::shared_ptr<Light>> mLights;
+		Signal<std::shared_ptr<Camera>> mOnCameraAdded;
+		Signal<std::shared_ptr<Light>> mOnLightAdded;
+		Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;
 	};
 }
 

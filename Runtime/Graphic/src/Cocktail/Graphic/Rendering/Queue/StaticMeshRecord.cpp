@@ -39,7 +39,7 @@ namespace Ck
 		COCKTAIL_UNREACHABLE();
 	}
 
-	Ref<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+	std::shared_ptr<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
 	{
 		static ObjectPool<StaticMeshRecord> RecordPool;
 		return RecordPool.Allocate(recordInfo, materialProgramVariant);
@@ -73,11 +73,11 @@ namespace Ck
 		{
 			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))
 			{
-				Ref<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
+				std::shared_ptr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
 				if (!textureView)
 					continue;
 
-				commandList.BindTextureSampler(slot, 0, textureView.Get(), mRecordInfo.Sampler.Get());
+				commandList.BindTextureSampler(slot, 0, textureView.get(), mRecordInfo.Sampler.get());
 			}
 		}
 

@@ -5,11 +5,11 @@
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API HeadlessSceneViewer : public Extends<HeadlessSceneViewer, SceneViewer>
+	class COCKTAIL_GRAPHIC_API HeadlessSceneViewer : public SceneViewer
 	{
 	public:
 
-		HeadlessSceneViewer(Ref<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters);
+		HeadlessSceneViewer(std::shared_ptr<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters);
 
 	protected:
 
@@ -18,7 +18,7 @@ namespace Ck
 	private:
 
 		mutable unsigned int mCurrentFramebuffer;
-		std::vector<Ref<Renderer::Framebuffer>> mFramebuffers;
+		std::vector<std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
 	};
 }
 

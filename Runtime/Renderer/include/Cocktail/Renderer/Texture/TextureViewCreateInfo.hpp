@@ -31,7 +31,7 @@ namespace Ck::Renderer
 		/**
 		 * \brief Specifies the Texture on which create the TextureView
 		 */
-		Ref<Texture> Texture;
+		std::shared_ptr<Texture> Texture;
 
 		/**
 		 * \brief Specifies the type of the TextureView to create

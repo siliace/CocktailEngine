@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	Sampler::Sampler(const Ref<RenderDevice>& renderDevice, const Renderer::SamplerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Sampler::Sampler(std::shared_ptr<RenderDevice> renderDevice, const Renderer::SamplerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -61,7 +61,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> Sampler::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> Sampler::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

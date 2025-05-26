@@ -2,7 +2,6 @@
 #define COCKTAIL_RENDERER_TEXTURE_TEXTUREVIEW_HPP
 
 #include <Cocktail/Core/Image/PixelFormat.hpp>
-#include <Cocktail/Core/Memory/Ref.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
@@ -13,7 +12,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief 
 	 */
-	class TextureView : public Implements<TextureView, RenderDeviceObject>
+	class TextureView : public RenderDeviceObject
 	{
 	public:
 
@@ -21,7 +20,7 @@ namespace Ck::Renderer
 		 * \brief 
 		 * \return 
 		 */
-		virtual Ref<Texture> GetTexture() const = 0;
+		virtual std::shared_ptr<Texture> GetTexture() const = 0;
 		
 		/**
 		 * \brief 

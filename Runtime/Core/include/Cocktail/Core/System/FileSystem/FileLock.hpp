@@ -1,16 +1,19 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILELOCK_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILELOCK_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
-
 namespace Ck
 {
 	/**
 	 * \brief 
 	 */
-	class FileLock : public Implements<File, Interface>
+	class FileLock
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~FileLock() = default;
 
 		/**
 		 * \brief 

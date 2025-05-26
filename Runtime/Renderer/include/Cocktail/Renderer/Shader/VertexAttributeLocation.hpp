@@ -4,18 +4,22 @@
 #include <string>
 
 #include <Cocktail/Core/DataType.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 
 namespace Ck::Renderer
 {
     /**
      * \brief
      */
-    class VertexAttributeLocation : public Implements<VertexAttributeLocation, Interface>
+    class VertexAttributeLocation
     {
     public:
 
-        /**
+	    /**
+	     * \brief 
+	     */
+	    virtual ~VertexAttributeLocation() = default;
+
+	    /**
          * \brief
          * \return
          */

@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_TEXTURE_SAMPLER_HPP
 #define COCKTAIL_VULKAN_TEXTURE_SAMPLER_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Texture/Sampler.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
@@ -15,7 +12,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Sampler : public Inherit<Sampler, Object, Renderer::Sampler>
+	class Sampler : public Renderer::Sampler
 	{
 	public:
 
@@ -25,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Sampler(const Ref<RenderDevice>& renderDevice, const Renderer::SamplerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Sampler(std::shared_ptr<RenderDevice> renderDevice, const Renderer::SamplerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -42,7 +39,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -94,7 +91,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSampler mHandle;
 		Renderer::Filter mMagFilter;

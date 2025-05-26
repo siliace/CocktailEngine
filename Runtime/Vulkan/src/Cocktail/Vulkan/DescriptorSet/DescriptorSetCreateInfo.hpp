@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		Ref<DescriptorSetLayout> Layout;
+		std::shared_ptr<DescriptorSetLayout> Layout;
 
 		/**
 		 * \brief 

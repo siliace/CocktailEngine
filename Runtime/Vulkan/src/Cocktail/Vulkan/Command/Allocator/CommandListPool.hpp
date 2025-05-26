@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class CommandListPool : public Inherit<CommandListPool, Object, Renderer::CommandListPool>
+	class CommandListPool : public Renderer::CommandListPool, public std::enable_shared_from_this<CommandListPool>
 	{
 	public:
 
@@ -29,7 +29,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		CommandListPool(Ref<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -46,7 +46,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -54,13 +54,13 @@ namespace Ck::Vulkan
 		 * \param length 
 		 * \return 
 		 */
-		Ref<StagingBuffer> AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
+		std::shared_ptr<StagingBuffer> AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 */
-		Ref<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
+		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
@@ -89,12 +89,12 @@ namespace Ck::Vulkan
 		 * \param queueType 
 		 * \return 
 		 */
-		Ref<CommandPool> GetCommandPool(Renderer::CommandQueueType queueType) const;
+		std::shared_ptr<CommandPool> GetCommandPool(Renderer::CommandQueueType queueType) const;
 
-		Ref<RenderDevice> mRenderDevice;
-		EnumMap<Renderer::CommandQueueType, Ref<CommandPool>> mCommandPools;
-		Ref<DescriptorSetAllocator> mDescriptorSetAllocator;
-		Ref<StagingAllocator> mStagingAllocator;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		EnumMap<Renderer::CommandQueueType, std::shared_ptr<CommandPool>> mCommandPools;
+		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
+		std::unique_ptr<StagingAllocator> mStagingAllocator;
 		bool mTransient;
 		bool mCommandListResetable;
 		Signal<> mOnReset;

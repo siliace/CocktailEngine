@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	MaterialProgramManager::MaterialProgramManager(Ref<Renderer::RenderDevice> renderDevice) :
+	MaterialProgramManager::MaterialProgramManager(std::shared_ptr<Renderer::RenderDevice> renderDevice) :
 		mRenderDevice(std::move(renderDevice))
 	{
 		for (const MaterialProgramLibrary::Entry& entry : App::Resolve<MaterialProgramLibrary>()->GetEntries())
@@ -17,11 +17,11 @@ namespace Ck
 			materialProgramCreateInfo.Interface = entry.Interface;
 			materialProgramCreateInfo.VariantsBinaries = entry.VariantsBinaries;
 
-			Register(entry.RenderableType, entry.ShadingMode, MaterialProgram::New(mRenderDevice, materialProgramCreateInfo));
+			Register(entry.RenderableType, entry.ShadingMode, std::make_shared<MaterialProgram>(mRenderDevice, materialProgramCreateInfo));
 		}
 	}
 
-	void MaterialProgramManager::Register(RenderableType renderableType, Material::ShadingMode shadingMode, Ref<MaterialProgram> materialProgram)
+	void MaterialProgramManager::Register(RenderableType renderableType, Material::ShadingMode shadingMode, std::shared_ptr<MaterialProgram> materialProgram)
 	{
 		MaterialProgramKey key(renderableType, shadingMode);
 		mMaterialPrograms[key] = std::move(materialProgram);

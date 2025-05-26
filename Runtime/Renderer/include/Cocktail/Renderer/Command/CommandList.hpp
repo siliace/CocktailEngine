@@ -25,7 +25,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class CommandList : public Implements<CommandList, RenderDeviceObject>
+    class CommandList : public RenderDeviceObject
     {
     public:
 

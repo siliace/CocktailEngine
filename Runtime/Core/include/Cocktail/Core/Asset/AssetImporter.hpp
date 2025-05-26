@@ -29,7 +29,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		virtual Ref<T> LoadFromPath(const std::filesystem::path& path, const P& parameters = {})
+		virtual std::shared_ptr<T> LoadFromPath(const std::filesystem::path& path, const P& parameters = {})
 		{
 			FileInputStream inputStream(Storage::OpenFile(path, FileOpenFlagBits::Read));
 			return LoadFromStream(inputStream, parameters);
@@ -41,7 +41,7 @@ namespace Ck
 		 * \param parameters
 		 * \return 
 		 */
-		virtual Ref<T> LoadFromStream(InputStream& inputStream, const P& parameters = {}) = 0;
+		virtual std::shared_ptr<T> LoadFromStream(InputStream& inputStream, const P& parameters = {}) = 0;
 
 		/**
 		 * \brief 
@@ -50,7 +50,7 @@ namespace Ck
 		 * \param parameters
 		 * \return 
 		 */
-		virtual Ref<T> LoadFromMemory(const void* buffer, std::size_t length, const P& parameters = {})
+		virtual std::shared_ptr<T> LoadFromMemory(const void* buffer, std::size_t length, const P& parameters = {})
 		{
 			MemoryInputStream inputStream(buffer, length);
 			return LoadFromStream(inputStream, parameters);

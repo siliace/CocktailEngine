@@ -2,7 +2,6 @@
 #define COCKTAIL_CORE_SYSTEM_MOUSE_WIN32_MOUSESERVICE_HPP
 
 #include <Cocktail/Core/Application/Application.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/Mouse/MouseService.hpp>
 
 namespace Ck::Detail::Win32

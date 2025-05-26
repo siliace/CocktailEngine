@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_DESCRIPTORSET_ALLOCATOR_DESCRIPTORPOOL_HPP
 #define COCKTAIL_VULKAN_DESCRIPTORSET_ALLOCATOR_DESCRIPTORPOOL_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
@@ -16,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class DescriptorPool : public Inherit<DescriptorPool, Object, Renderer::RenderDeviceObject>
+	class DescriptorPool : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -26,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		DescriptorPool(Ref<RenderDevice> renderDevice, const DescriptorPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DescriptorPool(std::shared_ptr<RenderDevice> renderDevice, const DescriptorPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief Destructor
@@ -43,7 +40,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -74,7 +71,7 @@ namespace Ck::Vulkan
 		 */
 		static void PushPoolSize(VkDescriptorPoolSize* sizes, unsigned int& index, Renderer::DescriptorType type, unsigned int descriptorCount, unsigned int setCount);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDescriptorPool mHandle;
 		bool mSupportFree;

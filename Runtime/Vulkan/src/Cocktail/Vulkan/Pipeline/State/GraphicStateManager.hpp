@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		 * \param descriptorSetAllocator
 		 * \param dynamicState 
 		 */
-		GraphicStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState);
+		GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState);
 
 		void SetShaderProgram(const ShaderProgram* shaderProgram) override;
 		void SetEntryPoint(Renderer::ShaderType shaderType, const char* name) override;
@@ -95,14 +95,14 @@ namespace Ck::Vulkan
 		void EnableBlending(unsigned int attachmentIndex, bool enable);
 		void SetBlendingEquation(unsigned int attachmentIndex, Renderer::BlendOp colorBlendOp, Renderer::BlendOp alphaBlendOp);
 		void SetBlendingFunction(unsigned int attachmentIndex, Renderer::BlendFactor sourceColor, Renderer::BlendFactor destinationColor, Renderer::BlendFactor sourceAlpha, Renderer::BlendFactor destinationAlpha);
-		void SetRenderPass(const RenderPass* renderPass);
+		void SetRenderPass(const std::shared_ptr<RenderPass>& renderPass);
 
 		void BindIndexBuffer(const Buffer* indexBuffer, std::size_t offset, Renderer::IndexType indexType);
 		void BindVertexBuffer(unsigned int binding, const Buffer* vertexBuffer, std::size_t offset);
 
 		void ResetBindings() override;
 
-		Ref<Pipeline> CompilePipeline() override;
+		std::shared_ptr<Pipeline> CompilePipeline() override;
 		IndexBufferBinding CompileIndexBuffer();
 		VertexBufferBindingRange CompileVertexBuffers(unsigned int binding);
 
@@ -114,7 +114,7 @@ namespace Ck::Vulkan
 		Renderer::CommandListDynamicState mDynamicState;
 		GraphicState mState;
 		const ShaderProgram* mShaderProgram;
-		const RenderPass* mRenderPass;
+		std::shared_ptr<RenderPass> mRenderPass;
 		Flags<GraphicDirtyFlagBits> mGraphicDirtyFlags;
 		IndexBufferBindingInfo mIndexBufferBinding;
 		VertexBufferBindingInfo mVertexBufferBindings[MaxInputBindings];

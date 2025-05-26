@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API SceneContainer : public Extends<SceneContainer, Object>
+	class COCKTAIL_GRAPHIC_API SceneContainer
 	{
 	public:
 
@@ -14,7 +14,7 @@ namespace Ck
 		 * \param scene 
 		 * \return 
 		 */
-		Ref<SceneNode> AddToScene(Scene& scene);
+		std::shared_ptr<SceneNode> AddToScene(Scene& scene);
 
 	protected:
 
@@ -23,7 +23,7 @@ namespace Ck
 			std::string Name;
 			Material::UniformColors Colors;
 			Material::ShadingMode ShadingMode;
-			EnumMap<Material::TextureType, Ref<MipMaps>> Textures;
+			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
 			bool DoubleSided = false;
 			bool Opaque = false;
 		};
@@ -41,8 +41,8 @@ namespace Ck
 		struct MeshInfo
 		{
 			std::string Name;
-			Ref<VertexArray> Vertices;
-			Ref<IndexArray> Indices;
+			std::shared_ptr<VertexArray> Vertices;
+			std::shared_ptr<IndexArray> Indices;
 			std::vector<SubMeshInfo> SubMeshes;
 		};
 
@@ -55,7 +55,7 @@ namespace Ck
 
 		NodeInfo mRoot;
 		std::vector<MeshInfo> mMeshes;
-		std::vector<Ref<MipMaps>> mMipMaps;
+		std::vector<std::shared_ptr<MipMaps>> mMipMaps;
 		std::vector<MaterialInfo> mMaterials;
 
 	private:
@@ -69,7 +69,7 @@ namespace Ck
 		 * \param materials 
 		 * \return 
 		 */
-		Ref<SceneNode> ProcessNode(Scene& scene, Ref<SceneNode> parent, NodeInfo& nodeInfo, const std::vector<Ref<Mesh>>& meshes, const std::vector<Ref<Material>>& materials);
+		std::shared_ptr<SceneNode> ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const std::vector<std::shared_ptr<Mesh>>& meshes, const std::vector<std::shared_ptr<Material>>& materials);
 	};
 }
 

@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_QUEUE_QUEUESUBMITTER_HPP
 #define COCKTAIL_VULKAN_QUEUE_QUEUESUBMITTER_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
-
 #include <Cocktail/Renderer/Command/CommandQueueType.hpp>
 
 #include <Cocktail/Vulkan/Command/CommandList.hpp>
@@ -18,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief Class managing submits on a single queue
 	 */
-	class QueueSubmitter : public Extends<QueueSubmitter, Object>
+	class QueueSubmitter
 	{
 	public:
 
@@ -29,7 +26,7 @@ namespace Ck::Vulkan
 		 * \param queueType 
 		 * \param queueIndex 
 		 */
-		QueueSubmitter(Ref<RenderDevice> renderDevice, Ref<SubmitScheduler> scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex);
+		QueueSubmitter(std::shared_ptr<RenderDevice> renderDevice, SubmitScheduler* scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex);
 
 		/**
 		 * \brief 
@@ -46,20 +43,20 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param fence 
 		 */
-		void SignalFence(const Ref<Fence>& fence);
+		void SignalFence(std::shared_ptr<Fence> fence);
 		
 		/**
 		 * \brief Add a Semaphore to be signaled by the current submit of the current batch 
 		 * \param semaphore 
 		 */
-		void SignalSemaphore(const Ref<Semaphore>& semaphore);
+		void SignalSemaphore(std::shared_ptr<Semaphore> semaphore);
 		
 		/**
 		 * \brief 
 		 * \param semaphore 
 		 * \param waitStages 
 		 */
-		void WaitExternalSemaphore(const Ref<Semaphore>& semaphore, VkPipelineStageFlags waitStages);
+		void WaitExternalSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
 
 		/**
 		 * \brief 
@@ -75,7 +72,7 @@ namespace Ck::Vulkan
 		 * \param commandLists 
 		 * \param fence 
 		 */
-		void ExecuteCommandList(unsigned int commandListCount, Ref<CommandList>* commandLists, const Ref<Fence>& fence);
+		void ExecuteCommandList(unsigned int commandListCount, CommandList** commandLists, Fence* fence);
 
 		/**
 		 * \brief 
@@ -91,8 +88,8 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<SubmitScheduler> mScheduler;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		SubmitScheduler* mScheduler;
 		Renderer::CommandQueueType mQueueType;
 		unsigned int mQueueIndex;
 		QueueSubmitBatch* mCurrentBatch;

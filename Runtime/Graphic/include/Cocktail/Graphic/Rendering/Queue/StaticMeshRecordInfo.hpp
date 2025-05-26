@@ -99,12 +99,12 @@ namespace Ck
 		/**
 		 * \brief Sampler to use to access to material's textures
 		 */
-		Ref<Renderer::Sampler> Sampler;
+		std::shared_ptr<Renderer::Sampler> Sampler;
 
 		/**
 		 * \brief 
 		 */
-		EnumMap<Material::TextureType, Ref<Renderer::TextureView>> MaterialTextures;
+		EnumMap<Material::TextureType, std::shared_ptr<Renderer::TextureView>> MaterialTextures;
 
 		/**
 		 * \brief Tell whether the geometry drawn by this record is opaque.

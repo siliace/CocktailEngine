@@ -12,7 +12,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class ComputePipeline : public Extends<ComputePipeline, Pipeline>
+	class ComputePipeline : public Pipeline
 	{
 	public:
 
@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks
 		 */
-		ComputePipeline(const Ref<RenderDevice>& renderDevice, const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		ComputePipeline(std::shared_ptr<RenderDevice> renderDevice, const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -34,7 +34,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<PipelineLayout> GetLayout() const override;
+		std::shared_ptr<PipelineLayout> GetLayout() const override;
 
 		/**
 		 * \brief 
@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<PipelineLayout> mLayout;
+		std::shared_ptr<PipelineLayout> mLayout;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipeline mHandle;
 	};

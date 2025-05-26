@@ -11,12 +11,12 @@
 
 namespace Ck
 {
-	void SceneViewer::AttachViewport(Ref<Viewport> viewport, unsigned index)
+	void SceneViewer::AttachViewport(std::shared_ptr<Viewport> viewport, unsigned index)
 	{
 		mViewports.insert(mViewports.end(), ViewportEntry{viewport, index});
 	}
 
-	void SceneViewer::DetachViewport(const Ref<Viewport>& viewport)
+	void SceneViewer::DetachViewport(const std::shared_ptr<Viewport>& viewport)
 	{
 		auto viewportEntryIt = std::find_if(mViewports.begin(), mViewports.end(), [&](const ViewportEntry& entry) {
 			return entry.Viewport == viewport;
@@ -28,7 +28,7 @@ namespace Ck
 
 	void SceneViewer::Render()
 	{
-		Ref<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
+		std::shared_ptr<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
 		Renderer::FrameContext* frameContext = graphicEngine->GetFrameContext();
 		Renderer::Framebuffer* framebuffer = AcquireNextFramebuffer(*frameContext);
 		if (!framebuffer)
@@ -38,7 +38,7 @@ namespace Ck
 		
 		Renderer::CommandListCreateInfo commandListCreateInfo;
 		commandListCreateInfo.Usage = Renderer::CommandListUsage::Graphic;
-		Ref<Renderer::CommandList> commandList = frameContext->CreateCommandList(commandListCreateInfo);
+		std::shared_ptr<Renderer::CommandList> commandList = frameContext->CreateCommandList(commandListCreateInfo);
 
 		commandList->Begin(nullptr);
 
@@ -53,7 +53,7 @@ namespace Ck
 		
 		for (const ViewportEntry& viewportEntry : mViewports)
 		{
-			const Ref<Viewport>& viewport = viewportEntry.Viewport;
+			const std::shared_ptr<Viewport>& viewport = viewportEntry.Viewport;
 			viewport->Bind(*commandList, *framebuffer, drawContext, viewportEntry.Index == 0);
 
 			std::vector<Light*> lights = mScene->CollectLights(*viewport->GetCamera());
@@ -85,7 +85,7 @@ namespace Ck
 				{
 					if (lights[i]->GetType() == Light::Type::Spot)
 					{
-						SpotLight* spotLight = SpotLight::Cast(lights[i]);
+						SpotLight* spotLight = static_cast<SpotLight*>(lights[i]);
 						lightInstance.Position = spotLight->GetWorldTransformation().GetTranslation();
 						lightInstance.Direction = -spotLight->GetFront();
 						lightInstance.Constants = 1.f;
@@ -96,7 +96,7 @@ namespace Ck
 					}
 					else if (lights[i]->GetType() == Light::Type::Point)
 					{
-						PointLight* pointLight = PointLight::Cast(lights[i]);
+						PointLight* pointLight = static_cast<PointLight*>(lights[i]);
 						lightInstance.Position = pointLight->GetWorldTransformation().GetTranslation();
 						lightInstance.Constants = 1.f;
 						lightInstance.Linear = 0.09f;
@@ -105,7 +105,7 @@ namespace Ck
 				}
 				else
 				{
-					DirectionalLight* directionalLight = DirectionalLight::Cast(lights[i]);
+					DirectionalLight* directionalLight = static_cast<DirectionalLight*>(lights[i]);
 					lightInstance.Direction = directionalLight->GetDirection();
 				}
 			}
@@ -114,7 +114,7 @@ namespace Ck
 
 			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
 			{
-				Ref<Camera> camera = viewport->GetCamera();
+				std::shared_ptr<Camera> camera = viewport->GetCamera();
 				renderable->AddToQueue(*mOpaqueRenderQueue, *camera);
 				renderable->AddToQueue(*mBlendingRenderQueue, *camera);
 			}
@@ -125,20 +125,24 @@ namespace Ck
 			commandList->EndRenderPass();
 		}
 		commandList->End();
+
+		Renderer::CommandList* commandLists[] = {
+			commandList.get()
+		};
 		
-		graphicEngine->GetRenderContext()->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
+		graphicEngine->GetRenderContext()->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
 
 		mOnRendered.Emit(*graphicEngine->GetRenderContext(), *frameContext, *framebuffer);
 	}
 
-	SceneViewer::SceneViewer(Ref<Scene> scene) :
+	SceneViewer::SceneViewer(std::shared_ptr<Scene> scene) :
 		mScene(std::move(scene))
 	{
-		mOpaqueRenderQueue = RenderQueue::New(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Opaque);
-		mBlendingRenderQueue = RenderQueue::New(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Transparent);
+		mOpaqueRenderQueue = std::make_unique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Opaque);
+		mBlendingRenderQueue = std::make_unique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Transparent);
 	}
 
-	Ref<Scene> SceneViewer::GetScene() const
+	std::shared_ptr<Scene> SceneViewer::GetScene() const
 	{
 		return mScene;
 	}

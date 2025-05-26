@@ -8,7 +8,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief 
 	 */
-	class CommandListPool : public Implements<CommandListPool, CommandListAllocator>
+	class CommandListPool : public CommandListAllocator
 	{
 	public:
 

@@ -17,7 +17,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class ShaderProgram : public Inherit<ShaderProgram, Object, Renderer::ShaderProgram>
+	class ShaderProgram : public Renderer::ShaderProgram
 	{
 	public:
 
@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		ShaderProgram(const Ref<RenderDevice>& renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		ShaderProgram(std::shared_ptr<RenderDevice> renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -39,7 +39,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 		
 		/**
 		 * \brief 
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param type 
 		 * \return 
 		 */
-		Ref<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
+		std::shared_ptr<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
 
 		/**
 		 * \brief 
@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<PipelineLayout> GetPipelineLayout() const;
+		std::shared_ptr<PipelineLayout> GetPipelineLayout() const;
 
 	private:
 
@@ -79,12 +79,12 @@ namespace Ck::Vulkan
 		 */
 		void CreateUniformSlots();
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		Renderer::ShaderProgramType mType;
-		EnumMap<Renderer::ShaderType, Ref<Shader>> mShaders;
+		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaders;
 		std::vector<std::unique_ptr<UniformSlot>> mUniformSlots;
-		Ref<PipelineLayout> mPipelineLayout;
+		std::shared_ptr<PipelineLayout> mPipelineLayout;
 	};
 }
 

@@ -5,13 +5,13 @@
 
 namespace Ck
 {
-	Ref<MipMaps> MipMaps::FromImage(const Image& image)
+	std::shared_ptr<MipMaps> MipMaps::FromImage(const Image& image)
 	{
 		Extent3D<unsigned int> baseLevelSize = MakeExtent(image.GetSize(), 1u);
 
 		unsigned int levelCount = ComputeLevelCount(baseLevelSize);
 
-		Ref<MipMaps> mipMaps = New(baseLevelSize, image.GetFormat(), 1, levelCount);
+		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, image.GetFormat(), 1, levelCount);
 		mipMaps->GetLevel(0, 0).CopyPixels(image.GetPixels().GetData());
 
 		return mipMaps;

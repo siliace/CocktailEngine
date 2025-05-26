@@ -8,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API TransformationGraph : public Extends<TransformationGraph, AcyclicGraph<TransformationNode>>
+	class COCKTAIL_GRAPHIC_API TransformationGraph : public AcyclicGraph<TransformationNode>
 	{
 	public:
 

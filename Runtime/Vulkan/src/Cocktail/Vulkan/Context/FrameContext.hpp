@@ -16,7 +16,7 @@ namespace Ck::Vulkan
 {
 	class RenderContext;
 
-	class FrameContext : public Inherit<FrameContext, Object, Renderer::FrameContext>
+	class FrameContext : public Renderer::FrameContext
 	{
 	public:
 
@@ -50,7 +50,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
+		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
 
 		/**
 		 * \brief
@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -96,7 +96,7 @@ namespace Ck::Vulkan
 			/**
 			 * \brief 
 			 */
-			Ref<Swapchain> Swapchain;
+			std::shared_ptr<Swapchain> Swapchain;
 
 			/**
 			 * \brief 
@@ -106,22 +106,22 @@ namespace Ck::Vulkan
 			/**
 			 * \brief 
 			 */
-			Ref<Semaphore> ImageAvailable;
+			std::shared_ptr<Semaphore> ImageAvailable;
 
 			/**
 			 * \brief 
 			 */
-			Ref<Semaphore> ImagePresentable;
+			std::shared_ptr<Semaphore> ImagePresentable;
 		};
 
 		RenderContext* mRenderContext;
 		unsigned int mMaxRenderSurfaceCount;
 		unsigned int mRenderSurfaceCount;
-		Ref<CommandListPool> mCommandListPool;
-		std::vector<Ref<Renderer::CommandList>> mCommandLists;
-		Ref<Fence> mFrameFence;
+		std::shared_ptr<CommandListPool> mCommandListPool;
+		std::vector<std::shared_ptr<Renderer::CommandList>> mCommandLists;
+		std::shared_ptr<Fence> mFrameFence;
 		std::unique_ptr<AcquiredRenderSurface[]> mAcquiredRenderSurfaces;
-		std::unordered_map<BufferAllocatorKey, Ref<BufferAllocator>> mBufferAllocators;
+		std::unordered_map<BufferAllocatorKey, std::shared_ptr<BufferAllocator>> mBufferAllocators;
 		bool mSubmitted;
 	};
 }

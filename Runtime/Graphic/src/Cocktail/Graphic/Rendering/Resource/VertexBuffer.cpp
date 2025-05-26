@@ -3,8 +3,8 @@
 
 namespace Ck
 {
-	VertexBuffer::VertexBuffer(Ref<GraphicEngine> graphicEngine, Ref<VertexArray> vertices, std::string_view name) :
-		Extends<VertexBuffer, BufferResource>(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Vertex, vertices->GetVertices().GetSize(), name),
+	VertexBuffer::VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, std::string_view name) :
+		BufferResource(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Vertex, vertices->GetVertices().GetSize(), name),
 		mVertices(std::move(vertices))
 	{
 		/// Nothing
@@ -20,10 +20,10 @@ namespace Ck
 		const unsigned int vertexStride = mVertices->GetVertexLayout()->GetStride();
 		std::size_t firstVertexOffset = firstVertex * vertexStride;
 		std::size_t length = vertexCount * vertexStride;
-		GetGraphicEngine()->UploadBuffer(Self(), firstVertexOffset, length, mVertices->GetVertices().GetData() + firstVertexOffset);
+		GetGraphicEngine()->UploadBuffer(shared_from_this(), firstVertexOffset, length, mVertices->GetVertices().GetData() + firstVertexOffset);
 	}
 
-	Ref<VertexArray> VertexBuffer::GetVertexArray() const
+	std::shared_ptr<VertexArray> VertexBuffer::GetVertexArray() const
 	{
 		return mVertices;
 	}

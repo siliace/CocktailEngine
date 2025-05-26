@@ -12,7 +12,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class RenderBuffer final : public Extends<RenderBuffer, AbstractTexture>
+	class RenderBuffer final : public AbstractTexture
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks 
 		 */
-		RenderBuffer(const Ref<RenderDevice>& renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderBuffer(std::shared_ptr<RenderDevice> renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

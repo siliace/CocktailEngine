@@ -47,7 +47,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		textureCreateInfo.Format = PixelFormat::Color(PixelFormat::Layout::RGBA, DataType::UnsignedInt8);
 		textureCreateInfo.ArrayLayerCount = 1;
 		textureCreateInfo.MipMapsCount = 1;
-		Ref<Renderer::Texture> fontTexture = renderDevice.CreateTexture(textureCreateInfo);
+		std::shared_ptr<Renderer::Texture> fontTexture = renderDevice.CreateTexture(textureCreateInfo);
 
 		Renderer::TextureViewCreateInfo textureViewCreateInfo;
 		textureViewCreateInfo.Texture = fontTexture;
@@ -55,11 +55,11 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		mFontTextureView = renderDevice.CreateTextureView(textureViewCreateInfo);
 		mTextureSampler = renderDevice.CreateSampler(Renderer::SamplerCreateInfo{});
 
-		Ref<Renderer::CommandListPool> commandListPool = renderContext.CreateCommandListPool({
+		std::shared_ptr<Renderer::CommandListPool> commandListPool = renderContext.CreateCommandListPool({
 			Renderer::CommandListUsage::Transfer
 		});
 
-		Ref<Renderer::CommandList> commandList = commandListPool->CreateCommandList({
+		std::shared_ptr<Renderer::CommandList> commandList = commandListPool->CreateCommandList({
 			Renderer::CommandListUsage::Transfer
 		});
 
@@ -67,17 +67,17 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		commandList->Begin(nullptr);
 		{
 			Renderer::GpuBarrier barriers[] = {
-				Renderer::GpuBarrier::Of(fontTexture.Get(), Renderer::ResourceState::Undefined, Renderer::ResourceState::CopyDestination, fontSubResource)
+				Renderer::GpuBarrier::Of(fontTexture.get(), Renderer::ResourceState::Undefined, Renderer::ResourceState::CopyDestination, fontSubResource)
 			};
 			commandList->Barrier(1, barriers);
 		}
 
 		Renderer::TextureUploadInfo upload{ 0, 0, fontTexture->GetSize(), {0u, 0u, 0u}, pixels };
-		commandList->UploadTexture(fontTexture.Get(), Renderer::ResourceState::CopyDestination, 1, &upload);
+		commandList->UploadTexture(fontTexture.get(), Renderer::ResourceState::CopyDestination, 1, &upload);
 
 		{
 			Renderer::GpuBarrier barriers[] = {
-				Renderer::GpuBarrier::Of(fontTexture.Get(), Renderer::ResourceState::CopyDestination, Renderer::ResourceState::GraphicShaderResource, fontSubResource)
+				Renderer::GpuBarrier::Of(fontTexture.get(), Renderer::ResourceState::CopyDestination, Renderer::ResourceState::GraphicShaderResource, fontSubResource)
 			};
 			commandList->Barrier(1, barriers);
 		}
@@ -85,9 +85,13 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		commandList->End();
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
-		Ref<Renderer::Fence> fence = renderDevice.CreateFence(fenceCreateInfo);
+		std::shared_ptr<Renderer::Fence> fence = renderDevice.CreateFence(fenceCreateInfo);
 
-		renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, &commandList, fence);
+		Renderer::CommandList* commandLists[] = {
+			commandList.get()
+		};
+
+		renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, commandLists, fence.get());
 		renderContext.Flush();
 
 		fence->Wait();
@@ -142,7 +146,7 @@ void ImGuiOverlay::Update()
 	ImGui::Render();
 }
 
-Ref<Cursor> ImGuiOverlay::GetCursor(int mouseCursor)
+std::shared_ptr<Cursor> ImGuiOverlay::GetCursor(int mouseCursor)
 {
 	SystemCursorType cursorType;
 	switch (mouseCursor)
@@ -219,8 +223,8 @@ void ImGuiOverlay::SetupRenderState(Renderer::CommandList* commandList, Extent2D
 
 	commandList->EnableBlending(0, true);
 
-	commandList->BindShaderProgram(mShaderProgram.Get());
- 	commandList->BindTextureSampler(mTextureUniformSlot, 0, mFontTextureView.Get(), mTextureSampler.Get());
+	commandList->BindShaderProgram(mShaderProgram.get());
+ 	commandList->BindTextureSampler(mTextureUniformSlot, 0, mFontTextureView.get(), mTextureSampler.get());
 
 	struct VertexInfo
 	{
@@ -249,12 +253,12 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 	if (framebufferSize.Width <= 0.f || framebufferSize.Height <= 0.f)
 		return;
 
-	Ref<Renderer::CommandList> commandList = frameContext.CreateCommandList({ Renderer::CommandListUsage::Graphic, Renderer::CommandListDynamicStateBits::Scissor | Renderer::CommandListDynamicStateBits::Viewport });
+	std::shared_ptr<Renderer::CommandList> commandList = frameContext.CreateCommandList({ Renderer::CommandListUsage::Graphic, Renderer::CommandListDynamicStateBits::Scissor | Renderer::CommandListDynamicStateBits::Viewport });
 
 	commandList->Begin(nullptr);
 	commandList->BeginRenderPass({ Renderer::RenderPassMode::Load, &framebuffer });
 
-	SetupRenderState(commandList.Get(), framebufferSize);
+	SetupRenderState(commandList.get(), framebufferSize);
 
 	for (ImDrawList* drawList : drawData->CmdLists)
 	{
@@ -275,7 +279,7 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 			{
 				if (drawCmd.UserCallback == ImDrawCallback_ResetRenderState)
 				{
-					SetupRenderState(commandList.Get(), framebufferSize);
+					SetupRenderState(commandList.get(), framebufferSize);
 				}
 				else
 				{
@@ -314,5 +318,9 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 	commandList->EndRenderPass();
 	commandList->End();
 
-	renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
+	Renderer::CommandList* commandLists[] = {
+		commandList.get()
+	};
+
+	renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
 }

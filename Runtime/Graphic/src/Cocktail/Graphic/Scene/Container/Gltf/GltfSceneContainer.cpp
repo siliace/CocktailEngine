@@ -30,7 +30,7 @@ namespace Ck
 	        }
 
             DataType dataType = GltfUtils::ConvertComponentType(gltfImage.pixel_type);
-            Ref<Image> image = Image::New(size, PixelFormat::Color(pixelFormatLayout, dataType), gltfImage.image.data());
+            std::shared_ptr<Image> image = std::make_shared<Image>(size, PixelFormat::Color(pixelFormatLayout, dataType), gltfImage.image.data());
 
             mMipMaps.push_back(MipMaps::FromImage(*image));
         }
@@ -107,13 +107,13 @@ namespace Ck
                 attributeAccessors[attributeSemantic] = &accessor;
             }
 
-            Ref<VertexLayout> vertexLayout = vertexLayoutBuilder.Get();
+            std::shared_ptr<VertexLayout> vertexLayout = vertexLayoutBuilder.Get();
 
             std::size_t vertexCount = 0;
             for (const auto& [attributeSemantic, accessor] : attributeAccessors)
                 vertexCount = std::max(vertexCount, accessor->count);
 
-            Ref<VertexArray> vertices = VertexArray::New(vertexLayout, vertexCount);
+            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(vertexLayout, vertexCount);
             for (const auto& [attributeSemantic, accessor] : attributeAccessors)
             {
                 assert(accessor->count == vertexCount);
@@ -135,12 +135,12 @@ namespace Ck
                 }
             }
 
-            Ref<IndexArray> indices;
+            std::shared_ptr<IndexArray> indices;
             if (primitive.indices != -1)
             {
                 const tinygltf::Accessor& indexAccessor = model.accessors[primitive.indices];
 
-                indices = IndexArray::New(GltfUtils::ConvertIndexType(indexAccessor.componentType), indexAccessor.count);
+                indices = std::make_shared<IndexArray>(GltfUtils::ConvertIndexType(indexAccessor.componentType), indexAccessor.count);
 
                 const tinygltf::BufferView& bufferView = model.bufferViews[indexAccessor.bufferView];
                 const tinygltf::Buffer& buffer = model.buffers[bufferView.buffer];

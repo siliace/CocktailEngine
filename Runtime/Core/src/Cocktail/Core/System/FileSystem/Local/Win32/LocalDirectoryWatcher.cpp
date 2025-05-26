@@ -4,7 +4,7 @@
 
 namespace Ck::Detail::Win32
 {
-	LocalDirectoryWatcher::LocalDirectoryWatcher(const Ref<Directory>& directory, bool recursive):
+	LocalDirectoryWatcher::LocalDirectoryWatcher(const std::shared_ptr<Directory>& directory, bool recursive):
 		mDirectory(directory),
 		mRecursive(recursive),
 		mBuffer{}

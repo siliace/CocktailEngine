@@ -3,9 +3,9 @@
 
 namespace Ck
 {
-	Ref<DirectionalLight> DirectionalLight::Create(Ref<Scene> scene, LinearColor color, Vector3<float> direction, float intensity)
+	std::shared_ptr<DirectionalLight> DirectionalLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity)
 	{
-		Ref<DirectionalLight> light = DirectionalLight::New(color, direction, intensity);
+		std::shared_ptr<DirectionalLight> light = std::make_shared<DirectionalLight>(color, direction, intensity);
 		scene->AddLight(light);
 
 		return light;

@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_COMMAND_FENCE_HPP
 #define COCKTAIL_VULKAN_COMMAND_FENCE_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Command/Synchronization/Fence.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/FenceCreateInfo.hpp>
 
@@ -16,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Fence : public Inherit<Fence, Object, Renderer::Fence>
+	class Fence : public Renderer::Fence, public std::enable_shared_from_this<Fence>
 	{
 	public:
 
@@ -26,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Fence(const Ref<RenderDevice>& renderDevice, const Renderer::FenceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Fence(std::shared_ptr<RenderDevice> renderDevice, const Renderer::FenceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -43,7 +40,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -82,7 +79,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkFence mHandle;
 		bool mSignaled;

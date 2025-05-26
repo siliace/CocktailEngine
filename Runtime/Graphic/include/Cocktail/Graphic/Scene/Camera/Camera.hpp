@@ -10,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API Camera : public Extends<Camera, Transformable>
+	class COCKTAIL_GRAPHIC_API Camera : public Transformable
 	{
 	public:
 
@@ -38,7 +38,7 @@ namespace Ck
 		 * \brief 
 		 * \param transformationNode 
 		 */
-		explicit Camera(Ref<TransformationNode> transformationNode);
+		explicit Camera(std::shared_ptr<TransformationNode> transformationNode);
 	};
 }
 

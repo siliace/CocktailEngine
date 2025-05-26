@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API MaterialProgramManager : public Extends<MaterialProgramManager, Object>
+	class COCKTAIL_GRAPHIC_API MaterialProgramManager
 	{
 	public:
 
@@ -16,7 +16,7 @@ namespace Ck
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit MaterialProgramManager(Ref<Renderer::RenderDevice> renderDevice);
+		explicit MaterialProgramManager(std::shared_ptr<Renderer::RenderDevice> renderDevice);
 
 		/**
 		 * \brief 
@@ -42,12 +42,12 @@ namespace Ck
 		 * \param shadingMode 
 		 * \param materialProgram 
 		 */
-		void Register(RenderableType renderableType, Material::ShadingMode shadingMode, Ref<MaterialProgram> materialProgram);
+		void Register(RenderableType renderableType, Material::ShadingMode shadingMode, std::shared_ptr<MaterialProgram> materialProgram);
 
 		using MaterialProgramKey = CompositeKey<RenderableType, Material::ShadingMode>;
 
-		Ref<Renderer::RenderDevice> mRenderDevice;
-		std::unordered_map<MaterialProgramKey, Ref<MaterialProgram>> mMaterialPrograms;
+		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
+		std::unordered_map<MaterialProgramKey, std::shared_ptr<MaterialProgram>> mMaterialPrograms;
 	};
 }
 

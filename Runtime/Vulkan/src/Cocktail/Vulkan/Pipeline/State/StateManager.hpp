@@ -59,7 +59,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param descriptorSetAllocator 
 		 */
-		explicit StateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator);
+		explicit StateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator);
 
 		/**
 		 * \brief 
@@ -162,7 +162,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		virtual Ref<Pipeline> CompilePipeline() = 0;
+		virtual std::shared_ptr<Pipeline> CompilePipeline() = 0;
 
 		/**
 		 * \brief 
@@ -179,7 +179,7 @@ namespace Ck::Vulkan
 		 * \param writes 
 		 * \return 
 		 */
-		unsigned int CompilePushDescriptors(const Ref<DescriptorSetLayout>& setLayout, unsigned int set, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
+		unsigned int CompilePushDescriptors(std::shared_ptr<DescriptorSetLayout> setLayout, unsigned int set, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
 
 		/**
 		 * \brief 
@@ -189,7 +189,7 @@ namespace Ck::Vulkan
 		 * \param descriptors 
 		 * \return 
 		 */
-		void CompilePushDescriptorsWithTemplate(const Ref<DescriptorSetLayout>& setLayout, const Ref<DescriptorUpdateTemplate>& descriptorUpdateTemplate, unsigned int set, unsigned char* descriptors);
+		void CompilePushDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned int set, unsigned char* descriptors);
 
 		/**
 		 * \brief 
@@ -197,7 +197,7 @@ namespace Ck::Vulkan
 		 * \param set 
 		 * \return 
 		 */
-		DescriptorSetRange CompileDescriptorSets(const Ref<PipelineLayout>& pipelineLayout, unsigned int set);
+		DescriptorSetRange CompileDescriptorSets(std::shared_ptr<PipelineLayout> pipelineLayout, unsigned int set);
 
 		/**
 		 * \brief
@@ -229,10 +229,10 @@ namespace Ck::Vulkan
 			bool Dirty = false;
 		};
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<DescriptorSetAllocator> mDescriptorSetAllocator;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
 		Flags<DirtyFlagBits> mDirtyFlags;
-		EnumMap<Renderer::ShaderType, Ref<Shader>> mShaderStages;
+		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaderStages;
 		unsigned int mDescriptorSetDirtyFlags;
 		std::vector<DescriptorSetStateManager> mDescriptorSetStateManagers;
 		unsigned int mPipelineConstantStorageSize;

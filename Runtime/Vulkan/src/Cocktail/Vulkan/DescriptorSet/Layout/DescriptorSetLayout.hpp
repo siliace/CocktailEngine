@@ -3,9 +3,6 @@
 
 #include <vector>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayoutCreateInfo.hpp>
@@ -18,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class DescriptorSetLayout : public Inherit<DescriptorSetLayout, Object, Renderer::RenderDeviceObject>
+	class DescriptorSetLayout : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -28,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		DescriptorSetLayout(const Ref<RenderDevice>& renderDevice, const DescriptorSetLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DescriptorSetLayout(std::shared_ptr<RenderDevice> renderDevice, const DescriptorSetLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -45,7 +42,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -93,7 +90,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDescriptorSetLayout mHandle;
 		bool mSupportPushDescriptor;

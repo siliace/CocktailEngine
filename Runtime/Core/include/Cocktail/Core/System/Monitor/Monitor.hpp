@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
 #include <Cocktail/Core/System/Monitor/VideoMode.hpp>
 
 namespace Ck
@@ -9,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class Monitor : public Implements<Monitor, Interface>
+	class Monitor
 	{
 	public:
 
@@ -38,6 +37,11 @@ namespace Ck
 			 */
 			LeftPortait
 		};
+
+		/**
+		 * \brief 
+		 */
+		virtual ~Monitor() = default;
 
 		/**
 		 * \brief 

@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_COMPUTEPIPELINECREATEINFO_HPP
 #define COCKTAIL_VULKAN_PIPELINE_COMPUTEPIPELINECREATEINFO_HPP
 
+#include <Cocktail/Vulkan/Pipeline/State/ComputeState.hpp>
+
 namespace Ck::Vulkan
 {
 	/**
@@ -16,7 +18,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		Ref<PipelineLayout> PipelineLayout;
+		std::shared_ptr<PipelineLayout> PipelineLayout;
 
 		/**
 		 * \brief Specifies the name of the Pipeline to create

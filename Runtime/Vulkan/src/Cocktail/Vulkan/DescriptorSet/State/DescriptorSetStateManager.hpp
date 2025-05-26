@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param descriptorSetAllocator 
 		 */
-		explicit DescriptorSetStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator);
+		explicit DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator);
 
 		/**
 		 * \brief 
@@ -148,7 +148,7 @@ namespace Ck::Vulkan
 		 * \param writes 
 		 * \return 
 		 */
-		unsigned int CompileDescriptors(const Ref<DescriptorSetLayout>& layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
+		unsigned int CompileDescriptors(std::shared_ptr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
 
 		/**
 		 * \brief 
@@ -156,14 +156,14 @@ namespace Ck::Vulkan
 		 * \param descriptorUpdateTemplate 
 		 * \param descriptors 
 		 */
-		void CompileDescriptorsWithTemplate(const Ref<DescriptorSetLayout>& layout, const Ref<DescriptorUpdateTemplate>& descriptorUpdateTemplate, unsigned char* descriptors);
+		void CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> layout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
 
 		/**
 		 * \brief 
 		 * \param descriptorSetLayout 
 		 * \return 
 		 */
-		Ref<DescriptorSet> CompileSet(const Ref<DescriptorSetLayout>& descriptorSetLayout);
+		std::shared_ptr<DescriptorSet> CompileSet(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout);
 
 		/**
 		 * \brief 
@@ -171,7 +171,7 @@ namespace Ck::Vulkan
 		 * \param descriptorUpdateTemplate 
 		 * \return 
 		 */
-		Ref<DescriptorSet> CompileSetWithTemplate(const Ref<DescriptorSetLayout>& descriptorSetLayout, const Ref<DescriptorUpdateTemplate>& descriptorUpdateTemplate);
+		std::shared_ptr<DescriptorSet> CompileSetWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate);
 
 		/**
 		 * \brief 
@@ -219,9 +219,9 @@ namespace Ck::Vulkan
 		 */
 		DescriptorState* FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement);
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<DescriptorSetAllocator> mDescriptorSetAllocator;
-		Ref<DescriptorSet> mLastSet;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
+		std::shared_ptr<DescriptorSet> mLastSet;
 		std::vector<DescriptorState> mBindingStates;
 		unsigned int mBindingDirtyFlags;
 	};

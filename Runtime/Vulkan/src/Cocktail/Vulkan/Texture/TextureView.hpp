@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class TextureView : public Inherit<TextureView, Object, Renderer::TextureView>
+	class TextureView : public Renderer::TextureView
 	{
 	public:
 
@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		TextureView(const Ref<RenderDevice>& renderDevice, const Renderer::TextureViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		TextureView(std::shared_ptr<RenderDevice> renderDevice, const Renderer::TextureViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -40,13 +40,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::Texture> GetTexture() const override;
+		std::shared_ptr<Renderer::Texture> GetTexture() const override;
 
 		/**
 		 * \brief 
@@ -62,8 +62,8 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<AbstractTexture> mTexture;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<AbstractTexture> mTexture;
 		PixelFormat mFormat;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkImageView mHandle;

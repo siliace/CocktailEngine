@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit DepthResolver(Ref<RenderDevice> renderDevice);
+		explicit DepthResolver(std::shared_ptr<RenderDevice> renderDevice);
 
 		/**
 		 * \brief 
@@ -31,7 +31,7 @@ namespace Ck::Vulkan
 		 * \param attachment
 		 * \param depthResolveMode 
 		 */
-		void Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, Ref<Renderer::TextureView> multisampleAttachment, Ref<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode);
+		void Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<Renderer::TextureView> multisampleAttachment, std::shared_ptr<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode);
 
 	private:
 
@@ -48,19 +48,19 @@ namespace Ck::Vulkan
 		 * \param shaderType 
 		 * \return 
 		 */
-		static Ref<Renderer::Shader> LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType);
+		static std::shared_ptr<Renderer::Shader> LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType);
 
 		/**
 		 * \brief 
 		 * \param attachment 
 		 * \return 
 		 */
-		Renderer::Framebuffer* GetOrCreateFramebuffer(const Ref<Renderer::TextureView>& attachment);
+		Renderer::Framebuffer* GetOrCreateFramebuffer(std::shared_ptr<Renderer::TextureView> attachment);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
-		Ref<Renderer::ShaderProgram> mShaderProgram;
-		std::unordered_map<Ref<Renderer::TextureView>, Ref<Renderer::Framebuffer>> mFramebuffers;
+		std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
+		std::unordered_map<std::shared_ptr<Renderer::TextureView>, std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
 	};
 	
 }

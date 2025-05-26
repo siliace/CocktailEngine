@@ -1,23 +1,20 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_LAYOUT_PIPELINELAYOUT_HPP
 #define COCKTAIL_VULKAN_PIPELINE_LAYOUT_PIPELINELAYOUT_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
 #include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayoutCreateInfo.hpp>
 
 namespace Ck::Vulkan
 {
+	class DescriptorUpdateTemplate;
 	class RenderDevice;
 
 	/**
 	 * \brief 
 	 */
-	class PipelineLayout : public Inherit<PipelineLayout, Object, Renderer::RenderDeviceObject>
+	class PipelineLayout : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -27,7 +24,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		PipelineLayout(const Ref<RenderDevice>& renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		PipelineLayout(std::shared_ptr<RenderDevice> renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -44,7 +41,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -57,14 +54,14 @@ namespace Ck::Vulkan
 		 * \param set 
 		 * \return 
 		 */
-		Ref<DescriptorSetLayout> GetDescriptorSetLayout(unsigned int set) const;
+		std::shared_ptr<DescriptorSetLayout> GetDescriptorSetLayout(unsigned int set) const;
 
 		/**
 		 * \brief 
 		 * \param set 
 		 * \return 
 		 */
-		Ref<DescriptorUpdateTemplate> GetDescriptorUpdateTemplate(unsigned int set) const;
+		std::shared_ptr<DescriptorUpdateTemplate> GetDescriptorUpdateTemplate(unsigned int set) const;
 
 		/**
 		 * \brief 
@@ -86,11 +83,11 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipelineLayout mHandle;
-		std::vector<Ref<DescriptorSetLayout>> mDescriptorSetLayouts;
-		std::vector<Ref<DescriptorUpdateTemplate>> mUpdateTemplates;
+		std::vector<std::shared_ptr<DescriptorSetLayout>> mDescriptorSetLayouts;
+		std::vector<std::shared_ptr<DescriptorUpdateTemplate>> mUpdateTemplates;
 		EnumMap<Renderer::ShaderType, Optional<PushConstantBlockInfo>> mPipelineConstantBlocks;
 		VkPipelineBindPoint mBindPoint;
 	};

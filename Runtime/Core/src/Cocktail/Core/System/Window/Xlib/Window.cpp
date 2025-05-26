@@ -563,12 +563,12 @@ namespace Ck::Detail::Xlib
         }
     }
 
-    Ref<Cursor> Window::GetCursor() const
+    std::shared_ptr<Cursor> Window::GetCursor() const
     {
         return mCursor;
     }
 
-    void Window::SetCursor(Ref<Cursor> cursor)
+    void Window::SetCursor(std::shared_ptr<Cursor> cursor)
     {
         mCursor = std::move(cursor);
         XDefineCursor(mHandle.Display, mHandle.Window, (::Cursor)mCursor->GetSystemHandle());

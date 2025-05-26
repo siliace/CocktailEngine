@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters
 		 * \return 
 		 */
-		Ref<Image> LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters) override;
+		std::shared_ptr<Image> LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters) override;
 
 		/**
 		 * \brief 

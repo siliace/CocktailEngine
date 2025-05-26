@@ -23,7 +23,7 @@ namespace Ck
 		{
 		public:
 
-			static Ref<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
+			static std::shared_ptr<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
 			{
 				Vulkan::RenderDeviceCreateInfo createInfo;
 				createInfo.ApiVersion = Vulkan::GetSupportedApiVersion();
@@ -53,8 +53,8 @@ namespace Ck
 		mRenderContext = mRenderDevice->CreateRenderContext({ 1, 3, "" });
 		mFrameContext = mRenderContext->BeginFrame();
 
-		mResourceUploader = ResourceUploader::New();
-		mMaterialProgramManager = MaterialProgramManager::New(mRenderDevice);
+		mResourceUploader = std::make_shared<ResourceUploader>();
+		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice);
 
 		for (SamplerType samplerType : Enum<SamplerType>::Values)
 		{
@@ -119,25 +119,25 @@ namespace Ck
 		mRenderContext->EndFrame();
     }
 
-    Ref<VertexBuffer> GraphicEngine::CreateVertexBuffer(Ref<VertexArray> vertices, bool updatable, std::string_view name)
+    std::shared_ptr<VertexBuffer> GraphicEngine::CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable, std::string_view name)
     {
-		Ref<VertexBuffer> vertexBuffer = VertexBuffer::New(Self(), std::move(vertices), name);
+		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>(shared_from_this(), std::move(vertices), name);
 		vertexBuffer->Upload();
 
 		return vertexBuffer;
 	}
 
-	Ref<IndexBuffer> GraphicEngine::CreateIndexBuffer(Ref<IndexArray> indices, bool updatable, std::string_view name)
+	std::shared_ptr<IndexBuffer> GraphicEngine::CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable, std::string_view name)
 	{
-		Ref<IndexBuffer> indexBuffer = IndexBuffer::New(Self(), std::move(indices), name);
+		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(shared_from_this(), std::move(indices), name);
 		indexBuffer->Upload();
 
 		return indexBuffer;
 	}
 
-	Ref<TextureResource> GraphicEngine::CreateTextureSampler(Ref<MipMaps> mipMaps, std::string_view name)
+	std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, std::string_view name)
 	{
-		Ref<MipMapsTextureResource> textureResource = MipMapsTextureResource::New(Self(), mipMaps, name);
+		std::shared_ptr<MipMapsTextureResource> textureResource = std::make_shared<MipMapsTextureResource>(shared_from_this(), mipMaps, name);
 		for (unsigned int layer = 0; layer < mipMaps->GetArrayLayerCount(); layer++)
 			textureResource->LoadLevels(layer, 0, mipMaps->GetMipMapCount() - 1);
 
@@ -147,12 +147,12 @@ namespace Ck
 		return textureResource;
 	}
 
-	void GraphicEngine::UploadBuffer(Ref<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
+	void GraphicEngine::UploadBuffer(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
 	{
 		mResourceUploader->RequestBufferUpload(buffer, offset, length, data);
 	}
 
-	void GraphicEngine::UploadTexture(Ref<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
+	void GraphicEngine::UploadTexture(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
 	{
 		mResourceUploader->RequestTextureUpload(texture, arrayLayer, mipMapLevel, data);
 	}
@@ -161,27 +161,35 @@ namespace Ck
 	{
 		if (mResourceUploader->HasPendingTransfer())
 		{
-			Ref<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Transfer });
+			std::shared_ptr<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Transfer });
 
 			commandList->Begin(nullptr);
 			mResourceUploader->Flush(*commandList);
 			commandList->End();
 
-			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, &commandList, nullptr);
+			Renderer::CommandList* commandLists[] = {
+				commandList.get()
+			};
+
+			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, commandLists, nullptr);
 			mRenderContext->SignalQueue(Renderer::CommandQueueType::Transfer);
 			mRenderContext->WaitQueue(Renderer::CommandQueueType::Graphic, Renderer::CommandQueueType::Transfer);
 		}
 
 		if (!mGeneratingMipMaps.empty())
 		{
-			Ref<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Graphic });
+			std::shared_ptr<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Graphic });
 
 			commandList->Begin(nullptr);
-			for (Ref<TextureResource> generatingMipMap : mGeneratingMipMaps)
+			for (std::shared_ptr<TextureResource> generatingMipMap : mGeneratingMipMaps)
 				generatingMipMap->GenerateMipMaps(*commandList);
 			commandList->End();
 
-			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
+			Renderer::CommandList* commandLists[] = {
+				commandList.get()
+			};
+
+			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
 
 			mGeneratingMipMaps.clear();
 		}
@@ -195,12 +203,12 @@ namespace Ck
 		FlushTransfer();
 	}
 
-	Ref<Renderer::RenderDevice> GraphicEngine::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> GraphicEngine::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
 
-	Ref<Renderer::RenderContext> GraphicEngine::GetRenderContext() const
+	std::shared_ptr<Renderer::RenderContext> GraphicEngine::GetRenderContext() const
 	{
 		return mRenderContext;
 	}
@@ -210,12 +218,12 @@ namespace Ck
 		return mFrameContext;
 	}
 
-	Ref<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const
+	std::shared_ptr<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const
 	{
 		return mMaterialProgramManager;
 	}
 
-	Ref<Renderer::Sampler> GraphicEngine::GetSampler(SamplerType samplerType) const
+	std::shared_ptr<Renderer::Sampler> GraphicEngine::GetSampler(SamplerType samplerType) const
 	{
 		return mSamplers[samplerType];
 	}

@@ -3,8 +3,8 @@
 
 namespace Ck
 {
-	IndexBuffer::IndexBuffer(Ref<GraphicEngine> graphicEngine, Ref<IndexArray> indices, std::string_view name) :
-		Extends<Ck::IndexBuffer, Ck::BufferResource>(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Index, indices->GetIndices().GetSize(), name),
+	IndexBuffer::IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, std::string_view name) :
+		BufferResource(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Index, indices->GetIndices().GetSize(), name),
 		mIndices(std::move(indices))
 	{
 		/// Nothing
@@ -20,10 +20,10 @@ namespace Ck
 		const unsigned int indexStride = Renderer::ToDataType(mIndices->GetIndexType()).GetSize();
 		std::size_t firstVertexOffset = firstIndex * indexStride;
 		std::size_t length = indexCount * indexStride;
-		GetGraphicEngine()->UploadBuffer(Self(), firstVertexOffset, length, mIndices->GetIndices().GetData() + firstVertexOffset);
+		GetGraphicEngine()->UploadBuffer(shared_from_this(), firstVertexOffset, length, mIndices->GetIndices().GetData() + firstVertexOffset);
 	}
 
-	Ref<IndexArray> IndexBuffer::GetIndexArray() const
+	std::shared_ptr<IndexArray> IndexBuffer::GetIndexArray() const
 	{
 		return mIndices;
 	}

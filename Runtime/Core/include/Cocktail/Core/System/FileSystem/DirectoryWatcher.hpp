@@ -4,16 +4,20 @@
 #include <filesystem>
 
 #include <Cocktail/Core/Signal/Signal.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 
 namespace Ck
 {
 	/**
 	 * \brief 
 	 */
-	class DirectoryWatcher : public Implements<Directory, Interface>
+	class DirectoryWatcher
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~DirectoryWatcher() = default;
 
 		/**
 		 * \brief 

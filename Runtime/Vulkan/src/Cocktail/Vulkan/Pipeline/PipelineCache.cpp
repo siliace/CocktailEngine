@@ -151,7 +151,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	PipelineCache::PipelineCache(const Ref<RenderDevice>& renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	PipelineCache::PipelineCache(std::shared_ptr<RenderDevice> renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -173,25 +173,25 @@ namespace Ck::Vulkan
 		vkDestroyPipelineCache(mRenderDevice->GetHandle(), mHandle, mAllocationCallbacks);
 	}
 
-	Ref<ComputePipeline> PipelineCache::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
+	std::shared_ptr<ComputePipeline> PipelineCache::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 	{
 		PipelineStateHash stateHash = HashComputeState(createInfo.ComputeState);
 		if (auto it = mCache.find(stateHash); it != mCache.end())
-			return ComputePipeline::Cast(it->second);
+			return std::static_pointer_cast<ComputePipeline>(it->second);
 
-		Ref<ComputePipeline> pipeline = mRenderDevice->CreateComputePipeline(this, createInfo);
+		std::shared_ptr<ComputePipeline> pipeline = mRenderDevice->CreateComputePipeline(this, createInfo);
 		mCache[stateHash] = pipeline;
 
 		return pipeline;
 	}
 
-	Ref<GraphicPipeline> PipelineCache::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
+	std::shared_ptr<GraphicPipeline> PipelineCache::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
 	{
 		PipelineStateHash stateHash = HashGraphicState(createInfo.GraphicState);
 		if (auto it = mCache.find(stateHash); it != mCache.end())
-			return GraphicPipeline::Cast(it->second);
+			return std::static_pointer_cast<GraphicPipeline>(it->second);
 
-		Ref<GraphicPipeline> pipeline = mRenderDevice->CreateGraphicPipeline(this, createInfo);
+		std::shared_ptr<GraphicPipeline> pipeline = mRenderDevice->CreateGraphicPipeline(this, createInfo);
 		mCache[stateHash] = pipeline;
 
 		return pipeline;
@@ -209,7 +209,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<RenderDevice> PipelineCache::GetRenderDevice() const
+	std::shared_ptr<RenderDevice> PipelineCache::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

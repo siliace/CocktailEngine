@@ -40,7 +40,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API SceneViewer : public Extends<SceneViewer, Object>, public Observable
+	class COCKTAIL_GRAPHIC_API SceneViewer : public Observable
 	{
 	public:
 
@@ -49,13 +49,13 @@ namespace Ck
 		 * \param viewport
 		 * \param index
 		 */
-		void AttachViewport(Ref<Viewport> viewport, unsigned int index = 0);
+		void AttachViewport(std::shared_ptr<Viewport> viewport, unsigned int index = 0);
 
 		/**
 		 * \brief
 		 * \param viewport
 		 */
-		void DetachViewport(const Ref<Viewport>& viewport);
+		void DetachViewport(const std::shared_ptr<Viewport>& viewport);
 
 		/**
 		 * \brief 
@@ -66,7 +66,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Scene> GetScene() const;
+		std::shared_ptr<Scene> GetScene() const;
 
 		/**
 		 * \brief 
@@ -80,7 +80,7 @@ namespace Ck
 		 * \brief
 		 * \param scene
 		 */
-		explicit SceneViewer(Ref<Scene> scene);
+		explicit SceneViewer(std::shared_ptr<Scene> scene);
 
 		/**
 		 * \brief 
@@ -99,7 +99,7 @@ namespace Ck
 			/**
 			 * \brief 
 			 */
-			Ref<Viewport> Viewport;
+			std::shared_ptr<Viewport> Viewport;
 
 			/**
 			 * \brief 
@@ -121,10 +121,10 @@ namespace Ck
 			int operator()(const ViewportEntry& lhs, const ViewportEntry& rhs) const noexcept;
 		};
 
-		Ref<Scene> mScene;
+		std::shared_ptr<Scene> mScene;
 		std::set<ViewportEntry, ViewportComparator> mViewports;
-		Ref<RenderQueue> mOpaqueRenderQueue;
-		Ref<RenderQueue> mBlendingRenderQueue;
+		std::unique_ptr<RenderQueue> mOpaqueRenderQueue;
+		std::unique_ptr<RenderQueue> mBlendingRenderQueue;
 		Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&> mOnRendered;
 	};
 }

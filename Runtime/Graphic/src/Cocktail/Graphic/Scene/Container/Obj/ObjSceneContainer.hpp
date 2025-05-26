@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	class ObjSceneContainer : public Extends<ObjSceneContainer, SceneContainer>
+	class ObjSceneContainer : public SceneContainer
 	{
 	public:
 
@@ -23,17 +23,16 @@ namespace Ck
 
 	private:
 
-
-		Ref<MipMaps> LoadMipMaps(const std::filesystem::path& path);
+		std::shared_ptr<MipMaps> LoadMipMaps(const std::filesystem::path& path);
 		MaterialInfo ProcessMaterial(const tinyobj::material_t& objMaterial);
 
 		void ProcessIndices(ObjVertexCache& vertexCache, const tinyobj::attrib_t& attributes, const tinyobj::index_t* indices, std::size_t indicesCount) const;
 		bool ProcessSubMesh(ObjVertexCache& vertexCache, std::vector<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape);
 		MeshInfo ProcessMesh(const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes);
 
-		Ref<VertexLayout> mVertexLayout;
+		std::shared_ptr<VertexLayout> mVertexLayout;
 		SceneImportParameters mImportParameters;
-		std::unordered_map<std::filesystem::path, Ref<MipMaps>> mMipMaps;
+		std::unordered_map<std::filesystem::path, std::shared_ptr<MipMaps>> mMipMaps;
 	};
 }
 

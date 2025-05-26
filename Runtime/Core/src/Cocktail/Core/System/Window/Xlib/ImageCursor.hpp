@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_WIN32_IMAGECURSOR_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_WIN32_IMAGECURSOR_HPP
 
-#include <Cocktail/Core/Object.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/Unix/Xlib/Xlib.hpp>
 #include <Cocktail/Core/System/Window/ImageCursor.hpp>
 
@@ -12,7 +10,7 @@ namespace Ck::Detail::Xlib
 	/**
 	 * \brief 
 	 */
-	class ImageCursor : public Inherit<ImageCursor, Object, Ck::ImageCursor>
+	class ImageCursor : public Ck::ImageCursor
 	{
 	public:
 

@@ -12,7 +12,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief Class managing batches submission and life-cycle in a deterministic order
 	 */
-	class SubmitScheduler : public Extends<SubmitScheduler, Object>, public Observable
+	class SubmitScheduler : public Observable
 	{
 	public:
 
@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit SubmitScheduler(Ref<RenderDevice> renderDevice);
+		explicit SubmitScheduler(std::shared_ptr<RenderDevice> renderDevice);
 
 		/**
 		 * \brief Destructor
@@ -40,7 +40,7 @@ namespace Ck::Vulkan
 		 * \param batch 
 		 * \param fence 
 		 */
-		void ConnectFence(QueueSubmitBatch* batch, const Ref<Fence>& fence);
+		void ConnectFence(QueueSubmitBatch* batch, std::shared_ptr<Fence> fence);
 
 		/**
 		 * \brief 
@@ -49,11 +49,11 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		TlsObjectPool<QueueSubmitBatch> mBatchPool;
-		std::queue<Ref<QueueSubmitBatch>> mBatches;
-		std::vector<Ref<QueueSubmitBatch>> mPending;
-		std::vector<Ref<QueueSubmitBatch>> mTerminated;
+		std::queue<std::shared_ptr<QueueSubmitBatch>> mBatches;
+		std::vector<std::shared_ptr<QueueSubmitBatch>> mPending;
+		std::vector<std::shared_ptr<QueueSubmitBatch>> mTerminated;
 	};
 }
 

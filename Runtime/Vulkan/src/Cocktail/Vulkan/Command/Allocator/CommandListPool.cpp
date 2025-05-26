@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	CommandListPool::CommandListPool(Ref<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	CommandListPool::CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mTransient(createInfo.Transient),
 		mCommandListResetable(createInfo.Reset)
@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 		if (queueFamilyContext.IsUnified())
 		{
 			poolCreateInfo.QueueType = Renderer::CommandQueueType::Graphic;
-			Ref<CommandPool> commandPool = CommandPool::New(mRenderDevice, poolCreateInfo, allocationCallbacks);
+			std::shared_ptr<CommandPool> commandPool = std::make_shared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
 			for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 				mCommandPools[queueType] = commandPool;
 		}
@@ -29,11 +29,11 @@ namespace Ck::Vulkan
 			for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 			{
 				poolCreateInfo.QueueType = queueType;
-				mCommandPools[queueType] = CommandPool::New(mRenderDevice, poolCreateInfo, allocationCallbacks);
+				mCommandPools[queueType] = std::make_shared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
 			}
 		}
 
-		mStagingAllocator = StagingAllocator::New(mRenderDevice, 16 * 1024 * 1024);
+		mStagingAllocator = std::make_unique<StagingAllocator>(mRenderDevice, 16 * 1024 * 1024);
 	}
 
 	CommandListPool::~CommandListPool()
@@ -47,20 +47,20 @@ namespace Ck::Vulkan
 			mCommandPools[queueType]->SetObjectName(name);
 	}
 
-	Ref<Renderer::RenderDevice> CommandListPool::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> CommandListPool::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
 
-	Ref<StagingBuffer> CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
+	std::shared_ptr<StagingBuffer> CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
 	{
 		return mStagingAllocator->AcquireStagingBuffer(alignment, length);
 	}
 	
-	Ref<Renderer::CommandList> CommandListPool::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
+	std::shared_ptr<Renderer::CommandList> CommandListPool::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		Ref<CommandList> commandList = mRenderDevice->CreateCommandList(Self(), mDescriptorSetAllocator, createInfo);
-		commandList->Connect(mOnReset, [self = commandList.Get()] {
+		std::shared_ptr<CommandList> commandList = mRenderDevice->CreateCommandList(shared_from_this(), mDescriptorSetAllocator, createInfo);
+		commandList->Connect(mOnReset, [self = commandList.get()] {
 			self->MarkInitial();
 		});
 
@@ -95,7 +95,7 @@ namespace Ck::Vulkan
 		return mCommandListResetable;
 	}
 
-	Ref<CommandPool> CommandListPool::GetCommandPool(Renderer::CommandQueueType queueType) const
+	std::shared_ptr<CommandPool> CommandListPool::GetCommandPool(Renderer::CommandQueueType queueType) const
 	{
 		return mCommandPools[queueType];
 	}

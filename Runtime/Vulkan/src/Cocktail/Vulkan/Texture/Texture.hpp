@@ -9,7 +9,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Texture final : public Extends<Texture, AbstractTexture>
+	class Texture final : public AbstractTexture
 	{
 	public:
 
@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Texture(const Ref<RenderDevice>& renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Texture(std::shared_ptr<RenderDevice> renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

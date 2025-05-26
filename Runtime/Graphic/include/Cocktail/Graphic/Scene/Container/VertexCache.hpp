@@ -18,7 +18,7 @@ namespace Ck
          * \brief Constructor
          * \param vertexLayout
          */
-        explicit VertexCache(Ref<VertexLayout> vertexLayout) :
+        explicit VertexCache(std::shared_ptr<VertexLayout> vertexLayout) :
             mVertexLayout(std::move(vertexLayout)),
             mCurrentIndex(0)
         {
@@ -55,12 +55,12 @@ namespace Ck
          * \brief
          * \return
          */
-        Ref<IndexArray> CreateIndexArray() const
+        std::shared_ptr<IndexArray> CreateIndexArray() const
         {
             const bool useShortIndices = mVertices.size() < std::numeric_limits<Uint16>::max();
             const Renderer::IndexType indexType = useShortIndices ? Renderer::IndexType::Short : Renderer::IndexType::Integer;
 
-            Ref<IndexArray> indices = IndexArray::New(indexType, mIndices.size());
+            std::shared_ptr<IndexArray> indices = std::make_shared<IndexArray>(indexType, mIndices.size());
             for (std::size_t i = 0; i < mIndices.size(); i++)
             {
                 IndexRef indexRef = indices->At(i);
@@ -82,16 +82,16 @@ namespace Ck
          * \brief
          * \return
          */
-        Ref<VertexArray> CreateVertexArray() const
+        std::shared_ptr<VertexArray> CreateVertexArray() const
         {
-            Ref<VertexArray> vertices = VertexArray::New(mVertexLayout, mVertices.size());
+            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(mVertexLayout, mVertices.size());
             for (const auto& [vertex, index] : mVertices)
                 HydrateVertexRef(vertices->At(index), vertex);
 
             return vertices;
         }
 
-        Ref<VertexLayout> GetVertexLayout() const
+        std::shared_ptr<VertexLayout> GetVertexLayout() const
         {
             return mVertexLayout;
         }
@@ -125,7 +125,7 @@ namespace Ck
 
     private:
 
-        Ref<VertexLayout> mVertexLayout;
+        std::shared_ptr<VertexLayout> mVertexLayout;
         unsigned int mCurrentIndex;
         std::unordered_map<T, unsigned int, Hasher, Equal> mVertices;
         std::vector<unsigned int> mIndices;

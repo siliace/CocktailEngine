@@ -1,16 +1,19 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_CURSOR_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_CURSOR_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
-
 namespace Ck
 {
 	/**
      * \brief 
      */
-    class Cursor : public Implements<Cursor, Interface>
+    class Cursor
     {
     public:
+
+	    /**
+	     * \brief 
+	     */
+	    virtual ~Cursor() = default;
 
 	    /**
          * \brief 

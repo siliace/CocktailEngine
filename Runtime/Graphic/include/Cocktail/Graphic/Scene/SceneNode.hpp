@@ -2,7 +2,6 @@
 #define COCKTAIL_GRAPHIC_SCENE_SCENENODE_HPP
 
 #include <Cocktail/Core/Math/Volume/Box.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 
 #include <Cocktail/Graphic/Material/Material.hpp>
 #include <Cocktail/Graphic/Mesh/Mesh.hpp>
@@ -15,7 +14,7 @@ namespace Ck
 	class Scene;
 	class VertexBuffer;
 
-	class COCKTAIL_GRAPHIC_API Shape : public Extends<Shape, Object>
+	class COCKTAIL_GRAPHIC_API Shape
 	{
 	public:
 
@@ -45,28 +44,28 @@ namespace Ck
 			Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
 		};
 
-		Shape(GraphicEngine& graphicEngine, Ref<Mesh> mesh, const std::vector<Ref<Material>>& materials);
+		Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const std::vector<std::shared_ptr<Material>>& materials);
 
-		const Ref<Mesh>& GetMesh() const;
+		const std::shared_ptr<Mesh>& GetMesh() const;
 
-		const Ref<VertexBuffer>& GetVertexBuffer() const;
+		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const;
 
-		const Ref<IndexBuffer>& GetIndexBuffer() const;
+		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const;
 
-		const std::unordered_set<Ref<Material>>& GetMaterials() const;
+		const std::unordered_set<std::shared_ptr<Material>>& GetMaterials() const;
 
 		const std::vector<Geometry>& GetGeometries(const Material* material) const;
 
 	private:
 
-		Ref<Mesh> mMesh;
-		Ref<VertexBuffer> mVertexBuffer;
-		Ref<IndexBuffer> mIndexBuffer;
-		std::unordered_set<Ref<Material>> mMaterials;
+		std::shared_ptr<Mesh> mMesh;
+		std::shared_ptr<VertexBuffer> mVertexBuffer;
+		std::shared_ptr<IndexBuffer> mIndexBuffer;
+		std::unordered_set<std::shared_ptr<Material>> mMaterials;
 		std::unordered_map<const Material*, std::vector<Geometry>> mGeometries;
 	};
 
-	class COCKTAIL_GRAPHIC_API SceneNode : public Inherit<SceneNode, Transformable, AcyclicGraphNode<SceneNode>, Renderable>
+	class COCKTAIL_GRAPHIC_API SceneNode : public AcyclicGraphNode<SceneNode>, public Renderable, public Transformable
 	{
 	public:
 
@@ -74,13 +73,13 @@ namespace Ck
 		 * \brief 
 		 * \param transformationNode 
 		 */
-		SceneNode(Scene* scene, Ref<TransformationNode> transformationNode);
+		SceneNode(Scene* scene, std::shared_ptr<TransformationNode> transformationNode);
 
 		/**
 		 * \brief 
 		 * \param shape 
 		 */
-		void AddShape(Ref<Shape> shape);
+		void AddShape(std::shared_ptr<Shape> shape);
 
 		/**
 		 * \brief
@@ -111,7 +110,7 @@ namespace Ck
 
 		Scene* mScene;
 		bool mVisible;
-		std::vector<Ref<Shape>> mShapes;
+		std::vector<std::shared_ptr<Shape>> mShapes;
 		Box<float> mBoundingBox;
 	};
 }

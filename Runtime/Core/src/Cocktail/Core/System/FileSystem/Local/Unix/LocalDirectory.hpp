@@ -3,8 +3,6 @@
 
 #include <dirent.h>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
 
 namespace Ck::Detail::Unix
@@ -12,7 +10,7 @@ namespace Ck::Detail::Unix
 	/**
 	 * \brief 
 	 */
-	class LocalDirectory : public Inherit<LocalDirectory, Object, Directory>
+	class LocalDirectory : public Directory
 	{
 	public:
 

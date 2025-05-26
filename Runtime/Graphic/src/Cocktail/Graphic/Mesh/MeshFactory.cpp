@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	Ref<Mesh> MeshFactory::CreateCube(float size, const LinearColor& color)
+	std::shared_ptr<Mesh> MeshFactory::CreateCube(float size, const LinearColor& color)
 	{
 		float halfExtent = size / 2.f;
 		Vector3<float> minPoint(-halfExtent), maxPoint(halfExtent);
@@ -16,9 +16,9 @@ namespace Ck
 		return CreateBox(box, color);
 	}
 
-	Ref<Mesh> MeshFactory::CreateBox(const Box<float>& box, const LinearColor& color)
+	std::shared_ptr<Mesh> MeshFactory::CreateBox(const Box<float>& box, const LinearColor& color)
 	{
-		Ref<VertexLayout> vertexLayout = VertexLayout::Builder()
+		std::shared_ptr<VertexLayout> vertexLayout = VertexLayout::Builder()
 		                                 .AddAttribute(VertexAttributeSemantic::Position, DataType::Float32, 3)
 		                                 .AddAttribute(VertexAttributeSemantic::Normal, DataType::Float32, 3)
 		                                 .AddAttribute(VertexAttributeSemantic::Color, DataType::Float32, 4)
@@ -74,7 +74,7 @@ namespace Ck
 			Vector3<float>::Down(),
 		};
 
-		Ref<VertexArray> vertexArray = VertexArray::New(std::move(vertexLayout), 24);
+		std::shared_ptr<VertexArray> vertexArray = std::make_shared<VertexArray>(std::move(vertexLayout), 24);
 		for (std::size_t i = 0; i < vertexArray->GetVertexCount(); i++)
 		{
 			VertexRef vertex = vertexArray->At(i);
@@ -103,13 +103,13 @@ namespace Ck
 			21, 22, 23
 		};
 
-		Ref<IndexArray> indexArray = IndexArray::New(Renderer::IndexType::Short, 36);
+		std::shared_ptr<IndexArray> indexArray = std::make_shared<IndexArray>(Renderer::IndexType::Short, 36);
 		for (std::size_t i = 0; i < indexArray->GetIndexCount(); i++)
 		{
 			IndexRef index = indexArray->At(i);
 			index.Set(indices[i]);
 		}
 
-		return Mesh::New(std::move(vertexArray), std::move(indexArray));
+		return std::make_shared<Mesh>(std::move(vertexArray), std::move(indexArray));
 	}
 }

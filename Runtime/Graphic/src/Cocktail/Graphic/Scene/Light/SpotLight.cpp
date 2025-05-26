@@ -3,18 +3,18 @@
 
 namespace Ck
 {
-	Ref<SpotLight> SpotLight::Create(Ref<Scene> scene, LinearColor color, Vector3<float> position, float intensity)
+	std::shared_ptr<SpotLight> SpotLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> position, float intensity)
 	{
 		Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
-		Ref<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
-		Ref<SpotLight> SpotLight = New(std::move(transformationNode), color, intensity);
-		scene->AddLight(SpotLight);
+		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
+		std::shared_ptr<SpotLight> spotLight = std::make_shared<SpotLight>(std::move(transformationNode), color, intensity);
+		scene->AddLight(spotLight);
 
-		return SpotLight;
+		return spotLight;
 	}
 
-	SpotLight::SpotLight(Ref<TransformationNode> transformationNode, LinearColor color, float intensity) :
-		Inherit(transformationNode),
+	SpotLight::SpotLight(std::shared_ptr<TransformationNode> transformationNode, LinearColor color, float intensity) :
+		Transformable(transformationNode),
 		mColor(color),
 		mIntensity(intensity)
 	{

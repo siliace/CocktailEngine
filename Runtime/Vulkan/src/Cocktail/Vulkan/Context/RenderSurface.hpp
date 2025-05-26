@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class RenderSurface : public Inherit<RenderSurface, Object, Renderer::RenderSurface>, public Observable
+	class RenderSurface : public Renderer::RenderSurface, public Observable
 	{
 	public:
 
@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks 
 		 */
-		RenderSurface(const Ref<RenderDevice>& renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderSurface(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		 * \param fence
 		 * \return
 		 */
-		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, const Ref<Semaphore>& semaphore, const Ref<Fence>& fence);
+		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence);
 
 		/**
 		 * \brief 
@@ -54,7 +54,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief
@@ -103,13 +103,13 @@ namespace Ck::Vulkan
 		 * \param framebufferIndex
 		 * \return
 		 */
-		Ref<Framebuffer> GetFramebuffer(unsigned int framebufferIndex) const;
+		std::shared_ptr<Framebuffer> GetFramebuffer(unsigned int framebufferIndex) const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Swapchain> GetSwapchain() const;
+		std::shared_ptr<Swapchain> GetSwapchain() const;
 
 	private:
 
@@ -128,14 +128,14 @@ namespace Ck::Vulkan
 		 */
 		void RecreateSwapchain(const Extent2D<unsigned int>& size, bool enableVSync);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSurfaceKHR mSurface;
 		PixelFormat mDepthStencilFormat;
-		Ref<PresentationContext> mPresentationContext;
-		Ref<RenderPass> mRenderPass;
-		Ref<Swapchain> mSwapchain;
-		Ref<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];
+		std::unique_ptr<PresentationContext> mPresentationContext;
+		std::shared_ptr<RenderPass> mRenderPass;
+		std::shared_ptr<Swapchain> mSwapchain;
+		std::shared_ptr<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];
 		Extent2D<unsigned int> mSize;
 		bool mVSyncEnable;
 	};

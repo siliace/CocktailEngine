@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_RENDERABLE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_RENDERABLE_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
-
 #include <Cocktail/Graphic/Scene/Camera/Camera.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
 
@@ -11,9 +9,14 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class Renderable : public Implements<Renderable, Interface>
+	class Renderable
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~Renderable() = default;
 
 		/**
 		 * \brief 

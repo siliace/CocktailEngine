@@ -78,7 +78,7 @@ namespace Ck
         mLoader.SetImageLoader(GltfImporter::LoadImageData, this);
     }
 
-    Ref<SceneContainer> GltfImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
+    std::shared_ptr<SceneContainer> GltfImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
@@ -87,10 +87,10 @@ namespace Ck
         if (!success)
             return nullptr;
 
-        return GltfSceneContainer::New(model);
+        return std::make_shared<GltfSceneContainer>(model);
     }
 
-    Ref<SceneContainer> GltfImporter::LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters)
+    std::shared_ptr<SceneContainer> GltfImporter::LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
@@ -103,7 +103,7 @@ namespace Ck
         if (!success)
             return nullptr;
 
-        return GltfSceneContainer::New(model);
+        return std::make_shared<GltfSceneContainer>(model);
     }
     
     bool GltfImporter::SupportExtension(std::string_view extension) const
@@ -120,7 +120,7 @@ namespace Ck
     {
         GltfImporter* self = static_cast<GltfImporter*>(userData);
 
-        Ref<Image> image;
+        std::shared_ptr<Image> image;
         try 
         {
             image = App::Resolve<ImageLoader>()->LoadFromMemory(data, size, { ImageImportParameters::Format::RedGreenBlueAlpha });

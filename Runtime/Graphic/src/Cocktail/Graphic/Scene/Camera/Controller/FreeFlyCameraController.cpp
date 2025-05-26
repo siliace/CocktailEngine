@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	FreeFlyCameraViewController::FreeFlyCameraViewController(Ref<Camera> camera, Angle<float> pitchLimit) :
+	FreeFlyCameraViewController::FreeFlyCameraViewController(std::shared_ptr<Camera> camera, Angle<float> pitchLimit) :
 		mCamera(std::move(camera)),
 		mPitchLimit(std::abs(pitchLimit))
 	{

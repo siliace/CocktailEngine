@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_COMMANDLIST_ALLOCATOR_COMMANDPOOL_HPP
 #define COCKTAIL_VULKAN_COMMANDLIST_ALLOCATOR_COMMANDPOOL_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
@@ -16,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class CommandPool : public Inherit<CommandPool, Object, Renderer::RenderDeviceObject>
+	class CommandPool : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -26,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks
 		 */
-		CommandPool(const Ref<RenderDevice>& renderDevice, const CommandPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		CommandPool(std::shared_ptr<RenderDevice> renderDevice, const CommandPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -43,7 +40,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief
@@ -71,7 +68,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkCommandPool mHandle;
 		Renderer::CommandQueueType mQueueType;

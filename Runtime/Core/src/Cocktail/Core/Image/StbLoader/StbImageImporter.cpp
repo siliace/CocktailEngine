@@ -17,7 +17,7 @@ namespace Ck
 		mCallbacks.eof = &StbImageImporter::EofCallback;
 	}
 
-	Ref<Image> StbImageImporter::LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters)
+	std::shared_ptr<Image> StbImageImporter::LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters)
 	{
 		void* pixels;
 		DataType dataType;
@@ -102,7 +102,7 @@ namespace Ck
 		}
 
 		PixelFormat pixelFormat = PixelFormat::Color(pixelLayout, dataType, pixelEncoding);
-		Ref<Image> image = Image::New(size, pixelFormat, pixels);
+		std::shared_ptr<Image> image = std::make_shared<Image>(size, pixelFormat, pixels);
 
 		stbi_image_free(pixels);
 

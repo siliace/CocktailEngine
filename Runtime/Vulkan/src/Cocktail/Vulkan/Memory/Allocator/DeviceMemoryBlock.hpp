@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class DeviceMemoryBlock : public Extends<DeviceMemoryBlock, Object>
+	class DeviceMemoryBlock
 	{
 	public:
 
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \return 
 		 */
-		Ref<DeviceMemoryBlock> Split(ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t alignment, std::size_t size);
+		std::shared_ptr<DeviceMemoryBlock> Split(ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t alignment, std::size_t size);
 
 		/**
 		 * \brief 

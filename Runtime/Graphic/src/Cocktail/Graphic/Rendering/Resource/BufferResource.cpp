@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-	BufferResource::BufferResource(Ref<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, std::string_view name) :
+	BufferResource::BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, std::string_view name) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
 		Renderer::BufferCreateInfo createInfo;
@@ -17,10 +17,10 @@ namespace Ck
 
 	Renderer::Buffer* BufferResource::GetUnderlyingResource() const
 	{
-		return mBuffer.Get();
+		return mBuffer.get();
 	}
 
-	Ref<GraphicEngine> BufferResource::GetGraphicEngine() const
+	std::shared_ptr<GraphicEngine> BufferResource::GetGraphicEngine() const
 	{
 		return mGraphicEngine;
 	}

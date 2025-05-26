@@ -3,9 +3,6 @@
 
 #include <memory>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 #include <Cocktail/Renderer/Texture/Texture.hpp>
 
@@ -18,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class AbstractTexture : public Inherit<AbstractTexture, Object, Renderer::Texture>
+	class AbstractTexture : public Renderer::Texture, public std::enable_shared_from_this<AbstractTexture>
 	{
 	public:
 
@@ -26,7 +23,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit AbstractTexture(const Ref<RenderDevice>& renderDevice);
+		explicit AbstractTexture(std::shared_ptr<RenderDevice> renderDevice);
 
 		/**
 		 * \brief 
@@ -38,7 +35,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -73,7 +70,7 @@ namespace Ck::Vulkan
 		 */
 		void SetViewFormats(unsigned int viewFormatCount, const PixelFormat* viewFormats);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 
 	private:
 

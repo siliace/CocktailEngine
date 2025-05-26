@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 		/// Nothing
 	}
 
-	void QueueSubmit::WaitSemaphore(const Ref<Semaphore>& semaphore, VkPipelineStageFlags pipelineWaitStages)
+	void QueueSubmit::WaitSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages)
 	{
 		mWaitSemaphores[mWaitSemaphoreCount] = semaphore;
 		mPipelineWaitStages[mWaitSemaphoreCount] = pipelineWaitStages;
@@ -22,15 +22,13 @@ namespace Ck::Vulkan
 		++mWaitSemaphoreCount;
 	}
 
-	void QueueSubmit::ExecuteCommandLists(unsigned int commandListCount, Ref<CommandList>* commandLists)
+	void QueueSubmit::ExecuteCommandList(std::shared_ptr<CommandList> commandList)
 	{
-		for (unsigned int i = 0; i < commandListCount; i++)
-			mCommandLists[mCommandListCount + i] = commandLists[i];
-
-		mCommandListCount += commandListCount;
+		mCommandLists[mCommandListCount] = std::move(commandList);
+		mCommandListCount += 1;
 	}
 
-	void QueueSubmit::SignalSemaphore(const Ref<Semaphore>& semaphore)
+	void QueueSubmit::SignalSemaphore(std::shared_ptr<Semaphore> semaphore)
 	{
 		mSignalSemaphores[mSignalSemaphoreCount] = semaphore;
 

@@ -9,7 +9,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class SystemCursor : public Implements<SystemCursor, Cursor>
+	class SystemCursor : public Cursor
 	{
 	public:
 

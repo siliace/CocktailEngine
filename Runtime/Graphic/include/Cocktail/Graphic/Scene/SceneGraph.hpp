@@ -10,14 +10,14 @@ namespace Ck
 	/**
 	 * \brief
 	 */
-	class COCKTAIL_GRAPHIC_API SceneGraph : public Extends<SceneGraph, AcyclicGraph<SceneNode>>
+	class COCKTAIL_GRAPHIC_API SceneGraph : public AcyclicGraph<SceneNode>
 	{
 	public:
 
 		/**
 		 * \brief
 		 */
-		SceneGraph(Scene* scene, Ref<TransformationNode> rootTransformationNode);
+		SceneGraph(Scene* scene, std::shared_ptr<TransformationNode> rootTransformationNode);
 
 	private:
 

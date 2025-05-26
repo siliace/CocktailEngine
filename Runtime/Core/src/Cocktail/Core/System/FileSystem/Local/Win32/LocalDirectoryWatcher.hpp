@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALDIRECTORYWATCHER_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALDIRECTORYWATCHER_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
 #include <Cocktail/Core/System/FileSystem/DirectoryWatcher.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -12,7 +10,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class LocalDirectoryWatcher : public Inherit<LocalDirectoryWatcher, Object, DirectoryWatcher>
+	class LocalDirectoryWatcher : public DirectoryWatcher
 	{
 	public:
 
@@ -21,7 +19,7 @@ namespace Ck::Detail::Win32
 		 * \param directory
 		 * \param recursive 
 		 */
-		LocalDirectoryWatcher(const Ref<Directory>& directory, bool recursive);
+		LocalDirectoryWatcher(const std::shared_ptr<Directory>& directory, bool recursive);
 
 		/**
 		 * \brief 
@@ -48,7 +46,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		Ref<Directory> mDirectory;
+		std::shared_ptr<Directory> mDirectory;
 		bool mRecursive;
 		BYTE mBuffer[63 * 1024];
 		Signal<std::filesystem::path> mOnFileCreated;

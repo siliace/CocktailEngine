@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_SHADER_VERTEXATTRIBUTELOCATION_HPP
 #define COCKTAIL_VULKAN_SHADER_VERTEXATTRIBUTELOCATION_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck::Vulkan
@@ -11,7 +8,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class VertexAttributeLocation : public Inherit<VertexAttributeLocation, Object, Renderer::VertexAttributeLocation>
+	class VertexAttributeLocation : public Renderer::VertexAttributeLocation
 	{
 	public:
 
@@ -21,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param dataType 
 		 * \param elementCount 
 		 * \param name 
-		 */
+		 */	
 		VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, std::string name);
 
 		/**

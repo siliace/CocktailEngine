@@ -4,7 +4,6 @@
 #include <Cocktail/Core/Color.hpp>
 #include <Cocktail/Core/Math/Intersection.hpp>
 #include <Cocktail/Core/Math/Volume/Frustum.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
 
@@ -13,16 +12,21 @@ namespace Ck
 	/**
      * \brief 
      */
-    class COCKTAIL_GRAPHIC_API Light : public Implements<Light, Interface>
+    class COCKTAIL_GRAPHIC_API Light
     {
     public:
 
-        enum class Type
+	    enum class Type
         {
 	        Directional,
             Point,
             Spot
         };
+
+	    /**
+         * \brief 
+         */
+        virtual ~Light() = default;
 
         /**
          * \brief 

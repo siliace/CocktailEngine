@@ -27,21 +27,21 @@ namespace Ck
 		 * \param hotspot
 		 * \return The created Cursor
 		 */
-		virtual Ref<ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) = 0;
+		virtual std::shared_ptr<ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) = 0;
 
 		/**
 		 * \brief Create a new Window
 		 * \param createInfo The structure describing the Window to create
 		 * \return The created Window
 		 */
-		virtual Ref<Window> CreateWindow(const WindowCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<Window> CreateWindow(const WindowCreateInfo& createInfo) = 0;
 
 		/**
 		 * \brief Load a system's Cursor
 		 * \param type The type of Cursor to load
 		 * \return The loaded cursor
 		 */
-		virtual Ref<SystemCursor> LoadSystemCursor(SystemCursorType type) = 0;
+		virtual std::shared_ptr<SystemCursor> LoadSystemCursor(SystemCursorType type) = 0;
 
 		/**
 		 * \brief Tell whether a SystemCursorType is supported
@@ -54,7 +54,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual Signal<Ref<Window>>& OnWindowCreated() = 0;
+		virtual Signal<std::shared_ptr<Window>>& OnWindowCreated() = 0;
 	};
 }
 

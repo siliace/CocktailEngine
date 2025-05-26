@@ -18,7 +18,7 @@ namespace Ck::Detail::Win32
 		);
 	}
 
-	Ref<Ck::Monitor> MonitorService::GetPrimaryMonitor() const
+	std::shared_ptr<Ck::Monitor> MonitorService::GetPrimaryMonitor() const
 	{
 		return mPrimaryMonitor;
 	}
@@ -28,19 +28,19 @@ namespace Ck::Detail::Win32
 		return mMonitors.size();
 	}
 
-	Ref<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
+	std::shared_ptr<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
 	{
 		return mMonitors.at(index);
 	}
 
-	Ref<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
+	std::shared_ptr<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
 	{
 		HMONITOR monitorHandle = MonitorFromWindow(
 			static_cast<HWND>(window.GetSystemHandle()), 
 			MONITOR_DEFAULTTONULL
 		);
 
-		for (const Ref<Monitor>& monitor : mMonitors)
+		for (const std::shared_ptr<Monitor>& monitor : mMonitors)
 		{
 			if (monitor->GetSystemHandle() == monitorHandle)
 				return monitor;
@@ -53,7 +53,7 @@ namespace Ck::Detail::Win32
 	{
 		MonitorService* self = reinterpret_cast<MonitorService*>(userParam);
 		
-		Ref<Monitor> monitor = Monitor::New(handle);
+		std::shared_ptr<Monitor> monitor = std::make_shared<Monitor>(handle);
 
 		if (monitor->IsPrimary())
 			self->mPrimaryMonitor = monitor;

@@ -57,7 +57,7 @@ namespace Ck
 	void TransformationNode::SetDirty(bool dirty)
 	{
 		mWorldTransformation.SetDirty(dirty);
-		for (Ref<TransformationNode> childNode : GetChildren())
+		for (std::shared_ptr<TransformationNode> childNode : GetChildren())
 			childNode->SetDirty(dirty);
 	}
 }

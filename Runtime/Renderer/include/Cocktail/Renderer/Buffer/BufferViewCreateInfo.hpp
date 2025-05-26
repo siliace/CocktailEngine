@@ -1,8 +1,9 @@
 #ifndef COCKTAIL_RENDERER_BUFFER_BUFFERVIEWCREATEINFO_HPP
 #define COCKTAIL_RENDERER_BUFFER_BUFFERVIEWCREATEINFO_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/Image/PixelFormat.hpp>
-#include <Cocktail/Core/Memory/Ref.hpp>
 
 namespace Ck::Renderer
 {
@@ -20,7 +21,7 @@ namespace Ck::Renderer
         /**
          * \brief Specifies the Buffer on which create the BufferView
          */
-        Ref<Buffer> Buffer;
+        Buffer* Buffer;
 
         /**
          * \brief Specifies the Format describing the layout of the data elements in the \p Buffer

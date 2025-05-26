@@ -1,5 +1,4 @@
 #include <Cocktail/Graphic/Scene/Camera/Camera.hpp>
-#include <Cocktail/Graphic/Scene/Camera/Controller/CameraController.hpp>
 
 namespace Ck
 {
@@ -8,8 +7,8 @@ namespace Ck
 		return GetTransformationNode()->GetWorldTransformation().GetInverse().ToMatrix();
 	}
 
-	Camera::Camera(Ref<TransformationNode> transformationNode) :
-		Super(std::move(transformationNode))
+	Camera::Camera(std::shared_ptr<TransformationNode> transformationNode) :
+		Transformable(std::move(transformationNode))
 	{
 		/// Nothing
 	}

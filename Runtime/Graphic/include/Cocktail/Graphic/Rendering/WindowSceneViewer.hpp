@@ -10,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API WindowSceneViewer : public Extends<WindowSceneViewer, SceneViewer>
+	class COCKTAIL_GRAPHIC_API WindowSceneViewer : public SceneViewer
 	{
 	public:
 
@@ -21,7 +21,7 @@ namespace Ck
 		 * \param parameters 
 		 * \param vSync 
 		 */
-		WindowSceneViewer(Ref<Scene> scene, Ref<Window> window, SceneViewerParameters parameters, bool vSync);
+		WindowSceneViewer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window, SceneViewerParameters parameters, bool vSync);
 
 	protected:
 
@@ -34,7 +34,7 @@ namespace Ck
 
 	private:
 
-		Ref<Renderer::RenderSurface> mRenderSurface;
+		std::shared_ptr<Renderer::RenderSurface> mRenderSurface;
 	};
 }
 

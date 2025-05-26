@@ -13,7 +13,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class Framebuffer : public Implements<Framebuffer, RenderDeviceObject>
+    class Framebuffer : public RenderDeviceObject
     {
     public:
 
@@ -39,7 +39,7 @@ namespace Ck::Renderer
          * \param index
          * \return
          */
-        virtual Ref<TextureView> GetColorAttachment(unsigned int index) const = 0;
+        virtual std::shared_ptr<TextureView> GetColorAttachment(unsigned int index) const = 0;
 
         /**
          * \brief
@@ -51,7 +51,7 @@ namespace Ck::Renderer
          * \brief
          * \return
          */
-        virtual Ref<TextureView> GetDepthStencilAttachment() const = 0;
+        virtual std::shared_ptr<TextureView> GetDepthStencilAttachment() const = 0;
     };
 }
 

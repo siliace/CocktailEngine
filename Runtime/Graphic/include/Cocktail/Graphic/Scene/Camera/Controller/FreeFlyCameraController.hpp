@@ -1,16 +1,14 @@
 #ifndef COCKTAIL_GRAPHIC_SCENE_CAMERA_CONTROLLER_FREEFLYCAMERACONTROLLER_HPP
 #define COCKTAIL_GRAPHIC_SCENE_CAMERA_CONTROLLER_FREEFLYCAMERACONTROLLER_HPP
 
-#include <Cocktail/Core/Object.hpp>
 #include <Cocktail/Core/Math/Angle.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Graphic/Scene/Camera/Controller/CameraController.hpp>
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API FreeFlyCameraViewController : public Inherit<FreeFlyCameraViewController, Object, CameraController>
+	class COCKTAIL_GRAPHIC_API FreeFlyCameraViewController : public CameraController
 	{
 	public:
 
@@ -33,7 +31,7 @@ namespace Ck
 		 * \param camera The camera to move
 		 * \param pitchLimit The min and max values of pitch possible
 		 */
-		explicit FreeFlyCameraViewController(Ref<Camera> camera, Angle<float> pitchLimit = Angle<float>::Degree(89.f));
+		explicit FreeFlyCameraViewController(std::shared_ptr<Camera> camera, Angle<float> pitchLimit = Angle<float>::Degree(89.f));
 
 		/**
 		 * \brief Perform updates on the transformation of the underlying cameras
@@ -71,7 +69,7 @@ namespace Ck
 
 	private:
 
-		Ref<Camera> mCamera;
+		std::shared_ptr<Camera> mCamera;
 		Angle<float> mPitchLimit;
 		EnumMap<TranslationAxis, bool> mEnabledTranslations;
 		EnumMap<TranslationAxis, float> mTranslations;

@@ -9,7 +9,7 @@ namespace Ck::Vulkan
 	class DescriptorSetAllocator;
 	class RenderDevice;
 
-	class DescriptorSet : public Inherit<DescriptorSet, Object, Renderer::RenderDeviceObject>
+	class DescriptorSet : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		DescriptorSet(const Ref<RenderDevice>& renderDevice, const Ref<DescriptorPool>& pool, const DescriptorSetCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DescriptorSet(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorPool> pool, const DescriptorSetCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -37,13 +37,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Ref<DescriptorSetLayout> GetLayout() const;
+		std::shared_ptr<DescriptorSetLayout> GetLayout() const;
 
 		/**
 		 * \brief 
@@ -53,11 +53,11 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<DescriptorPool> mPool;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<DescriptorPool> mPool;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDescriptorSet mHandle;
-		Ref<DescriptorSetLayout> mLayout;
+		std::shared_ptr<DescriptorSetLayout> mLayout;
 	};
 }
 

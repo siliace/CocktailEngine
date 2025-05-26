@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_VOLKSERVICE_HPP
 #define COCKTAIL_VULKAN_VOLKSERVICE_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
-
 #include <Cocktail/Vulkan/Volk.hpp>
 
 namespace Ck::Vulkan
@@ -11,7 +8,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class VolkService : public Extends<VolkService, Object>
+	class VolkService
 	{
 	public:
 

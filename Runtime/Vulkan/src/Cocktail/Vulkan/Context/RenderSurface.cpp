@@ -8,7 +8,7 @@
 
 namespace Ck::Vulkan
 {
-	RenderSurface::RenderSurface(const Ref<RenderDevice>& renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderSurface::RenderSurface(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mSurface(VK_NULL_HANDLE),
@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		mSurface = WSI::CreateWindowSurface(renderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
 
 		// Create the PresentationContext used to manage swapchains creation
-		mPresentationContext = PresentationContext::New(mRenderDevice, mSurface, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
+		mPresentationContext = std::make_unique<PresentationContext>(mRenderDevice, mSurface, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
 
 		CreateRenderPass(createInfo.Samples, createInfo.DepthStencilFormat);
 
@@ -60,7 +60,7 @@ namespace Ck::Vulkan
 		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mSurface, mAllocationCallbacks);
 	}
 
-	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, const Ref<Semaphore>& semaphore, const Ref<Fence>& fence)
+	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence)
 	{
 		if (!mSwapchain)
 			return Optional<unsigned int>::Empty();
@@ -85,7 +85,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> RenderSurface::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> RenderSurface::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -125,7 +125,7 @@ namespace Ck::Vulkan
 		return mPresentationContext->GetBufferCount();
 	}
 
-	Ref<Framebuffer> RenderSurface::GetFramebuffer(unsigned int framebufferIndex) const
+	std::shared_ptr<Framebuffer> RenderSurface::GetFramebuffer(unsigned int framebufferIndex) const
 	{
 		if (framebufferIndex >= GetBufferCount())
 			return nullptr;
@@ -133,7 +133,7 @@ namespace Ck::Vulkan
 		return mFramebuffers[framebufferIndex];
 	}
 
-	Ref<Swapchain> RenderSurface::GetSwapchain() const
+	std::shared_ptr<Swapchain> RenderSurface::GetSwapchain() const
 	{
 		return mSwapchain;
 	}
@@ -181,7 +181,7 @@ namespace Ck::Vulkan
 			}
 		}
 
-		Ref<TextureView> depthStencilTextureView;
+		std::shared_ptr<TextureView> depthStencilTextureView;
 		if (mDepthStencilFormat != PixelFormat::Undefined())
 		{
 			RenderBufferCreateInfo renderBufferCreateInfo;
@@ -189,16 +189,18 @@ namespace Ck::Vulkan
 			renderBufferCreateInfo.Size = mSize;
 			renderBufferCreateInfo.Samples = Renderer::RasterizationSamples::e1;
 
-			Ref<RenderBuffer> depthStencilTexture = mRenderDevice->CreateRenderBuffer(renderBufferCreateInfo);
+			std::shared_ptr<RenderBuffer> depthStencilTexture = mRenderDevice->CreateRenderBuffer(renderBufferCreateInfo);
 
 			Renderer::TextureViewCreateInfo viewCreateInfo;
 			viewCreateInfo.Texture = depthStencilTexture;
 			viewCreateInfo.Type = Renderer::TextureViewType::e2D;
 
-			depthStencilTextureView = TextureView::Cast(mRenderDevice->CreateTextureView(viewCreateInfo));
+			depthStencilTextureView = std::static_pointer_cast<TextureView>(
+				mRenderDevice->CreateTextureView(viewCreateInfo)
+			);
 		}
 
-		mSwapchain = mPresentationContext->CreateSwapchain(mSize, presentMode, mSwapchain.Get());
+		mSwapchain = mPresentationContext->CreateSwapchain(mSize, presentMode, mSwapchain.get());
 
 		for (unsigned int i = 0; i < mSwapchain->GetTextureCount(); i++)
 		{
@@ -207,7 +209,9 @@ namespace Ck::Vulkan
 			viewCreateInfo.Type = Renderer::TextureViewType::e2D;
 			viewCreateInfo.Format = mPresentationContext->GetSurfaceFormat();
 
-			Ref<TextureView> swapchainTextureView = TextureView::Cast(mRenderDevice->CreateTextureView(viewCreateInfo));
+			std::shared_ptr<TextureView> swapchainTextureView = std::static_pointer_cast<TextureView>(
+				mRenderDevice->CreateTextureView(viewCreateInfo)
+			);
 
 			Renderer::FramebufferCreateInfo framebufferCreateInfo;
 			framebufferCreateInfo.Samples = mRenderPass->GetSamples();
@@ -215,7 +219,9 @@ namespace Ck::Vulkan
 			framebufferCreateInfo.ColorAttachmentCount = 1;
 			framebufferCreateInfo.DepthStencilAttachment = depthStencilTextureView;
 
-			mFramebuffers[i] = Framebuffer::Cast(mRenderDevice->CreateFramebuffer(mRenderPass, framebufferCreateInfo));
+			mFramebuffers[i] = std::static_pointer_cast<Framebuffer>(
+				mRenderDevice->CreateFramebuffer(mRenderPass, framebufferCreateInfo)
+			);
 		}
 	}
 }

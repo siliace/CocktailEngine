@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-    class GltfSceneContainer : public Extends<GltfSceneContainer, SceneContainer>
+    class GltfSceneContainer : public SceneContainer
     {
     public:
 

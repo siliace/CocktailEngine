@@ -46,10 +46,10 @@ namespace Ck
 		}
 	}
 
-	WindowSceneViewer::WindowSceneViewer(Ref<Scene> scene, Ref<Window> window, SceneViewerParameters parameters, bool vSync) :
-		Super(std::move(scene))
+	WindowSceneViewer::WindowSceneViewer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window, SceneViewerParameters parameters, bool vSync) :
+		SceneViewer(std::move(scene))
 	{
-		Ref<Renderer::RenderDevice> renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
+		std::shared_ptr<Renderer::RenderDevice> renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
 
 		Renderer::RenderSurfaceCreateInfo renderSurfaceCreateInfo;
 		renderSurfaceCreateInfo.Window = std::move(window);
@@ -70,6 +70,6 @@ namespace Ck
 
 	Renderer::Framebuffer* WindowSceneViewer::AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const
 	{
-		return frameContext.AcquireNextFramebuffer(mRenderSurface.Get());
+		return frameContext.AcquireNextFramebuffer(mRenderSurface.get());
 	}
 }

@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-	MaterialProgramVariant::MaterialProgramVariant(const MaterialProgramInterface& interface, Ref<Renderer::ShaderProgram> shaderProgram) :
+	MaterialProgramVariant::MaterialProgramVariant(const MaterialProgramInterface& interface, std::shared_ptr<Renderer::ShaderProgram> shaderProgram) :
 		mShaderProgram(std::move(shaderProgram))
 	{
 		assert(mShaderProgram);
@@ -39,7 +39,7 @@ namespace Ck
 		return mTextureUniformSlots[textureType];
 	}
 
-	const Ref<Renderer::ShaderProgram>& MaterialProgramVariant::GetShaderProgram() const
+	const std::shared_ptr<Renderer::ShaderProgram>& MaterialProgramVariant::GetShaderProgram() const
 	{
 		return mShaderProgram;
 	}

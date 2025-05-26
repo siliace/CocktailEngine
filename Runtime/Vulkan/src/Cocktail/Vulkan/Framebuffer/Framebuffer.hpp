@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Framebuffer : public Inherit<Framebuffer, Object, Renderer::Framebuffer>
+	class Framebuffer : public Renderer::Framebuffer
 	{
 	public:
 
@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Framebuffer(const Ref<RenderDevice>& renderDevice, const Ref<RenderPass>& renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Framebuffer(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -61,14 +61,14 @@ namespace Ck::Vulkan
 		 * \param index
 		 * \return
 		 */
-		Ref<Renderer::TextureView> GetColorMultisampleAttachment(unsigned index) const;
+		std::shared_ptr<Renderer::TextureView> GetColorMultisampleAttachment(unsigned index) const;
 
 		/**
 		 * \brief 
 		 * \param index 
 		 * \return 
 		 */
-		Ref<Renderer::TextureView> GetColorAttachment(unsigned index) const override;
+		std::shared_ptr<Renderer::TextureView> GetColorAttachment(unsigned index) const override;
 
 		/**
 		 * \brief 
@@ -80,19 +80,19 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		Ref<Renderer::TextureView> GetDepthStencilMultisampleAttachment() const;
+		std::shared_ptr<Renderer::TextureView> GetDepthStencilMultisampleAttachment() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::TextureView> GetDepthStencilAttachment() const override;
+		std::shared_ptr<Renderer::TextureView> GetDepthStencilAttachment() const override;
 
 		/**
 		 * \brief
 		 * \return 
 		 */
-		Ref<RenderPass> GetRenderPass() const;
+		std::shared_ptr<RenderPass> GetRenderPass() const;
 
 		/**
 		 * \brief 
@@ -102,8 +102,8 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<RenderPass> mRenderPass;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderPass> mRenderPass;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkFramebuffer mHandle;
 		Extent3D<unsigned int> mSize;

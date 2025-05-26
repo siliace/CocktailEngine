@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_SEMAPHORE_HPP
 #define COCKTAIL_VULKAN_SEMAPHORE_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
@@ -16,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Semaphore : public Inherit<Semaphore, Object, Renderer::RenderDeviceObject>
+	class Semaphore : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -26,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Semaphore(const Ref<RenderDevice>& renderDevice, const SemaphoreCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Semaphore(std::shared_ptr<RenderDevice> renderDevice, const SemaphoreCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -43,7 +40,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -53,7 +50,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSemaphore mHandle;
 	};

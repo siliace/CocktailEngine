@@ -7,7 +7,7 @@
 
 namespace Ck::Vulkan
 {
-	RenderContext::RenderContext(Ref<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderContext::RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mPresentationQueue(VK_NULL_HANDLE),
 		mFrameContextCount(createInfo.ConcurrentFrameCount),
@@ -18,11 +18,11 @@ namespace Ck::Vulkan
 		vkGetDeviceQueue(mRenderDevice->GetHandle(), queueFamily.GetIndex(), 0, &mPresentationQueue);
 
 		for (unsigned int i = 0; i < mFrameContextCount; i++)
-			mFrameContexts[i] = FrameContext::New(this, createInfo.RenderSurfaceCount, allocationCallbacks);
+			mFrameContexts[i] = std::make_unique<FrameContext>(this, createInfo.RenderSurfaceCount, allocationCallbacks);
 
-		mScheduler = SubmitScheduler::New(mRenderDevice);
+		mScheduler = std::make_unique<SubmitScheduler>(mRenderDevice);
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
-			mSubmitters[queueType] = QueueSubmitter::New(mRenderDevice, mScheduler, queueType, 0);
+			mSubmitters[queueType] = std::make_unique<QueueSubmitter>(mRenderDevice, mScheduler.get(), queueType, 0);
 	}
 
 	RenderContext::~RenderContext()
@@ -35,19 +35,19 @@ namespace Ck::Vulkan
 	{
 	}
 
-	Ref<Renderer::RenderDevice> RenderContext::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> RenderContext::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
 
-	Ref<Renderer::CommandListPool> RenderContext::CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo)
+	std::shared_ptr<Renderer::CommandListPool> RenderContext::CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo)
 	{
-		return CommandListPool::New(mRenderDevice, createInfo, nullptr);
+		return std::make_shared<CommandListPool>(mRenderDevice, createInfo, nullptr);
 	}
 
 	Renderer::FrameContext* RenderContext::BeginFrame()
 	{
-		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].Get();
+		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].get();
 		currentFrameContext->Synchronize();
 		currentFrameContext->Reset();
 
@@ -59,12 +59,12 @@ namespace Ck::Vulkan
 		mSubmitters[queue]->NextSubmit();
 	}
 
-	void RenderContext::SignalFence(Renderer::CommandQueueType commandQueue, const Ref<Fence>& fence)
+	void RenderContext::SignalFence(Renderer::CommandQueueType commandQueue, std::shared_ptr<Fence> fence)
 	{
 		mSubmitters[commandQueue]->SignalFence(fence);
 	}
 
-	void RenderContext::SignalSemaphore(Renderer::CommandQueueType commandQueue, const Ref<Semaphore>& semaphore)
+	void RenderContext::SignalSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore)
 	{
 		mSubmitters[commandQueue]->SignalSemaphore(semaphore);
 	}
@@ -98,21 +98,21 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void RenderContext::WaitSemaphore(Renderer::CommandQueueType commandQueue, const Ref<Semaphore>& semaphore, VkPipelineStageFlags waitStages)
+	void RenderContext::WaitSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
 	{
 		mSubmitters[commandQueue]->WaitExternalSemaphore(semaphore, waitStages);
 	}
 
-	void RenderContext::ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Ref<Renderer::CommandList>* commandLists, Ref<Renderer::Fence> fence)
+	void RenderContext::ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence)
 	{
-		std::vector<Ref<CommandList>> vkCommandLists(commandListCount);
+		std::vector<CommandList*> vkCommandLists(commandListCount);
 		for (unsigned int i = 0; i < commandListCount; i++)
 		{
-			vkCommandLists[i] = CommandList::Cast(commandLists[i]);
+			vkCommandLists[i] = static_cast<CommandList*>(commandLists[i]);
 			assert(vkCommandLists[i]->GetState() == Renderer::CommandListState::Executable);
 		}
 
-		mSubmitters[commandQueue]->ExecuteCommandList(commandListCount, vkCommandLists.data(), Fence::Cast(fence));
+		mSubmitters[commandQueue]->ExecuteCommandList(commandListCount, vkCommandLists.data(), static_cast<Fence*>(fence));
 	}
 
 	void RenderContext::EndFrame()

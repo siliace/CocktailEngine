@@ -8,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API MaterialProgramSet : public Extends<MaterialProgramSet, Object>
+	class COCKTAIL_GRAPHIC_API MaterialProgramSet
 	{
 	public:
 
@@ -17,19 +17,19 @@ namespace Ck
 		 * \param materialProgramManager
 		 * \param shadingMode
 		 */
-		MaterialProgramSet(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode);
+		MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode);
 
 		/**
 		 * \brief 
 		 * \param renderableType 
 		 * \return 
 		 */
-		Ref<MaterialProgram> GetMaterialProgram(RenderableType renderableType) const;
+		std::shared_ptr<MaterialProgram> GetMaterialProgram(RenderableType renderableType) const;
 
 	private:
 
-		Ref<MaterialProgramManager> mMaterialProgramManager;
-		EnumMap<RenderableType, Ref<MaterialProgram>> mMaterialPrograms;
+		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
+		EnumMap<RenderableType, std::shared_ptr<MaterialProgram>> mMaterialPrograms;
 	};
 }
 

@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_VULKAN_SHADER_UNIFORMSLOT_HPP
 #define COCKTAIL_VULKAN_SHADER_UNIFORMSLOT_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
+#include <memory>
 
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 
@@ -11,7 +10,7 @@
 
 namespace Ck::Vulkan
 {
-	class UniformSlot : public Inherit<UniformSlot, Object, Renderer::UniformSlot>
+	class UniformSlot : public Renderer::UniformSlot
 	{
 	public:
 
@@ -89,7 +88,7 @@ namespace Ck::Vulkan
 	private:
 
 		Renderer::ShaderProgramType mProgramType;
-		std::vector<Ref<Renderer::UniformMember>> mMembers;
+		std::vector<std::unique_ptr<Renderer::UniformMember>> mMembers;
 		std::string mName;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;

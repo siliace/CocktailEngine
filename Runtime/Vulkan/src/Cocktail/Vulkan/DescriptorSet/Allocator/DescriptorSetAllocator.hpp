@@ -12,7 +12,7 @@ namespace Ck::Vulkan
 	class DescriptorSet;
 	class RenderDevice;
 
-	class DescriptorSetAllocator : public Inherit<DescriptorSetAllocator, Object, Renderer::RenderDeviceObject>
+	class DescriptorSetAllocator : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		DescriptorSetAllocator(const Ref<RenderDevice>& renderDevice, const DescriptorSetAllocatorCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice, const DescriptorSetAllocatorCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -44,14 +44,14 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<DescriptorSet> CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo);
+		std::shared_ptr<DescriptorSet> CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo);
 
 		/**
 		 * \brief 
@@ -65,13 +65,13 @@ namespace Ck::Vulkan
 		 * \param layout 
 		 * \return 
 		 */
-		Ref<DescriptorPool> CreateDescriptorPool(const Ref<DescriptorSetLayout>& layout);
+		std::shared_ptr<DescriptorPool> CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout);
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
-		std::vector<Ref<DescriptorPool>> mDescriptorPools;
-		std::vector<Ref<DescriptorSet>> mAcquiredSets;
-		std::vector<Ref<DescriptorSet>> mVacantSets;
+		std::vector<std::shared_ptr<DescriptorPool>> mDescriptorPools;
+		std::vector<std::shared_ptr<DescriptorSet>> mAcquiredSets;
+		std::vector<std::shared_ptr<DescriptorSet>> mVacantSets;
 		TlsObjectPool<DescriptorSet> mDescriptorSetPool;
 	};
 }

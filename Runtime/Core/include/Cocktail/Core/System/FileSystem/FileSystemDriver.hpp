@@ -53,14 +53,14 @@ namespace Ck
 		 * \param flags
 		 * \return
 		 */
-		virtual Ref<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) = 0;
+		virtual std::shared_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) = 0;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		virtual Ref<Directory> OpenDirectory(const std::filesystem::path& path) = 0;
+		virtual std::shared_ptr<Directory> OpenDirectory(const std::filesystem::path& path) = 0;
 
 		/**
 		 * \brief

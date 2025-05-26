@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_RENDERER_BUFFER_BUFFERVIEW_HPP
 #define COCKTAIL_RENDERER_BUFFER_BUFFERVIEW_HPP
 
-#include <Cocktail/Core/Memory/Ref.hpp>
 #include <Cocktail/Core/Image/PixelFormat.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
@@ -14,7 +12,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-	class BufferView : public Implements<BufferView, RenderDeviceObject>
+	class BufferView : public RenderDeviceObject
 	{
 	public:
 
@@ -22,7 +20,7 @@ namespace Ck::Renderer
 	     * \brief 
 	     * \return 
 	     */
-		virtual Ref<Buffer> GetBuffer() const = 0;
+		virtual std::shared_ptr<Buffer> GetBuffer() const = 0;
 
 		/**
 		 * \brief 

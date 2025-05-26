@@ -4,9 +4,9 @@
 
 namespace Ck::Vulkan
 {
-	QueueSubmitter::QueueSubmitter(Ref<RenderDevice> renderDevice, Ref<SubmitScheduler> scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex) :
+	QueueSubmitter::QueueSubmitter(std::shared_ptr<RenderDevice> renderDevice, SubmitScheduler* scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex) :
 		mRenderDevice(std::move(renderDevice)),
-		mScheduler(std::move(scheduler)),
+		mScheduler(scheduler),
 		mQueueType(queueType),
 		mQueueIndex(queueIndex),
 		mCurrentBatch(nullptr)
@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 		return mCurrentBatch->CreateDependency(waitDstStages);
 	}
 
-	void QueueSubmitter::SignalFence(const Ref<Fence>& fence)
+	void QueueSubmitter::SignalFence(std::shared_ptr<Fence> fence)
 	{
 		if (!mCurrentBatch || mCurrentBatch && mCurrentBatch->HasFence())
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -36,7 +36,7 @@ namespace Ck::Vulkan
 		mScheduler->ConnectFence(mCurrentBatch, fence);
 	}
 
-	void QueueSubmitter::SignalSemaphore(const Ref<Semaphore>& semaphore)
+	void QueueSubmitter::SignalSemaphore(std::shared_ptr<Semaphore> semaphore)
 	{
 		if (!mCurrentBatch)
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		mCurrentBatch->SignalSemaphore(semaphore);
 	}
 
-	void QueueSubmitter::WaitExternalSemaphore(const Ref<Semaphore>& semaphore, VkPipelineStageFlags waitStages)
+	void QueueSubmitter::WaitExternalSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
 	{
 		if (!mCurrentBatch)
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -61,7 +61,7 @@ namespace Ck::Vulkan
 		mDependencies |= waitedQueue;
 	}
 
-	void QueueSubmitter::ExecuteCommandList(unsigned int commandListCount, Ref<CommandList>* commandLists, const Ref<Fence>& fence)
+	void QueueSubmitter::ExecuteCommandList(unsigned int commandListCount, CommandList** commandLists, Fence* fence)
 	{
 		if (mCurrentBatch && fence)
 		{
@@ -74,7 +74,7 @@ namespace Ck::Vulkan
 		}
 
 		if (fence)
-			mScheduler->ConnectFence(mCurrentBatch, fence);
+			mScheduler->ConnectFence(mCurrentBatch, fence->shared_from_this());
 
 		mCurrentBatch->ExecuteCommandLists(commandListCount, commandLists);
 	}

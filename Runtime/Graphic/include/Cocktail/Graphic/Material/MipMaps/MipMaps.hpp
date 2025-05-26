@@ -2,7 +2,6 @@
 #define COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 
 #include <Cocktail/Core/Image/Image.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 
 #include <Cocktail/Graphic/Material/MipMaps/MipMapLevel.hpp>
 
@@ -23,7 +22,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API MipMaps : public Extends<MipMaps, Object>
+	class COCKTAIL_GRAPHIC_API MipMaps
 	{
 	public:
 
@@ -32,7 +31,7 @@ namespace Ck
 		 * \param image
 		 * \return 
 		 */
-		static Ref<MipMaps> FromImage(const Image& image);
+		static std::shared_ptr<MipMaps> FromImage(const Image& image);
 
 		/**
 		 * \brief Compute the maximum number of mip maps level a texture with a given base size can support
@@ -59,8 +58,13 @@ namespace Ck
 		MipMaps(const Extent3D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int mipMapCount);
 
 		/**
+		 * \brief 
+		 */
+		virtual ~MipMaps() = default;
+
+		/**
 		 * \brief Tell whether every level of every layer is provided with pixels
-		 * Incomplete mipmaps will results in mipmap generations before rendering
+		 * Incomplete mipmaps will result in mipmap generations before rendering
 		 * \return True if complete, false otherwise
 		 */
 		bool IsComplete() const;

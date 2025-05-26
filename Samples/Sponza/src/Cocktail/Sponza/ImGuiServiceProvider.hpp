@@ -26,7 +26,7 @@ private:
 
 	void ConnectWindowEvents(Ck::Window& window);
 
-	Ck::Ref<Ck::Window> mEventWindow;
+	std::shared_ptr<Ck::Window> mEventWindow;
 };
 
 #endif // IMGUISERVICEPROVIDER_HPP

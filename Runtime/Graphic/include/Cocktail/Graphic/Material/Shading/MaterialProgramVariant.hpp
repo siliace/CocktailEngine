@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMVARIANT_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMVARIANT_HPP
 
-#include <Cocktail/Core/Meta/Extends.hpp>
-
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramInterface.hpp>
 
 #include <Cocktail/Renderer/Shader/ShaderProgram.hpp>
@@ -13,11 +11,11 @@ namespace Ck
 	/**
 	 * \brief
 	 */
-	class COCKTAIL_GRAPHIC_API MaterialProgramVariant : public Extends<MaterialProgramVariant, Object>
+	class COCKTAIL_GRAPHIC_API MaterialProgramVariant
 	{
 	public:
 
-		MaterialProgramVariant(const MaterialProgramInterface& interface, Ref<Renderer::ShaderProgram> shaderProgram);
+		MaterialProgramVariant(const MaterialProgramInterface& interface, std::shared_ptr<Renderer::ShaderProgram> shaderProgram);
 
 		/**
 		 * \brief
@@ -37,11 +35,11 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		const Ref<Renderer::ShaderProgram>& GetShaderProgram() const;
+		const std::shared_ptr<Renderer::ShaderProgram>& GetShaderProgram() const;
 
 	private:
 
-		Ref<Renderer::ShaderProgram> mShaderProgram;
+		std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
 		EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
 		EnumMap<Material::TextureType, Renderer::UniformSlot*> mTextureUniformSlots;
 	};

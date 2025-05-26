@@ -3,7 +3,7 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryChunk::DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(nullptr, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(texture, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(Ref<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -51,8 +51,8 @@ namespace Ck::Vulkan
 		if (it == mBlocks.end())
 			return nullptr;
 
-		DeviceMemoryBlock* allocatedBlock = it->Get();
-		Ref<DeviceMemoryBlock> remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
+		DeviceMemoryBlock* allocatedBlock = it->get();
+		std::shared_ptr<DeviceMemoryBlock> remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
 		if (remainingBlock)
 			mBlocks.insert(std::next(it), std::move(remainingBlock));
 
@@ -66,7 +66,7 @@ namespace Ck::Vulkan
 		for (auto it = mBlocks.begin(); it != mBlocks.end();)
 		{
 			auto itNext = std::next(it);
-			DeviceMemoryBlock* block = it->Get();
+			DeviceMemoryBlock* block = it->get();
 			if (block->IsFree() && itNext != mBlocks.end() && (*itNext)->IsFree())
 			{
 				block->Merge(**itNext);
@@ -101,7 +101,7 @@ namespace Ck::Vulkan
 		return mDedicated;
 	}
 
-	const Ref<DeviceMemory>& DeviceMemoryChunk::GetDeviceMemory() const
+	std::shared_ptr<DeviceMemory> DeviceMemoryChunk::GetDeviceMemory() const
 	{
 		return mDeviceMemory;
 	}

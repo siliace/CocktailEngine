@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_WIN32_MONITOR_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_WIN32_MONITOR_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/Monitor/Monitor.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
 
@@ -11,7 +9,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class Monitor : public Inherit<Monitor, Object, Ck::Monitor>
+	class Monitor : public Ck::Monitor
 	{
 	public:
 

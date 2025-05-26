@@ -2,7 +2,6 @@
 #define COCKTAIL_RENDERER_RENDERDEVICE_HPP
 
 #include <Cocktail/Core/Log/LogLevel.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceExtension.hpp>
@@ -54,86 +53,91 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class RenderDevice : public Implements<RenderDevice, Interface>
+    class RenderDevice
     {
     public:
+
+	    /**
+         * \brief 
+         */
+        virtual ~RenderDevice() = default;
 
 	    /**
          * \brief 
          * \param createInfo
          * \return 
          */
-        virtual Ref<Buffer> CreateBuffer(const BufferCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<Buffer> CreateBuffer(const BufferCreateInfo& createInfo) = 0;
 
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<BufferView> CreateBufferView(const BufferViewCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<BufferView> CreateBufferView(const BufferViewCreateInfo& createInfo) = 0;
 
 	    /**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		virtual Ref<Fence> CreateFence(const FenceCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<Fence> CreateFence(const FenceCreateInfo& createInfo) = 0;
 
         /**
          * \brief
          * \param createInfo
          * \return
          */
-        virtual Ref<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& createInfo) = 0;
 
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<RenderContext> CreateRenderContext(const RenderContextCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<RenderContext> CreateRenderContext(const RenderContextCreateInfo& createInfo) = 0;
 
 	    /**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		virtual Ref<RenderSurface> CreateRenderSurface(const RenderSurfaceCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<RenderSurface> CreateRenderSurface(const RenderSurfaceCreateInfo& createInfo) = 0;
     	
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<Sampler> CreateSampler(const SamplerCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<Sampler> CreateSampler(const SamplerCreateInfo& createInfo) = 0;
 
         /**
          * \brief
          * \param createInfo
          * \return
          */
-        virtual Ref<Shader> CreateShader(const ShaderCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<Shader> CreateShader(const ShaderCreateInfo& createInfo) = 0;
 
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<ShaderProgram> CreateShaderProgram(const ShaderProgramCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<ShaderProgram> CreateShaderProgram(const ShaderProgramCreateInfo& createInfo) = 0;
 
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<Texture> CreateTexture(const TextureCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<Texture> CreateTexture(const TextureCreateInfo& createInfo) = 0;
         
 	    /**
          * \brief 
          * \param createInfo 
          * \return 
          */
-        virtual Ref<TextureView> CreateTextureView(const TextureViewCreateInfo& createInfo) = 0;
+        virtual std::shared_ptr<TextureView> CreateTextureView(const TextureViewCreateInfo& createInfo) = 0;
 
 	    /**
          * \brief 

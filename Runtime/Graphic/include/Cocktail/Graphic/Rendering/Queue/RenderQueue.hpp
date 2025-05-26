@@ -3,9 +3,6 @@
 
 #include <queue>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
-
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
@@ -13,7 +10,7 @@
 
 namespace Ck
 {
-	class COCKTAIL_GRAPHIC_API RenderQueue : public Extends<RenderQueue, Object>
+	class COCKTAIL_GRAPHIC_API RenderQueue
 	{
 	public:
 
@@ -29,7 +26,7 @@ namespace Ck
 		 * \param materialProgramManager 
 		 * \param shadingMode 
 		 */
-		RenderQueue(Ref<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode = BlendingMode::Ignore);
+		RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode = BlendingMode::Ignore);
 
 		/**
 		 * \brief 
@@ -71,15 +68,15 @@ namespace Ck
 
 		struct RecordInfo
 		{
-			Ref<RenderRecord> Record;
+			std::shared_ptr<RenderRecord> Record;
 			Uint64 SortingKey = 0;
 		};
 
-		void Emplace(Ref<RenderRecord> record, Uint64 sortingKey);
+		void Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey);
 
 		Material::ShadingMode mShadingMode;
 		BlendingMode mBlendingMode;
-		Ref<MaterialProgramSet> mMaterialProgramSet;
+		std::shared_ptr<MaterialProgramSet> mMaterialProgramSet;
 		std::vector<RecordInfo> mRecords;
 	};
 }

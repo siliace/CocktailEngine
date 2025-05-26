@@ -13,23 +13,23 @@ namespace Ck::Detail::Xlib
 
 		explicit WindowFactory(::Display* display);
 
-		Ref<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
+		std::shared_ptr<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
 
-		Ref<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
+		std::shared_ptr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
 
-		Ref<Ck::SystemCursor> LoadSystemCursor(SystemCursorType type) override;
+		std::shared_ptr<Ck::SystemCursor> LoadSystemCursor(SystemCursorType type) override;
 
 		bool IsSystemCursorSupported(SystemCursorType systemCursorType) const override;
 
-		Signal<Ref<Ck::Window>>& OnWindowCreated() override;
+		Signal<std::shared_ptr<Ck::Window>>& OnWindowCreated() override;
 		
 		::Display* GetDisplay() const;
 
 	private:
 
 		::Display* mDisplay;
-		Signal<Ref<Ck::Window>> mOnWindowCreated;
-		EnumMap<SystemCursorType, Ref<Ck::SystemCursor>> mSystemCursors;
+		Signal<std::shared_ptr<Ck::Window>> mOnWindowCreated;
+		EnumMap<SystemCursorType, std::shared_ptr<Ck::SystemCursor>> mSystemCursors;
     };
 }
 

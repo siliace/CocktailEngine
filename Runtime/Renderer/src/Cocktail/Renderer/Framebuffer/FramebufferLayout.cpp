@@ -12,7 +12,7 @@ namespace Ck::Renderer
 		for (unsigned int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
 			layout.ColorAttachmentFormats[i++] = framebuffer.GetColorAttachment(i)->GetTexture()->GetFormat();
 
-		if (Ref<TextureView> depthStencilAttachment = framebuffer.GetDepthStencilAttachment(); depthStencilAttachment)
+		if (std::shared_ptr<TextureView> depthStencilAttachment = framebuffer.GetDepthStencilAttachment())
 			layout.DepthStencilAttachmentFormat = depthStencilAttachment->GetTexture()->GetFormat();
 
 		return layout;

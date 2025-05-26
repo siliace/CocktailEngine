@@ -26,7 +26,7 @@ namespace Ck::Detail::Xlib
 				XRROutputInfo* outputInfo = XRRGetOutputInfo(mDisplay, screenResources, crtcInfo->outputs[j]);
 				if (outputInfo->connection == RR_Connected)
 				{
-					Ref<Monitor> monitor = Monitor::New(mDisplay, outputInfo->crtc, crtcInfo->outputs[j]);
+					std::shared_ptr<Monitor> monitor = std::make_shared<Monitor>(mDisplay, outputInfo->crtc, crtcInfo->outputs[j]);
 					if (monitor->IsPrimary())
 						mPrimaryMonitor = monitor;
 
@@ -42,7 +42,7 @@ namespace Ck::Detail::Xlib
 		XRRFreeScreenResources(screenResources);
 	}
 
-    Ref<Ck::Monitor> MonitorService::GetPrimaryMonitor() const
+    std::shared_ptr<Ck::Monitor> MonitorService::GetPrimaryMonitor() const
     {
 		return mPrimaryMonitor;
 	}
@@ -52,12 +52,12 @@ namespace Ck::Detail::Xlib
 		return mMonitors.size();
 	}
 
-	Ref<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
+	std::shared_ptr<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
 	{
 		return mMonitors.at(index);
 	}
 
-	Ref<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
+	std::shared_ptr<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
 	{
 		return nullptr;
 	}

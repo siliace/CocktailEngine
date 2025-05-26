@@ -14,18 +14,18 @@ namespace Ck::Detail::Xlib
         for (SystemCursorType cursorType : Enum<SystemCursorType>::Values)
         {
             if (IsSystemCursorSupported(cursorType))
-                mSystemCursors[cursorType] = SystemCursor::New(mDisplay, cursorType);
+                mSystemCursors[cursorType] = std::make_shared<SystemCursor>(mDisplay, cursorType);
         }
     } 
 
-    Ref<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
+    std::shared_ptr<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
     {
-        return ImageCursor::New(mDisplay, image, hotspot);
+        return std::make_shared<ImageCursor>(mDisplay, image, hotspot);
     }
 
-    Ref<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
+    std::shared_ptr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
     {
-        Ref<Window> window = Window::New(mDisplay, createInfo);
+        std::shared_ptr<Window> window = std::make_shared<Window>(mDisplay, createInfo);
 
         window->Connect(window->OnKeyboardEvent(), [](const WindowKeyboardEvent& event) {
 			App::Resolve<Ck::KeyboardService>()->OnKeyboardEvent().Emit({
@@ -56,7 +56,7 @@ namespace Ck::Detail::Xlib
         return window;
     }
 
-	Ref<Ck::SystemCursor> WindowFactory::LoadSystemCursor(SystemCursorType type)
+	std::shared_ptr<Ck::SystemCursor> WindowFactory::LoadSystemCursor(SystemCursorType type)
     {
 		return mSystemCursors[type];
     }
@@ -66,7 +66,7 @@ namespace Ck::Detail::Xlib
         return cursorType != SystemCursorType::SizeTopLeftBottomRight && cursorType != SystemCursorType::SizeBottomLeftTopRight;
     }
 
-    Signal<Ref<Ck::Window>>& WindowFactory::OnWindowCreated() 
+    Signal<std::shared_ptr<Ck::Window>>& WindowFactory::OnWindowCreated() 
     {
         return mOnWindowCreated;
     }

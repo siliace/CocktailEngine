@@ -38,9 +38,9 @@ namespace Ck::Vulkan
 		return ApiVersion::Version_1_0;
 	}
 
-	Ref<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
+	std::shared_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
 	{
-		Ref<RenderDevice> renderDevice = RenderDevice::New(createInfo);
+		std::shared_ptr<RenderDevice> renderDevice = std::make_shared<RenderDevice>(createInfo);
 
 		if (createInfo.EnableValidation && renderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
 		{

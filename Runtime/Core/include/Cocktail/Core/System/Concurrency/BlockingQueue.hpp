@@ -4,8 +4,6 @@
 #include <condition_variable>
 #include <queue>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 
@@ -16,7 +14,7 @@ namespace Ck
 	 * \tparam T 
 	 */
 	template <typename T>
-	class BlockingQueue : public Extends<BlockingQueue<T>, Object>
+	class BlockingQueue
 	{
 	public:
 

@@ -92,7 +92,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	RenderPass::RenderPass(const Ref<RenderDevice>& renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderPass::RenderPass(std::shared_ptr<RenderDevice> renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks)
 	{
@@ -261,7 +261,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	Ref<Renderer::RenderDevice> RenderPass::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> RenderPass::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

@@ -12,7 +12,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class ShaderProgram : public Implements<ShaderProgram, RenderDeviceObject>
+    class ShaderProgram : public RenderDeviceObject
     {
     public:
 
@@ -27,7 +27,7 @@ namespace Ck::Renderer
          * \param type 
          * \return 
          */
-        virtual Ref<Shader> GetStage(ShaderType type) const = 0;
+        virtual std::shared_ptr<Shader> GetStage(ShaderType type) const = 0;
 
 	    /**
          * \brief Find a UniformSlot by its name in the shader's sources

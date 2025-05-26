@@ -12,14 +12,14 @@ namespace Ck::Vulkan
 		mRenderSurfaceCount(0),
 		mSubmitted(false)
 	{
-		Ref<RenderDevice> renderDevice = RenderDevice::Cast(mRenderContext->GetRenderDevice());
+		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
 
 		Renderer::CommandListPoolCreateInfo commandListPoolCreateInfo;
-		mCommandListPool = CommandListPool::New(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
+		mCommandListPool = std::make_shared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
 		fenceCreateInfo.Signaled = true;
-		mFrameFence = Fence::Cast(renderDevice->CreateFence(fenceCreateInfo));
+		mFrameFence = std::static_pointer_cast<Fence>(renderDevice->CreateFence(fenceCreateInfo));
 
 		SemaphoreCreateInfo semaphoreCreateInfo;
 		mAcquiredRenderSurfaces = std::make_unique<AcquiredRenderSurface[]>(mMaxRenderSurfaceCount);
@@ -48,11 +48,11 @@ namespace Ck::Vulkan
 
 	Renderer::Framebuffer* FrameContext::AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface)
 	{
-		RenderSurface* renderSurfaceImpl = RenderSurface::Cast(renderSurface);
+		RenderSurface* renderSurfaceImpl = static_cast<RenderSurface*>(renderSurface);
 		for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
 		{
 			if (mAcquiredRenderSurfaces[i].Swapchain == renderSurfaceImpl->GetSwapchain())
-				return renderSurfaceImpl->GetFramebuffer(mAcquiredRenderSurfaces[i].SwapchainImageIndex).Get();
+				return renderSurfaceImpl->GetFramebuffer(mAcquiredRenderSurfaces[i].SwapchainImageIndex).get();
 		}
 
 		assert(mRenderSurfaceCount < mMaxRenderSurfaceCount);
@@ -68,12 +68,12 @@ namespace Ck::Vulkan
 
 		++mRenderSurfaceCount;
 
-		return renderSurfaceImpl->GetFramebuffer(imageIndex.Get()).Get();
+		return renderSurfaceImpl->GetFramebuffer(imageIndex.Get()).get();
 	}
 
-	Ref<Renderer::CommandList> FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
+	std::shared_ptr<Renderer::CommandList> FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		for (const Ref<Renderer::CommandList>& commandList : mCommandLists)
+		for (std::shared_ptr<Renderer::CommandList> commandList : mCommandLists)
 		{
 			if (commandList->GetState() != Renderer::CommandListState::Initial)
 				continue;
@@ -91,7 +91,7 @@ namespace Ck::Vulkan
 			return commandList;
 		}
 
-		Ref<Renderer::CommandList> commandList = mCommandListPool->CreateCommandList(createInfo);
+		std::shared_ptr<Renderer::CommandList> commandList = mCommandListPool->CreateCommandList(createInfo);
 		mCommandLists.push_back(commandList);
 
 		return commandList;
@@ -102,14 +102,14 @@ namespace Ck::Vulkan
 		for (const auto& [bufferAllocatorKey, bufferAllocator] : mBufferAllocators)
 		{
 			if (std::get<0>(bufferAllocatorKey) & usage && std::get<1>(bufferAllocatorKey) == memoryType)
-				return bufferAllocator.Get();
+				return bufferAllocator.get();
 		}
 
-		Ref<RenderDevice> renderDevice = RenderDevice::Cast(mRenderContext->GetRenderDevice());
-		Ref<BufferAllocator> allocator = BufferAllocator::New(renderDevice, usage, 1024 * 1024, memoryType);
+		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+		std::shared_ptr<BufferAllocator> allocator = std::make_shared<BufferAllocator>(renderDevice, usage, 1024 * 1024, memoryType);
 		mBufferAllocators[BufferAllocatorKey(usage, memoryType)] = allocator;
 
-		return allocator.Get();
+		return allocator.get();
 	}
 
 	void FrameContext::Present(VkQueue queue)
@@ -165,7 +165,7 @@ namespace Ck::Vulkan
 
 	}
 
-	Ref<Renderer::RenderDevice> FrameContext::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> FrameContext::GetRenderDevice() const
 	{
 		return mRenderContext->GetRenderDevice();
 	}

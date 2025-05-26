@@ -9,7 +9,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief 
 	 */
-	class Sampler : public Implements<Sampler, RenderDeviceObject>
+	class Sampler : public RenderDeviceObject
 	{
 	public:
 

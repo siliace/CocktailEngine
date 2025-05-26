@@ -11,7 +11,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief Primitive to synchronize the GPU and the CPU
 	 */
-	class Fence : public Implements<Fence, RenderDeviceObject>, public Observable
+	class Fence : public RenderDeviceObject, public Observable
 	{
 	public:
 

@@ -5,8 +5,6 @@
 
 #include <cmrc/cmrc.hpp>
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
 
 
@@ -15,7 +13,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class EmbeddedDirectory final : public Inherit<EmbeddedDirectory, Object, Directory>
+	class EmbeddedDirectory final : public Directory
 	{
 	public:
 

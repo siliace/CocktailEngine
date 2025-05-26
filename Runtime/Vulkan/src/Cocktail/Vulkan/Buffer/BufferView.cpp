@@ -4,14 +4,14 @@
 
 namespace Ck::Vulkan
 {
-	BufferView::BufferView(Ref<RenderDevice> renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	BufferView::BufferView(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mFormat(createInfo.Format),
 		mOffset(createInfo.Offset),
 		mRange(createInfo.Range),
 		mAllocationCallbacks(allocationCallbacks)
 	{
-		mBuffer = Buffer::Cast(createInfo.Buffer);
+		mBuffer = static_cast<Buffer*>(createInfo.Buffer)->shared_from_this();
 
 		VkBufferViewCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO, nullptr };
 		{
@@ -44,12 +44,12 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> BufferView::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> BufferView::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
 
-	Ref<Renderer::Buffer> BufferView::GetBuffer() const
+	std::shared_ptr<Renderer::Buffer> BufferView::GetBuffer() const
 	{
 		return mBuffer;
 	}

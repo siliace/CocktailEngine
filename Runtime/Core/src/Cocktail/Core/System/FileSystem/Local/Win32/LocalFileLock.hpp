@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_WIN_32FILELOCK_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_WIN_32FILELOCK_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 #include <Cocktail/Core/System/FileSystem/FileLock.hpp>
 
@@ -11,7 +9,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class LocalFileLock : public Inherit<LocalFileLock, Object, FileLock>
+	class LocalFileLock : public FileLock
 	{
 	public:
 
@@ -21,7 +19,7 @@ namespace Ck::Detail::Win32
 		 * \param offset
 		 * \param length 
 		 */
-		LocalFileLock(const Ref<File>& file, std::size_t offset, std::size_t length);
+		LocalFileLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length);
 
 		/**
 		 * \brief 
@@ -41,7 +39,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		Ref<File> mFile;
+		std::shared_ptr<File> mFile;
 		std::size_t mOffset;
 		std::size_t mLength;
 	};

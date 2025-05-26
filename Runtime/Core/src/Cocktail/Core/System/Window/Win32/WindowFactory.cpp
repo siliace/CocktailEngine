@@ -34,7 +34,7 @@ namespace Ck::Detail::Win32
 					{
 						SetCursor(nullptr);
 					}
-					else if (Ref<Cursor> cursor = window->GetCursor())
+					else if (std::shared_ptr<Cursor> cursor = window->GetCursor())
 					{
 						SetCursor(static_cast<HCURSOR>(cursor->GetSystemHandle()));
 					}
@@ -58,18 +58,18 @@ namespace Ck::Detail::Win32
 			if (!WindowFactory::IsSystemCursorSupported(cursorType))
 				continue;
 				
-			mSystemCursors[cursorType] = SystemCursor::New(cursorType);
+			mSystemCursors[cursorType] = std::make_shared<SystemCursor>(cursorType);
 		}
 	}
 
-	Ref<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
+	std::shared_ptr<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
 	{
-		return ImageCursor::New(image, hotspot);
+		return std::make_shared<ImageCursor>(image, hotspot);
 	}
 
-	Ref<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
+	std::shared_ptr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
 	{
-		Ref<Window> window = Window::New(createInfo, mWindowClass);
+		std::shared_ptr<Window> window = std::make_shared<Window>(createInfo, mWindowClass);
 
 		window->Connect(window->OnKeyboardEvent(), [](const WindowKeyboardEvent& event) {
 			App::Resolve<Ck::KeyboardService>()->OnKeyboardEvent().Emit({
@@ -100,7 +100,7 @@ namespace Ck::Detail::Win32
 		return window;
 	}
 
-	Ref<Ck::SystemCursor> WindowFactory::LoadSystemCursor(SystemCursorType type)
+	std::shared_ptr<Ck::SystemCursor> WindowFactory::LoadSystemCursor(SystemCursorType type)
 	{
 		return mSystemCursors[type];
 	}
@@ -110,7 +110,7 @@ namespace Ck::Detail::Win32
 		return true;
 	}
 
-	Signal<Ref<Ck::Window>>& WindowFactory::OnWindowCreated()
+	Signal<std::shared_ptr<Ck::Window>>& WindowFactory::OnWindowCreated()
 	{
 		return mOnWindowCreated;
 	}

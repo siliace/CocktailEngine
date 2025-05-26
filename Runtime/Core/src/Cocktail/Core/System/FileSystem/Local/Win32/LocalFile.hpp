@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALFILE_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALFILE_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 #include <Cocktail/Core/System/FileSystem/FileOpenFlags.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -12,7 +10,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class LocalFile : public Inherit<LocalFile, Object, File>
+	class LocalFile : public File
 	{
 	public:
 

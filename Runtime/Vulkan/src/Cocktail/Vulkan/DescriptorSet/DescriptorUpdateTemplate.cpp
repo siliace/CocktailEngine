@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorUpdateTemplate::DescriptorUpdateTemplate(const Ref<RenderDevice>& renderDevice, const DescriptorUpdateTemplateCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	DescriptorUpdateTemplate::DescriptorUpdateTemplate(std::shared_ptr<RenderDevice> renderDevice, const DescriptorUpdateTemplateCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mHandle(VK_NULL_HANDLE),
 		mAllocationCallbacks(allocationCallbacks)
@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 		return std::max(sizeof(VkDescriptorBufferInfo), sizeof(VkDescriptorImageInfo));
 	}
 
-	Ref<Renderer::RenderDevice> DescriptorUpdateTemplate::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> DescriptorUpdateTemplate::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

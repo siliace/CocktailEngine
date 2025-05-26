@@ -10,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API PerspectiveCamera : public Extends<PerspectiveCamera, Camera>
+	class COCKTAIL_GRAPHIC_API PerspectiveCamera : public Camera
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace Ck
 		 * \param zBounds 
 		 * \return 
 		 */
-		static Ref<PerspectiveCamera> Create(Ref<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		static std::shared_ptr<PerspectiveCamera> Create(std::shared_ptr<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 
@@ -31,7 +31,7 @@ namespace Ck
 		 * \param aspectRatio 
 		 * \param zBounds 
 		 */
-		PerspectiveCamera(Ref<TransformationNode> transformationNode, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

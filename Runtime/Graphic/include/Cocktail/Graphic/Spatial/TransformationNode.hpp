@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_SPATIAL_TRANSFORMATIONNODE_HPP
 #define COCKTAIL_GRAPHIC_SPATIAL_TRANSFORMATIONNODE_HPP
 
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/Utility/AcyclicGraph.hpp>
 
 #include <Cocktail/Graphic/Spatial/Transformation.hpp>
@@ -11,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API TransformationNode : public Inherit<TransformationNode, Object, AcyclicGraphNode<TransformationNode>>
+	class COCKTAIL_GRAPHIC_API TransformationNode : public AcyclicGraphNode<TransformationNode>
 	{
 	public:
 

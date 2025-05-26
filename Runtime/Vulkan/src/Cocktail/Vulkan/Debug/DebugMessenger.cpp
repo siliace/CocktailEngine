@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 		return VK_FALSE;
 	}
 
-	DebugMessenger::DebugMessenger(Ref<RenderDevice> renderDevice, const DebugMessengerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	DebugMessenger::DebugMessenger(std::shared_ptr<RenderDevice> renderDevice, const DebugMessengerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 	{
 	}
 
-	Ref<RenderDevice> DebugMessenger::GetRenderDevice() const
+	std::shared_ptr<RenderDevice> DebugMessenger::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

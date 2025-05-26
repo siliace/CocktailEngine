@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	ComputeStateManager::ComputeStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator) :
+	ComputeStateManager::ComputeStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator) :
 		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
 		mShaderProgram(nullptr)
 	{
@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 			StateManager::SetShaderProgram(mShaderProgram);
 
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
-			mState.ComputeStageState.Shader = mShaderStages[Renderer::ShaderType::Compute].Get();
+			mState.ComputeStageState.Shader = mShaderStages[Renderer::ShaderType::Compute].get();
 		}
 	}
 
@@ -30,7 +30,7 @@ namespace Ck::Vulkan
 		mState.ComputeStageState.EntryPoint = name;
 	}
 
-	Ref<Pipeline> ComputeStateManager::CompilePipeline()
+	std::shared_ptr<Pipeline> ComputeStateManager::CompilePipeline()
 	{
 		assert(mShaderProgram);
 

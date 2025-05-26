@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_IO_INPUT_READER_TEXTREADER_HPP
 #define COCKTAIL_CORE_IO_INPUT_READER_TEXTREADER_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
+#include <Cocktail/Core/Cocktail.hpp>
 
 namespace Ck
 {

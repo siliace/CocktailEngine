@@ -13,7 +13,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API Viewport : public Extends<Viewport, Object>
+	class COCKTAIL_GRAPHIC_API Viewport
 	{
 	public:
 		/**
@@ -21,7 +21,7 @@ namespace Ck
 		 * \param camera 
 		 * \param area 
 		 */
-		Viewport(Ref<Camera> camera, const Rectangle<unsigned>& area);
+		Viewport(std::shared_ptr<Camera> camera, const Rectangle<unsigned>& area);
 
 		/**
 		 * \brief 
@@ -47,11 +47,11 @@ namespace Ck
 		 * \brief Get the Camera used to render this Viewport
 		 * \return The camera
 		 */
-		Ref<Camera> GetCamera() const;
+		std::shared_ptr<Camera> GetCamera() const;
 
 	private:
 
-		Ref<Camera> mCamera;
+		std::shared_ptr<Camera> mCamera;
 		Rectangle<unsigned int> mArea;
 	};
 }

@@ -22,12 +22,12 @@ namespace Ck
 		return ResolveFacadeInstance()->CreateDirectory(path);
 	}
 
-	Ref<File> Storage::OpenFile(const std::filesystem::path& path, FileOpenFlags flags)
+	std::shared_ptr<File> Storage::OpenFile(const std::filesystem::path& path, FileOpenFlags flags)
 	{
 		return ResolveFacadeInstance()->OpenFile(path, flags);
 	}
 
-	Ref<Directory> Storage::OpenDirectory(const std::filesystem::path& path)
+	std::shared_ptr<Directory> Storage::OpenDirectory(const std::filesystem::path& path)
 	{
 		return ResolveFacadeInstance()->OpenDirectory(path);
 	}

@@ -14,7 +14,7 @@ namespace Ck
          * \brief Constructor
          * \param vertexLayout
          */
-        explicit ObjVertexCache(Ref<VertexLayout> vertexLayout) :
+        explicit ObjVertexCache(std::shared_ptr<VertexLayout> vertexLayout) :
             VertexCache<ObjVertex, ObjVertex::Hasher, ObjVertex::Comparator>(std::move(vertexLayout))
         {
             /// Nothing

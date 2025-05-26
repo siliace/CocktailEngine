@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_EMBEDDED_EMBEDDEDFILE_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_EMBEDDED_EMBEDDEDFILE_HPP
 
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 #include <Cocktail/Core/System/FileSystem/FileOpenFlags.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp>
@@ -11,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class EmbeddedFile final : public Inherit<EmbeddedFile, Object, File>
+	class EmbeddedFile final : public File
 	{
 	public:
 

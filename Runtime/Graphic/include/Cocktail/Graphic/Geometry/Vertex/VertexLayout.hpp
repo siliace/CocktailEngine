@@ -1,10 +1,10 @@
 #ifndef COCKTAIL_GRAPHIC_GEOMETRY_VERTEX_VERTEXLAYOUT_HPP
 #define COCKTAIL_GRAPHIC_GEOMETRY_VERTEX_VERTEXLAYOUT_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/DataType.hpp>
 #include <Cocktail/Core/Flags.hpp>
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 
 #include <Cocktail/Graphic/Geometry/Vertex/VertexAttribute.hpp>
 
@@ -70,7 +70,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API VertexLayout : public Extends<VertexLayout, Object>
+	class COCKTAIL_GRAPHIC_API VertexLayout
 	{
 	public:
 
@@ -81,7 +81,7 @@ namespace Ck
 			Builder& AddAttribute(VertexAttributeSemantic semantic, const DataType& dataType, unsigned int elementCount, unsigned int arrayLength = 1, bool normalized = false);
 			Builder& SetInstanced(bool instanced = true);
 			Builder& SetDivisor(unsigned int divisor);
-			Ref<VertexLayout> Get();
+			std::shared_ptr<VertexLayout> Get();
 			const VertexLayoutCreateInfo& ToCreateInfo() const;
 
 		private:

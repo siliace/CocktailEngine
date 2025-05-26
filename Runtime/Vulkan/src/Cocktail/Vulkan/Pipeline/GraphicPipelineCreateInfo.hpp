@@ -6,6 +6,8 @@
 
 namespace Ck::Vulkan
 {
+	class RenderPass;
+
 	/**
 	 * \brief 
 	 */
@@ -24,12 +26,12 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		Ref<PipelineLayout> PipelineLayout;
+		std::shared_ptr<PipelineLayout> PipelineLayout;
 
 		/**
 		 * \brief 
 		 */
-		const RenderPass* RenderPass;
+		std::shared_ptr<RenderPass> RenderPass;
 
 		/**
 		 * \brief 

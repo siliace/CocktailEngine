@@ -25,21 +25,21 @@ namespace Ck::Detail::Win32
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
+		std::shared_ptr<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		Ref<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
+		std::shared_ptr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param type 
 		 * \return 
 		 */
-		Ref<Ck::SystemCursor> LoadSystemCursor(SystemCursorType type) override;
+		std::shared_ptr<Ck::SystemCursor> LoadSystemCursor(SystemCursorType type) override;
 
 		/**
 		 * \brief Tell whether a SystemCursorType is supported
@@ -52,14 +52,14 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		Signal<Ref<Ck::Window>>& OnWindowCreated() override;
+		Signal<std::shared_ptr<Ck::Window>>& OnWindowCreated() override;
 
 	private:
 
 		HINSTANCE mInstanceHandle;
 		WindowClass mWindowClass;
-		EnumMap<SystemCursorType, Ref<Ck::SystemCursor>> mSystemCursors;
-		Signal<Ref<Ck::Window>> mOnWindowCreated;
+		EnumMap<SystemCursorType, std::shared_ptr<Ck::SystemCursor>> mSystemCursors;
+		Signal<std::shared_ptr<Ck::Window>> mOnWindowCreated;
 	};
 }
 

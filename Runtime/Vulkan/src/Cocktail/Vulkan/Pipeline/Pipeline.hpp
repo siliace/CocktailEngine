@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_PIPELINE_HPP
 #define COCKTAIL_VULKAN_PIPELINE_PIPELINE_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
 #include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
@@ -15,7 +12,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Pipeline : public Inherit<Pipeline, Object, Renderer::RenderDeviceObject>
+	class Pipeline : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -23,7 +20,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit Pipeline(const Ref<RenderDevice>& renderDevice);
+		explicit Pipeline(std::shared_ptr<RenderDevice> renderDevice);
 
 		/**
 		 * \brief 
@@ -35,13 +32,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual Ref<PipelineLayout> GetLayout() const = 0;
+		virtual std::shared_ptr<PipelineLayout> GetLayout() const = 0;
 		
 		/**
 		 * \brief 
@@ -51,7 +48,7 @@ namespace Ck::Vulkan
 
 	protected:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 	};
 }
 

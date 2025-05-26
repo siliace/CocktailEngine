@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_IMAGE_IMAGE_HPP
 #define COCKTAIL_CORE_IMAGE_IMAGE_HPP
 
-#include <Cocktail/Core/Object.hpp>
 #include <Cocktail/Core/Image/PixelFormat.hpp>
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 namespace Ck
@@ -61,7 +59,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_CORE_API Image : public Extends<Image, Object>
+	class COCKTAIL_CORE_API Image
 	{
 	public:
 

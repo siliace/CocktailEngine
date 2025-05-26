@@ -37,12 +37,12 @@ namespace Ck
 		mUniformColors.Emission = color;
 	}
 
-	void Material::SetTexture(TextureType textureType, Ref<TextureResource> textureResource)
+	void Material::SetTexture(TextureType textureType, std::shared_ptr<TextureResource> textureResource)
 	{
 		mTextures[textureType] = std::move(textureResource);
 	}
 
-	Ref<TextureResource> Material::GetTexture(TextureType textureType) const
+	std::shared_ptr<TextureResource> Material::GetTexture(TextureType textureType) const
 	{
 		return mTextures[textureType];
 	}

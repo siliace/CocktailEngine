@@ -2,7 +2,6 @@
 #define COCKTAIL_CORE_SYSTEM_WINDOW_WINDOW_HPP
 
 #include <Cocktail/Core/Image/Image.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 #include <Cocktail/Core/System/Window/WindowEvent.hpp>
@@ -14,7 +13,7 @@ namespace Ck
     /**
      * \brief 
      */
-    class Window : public Implements<Window, Interface>, public Observable
+    class Window : public Observable
     {
     public:
 
@@ -67,13 +66,13 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual Ref<Cursor> GetCursor() const = 0;
+        virtual std::shared_ptr<Cursor> GetCursor() const = 0;
 
         /**
          * \brief
          * \param cursor
          */
-        virtual void SetCursor(Ref<Cursor> cursor) = 0;
+        virtual void SetCursor(std::shared_ptr<Cursor> cursor) = 0;
 
         virtual bool IsCursorVisible() const = 0;
 

@@ -3,16 +3,19 @@
 
 #include <filesystem>
 
-#include <Cocktail/Core/Meta/Implements.hpp>
-
 namespace Ck
 {
 	/**
 	 * \brief 
 	 */
-	class Directory : public Implements<Directory, Interface>
+	class Directory
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~Directory() = default;
 
 		/**
 		 * \brief 

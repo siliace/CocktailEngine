@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERRECORD_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERRECORD_HPP
 
-#include <Cocktail/Core/Meta/Implements.hpp>
-
 #include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 
 #include <Cocktail/Renderer/Command/CommandList.hpp>
@@ -12,9 +10,14 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API RenderRecord : public Implements<RenderRecord, Interface>
+	class COCKTAIL_GRAPHIC_API RenderRecord
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~RenderRecord() = default;
 
 		/**
 		 * \brief 

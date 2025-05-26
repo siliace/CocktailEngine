@@ -3,7 +3,6 @@
 
 #include <unordered_set>
 
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Math/Volume/Box.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
@@ -19,7 +18,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API Mesh : public Extends<Mesh, Object>
+	class COCKTAIL_GRAPHIC_API Mesh
 	{
 	public:
 
@@ -61,7 +60,7 @@ namespace Ck
 		 * \param indices 
 		 * \param subMeshes 
 		 */
-		Mesh(Ref<VertexArray> vertices, Ref<IndexArray> indices, std::vector<SubMesh> subMeshes);
+		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, std::vector<SubMesh> subMeshes);
 
 		/**
 		 * \brief
@@ -69,7 +68,7 @@ namespace Ck
 		 * \param indices
 		 * \param primitiveTopology
 		 */
-		Mesh(Ref<VertexArray> vertices, Ref<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology = Renderer::PrimitiveTopology::Triangle);
+		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology = Renderer::PrimitiveTopology::Triangle);
 
 		/**
 		 * \brief 
@@ -81,13 +80,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const Ref<VertexArray>& GetVertices() const;
+		const std::shared_ptr<VertexArray>& GetVertices() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const Ref<IndexArray>& GetIndices() const;
+		const std::shared_ptr<IndexArray>& GetIndices() const;
 
 		/**
 		 * \brief 
@@ -114,8 +113,8 @@ namespace Ck
 		 */
 		void GenerateBoundingBox();
 
-		Ref<VertexArray> mVertices;
-		Ref<IndexArray> mIndices;
+		std::shared_ptr<VertexArray> mVertices;
+		std::shared_ptr<IndexArray> mIndices;
 		std::vector<SubMesh> mSubMeshes;
 		std::unordered_set<unsigned int> mMaterialIndices;
 		Box<float> mBoundingBox;

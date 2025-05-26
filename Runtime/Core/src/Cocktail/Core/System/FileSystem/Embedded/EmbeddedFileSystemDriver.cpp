@@ -36,23 +36,23 @@ namespace Ck
 		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
 	}
 
-	Ref<File> EmbeddedFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
+	std::shared_ptr<File> EmbeddedFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
 	{
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
 			if (fileSystem.is_file(path.string()))
-				return EmbeddedFile::New(fileSystem, path, flags);
+				return std::make_shared<EmbeddedFile>(fileSystem, path, flags);
 		}
 
 		throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));
 	}
 
-	Ref<Directory> EmbeddedFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
+	std::shared_ptr<Directory> EmbeddedFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
 	{
 		for (const cmrc::embedded_filesystem& mFileSystem : mFileSystems)
 		{
 			if (mFileSystem.is_directory(path.string()))
-				return EmbeddedDirectory::New(mFileSystem, path);
+				return std::make_shared<EmbeddedDirectory>(mFileSystem, path);
 		}
 
 		throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));

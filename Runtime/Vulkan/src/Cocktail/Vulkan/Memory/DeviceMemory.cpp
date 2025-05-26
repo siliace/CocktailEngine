@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemory::DeviceMemory(Ref<RenderDevice> renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
+	DeviceMemory::DeviceMemory(std::shared_ptr<RenderDevice> renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -45,7 +45,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> DeviceMemory::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> DeviceMemory::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

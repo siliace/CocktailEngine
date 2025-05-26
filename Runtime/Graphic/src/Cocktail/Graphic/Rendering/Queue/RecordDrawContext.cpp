@@ -16,7 +16,7 @@ namespace Ck
 	void RecordDrawContext::BindMaterialProgram(Renderer::CommandList& commandList, const MaterialProgramVariant& materialProgramVariant)
 	{
 		mCurrentMaterialProgram = &materialProgramVariant;
-		commandList.BindShaderProgram(mCurrentMaterialProgram->GetShaderProgram().Get());
+		commandList.BindShaderProgram(mCurrentMaterialProgram->GetShaderProgram().get());
 		for (const auto& [key, area] : mPersistentBuffers)
 		{
 			std::string name = std::get<0>(key);

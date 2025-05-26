@@ -17,17 +17,17 @@ namespace Ck::Vulkan
 	class DescriptorSetAllocator;
 	class RenderDevice;
 
-	class CommandList : public Inherit<CommandList, Object, Renderer::CommandList>, public Observable
+	class CommandList : public Renderer::CommandList, public Observable, public std::enable_shared_from_this<CommandList>
 	{
 	public:
 
-		CommandList(Ref<RenderDevice> renderDevice, Ref<CommandListPool> allocator, const Ref<DescriptorSetAllocator>& descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		~CommandList() override;
 
 		void SetObjectName(const char* name) const override;
 
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		void Begin(Renderer::CommandList* primary) override;
 		void End() override;
@@ -51,8 +51,8 @@ namespace Ck::Vulkan
 		void BindIndexBuffer(const Renderer::Buffer* inIndexBuffer, std::size_t offset, Renderer::IndexType indexType) override;
 		void BindSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler) override;
 		void BindTextureSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler) override;
-		void BindTexture(Renderer::UniformSlot* inUniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView) override;
-		void BindBuffer(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range) override;
+		void BindTexture(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView) override;
+		void BindBuffer(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range) override;
 
 		void UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int length, const void* data) override;
 
@@ -108,9 +108,9 @@ namespace Ck::Vulkan
 		void FlushGraphicState();
 		void FlushState(Renderer::ShaderProgramType programType);
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<CommandListPool> mAllocator;
-		Ref<DescriptorSetAllocator> mDescriptorSetAllocator;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<CommandListPool> mAllocator;
+		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
 		VkCommandBuffer mHandle;
 		bool mOneShot;
 		bool mSecondary;
@@ -119,7 +119,7 @@ namespace Ck::Vulkan
 		Renderer::CommandListDynamicState mDynamicState;
 		const Framebuffer* mCurrentFramebuffer;
 		Optional<Renderer::RenderPassMode> mCurrentRenderPassMode;
-		EnumMap<Renderer::ShaderProgramType, Ref<Pipeline>> mCurrentPipelines;
+		EnumMap<Renderer::ShaderProgramType, std::shared_ptr<Pipeline>> mCurrentPipelines;
 		EnumMap<Renderer::ShaderProgramType, std::unique_ptr<StateManager>> mStateManagers;
 	};
 }

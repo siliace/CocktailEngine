@@ -156,7 +156,7 @@ void ImGuiServiceProvider::DoBoot(Application* application)
 	io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 
 	WindowFactory* windowFactory = application->Resolve<WindowFactory>();
-	Connect(windowFactory->OnWindowCreated(), [&](Ref<Window> window) {
+	Connect(windowFactory->OnWindowCreated(), [&](std::shared_ptr<Window> window) {
 		if (mEventWindow)
 			return;
 

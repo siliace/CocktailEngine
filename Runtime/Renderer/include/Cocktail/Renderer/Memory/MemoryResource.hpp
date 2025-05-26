@@ -10,7 +10,7 @@ namespace Ck::Renderer
     /**
      * \brief 
      */
-    class MemoryResource : public Implements<MemoryResource, RenderDeviceObject>
+    class MemoryResource : public RenderDeviceObject
     {
     public:
 

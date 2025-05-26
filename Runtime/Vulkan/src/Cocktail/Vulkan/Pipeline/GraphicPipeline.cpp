@@ -6,8 +6,8 @@
 
 namespace Ck::Vulkan
 {
-	GraphicPipeline::GraphicPipeline(const Ref<RenderDevice>& renderDevice, const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		Super(renderDevice),
+	GraphicPipeline::GraphicPipeline(std::shared_ptr<RenderDevice> renderDevice, const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+		Pipeline(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{
@@ -253,7 +253,7 @@ namespace Ck::Vulkan
 		vkDestroyPipeline(mRenderDevice->GetHandle(), mHandle, mAllocationCallbacks);
 	}
 
-	Ref<PipelineLayout> GraphicPipeline::GetLayout() const
+	std::shared_ptr<PipelineLayout> GraphicPipeline::GetLayout() const
 	{
 		return mLayout;
 	}

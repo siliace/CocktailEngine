@@ -15,7 +15,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief Interface exposing creation of GPU resources to generate a single frame
 	 */
-	class FrameContext : public Implements<FrameContext, CommandListAllocator>
+	class FrameContext : public CommandListAllocator
 	{
 	public:
 

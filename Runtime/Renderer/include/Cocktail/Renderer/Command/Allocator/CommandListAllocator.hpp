@@ -9,7 +9,7 @@ namespace Ck::Renderer
 	/**
 	 * \brief Interface shared by classes capable of allocating command lists
 	 */
-	class CommandListAllocator : public Implements<CommandListAllocator, RenderDeviceObject>
+	class CommandListAllocator : public RenderDeviceObject
 	{
 	public:
 
@@ -18,7 +18,7 @@ namespace Ck::Renderer
 		 * \param createInfo 
 		 * \return 
 		 */
-		virtual Ref<CommandList> CreateCommandList(const CommandListCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<CommandList> CreateCommandList(const CommandListCreateInfo& createInfo) = 0;
 	};
 }
 

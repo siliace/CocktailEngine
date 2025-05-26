@@ -11,7 +11,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class Buffer : public Implements<Buffer, MemoryResource>
+    class Buffer : public MemoryResource
     {
     public:
 

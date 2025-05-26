@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASS_HPP
 #define COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASS_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Renderer/Command/RenderPassBeginInfo.hpp>
@@ -17,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class RenderPass : public Inherit<RenderPass, Object, Renderer::RenderDeviceObject>
+	class RenderPass : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -27,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		RenderPass(const Ref<RenderDevice>& renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderPass(std::shared_ptr<RenderDevice> renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -44,7 +42,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -84,7 +82,7 @@ namespace Ck::Vulkan
 
 	private:
 		
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		EnumMap<Renderer::RenderPassMode, VkRenderPass> mHandle;
 		unsigned int mColorAttachmentCount;

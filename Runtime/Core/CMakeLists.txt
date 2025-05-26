@@ -11,11 +11,9 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent2D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent3D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Object.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Object.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -179,31 +177,6 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Frustum.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Sphere.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Volume.hpp
-)
-
-cocktail_source_directory(CORE_FILES    
-    FOLDER "Memory"
-    INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Ref.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/RefCounter.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/WeakRef.hpp
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/RefCounter.cpp
-)
-
-cocktail_source_directory(CORE_FILES    
-    FOLDER "Memory/Detail"
-    INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Detail/StorageRefCounter.hpp
-)
-
-cocktail_source_directory(CORE_FILES    
-    FOLDER "Meta"
-    INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Meta/Extends.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Meta/Implements.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Meta/Inherit.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Meta/Interface.hpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -689,7 +662,6 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ObjectPool.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Optional.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ParameterPack.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/RefTraits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringUtils.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArray.cpp

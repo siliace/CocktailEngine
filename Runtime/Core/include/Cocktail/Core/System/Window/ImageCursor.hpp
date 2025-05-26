@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	class ImageCursor : public Implements<ImageCursor, Cursor>
+	class ImageCursor : public Cursor
 	{
 	public:
 

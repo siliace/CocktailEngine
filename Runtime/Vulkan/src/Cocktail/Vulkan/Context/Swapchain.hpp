@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_CONTEXT_SWAPCHAIN_HPP
 #define COCKTAIL_VULKAN_CONTEXT_SWAPCHAIN_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Vulkan/Context/SwapchainCreateInfo.hpp>
 #include <Cocktail/Vulkan/Texture/SwapchainTexture.hpp>
 
@@ -12,7 +9,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Swapchain : public Inherit<Swapchain, Object, Renderer::RenderDeviceObject>
+	class Swapchain : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -28,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Swapchain(Ref<RenderDevice> renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Swapchain(std::shared_ptr<RenderDevice> renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -45,7 +42,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -58,7 +55,7 @@ namespace Ck::Vulkan
 		 * \param index 
 		 * \return 
 		 */
-		Ref<SwapchainTexture> GetTexture(unsigned int index) const;
+		std::shared_ptr<SwapchainTexture> GetTexture(unsigned int index) const;
 
 		/**
 		 * \brief 
@@ -68,11 +65,11 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSwapchainKHR mHandle;
 		unsigned int mTextureCount;
-		Ref<SwapchainTexture> mTextures[MaxSwapchainTexture];
+		std::shared_ptr<SwapchainTexture> mTextures[MaxSwapchainTexture];
 	};
 }
 

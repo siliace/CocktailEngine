@@ -19,7 +19,7 @@ namespace Ck
 
 	ByteArray FileUtils::ReadFile(const std::filesystem::path& path)
 	{
-		Ref<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
 		std::unique_ptr<std::uint8_t[]> buffer = std::make_unique<std::uint8_t[]>(size);
@@ -31,7 +31,7 @@ namespace Ck
 
 	std::vector<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
 	{
-		Ref<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		FileInputStream inputStream(file);
 		InputStreamReader inputStreamReader(inputStream);
@@ -49,7 +49,7 @@ namespace Ck
 		if (!Storage::IsFile(path))
 			Storage::CreateFile(path);
 
-		Ref<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
+		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
 		file->Write(content.GetData(), content.GetSize());
 	}
 

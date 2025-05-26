@@ -34,13 +34,13 @@ namespace Ck
 		return ResolveProtocol(protocol)->CreateDirectory(p);
 	}
 
-	Ref<File> StorageService::OpenFile(const std::filesystem::path& path, FileOpenFlags flags) const
+	std::shared_ptr<File> StorageService::OpenFile(const std::filesystem::path& path, FileOpenFlags flags) const
 	{
 		const auto [protocol, p] = SplitPathProtocol(path);
 		return ResolveProtocol(protocol)->OpenFile(p, flags);
 	}
 
-	Ref<Directory> StorageService::OpenDirectory(const std::filesystem::path& path) const
+	std::shared_ptr<Directory> StorageService::OpenDirectory(const std::filesystem::path& path) const
 	{
 		const auto [protocol, p] = SplitPathProtocol(path);
 		return ResolveProtocol(protocol)->OpenDirectory(p);
@@ -60,13 +60,13 @@ namespace Ck
 		}
 		else
 		{
-			Ref<File> sourceFile = sourceDriver->OpenFile(sourcePath, FileOpenFlagBits::Read);
+			std::shared_ptr<File> sourceFile = sourceDriver->OpenFile(sourcePath, FileOpenFlagBits::Read);
 
 			FileOpenFlags destinationOpenFlags = FileOpenFlagBits::Write | FileOpenFlagBits::Truncate;
 			if (failIfExists)
 				destinationOpenFlags |= FileOpenFlagBits::Existing;
 
-			Ref<File> destinationFile = destinationDriver->OpenFile(destinationPath, destinationOpenFlags);
+			std::shared_ptr<File> destinationFile = destinationDriver->OpenFile(destinationPath, destinationOpenFlags);
 
 			const std::size_t bufferSize = 2048;
 			unsigned char buffer[bufferSize] = { 0 };

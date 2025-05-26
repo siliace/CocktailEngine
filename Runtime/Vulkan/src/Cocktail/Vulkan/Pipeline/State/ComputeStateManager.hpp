@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice
 		 * \param descriptorSetAllocator
 		 */
-		ComputeStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator);
+		ComputeStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator);
 
 		/**
 		 * \brief 
@@ -37,7 +37,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Pipeline> CompilePipeline() override;
+		std::shared_ptr<Pipeline> CompilePipeline() override;
 
 	private:
 

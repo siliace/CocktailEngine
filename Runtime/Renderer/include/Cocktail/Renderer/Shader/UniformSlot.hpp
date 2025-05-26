@@ -3,7 +3,6 @@
 
 #include <Cocktail/Core/DataType.hpp>
 #include <Cocktail/Core/Flags.hpp>
-#include <Cocktail/Core/Meta/Implements.hpp>
 
 #include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramType.hpp>
@@ -16,9 +15,14 @@ namespace Ck::Renderer
 	/**
 	 * \brief 
 	 */
-	class UniformMember : public Implements<UniformMember, Interface>
+	class UniformMember
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		virtual ~UniformMember() = default;
 
 		/**
 		 * \brief 
@@ -75,9 +79,14 @@ namespace Ck::Renderer
 	/**
 	 * \brief Interface describing the location of an uniform value from a ShaderProgram
 	 */
-	class UniformSlot : public Implements<UniformSlot, Interface>
+	class UniformSlot
 	{
 	public:
+
+		/**
+		 * \brief
+		 */
+		virtual ~UniformSlot() = default;
 
 		/**
 		 * \brief Get the program type this uniform location is compatible with

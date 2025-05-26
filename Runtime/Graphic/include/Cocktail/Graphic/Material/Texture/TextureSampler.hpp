@@ -8,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class TextureSampler : public Extends<TextureSampler, Object>
+	class TextureSampler
 	{
 	public:
 
@@ -28,9 +28,9 @@ namespace Ck
 
 	private:
 
-		Ref<MipMaps> mMipMaps;
+		std::shared_ptr<MipMaps> mMipMaps;
 		bool mGenerateMipMaps;
-		Ref<TextureResource> mTextureResource;
+		std::shared_ptr<TextureResource> mTextureResource;
 	};
 }
 

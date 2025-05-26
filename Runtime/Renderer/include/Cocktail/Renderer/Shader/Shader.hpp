@@ -11,7 +11,7 @@ namespace Ck::Renderer
 	/**
      * \brief 
      */
-    class Shader : public Implements<Shader, RenderDeviceObject>
+    class Shader : public RenderDeviceObject
     {
     public:
 

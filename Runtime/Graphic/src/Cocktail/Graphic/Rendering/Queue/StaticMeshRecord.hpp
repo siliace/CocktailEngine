@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_QUEUE_STATICMESHRECORD_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_STATICMESHRECORD_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
 
 namespace Ck
@@ -11,7 +8,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class StaticMeshRecord : public Inherit<StaticMeshRecord, Object, RenderRecord>
+	class StaticMeshRecord : public RenderRecord
 	{
 	public:
 
@@ -20,7 +17,7 @@ namespace Ck
 		 * \param recordInfo 
 		 * \return 
 		 */
-		static Ref<StaticMeshRecord> New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
+		static std::shared_ptr<StaticMeshRecord> New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
 
 		/**
 		 * \brief 

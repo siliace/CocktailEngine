@@ -22,8 +22,8 @@ namespace Ck
 			const Volume<float>& boundingVolume = sceneNode->GetBoundingVolume();
 			if (boundingVolume.IsNull())
 			{
-				for (const Ref<SceneNode>& childSceneNode : sceneNode->GetChildren())
-					ProcessSceneNode(childSceneNode.Get());
+				for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
+					ProcessSceneNode(childSceneNode.get());
 			}
 			else
 			{
@@ -39,8 +39,8 @@ namespace Ck
 				if (mFrustum.Intersect(obb) != Intersection::Outside || obb.Intersect(mFrustum) != Intersection::Outside)
 				{
 					mRenderables.push_back(sceneNode);
-					for (const Ref<SceneNode>& childSceneNode : sceneNode->GetChildren())
-						ProcessSceneNode(childSceneNode.Get());
+					for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
+						ProcessSceneNode(childSceneNode.get());
 				}
 			}
 		}
@@ -56,11 +56,11 @@ namespace Ck
 		std::vector<Renderable*> mRenderables;
 	};
 
-	Scene::Scene(Ref<GraphicEngine> graphicEngine, Ref<TransformationGraph> transformationGraph) :
-		mGraphicEngine(std::move(graphicEngine)),
-		mTransformationGraph(std::move(transformationGraph))
+	Scene::Scene(std::shared_ptr<GraphicEngine> graphicEngine) :
+		mGraphicEngine(std::move(graphicEngine))
 	{
-		mSceneGraph = SceneGraph::New(this, mTransformationGraph->GetRoot());
+		mTransformationGraph = std::make_unique<TransformationGraph>();
+		mSceneGraph = std::make_unique<SceneGraph>(this, mTransformationGraph->GetRoot());
 	}
 
 	Scene::~Scene()
@@ -69,24 +69,24 @@ namespace Ck
 		mSceneGraph->Detach();
 	}
 
-	void Scene::AddCamera(const Ref<Camera>& camera)
+	void Scene::AddCamera(const std::shared_ptr<Camera>& camera)
 	{
 		mCameras.emplace_back(camera);
 
 		mOnCameraAdded.Emit(camera);
 	}
 
-	void Scene::AddLight(const Ref<Light>& light)
+	void Scene::AddLight(const std::shared_ptr<Light>& light)
 	{
 		mLights.emplace_back(light);
 
 		mOnLightAdded.Emit(light);
 	}
 
-	Ref<SceneNode> Scene::CreateSceneNode()
+	std::shared_ptr<SceneNode> Scene::CreateSceneNode()
 	{
-		Ref<TransformationNode> transformationNode = CreateTransformationNode();
-		Ref<SceneNode> sceneNode = mSceneGraph->CreateNode(this, std::move(transformationNode));
+		std::shared_ptr<TransformationNode> transformationNode = CreateTransformationNode();
+		std::shared_ptr<SceneNode> sceneNode = mSceneGraph->CreateNode(this, std::move(transformationNode));
 
 		mSceneGraph->GetRoot()->InsertChild(sceneNode);
 
@@ -95,26 +95,26 @@ namespace Ck
 		return sceneNode;
 	}
 
-	Ref<TransformationNode> Scene::CreateTransformationNode(const Transformation& transformation)
+	std::shared_ptr<TransformationNode> Scene::CreateTransformationNode(const Transformation& transformation)
 	{
-		Ref<TransformationNode> transformationNode = mTransformationGraph->CreateNode(transformation);
-		Ref<TransformationNode> rootTransformation = mTransformationGraph->GetRoot();
+		std::shared_ptr<TransformationNode> transformationNode = mTransformationGraph->CreateNode(transformation);
+		std::shared_ptr<TransformationNode> rootTransformation = mTransformationGraph->GetRoot();
 		rootTransformation->InsertChild(transformationNode);
 
 		return transformationNode;
 	}
 
-	Signal<Ref<Camera>>& Scene::OnCameraAdded()
+	Signal<std::shared_ptr<Camera>>& Scene::OnCameraAdded()
 	{
 		return mOnCameraAdded;
 	}
 
-	Signal<Ref<Light>>& Scene::OnLightAdded()
+	Signal<std::shared_ptr<Light>>& Scene::OnLightAdded()
 	{
 		return mOnLightAdded;
 	}
 
-	Signal<Ref<SceneNode>>& Scene::OnSceneNodeAdded()
+	Signal<std::shared_ptr<SceneNode>>& Scene::OnSceneNodeAdded()
 	{
 		return mOnSceneNodeAdded;
 	}
@@ -122,7 +122,7 @@ namespace Ck
 	std::vector<Renderable*> Scene::CollectRenderables(const Camera& camera) const
 	{
 		FrustumCullAction action(camera.ComputeFrustum());
-		action.ProcessSceneNode(mSceneGraph->GetRoot().Get());
+		action.ProcessSceneNode(mSceneGraph->GetRoot().get());
 
 		return action.GetRenderables();
 	}
@@ -131,7 +131,7 @@ namespace Ck
 	{
 		std::vector<Light*> lights;
 		Frustum<float> cameraFrustum = camera.ComputeFrustum();
-		for (const Ref<Light>& light : mLights)
+		for (const std::shared_ptr<Light>& light : mLights)
 		{
 			if (NearlyEqual(light->GetIntensity(), 0.f))
 				continue;
@@ -139,13 +139,13 @@ namespace Ck
 			if (light->FrustumCull(cameraFrustum) == Intersection::Outside)
 				continue;
 
-			lights.push_back(light.Get());
+			lights.push_back(light.get());
 		}
 
 		return lights;
 	}
 
-	Ref<GraphicEngine> Scene::GetGraphicEngine() const
+	std::shared_ptr<GraphicEngine> Scene::GetGraphicEngine() const
 	{
 		return mGraphicEngine;
 	}

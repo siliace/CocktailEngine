@@ -19,7 +19,7 @@ using namespace Ck;
 Main::ExitCode ApplicationMain(Application* application)
 {
 	Extent2D windowSize = MakeExtent(800u, 600u);
-	Ref<Window> window = application->Invoke([&](WindowFactory* windowFactory)
+	std::shared_ptr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
@@ -30,34 +30,34 @@ Main::ExitCode ApplicationMain(Application* application)
 		return windowFactory->CreateWindow(windowCreateInfo);
 	});
 
-	Ref<GraphicEngine> graphicEngine = GraphicEngine::New(Renderer::GraphicApi::Vulkan);
-	Ref<Scene> scene = Scene::New(graphicEngine);
+	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
-	Ref<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor(1.f, 1.f, 1.f));
-	Ref<Material> material = Material::New("default-cube", Material::ShadingMode::Phong, SamplerType::NearestClamp, true);
+	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor(1.f, 1.f, 1.f));
+	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Phong, SamplerType::NearestClamp, true);
 	material->SetEmissiveColor(LinearColor(1.f, 1.f, 1.f));
-	Ref<Shape> shape = Shape::New(*graphicEngine, std::move(cubeMesh), std::vector<Ref<Material>>{ std::move(material) });
+	std::shared_ptr<Shape> shape = std::make_shared<Shape>(*graphicEngine, std::move(cubeMesh), std::vector<std::shared_ptr<Material>>{ std::move(material) });
 
 	for (unsigned int i = 0; i < 30; i++)
 	{
 		for (unsigned int j = 0; j < 30; j++)
 		{
-			Ref<SceneNode> sceneNode = scene->CreateSceneNode();
+			std::shared_ptr<SceneNode> sceneNode = scene->CreateSceneNode();
 			sceneNode->SetPosition(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
 			sceneNode->AddShape(shape);
 		}
 	}
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	Ref<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
+	std::shared_ptr<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);
 
-	Ref<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
+	std::shared_ptr<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
 	
-	Ref<FreeFlyCameraViewController> cameraController = FreeFlyCameraViewController::New(camera);
+	std::shared_ptr<FreeFlyCameraViewController> cameraController = std::make_shared<FreeFlyCameraViewController>(camera);
 
 	float move = 1.f;
 	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Q), [&](KeyboardEvent event)
@@ -107,8 +107,8 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	Ref<SceneViewer> viewer = WindowSceneViewer::New(scene, window, viewerParameters, true);
-	Ref<Viewport> viewport = Viewport::New(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
+	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
 	viewer->AttachViewport(viewport, 0);
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)

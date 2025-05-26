@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_SCENE_LIGHT_DIRECTIONALLIGHT_HPP
 #define COCKTAIL_GRAPHIC_SCENE_LIGHT_DIRECTIONALLIGHT_HPP
 
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Graphic/Scene/Light/Light.hpp>
 
 namespace Ck
@@ -12,7 +10,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API DirectionalLight : public Inherit<DirectionalLight, Object, Light>
+	class COCKTAIL_GRAPHIC_API DirectionalLight : public Light
 	{
 	public:
 
@@ -24,7 +22,7 @@ namespace Ck
 		 * \param intensity 
 		 * \return 
 		 */
-		static Ref<DirectionalLight> Create(Ref<Scene> scene, LinearColor color, Vector3<float> direction, float intensity = 100.f);
+		static std::shared_ptr<DirectionalLight> Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity = 100.f);
 
 		/**
 		 * \brief

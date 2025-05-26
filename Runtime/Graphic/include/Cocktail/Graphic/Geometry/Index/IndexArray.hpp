@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include <Cocktail/Core/Meta/Extends.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Graphic/Geometry/Index/IndexRef.hpp>
@@ -13,7 +12,7 @@ namespace Ck
 	/**
 	 * \brief
 	 */
-	class COCKTAIL_GRAPHIC_API IndexArray : public Extends<IndexArray, Object>
+	class COCKTAIL_GRAPHIC_API IndexArray
 	{
 	public:
 

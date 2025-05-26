@@ -61,7 +61,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	PresentationContext::PresentationContext(Ref<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
+	PresentationContext::PresentationContext(std::shared_ptr<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
 		mRenderDevice(std::move(renderDevice)),
 		mSurface(surface),
 		mSurfaceColorSpace(colorSpace)
@@ -87,7 +87,7 @@ namespace Ck::Vulkan
 		mBufferCount = std::clamp(bufferCount, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount);
 	}
 
-	Ref<Swapchain> PresentationContext::CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const
+	std::shared_ptr<Swapchain> PresentationContext::CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const
 	{
 		if (!IsPresentationModeSupported(presentMode))
 			throw std::invalid_argument("PresentMode not supported by the PresentationContext");

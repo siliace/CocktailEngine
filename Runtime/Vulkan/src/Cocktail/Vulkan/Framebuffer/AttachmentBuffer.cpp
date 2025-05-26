@@ -4,25 +4,25 @@
 
 namespace Ck::Vulkan
 {
-	AttachmentBuffer::AttachmentBuffer(RenderDevice& renderDevice, Ref<TextureView> resolveAttachment, Renderer::RasterizationSamples samples) :
+	AttachmentBuffer::AttachmentBuffer(RenderDevice& renderDevice, std::shared_ptr<TextureView> resolveAttachment, Renderer::RasterizationSamples samples) :
 		mResolveAttachments(std::move(resolveAttachment))
 	{
 		if (samples == Renderer::RasterizationSamples::e1)
 			return;
 		
-		Ref<AbstractTexture> texture = AbstractTexture::Cast(mResolveAttachments->GetTexture());
+		std::shared_ptr<AbstractTexture> texture = std::static_pointer_cast<AbstractTexture>(mResolveAttachments->GetTexture());
 		Extent3D<unsigned int> textureSize = texture->GetSize();
 
 		RenderBufferCreateInfo renderBufferCreateInfo;
 		renderBufferCreateInfo.Format = texture->GetFormat();
 		renderBufferCreateInfo.Size = MakeExtent(textureSize.Width, textureSize.Height);
 		renderBufferCreateInfo.Samples = samples;
-		Ref<RenderBuffer> renderBuffer = renderDevice.CreateRenderBuffer(renderBufferCreateInfo);
+		std::shared_ptr<RenderBuffer> renderBuffer = renderDevice.CreateRenderBuffer(renderBufferCreateInfo);
 
 		Renderer::TextureViewCreateInfo viewCreateInfo;
 		viewCreateInfo.Texture = renderBuffer;
 		viewCreateInfo.Type = Renderer::TextureViewType::e2D;
-		mMultisampleAttachment = TextureView::Cast(renderDevice.CreateTextureView(viewCreateInfo));
+		mMultisampleAttachment = std::static_pointer_cast<TextureView>(renderDevice.CreateTextureView(viewCreateInfo));
 	}
 
 	bool AttachmentBuffer::IsMultisample() const
@@ -30,12 +30,12 @@ namespace Ck::Vulkan
 		return mMultisampleAttachment != nullptr;
 	}
 
-	const Ref<TextureView>& AttachmentBuffer::GetMultisampleAttachment() const
+	std::shared_ptr<TextureView> AttachmentBuffer::GetMultisampleAttachment() const
 	{
 		return mMultisampleAttachment;
 	}
 
-	const Ref<TextureView>& AttachmentBuffer::GetResolveAttachment() const
+	std::shared_ptr<TextureView> AttachmentBuffer::GetResolveAttachment() const
 	{
 		return mResolveAttachments;
 	}

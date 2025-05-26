@@ -136,12 +136,12 @@ namespace Ck::Detail::Win32
 		return placement.showCmd == SW_MAXIMIZE;
 	}
 
-	Ref<Cursor> Window::GetCursor() const
+	std::shared_ptr<Cursor> Window::GetCursor() const
 	{
 		return mCursor;
 	}
 
-	void Window::SetCursor(Ref<Cursor> cursor)
+	void Window::SetCursor(std::shared_ptr<Cursor> cursor)
 	{
 		mCursor = cursor;
 	}

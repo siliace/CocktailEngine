@@ -20,7 +20,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		Ref<MipMaps> LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters) override;
+		std::shared_ptr<MipMaps> LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters) override;
 
 		/**
     	 * \brief 

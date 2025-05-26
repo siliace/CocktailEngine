@@ -9,7 +9,7 @@ namespace Ck
     /**
      * \brief
      */
-    class COCKTAIL_GRAPHIC_API VertexBuffer : public Extends<VertexBuffer, BufferResource>
+    class COCKTAIL_GRAPHIC_API VertexBuffer : public BufferResource
     {
     public:
 
@@ -19,7 +19,7 @@ namespace Ck
          * \param vertices
          * \param name
          */
-        VertexBuffer(Ref<GraphicEngine> graphicEngine, Ref<VertexArray> vertices, std::string_view name = "");
+        VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, std::string_view name = "");
 
         /**
          * \brief
@@ -35,11 +35,11 @@ namespace Ck
          * \brief 
          * \return 
          */
-        Ref<VertexArray> GetVertexArray() const;
+        std::shared_ptr<VertexArray> GetVertexArray() const;
 
     private:
 
-        Ref<VertexArray> mVertices;
+        std::shared_ptr<VertexArray> mVertices;
     };
 }
 

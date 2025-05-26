@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorSetStateManager::DescriptorSetStateManager(Ref<RenderDevice> renderDevice, Ref<DescriptorSetAllocator> descriptorSetAllocator) :
+	DescriptorSetStateManager::DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator) :
 		mRenderDevice(std::move(renderDevice)),
 		mDescriptorSetAllocator(std::move(descriptorSetAllocator)),
 		mBindingDirtyFlags(0)
@@ -86,7 +86,7 @@ namespace Ck::Vulkan
 		mDescriptorSetAllocator->Reset();
 	}
 
-	unsigned int DescriptorSetStateManager::CompileDescriptors(const Ref<DescriptorSetLayout>& layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
+	unsigned int DescriptorSetStateManager::CompileDescriptors(std::shared_ptr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
 	{
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
@@ -163,7 +163,7 @@ namespace Ck::Vulkan
 		return descriptorCount;
 	}
 
-	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(const Ref<DescriptorSetLayout>& layout, const Ref<DescriptorUpdateTemplate>& descriptorUpdateTemplate, unsigned char* descriptors)
+	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> layout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors)
 	{
 		unsigned int k = 0;
 		const std::size_t elementStride = descriptorUpdateTemplate->GetElementStride();
@@ -214,14 +214,14 @@ namespace Ck::Vulkan
 		}
 	}
 
-	Ref<DescriptorSet> DescriptorSetStateManager::CompileSet(const Ref<DescriptorSetLayout>& setLayout)
+	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSet(std::shared_ptr<DescriptorSetLayout> setLayout)
 	{
 		DescriptorSetCreateInfo createInfo;
 		createInfo.Layout = setLayout;
 
 		mBindingDirtyFlags = 0;
 
-		Ref<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
+		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
 
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
@@ -301,14 +301,14 @@ namespace Ck::Vulkan
 		return descriptorSet;
 	}
 
-	Ref<DescriptorSet> DescriptorSetStateManager::CompileSetWithTemplate(const Ref<DescriptorSetLayout>& descriptorSetLayout, const Ref<DescriptorUpdateTemplate>& descriptorUpdateTemplate)
+	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSetWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate)
 	{
 		DescriptorSetCreateInfo createInfo;
 		createInfo.Layout = descriptorSetLayout;
 
 		mBindingDirtyFlags = 0;
 
-		Ref<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
+		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
 
 		unsigned int k = 0;
 		const unsigned int descriptorCount = descriptorSetLayout->GetDescriptorCount();

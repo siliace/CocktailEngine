@@ -12,7 +12,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API OrthographicCamera : public Extends<OrthographicCamera, Camera>
+	class COCKTAIL_GRAPHIC_API OrthographicCamera : public Camera
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace Ck
 		 * \param zBounds 
 		 * \return 
 		 */
-		static Ref<OrthographicCamera> Create(Ref<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds);
+		static std::shared_ptr<OrthographicCamera> Create(std::shared_ptr<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds);
 
 		/**
 		 * \brief 
@@ -30,7 +30,7 @@ namespace Ck
 		 * \param area 
 		 * \param zBounds 
 		 */
-		OrthographicCamera(Ref<TransformationNode> transformationNode, Rectangle<unsigned int> area, Vector2<float> zBounds);
+		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<unsigned int> area, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

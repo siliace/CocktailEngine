@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	FileOutputStream::FileOutputStream(const Ref<File>& file) :
+	FileOutputStream::FileOutputStream(const std::shared_ptr<File>& file) :
 		mFile(file)
 	{
 		/// Nothing

@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class BufferView : public Inherit<BufferView, Object, Renderer::BufferView>
+	class BufferView : public Renderer::BufferView
 	{
 	public:
 
@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		BufferView(Ref<RenderDevice> renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		BufferView(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -40,13 +40,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::Buffer> GetBuffer() const override;
+		std::shared_ptr<Renderer::Buffer> GetBuffer() const override;
 
 		/**
 		 * \brief 
@@ -74,8 +74,8 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
-		Ref<Buffer> mBuffer;
+		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::shared_ptr<Buffer> mBuffer;
 		PixelFormat mFormat;
 		std::size_t mOffset;
 		std::size_t mRange;

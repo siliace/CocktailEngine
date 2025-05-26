@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/IO/Input/Reader/Reader.hpp>
 
 namespace Ck

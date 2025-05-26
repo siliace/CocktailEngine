@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_GRAPHICSTATE_HPP
 #define COCKTAIL_VULKAN_PIPELINE_GRAPHICSTATE_HPP
 
+#include <Cocktail/Core/Color.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Renderer/Renderer.hpp>
@@ -22,6 +23,8 @@ namespace Ck::Vulkan
 		unsigned int Stride = 0;
 		bool Instanced = false;
 		unsigned int Divisor = 0;
+
+
 	};
 
 	struct VertexInputState

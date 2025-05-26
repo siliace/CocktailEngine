@@ -50,14 +50,14 @@ namespace Ck::Detail::Win32
 			throw SystemError::GetLastError();
 	}
 
-	Ref<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
+	std::shared_ptr<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
 	{
-		return LocalFile::New(path, flags);
+		return std::make_shared<LocalFile>(path, flags);
 	}
 
-	Ref<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
+	std::shared_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
 	{
-		return LocalDirectory::New(path);
+		return std::make_shared<LocalDirectory>(path);
 	}
 
 	void LocalFileSystemDriver::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists)
@@ -88,13 +88,13 @@ namespace Ck::Detail::Win32
 		}
 	}
 
-	Ref<FileLock> LocalFileSystemDriver::CreateLock(const Ref<File>& file, std::size_t offset, std::size_t length)
+	std::shared_ptr<FileLock> LocalFileSystemDriver::CreateLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length)
 	{
-		return LocalFileLock::New(file, offset, length);
+		return std::make_shared<LocalFileLock>(file, offset, length);
 	}
 
-	Ref<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(const Ref<Directory>& directory, bool recursive)
+	std::shared_ptr<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(const std::shared_ptr<Directory>& directory, bool recursive)
 	{
-		return LocalDirectoryWatcher::New(directory, recursive);
+		return std::make_shared<LocalDirectoryWatcher>(directory, recursive);
 	}
 }

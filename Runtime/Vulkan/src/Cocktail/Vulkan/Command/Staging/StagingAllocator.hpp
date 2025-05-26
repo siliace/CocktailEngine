@@ -9,7 +9,7 @@ namespace Ck::Vulkan
 {
 	class RenderDevice;
 
-	class StagingAllocator : public Extends<StagingAllocator, Object>
+	class StagingAllocator
 	{
 	public:
 
@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param bufferSize 
 		 */
-		StagingAllocator(const Ref<RenderDevice>& renderDevice, std::size_t bufferSize);
+		StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, std::size_t bufferSize);
 
 		/**
 		 * \brief 
@@ -26,7 +26,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \return 
 		 */
-		Ref<StagingBuffer> AcquireStagingBuffer(std::size_t alignment, std::size_t size);
+		std::shared_ptr<StagingBuffer> AcquireStagingBuffer(std::size_t alignment, std::size_t size);
 
 		/**
 		 * \brief 
@@ -42,10 +42,10 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		std::size_t mBufferSize;
-		std::vector<Ref<StagingBuffer>> mAcquiredBuffers;
-		std::vector<Ref<StagingBuffer>> mAvailableBuffers;
+		std::vector<std::shared_ptr<StagingBuffer>> mAcquiredBuffers;
+		std::vector<std::shared_ptr<StagingBuffer>> mAvailableBuffers;
 		TlsObjectPool<StagingBuffer> mBufferPool;
 	};
 }

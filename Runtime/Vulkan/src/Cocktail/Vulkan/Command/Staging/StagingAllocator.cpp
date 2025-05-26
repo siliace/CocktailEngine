@@ -4,27 +4,27 @@
 
 namespace Ck::Vulkan
 {
-	StagingAllocator::StagingAllocator(const Ref<RenderDevice>& renderDevice, std::size_t bufferSize) :
+	StagingAllocator::StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, std::size_t bufferSize) :
 		mRenderDevice(renderDevice),
 		mBufferSize(bufferSize)
 	{
 		/// Nothing
 	}
 
-	Ref<StagingBuffer> StagingAllocator::AcquireStagingBuffer(std::size_t alignment, std::size_t size)
+	std::shared_ptr<StagingBuffer> StagingAllocator::AcquireStagingBuffer(std::size_t alignment, std::size_t size)
 	{
-		for (Ref<StagingBuffer> buffer : mAcquiredBuffers)
+		for (std::shared_ptr<StagingBuffer> buffer : mAcquiredBuffers)
 		{
 			std::size_t padding = buffer->ComputePadding(alignment);
 			if (padding + size <= buffer->GetRemainingCapacity())
 				return buffer;
 		}
 
-		auto itBuffer = std::find_if(mAvailableBuffers.begin(), mAvailableBuffers.end(), [&](const Ref<StagingBuffer>& stagingBuffer) {
+		auto itBuffer = std::find_if(mAvailableBuffers.begin(), mAvailableBuffers.end(), [&](std::shared_ptr<StagingBuffer> stagingBuffer) {
 			return stagingBuffer->GetRemainingCapacity() + stagingBuffer->ComputePadding(alignment) > size;
 		});
 
-		Ref<StagingBuffer> buffer;
+		std::shared_ptr<StagingBuffer> buffer;
 		if (itBuffer != mAvailableBuffers.end())
 		{
 			buffer = std::move(*itBuffer);
@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 	{
 		if (!release && !mAcquiredBuffers.empty())
 		{
-			for (Ref<StagingBuffer> stagingBuffer : mAcquiredBuffers)
+			for (std::shared_ptr<StagingBuffer> stagingBuffer : mAcquiredBuffers)
 			{
 				stagingBuffer->Reset();
 				mAvailableBuffers.push_back(stagingBuffer);

@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALDIRECTORY_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_WIN32_LOCALDIRECTORY_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
 
@@ -11,7 +9,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class LocalDirectory : public Inherit<LocalDirectory, Object, Directory>
+	class LocalDirectory : public Directory
 	{
 	public:
 

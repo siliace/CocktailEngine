@@ -28,7 +28,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	});
 
 	Extent2D windowSize = MakeExtent(800u, 600u);
-	Ref<Window> window = application->Invoke([&](WindowFactory* windowFactory)
+	std::shared_ptr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
@@ -39,21 +39,21 @@ Main::ExitCode ApplicationMain(Application* application)
 		return windowFactory->CreateWindow(windowCreateInfo);
 	});
 
-	Ref<GraphicEngine> graphicEngine = GraphicEngine::New(Renderer::GraphicApi::Vulkan);
-	Ref<Scene> scene = Scene::New(graphicEngine);
+	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
-	Ref<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
+	std::shared_ptr<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
 		return sceneLoader->LoadFromPath("./resources/Models/Sponza/Sponza.gltf", {})->AddToScene(*scene);
 	});
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	Ref<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
+	std::shared_ptr<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 4500.f);
-	Ref<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), aspectRatio, zBounds);
+	std::shared_ptr<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
-	Ref<FreeFlyCameraViewController> cameraController = FreeFlyCameraViewController::New(camera);
+	std::shared_ptr<FreeFlyCameraViewController> cameraController = std::make_shared<FreeFlyCameraViewController>(camera);
 
 	float move = 1.f;
 	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Q), [&](KeyboardEvent event)
@@ -103,8 +103,8 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	Ref<SceneViewer> viewer = WindowSceneViewer::New(scene, window, viewerParameters, true);
-	Ref<Viewport> viewport = Viewport::New(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
+	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
 	viewer->AttachViewport(viewport, 0);
 
 	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());

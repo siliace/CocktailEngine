@@ -33,7 +33,7 @@ private:
 	 * \param mouseCursor 
 	 * \return 
 	 */
-	static Ck::Ref<Ck::Cursor> GetCursor(int mouseCursor);
+	static std::shared_ptr<Ck::Cursor> GetCursor(int mouseCursor);
 
 
 	/**
@@ -53,10 +53,10 @@ private:
 
 	Ck::Window* mWindow;
 	int mLastMouseCursor = -1;
-	Ck::Ref<Ck::Renderer::ShaderProgram> mShaderProgram;
+	std::shared_ptr<Ck::Renderer::ShaderProgram> mShaderProgram;
 	Ck::Renderer::UniformSlot* mTextureUniformSlot;
-	Ck::Ref<Ck::Renderer::TextureView> mFontTextureView;
-	Ck::Ref<Ck::Renderer::Sampler> mTextureSampler;
+	std::shared_ptr<Ck::Renderer::TextureView> mFontTextureView;
+	std::shared_ptr<Ck::Renderer::Sampler> mTextureSampler;
 };
 
 #endif // IMGUIOVERLAY_HPP

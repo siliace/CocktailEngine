@@ -27,7 +27,7 @@ namespace Ck::Renderer
          * Every ShaderType must be compatible with the \p Type of the ShaderProgram to create
          * \see ProgramSupportShader
          */
-        Ref<Shader> Shaders[Enum<ShaderType>::ValueCount];
+        std::shared_ptr<Shader> Shaders[Enum<ShaderType>::ValueCount];
 
         /**
          * \brief Specifies the number of Shader linked to the ShaderProgram to create

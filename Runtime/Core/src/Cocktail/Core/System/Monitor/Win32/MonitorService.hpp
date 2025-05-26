@@ -25,7 +25,7 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Ck::Monitor> GetPrimaryMonitor() const override;
+		std::shared_ptr<Ck::Monitor> GetPrimaryMonitor() const override;
 
 		/**
 		 * \brief 
@@ -38,14 +38,14 @@ namespace Ck::Detail::Win32
 		 * \param index 
 		 * \return 
 		 */
-		Ref<Ck::Monitor> GetMonitor(std::size_t index) const override;
+		std::shared_ptr<Ck::Monitor> GetMonitor(std::size_t index) const override;
 
 		/**
 		 * \brief 
 		 * \param window 
 		 * \return 
 		 */
-		Ref<Ck::Monitor> GetWindowMonitor(const Window& window) const override;
+		std::shared_ptr<Ck::Monitor> GetWindowMonitor(const Window& window) const override;
 
 	private:
 
@@ -59,8 +59,8 @@ namespace Ck::Detail::Win32
 		 */
 		static BOOL CALLBACK EnumMonitorCallback(HMONITOR handle, HDC deviceContext, LPRECT area, LPARAM userParam);
 
-		Ref<Monitor> mPrimaryMonitor;
-		std::vector<Ref<Monitor>> mMonitors;
+		std::shared_ptr<Monitor> mPrimaryMonitor;
+		std::vector<std::shared_ptr<Monitor>> mMonitors;
 	};
 }
 

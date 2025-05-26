@@ -7,7 +7,7 @@
 
 namespace Ck::Vulkan
 {
-	DepthResolver::DepthResolver(Ref<RenderDevice> renderDevice) :
+	DepthResolver::DepthResolver(std::shared_ptr<RenderDevice> renderDevice) :
 		mRenderDevice(std::move(renderDevice)),
 		mDepthSamplerSlot(nullptr)
 	{
@@ -23,25 +23,25 @@ namespace Ck::Vulkan
 		assert(mDepthSamplerSlot);
 	}
 
-	void DepthResolver::Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, Ref<Renderer::TextureView> multisampleAttachment, Ref<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode)
+	void DepthResolver::Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<Renderer::TextureView> multisampleAttachment, std::shared_ptr<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode)
 	{
 		Renderer::RenderPassBeginInfo renderPassBeginInfo;
 		renderPassBeginInfo.Mode = renderPassMode;
 		renderPassBeginInfo.Framebuffer = GetOrCreateFramebuffer(attachment);
 		renderPassBeginInfo.DepthClearValue = 1.f;
 
-		Ref<AbstractTexture> multisampleTexture = AbstractTexture::Cast(multisampleAttachment->GetTexture());
+		std::shared_ptr<AbstractTexture> multisampleTexture = std::static_pointer_cast<AbstractTexture>(multisampleAttachment->GetTexture());
 		assert(multisampleTexture->GetSamples() != Renderer::RasterizationSamples::e1);
 
 		Renderer::GpuBarrier preBarriers[] = {
-			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::FramebufferAttachment, Renderer::ResourceState::GraphicShaderResource, Renderer::TextureSubResource::All(*multisampleTexture)),
+			Renderer::GpuBarrier::Of(multisampleTexture.get(), Renderer::ResourceState::FramebufferAttachment, Renderer::ResourceState::GraphicShaderResource, Renderer::TextureSubResource::All(*multisampleTexture)),
 		};
 		commandList.Barrier(1, preBarriers);
 
 		commandList.BeginRenderPass(renderPassBeginInfo);
 
-		commandList.BindShaderProgram(mShaderProgram.Get());
-		commandList.BindTexture(mDepthSamplerSlot, 0, multisampleAttachment.Get());
+		commandList.BindShaderProgram(mShaderProgram.get());
+		commandList.BindTexture(mDepthSamplerSlot, 0, multisampleAttachment.get());
 
 		ResolveInfo resolveInfo;
 		resolveInfo.SampleCount = static_cast<unsigned int>(multisampleTexture->GetSamples());
@@ -60,12 +60,12 @@ namespace Ck::Vulkan
 		commandList.EndRenderPass();
 
 		Renderer::GpuBarrier postBarriers[] = {
-			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::GraphicShaderResource, Renderer::ResourceState::FramebufferAttachment, Renderer::TextureSubResource::All(*multisampleTexture)),
+			Renderer::GpuBarrier::Of(multisampleTexture.get(), Renderer::ResourceState::GraphicShaderResource, Renderer::ResourceState::FramebufferAttachment, Renderer::TextureSubResource::All(*multisampleTexture)),
 		};
 		commandList.Barrier(1, postBarriers);
 	}
 
-	Ref<Renderer::Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
+	std::shared_ptr<Renderer::Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
 	{
 		ByteArray shaderCode = FileUtils::ReadFile(path);
 
@@ -77,16 +77,16 @@ namespace Ck::Vulkan
 		return renderDevice.CreateShader(createInfo);
 	}
 
-	Renderer::Framebuffer* DepthResolver::GetOrCreateFramebuffer(const Ref<Renderer::TextureView>& attachment)
+	Renderer::Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<Renderer::TextureView> attachment)
 	{
 		if (auto it = mFramebuffers.find(attachment); it != mFramebuffers.end())
-			return it->second.Get();
+			return it->second.get();
 
 		Renderer::FramebufferCreateInfo createInfo;
 		createInfo.DepthStencilAttachment = attachment;
-		Ref<Renderer::Framebuffer> framebuffer = mRenderDevice->CreateFramebuffer(createInfo);
+		std::shared_ptr<Renderer::Framebuffer> framebuffer = mRenderDevice->CreateFramebuffer(createInfo);
 		mFramebuffers[attachment] = framebuffer;
 
-		return framebuffer.Get();
+		return framebuffer.get();
 	}
 }

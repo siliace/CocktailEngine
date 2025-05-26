@@ -10,7 +10,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief
 	 */
-	class PresentationContext : public Extends<PresentationContext, Object>
+	class PresentationContext
 	{
 	public:
 
@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param alphaDepth 
 		 * \param colorSpace 
 		 */
-		PresentationContext(Ref<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace);
+		PresentationContext(std::shared_ptr<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace);
 
 		/**
 		 * \brief
@@ -32,7 +32,7 @@ namespace Ck::Vulkan
 		 * \param old
 		 * \return
 		 */
-		Ref<Swapchain> CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const;
+		std::shared_ptr<Swapchain> CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const;
 
 		/**
 		 * \brief
@@ -61,7 +61,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		VkSurfaceKHR mSurface;
 		unsigned int mBufferCount;
 		PixelFormat mSurfaceFormat;

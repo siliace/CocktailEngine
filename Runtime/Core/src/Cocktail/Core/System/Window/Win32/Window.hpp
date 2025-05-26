@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_WIN32_WINDOW_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_WIN32_WINDOW_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
 #include <Cocktail/Core/System/Window/Window.hpp>
 #include <Cocktail/Core/System/Window/Win32/WindowClass.hpp>
 #include <Cocktail/Core/System/Window/WindowCreateInfo.hpp>
@@ -12,7 +10,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class Window final : public Inherit<Window, Object, Ck::Window>
+	class Window final : public Ck::Window
 	{
 	public:
 
@@ -72,13 +70,13 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Cursor> GetCursor() const override;
+		std::shared_ptr<Cursor> GetCursor() const override;
 
 		/**
 		 * \brief 
 		 * \param cursor 
 		 */
-		void SetCursor(Ref<Cursor> cursor) override;
+		void SetCursor(std::shared_ptr<Cursor> cursor) override;
 
 		bool IsCursorVisible() const override;
 
@@ -176,7 +174,7 @@ namespace Ck::Detail::Win32
 	private:
 
 		HWND mHandle;
-		Ref<Cursor> mCursor;
+		std::shared_ptr<Cursor> mCursor;
 		Optional<Extent2D<unsigned int>> mMinSize;
 		Optional<Extent2D<unsigned int>> mMaxSize;
 		HICON mIcon;

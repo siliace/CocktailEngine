@@ -35,7 +35,7 @@ namespace Ck
 		}
 	}
 
-	MaterialProgram::MaterialProgram(const Ref<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo) :
+	MaterialProgram::MaterialProgram(const std::shared_ptr<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo) :
 		mName(createInfo.Name)
 	{
 		for (const EnumMap<Renderer::ShaderType, ByteArray>& variantBinaries : createInfo.VariantsBinaries)
@@ -60,8 +60,8 @@ namespace Ck
 			assert(shaderCount > 0);
 			shaderProgramCreateInfo.ShaderCount = shaderCount;
 
-			Ref<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
-			Ref<MaterialProgramVariant> variant = MaterialProgramVariant::New(createInfo.Interface, std::move(shaderProgram));
+			std::shared_ptr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
+			std::shared_ptr<MaterialProgramVariant> variant = std::make_shared<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));
 
 			Flags<VertexAttributeSemantic> vertexAttributes;
 			for (VertexAttributeSemantic attribute : Enum<VertexAttributeSemantic>::Values)
@@ -85,7 +85,7 @@ namespace Ck
 		}
 	}
 
-	Ref<MaterialProgramVariant> MaterialProgram::GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const
+	std::shared_ptr<MaterialProgramVariant> MaterialProgram::GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const
 	{
 		/// First try to find the best program
 		for (const auto& [key, materialProgram] : mVariants)
@@ -96,7 +96,7 @@ namespace Ck
 
 		/// Otherwise fallback on one that can just partially support our material
 		unsigned int bestScore = 0;
-		Ref<MaterialProgramVariant> bestVariant;
+		std::shared_ptr<MaterialProgramVariant> bestVariant;
 		for (const auto& [key, variant] : mVariants)
 		{
 			const unsigned int vertexAttributeScore = EvaluateCompatibility(std::get<0>(key), vertexAttributes);

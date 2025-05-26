@@ -7,7 +7,7 @@ namespace Ck::Vulkan
 {
 	class RenderDevice;
 
-	class SwapchainTexture final : public Extends<SwapchainTexture, AbstractTexture>
+	class SwapchainTexture final : public AbstractTexture
 	{
 	public:
 
@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \param handle 
 		 */
-		SwapchainTexture(const Ref<RenderDevice>& renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle);
+		SwapchainTexture(std::shared_ptr<RenderDevice> renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle);
 
 		/**
 		 * \brief

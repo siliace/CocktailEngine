@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	Fence::Fence(const Ref<RenderDevice>& renderDevice, const Renderer::FenceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Fence::Fence(std::shared_ptr<RenderDevice> renderDevice, const Renderer::FenceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -40,7 +40,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> Fence::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> Fence::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

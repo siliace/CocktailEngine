@@ -20,7 +20,7 @@ namespace Ck
 		 * \param color The color of the cube to create
 		 * \return The mesh of the cube
 		 */
-		static Ref<Mesh> CreateCube(float size, const LinearColor& color = LinearColor(0.f, 0.f, 0.f, 1.f));
+		static std::shared_ptr<Mesh> CreateCube(float size, const LinearColor& color = LinearColor(0.f, 0.f, 0.f, 1.f));
 
 		/**
 		 * \brief 
@@ -28,7 +28,7 @@ namespace Ck
 		 * \param color 
 		 * \return 
 		 */
-		static Ref<Mesh> CreateBox(const Box<float>& box, const LinearColor& color = LinearColor(0.f, 0.f, 0.f, 1.f));
+		static std::shared_ptr<Mesh> CreateBox(const Box<float>& box, const LinearColor& color = LinearColor(0.f, 0.f, 0.f, 1.f));
 	};
 }
 

@@ -1,10 +1,11 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplateCreateInfo.hpp>
 #include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
 
 namespace Ck::Vulkan
 {
-	PipelineLayout::PipelineLayout(const Ref<RenderDevice>& renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	PipelineLayout::PipelineLayout(std::shared_ptr<RenderDevice> renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -90,7 +91,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> PipelineLayout::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> PipelineLayout::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}
@@ -100,7 +101,7 @@ namespace Ck::Vulkan
 		return static_cast<unsigned int>(mDescriptorSetLayouts.size());
 	}
 
-	Ref<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(unsigned int set) const
+	std::shared_ptr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(unsigned int set) const
 	{
 		if (set >= mDescriptorSetLayouts.size())
 			return nullptr;
@@ -108,7 +109,7 @@ namespace Ck::Vulkan
 		return mDescriptorSetLayouts[set];
 	}
 
-	Ref<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
+	std::shared_ptr<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
 	{
 		if (set >= mUpdateTemplates.size())
 			return nullptr;

@@ -20,7 +20,7 @@ namespace Ck::Renderer
         /**
          * \brief Specifies the Window bound to the RenderSurface to create
          */
-        Ref<Window> Window;
+        std::shared_ptr<Window> Window;
 
         /**
          * \brief Specifies the ColorSpace of the RenderSurface to create

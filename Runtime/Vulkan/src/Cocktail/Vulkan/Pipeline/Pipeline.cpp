@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	Pipeline::Pipeline(const Ref<RenderDevice>& renderDevice) :
+	Pipeline::Pipeline(std::shared_ptr<RenderDevice> renderDevice) :
 		mRenderDevice(renderDevice)
 	{
 		/// Nothing
@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	Ref<Renderer::RenderDevice> Pipeline::GetRenderDevice() const
+	std::shared_ptr<Renderer::RenderDevice> Pipeline::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

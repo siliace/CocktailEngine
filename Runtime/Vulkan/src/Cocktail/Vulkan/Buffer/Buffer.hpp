@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_VULKAN_BUFFER_BUFFER_HPP
 #define COCKTAIL_VULKAN_BUFFER_BUFFER_HPP
 
-#include <Cocktail/Core/Object.hpp>
-#include <Cocktail/Core/Meta/Inherit.hpp>
-
 #include <Cocktail/Renderer/Buffer/Buffer.hpp>
 #include <Cocktail/Renderer/Buffer/BufferCreateInfo.hpp>
 
@@ -17,7 +14,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Buffer : public Inherit<Buffer, Object, Renderer::Buffer>
+	class Buffer : public Renderer::Buffer, public std::enable_shared_from_this<Buffer>
 	{
 	public:
 
@@ -27,7 +24,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Buffer(Ref<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Buffer(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -44,7 +41,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Ref<Renderer::RenderDevice> GetRenderDevice() const override;
+		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -97,7 +94,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		Ref<RenderDevice> mRenderDevice;
+		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkBuffer mHandle;
 		Renderer::BufferUsageFlags mUsage;
