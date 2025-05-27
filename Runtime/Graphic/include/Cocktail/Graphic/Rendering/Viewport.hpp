@@ -21,7 +21,7 @@ namespace Ck
 		 * \param camera 
 		 * \param area 
 		 */
-		Viewport(std::shared_ptr<Camera> camera, const Rectangle<unsigned>& area);
+		Viewport(Camera* camera, const Rectangle<unsigned>& area);
 
 		/**
 		 * \brief 
@@ -47,11 +47,11 @@ namespace Ck
 		 * \brief Get the Camera used to render this Viewport
 		 * \return The camera
 		 */
-		std::shared_ptr<Camera> GetCamera() const;
+		Camera* GetCamera() const;
 
 	private:
 
-		std::shared_ptr<Camera> mCamera;
+		Camera* mCamera;
 		Rectangle<unsigned int> mArea;
 	};
 }

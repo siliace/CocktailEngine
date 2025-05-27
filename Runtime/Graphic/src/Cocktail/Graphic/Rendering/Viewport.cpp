@@ -3,8 +3,8 @@
 
 namespace Ck
 {
-	Viewport::Viewport(std::shared_ptr<Camera> camera, const Rectangle<unsigned int>& area):
-		mCamera(std::move(camera)),
+	Viewport::Viewport(Camera* camera, const Rectangle<unsigned int>& area):
+		mCamera(camera),
 		mArea(area)
 	{
 		/// Nothing
@@ -55,7 +55,7 @@ namespace Ck
 		mArea = area;
 	}
 	
-	std::shared_ptr<Camera> Viewport::GetCamera() const
+	Camera* Viewport::GetCamera() const
 	{
     	return mCamera;
 	}

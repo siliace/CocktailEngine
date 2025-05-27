@@ -3,12 +3,13 @@
 
 namespace Ck
 {
-	std::shared_ptr<DirectionalLight> DirectionalLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity)
+	DirectionalLight* DirectionalLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity)
 	{
-		std::shared_ptr<DirectionalLight> light = std::make_shared<DirectionalLight>(color, direction, intensity);
-		scene->AddLight(light);
+		std::unique_ptr<DirectionalLight> light = std::make_unique<DirectionalLight>(color, direction, intensity);
+		DirectionalLight* lightPtr = light.get();
+		scene->AddLight(std::move(light));
 
-		return light;
+		return lightPtr;
 	}
 
 	DirectionalLight::DirectionalLight(LinearColor color, Vector3<float> direction, float intensity) :

@@ -33,13 +33,25 @@ namespace Ck
 		 * \brief 
 		 * \param camera
 		 */
-		void AddCamera(const std::shared_ptr<Camera>& camera);
+		void AddCamera(std::unique_ptr<Camera> camera);
+
+		/**
+		 * \brief 
+		 * \param camera 
+		 */
+		void RemoveCamera(const Camera* camera);
 
 		/**
 		 * \brief 
 		 * \param light 
 		 */
-		void AddLight(const std::shared_ptr<Light>& light);
+		void AddLight(std::unique_ptr<Light> light);
+
+		/**
+		 * \brief 
+		 * \param light 
+		 */
+		void RemoveLight(const Light* light);
 
 		/**
 		 * \brief
@@ -57,13 +69,13 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		Signal<std::shared_ptr<Camera>>& OnCameraAdded();
+		Signal<Camera*>& OnCameraAdded();
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Signal<std::shared_ptr<Light>>& OnLightAdded();
+		Signal<Light*>& OnLightAdded();
 
 		/**
 		 * \brief 
@@ -96,10 +108,10 @@ namespace Ck
 		std::shared_ptr<GraphicEngine> mGraphicEngine;
 		std::unique_ptr<TransformationGraph> mTransformationGraph;
 		std::unique_ptr<SceneGraph> mSceneGraph;
-		std::vector<std::shared_ptr<Camera>> mCameras;
-		std::vector<std::shared_ptr<Light>> mLights;
-		Signal<std::shared_ptr<Camera>> mOnCameraAdded;
-		Signal<std::shared_ptr<Light>> mOnLightAdded;
+		std::vector<std::unique_ptr<Camera>> mCameras;
+		std::vector<std::unique_ptr<Light>> mLights;
+		Signal<Camera*> mOnCameraAdded;
+		Signal<Light*> mOnLightAdded;
 		Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;
 	};
 }

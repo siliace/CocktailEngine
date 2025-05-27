@@ -3,18 +3,20 @@
 
 namespace Ck
 {
-	std::shared_ptr<PointLight> PointLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> position, float intensity)
+	PointLight* PointLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> position, float intensity)
 	{
 		Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
-		std::shared_ptr<PointLight> pointLight = std::make_shared<PointLight>(std::move(transformationNode), color, intensity);
-		scene->AddLight(pointLight);
 
-		return pointLight;
+		std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>(std::move(transformationNode), color, intensity);
+		PointLight* lightPtr = pointLight.get();
+		scene->AddLight(std::move(pointLight));
+
+		return lightPtr;
 	}
 
 	PointLight::PointLight(std::shared_ptr<TransformationNode> transformationNode, LinearColor color, float intensity) :
-		Transformable(transformationNode),
+		Transformable(std::move(transformationNode)),
 		mColor(color),
 		mIntensity(intensity)
 	{

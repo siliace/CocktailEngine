@@ -6,9 +6,9 @@
 
 namespace Ck
 {
-	FreeFlyCameraViewController::FreeFlyCameraViewController(std::shared_ptr<Camera> camera, Angle<float> pitchLimit) :
-		mCamera(std::move(camera)),
-		mPitchLimit(std::abs(pitchLimit))
+	FreeFlyCameraViewController::FreeFlyCameraViewController(Camera* camera, Angle<float> pitchLimit) :
+		mCamera(camera),
+		mPitchLimit(pitchLimit)
 	{
 		assert(mPitchLimit > Angle<float>::Degree(0.f) && mPitchLimit <= Angle<float>::Degree(89.f));
 

@@ -49,12 +49,12 @@ Main::ExitCode ApplicationMain(Application* application)
 	}
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	std::shared_ptr<DirectionalLight> directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
+	DirectionalLight* directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);
 
-	std::shared_ptr<PerspectiveCamera> camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
+	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
 	
 	std::shared_ptr<FreeFlyCameraViewController> cameraController = std::make_shared<FreeFlyCameraViewController>(camera);

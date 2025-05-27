@@ -22,7 +22,7 @@ namespace Ck
 		 * \param zBounds 
 		 * \return 
 		 */
-		static std::shared_ptr<OrthographicCamera> Create(std::shared_ptr<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds);
+		static OrthographicCamera* Create(std::shared_ptr<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

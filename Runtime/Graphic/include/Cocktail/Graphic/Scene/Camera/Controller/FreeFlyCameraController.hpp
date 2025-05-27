@@ -31,7 +31,7 @@ namespace Ck
 		 * \param camera The camera to move
 		 * \param pitchLimit The min and max values of pitch possible
 		 */
-		explicit FreeFlyCameraViewController(std::shared_ptr<Camera> camera, Angle<float> pitchLimit = Angle<float>::Degree(89.f));
+		explicit FreeFlyCameraViewController(Camera* camera, Angle<float> pitchLimit = Angle<float>::Degree(89.f));
 
 		/**
 		 * \brief Perform updates on the transformation of the underlying cameras
@@ -69,7 +69,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<Camera> mCamera;
+		Camera* mCamera;
 		Angle<float> mPitchLimit;
 		EnumMap<TranslationAxis, bool> mEnabledTranslations;
 		EnumMap<TranslationAxis, float> mTranslations;

@@ -114,7 +114,7 @@ namespace Ck
 
 			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
 			{
-				std::shared_ptr<Camera> camera = viewport->GetCamera();
+				Camera* camera = viewport->GetCamera();
 				renderable->AddToQueue(*mOpaqueRenderQueue, *camera);
 				renderable->AddToQueue(*mBlendingRenderQueue, *camera);
 			}

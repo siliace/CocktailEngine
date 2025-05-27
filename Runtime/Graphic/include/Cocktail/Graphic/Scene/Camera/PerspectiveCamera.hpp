@@ -22,7 +22,7 @@ namespace Ck
 		 * \param zBounds 
 		 * \return 
 		 */
-		static std::shared_ptr<PerspectiveCamera> Create(std::shared_ptr<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		static PerspectiveCamera* Create(std::shared_ptr<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

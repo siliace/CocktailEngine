@@ -69,18 +69,36 @@ namespace Ck
 		mSceneGraph->Detach();
 	}
 
-	void Scene::AddCamera(const std::shared_ptr<Camera>& camera)
+	void Scene::AddCamera(std::unique_ptr<Camera> camera)
 	{
-		mCameras.emplace_back(camera);
-
-		mOnCameraAdded.Emit(camera);
+		mCameras.push_back(std::move(camera));
+		mOnCameraAdded.Emit(mCameras.back().get());
 	}
 
-	void Scene::AddLight(const std::shared_ptr<Light>& light)
+	void Scene::RemoveCamera(const Camera* camera)
 	{
-		mLights.emplace_back(light);
+		auto it = std::find_if(mCameras.begin(), mCameras.end(), [&](const std::unique_ptr<Camera>& existingCamera) {
+			return existingCamera.get() == camera;
+		});
 
-		mOnLightAdded.Emit(light);
+		if (it != mCameras.end())
+			mCameras.erase(it);
+	}
+
+	void Scene::AddLight(std::unique_ptr<Light> light)
+	{
+		mLights.push_back(std::move(light));
+		mOnLightAdded.Emit(mLights.back().get());
+	}
+
+	void Scene::RemoveLight(const Light* light)
+	{
+		auto it = std::find_if(mLights.begin(), mLights.end(), [&](const std::unique_ptr<Light>& existingLight) {
+			return existingLight.get() == light;
+		});
+
+		if (it != mLights.end())
+			mLights.erase(it);
 	}
 
 	std::shared_ptr<SceneNode> Scene::CreateSceneNode()
@@ -104,12 +122,12 @@ namespace Ck
 		return transformationNode;
 	}
 
-	Signal<std::shared_ptr<Camera>>& Scene::OnCameraAdded()
+	Signal<Camera*>& Scene::OnCameraAdded()
 	{
 		return mOnCameraAdded;
 	}
 
-	Signal<std::shared_ptr<Light>>& Scene::OnLightAdded()
+	Signal<Light*>& Scene::OnLightAdded()
 	{
 		return mOnLightAdded;
 	}
@@ -131,7 +149,7 @@ namespace Ck
 	{
 		std::vector<Light*> lights;
 		Frustum<float> cameraFrustum = camera.ComputeFrustum();
-		for (const std::shared_ptr<Light>& light : mLights)
+		for (const std::unique_ptr<Light>& light : mLights)
 		{
 			if (NearlyEqual(light->GetIntensity(), 0.f))
 				continue;

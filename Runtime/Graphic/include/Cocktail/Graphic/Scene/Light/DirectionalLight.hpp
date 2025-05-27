@@ -22,7 +22,7 @@ namespace Ck
 		 * \param intensity 
 		 * \return 
 		 */
-		static std::shared_ptr<DirectionalLight> Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity = 100.f);
+		static DirectionalLight* Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity = 100.f);
 
 		/**
 		 * \brief
