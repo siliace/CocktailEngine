@@ -297,9 +297,7 @@ namespace Ck::Vulkan
 		{
 			if (mSecondary && primary)
 			{
-				CommandList* vkCommandList = static_cast<CommandList*>(primary);
-				const Framebuffer* framebuffer = vkCommandList->mCurrentFramebuffer;
-
+				const Framebuffer* framebuffer = static_cast<CommandList*>(primary)->mCurrentFramebuffer;
 				inheritanceInfo.renderPass = framebuffer ? framebuffer->GetRenderPass()->GetHandle(Renderer::RenderPassMode::Initial) : VK_NULL_HANDLE;
 				inheritanceInfo.framebuffer = framebuffer ? framebuffer->GetHandle() : VK_NULL_HANDLE;
 			}

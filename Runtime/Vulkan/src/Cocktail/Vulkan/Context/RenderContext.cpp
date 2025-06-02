@@ -105,14 +105,22 @@ namespace Ck::Vulkan
 
 	void RenderContext::ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence)
 	{
-		std::vector<CommandList*> vkCommandLists(commandListCount);
+		unsigned int submitCommandListCount = 0;
+		CommandList** submitCommandLists = COCKTAIL_STACK_ALLOC(CommandList*, commandListCount);
 		for (unsigned int i = 0; i < commandListCount; i++)
 		{
-			vkCommandLists[i] = static_cast<CommandList*>(commandLists[i]);
-			assert(vkCommandLists[i]->GetState() == Renderer::CommandListState::Executable);
+			if (commandLists[i]->GetState() == Renderer::CommandListState::Initial)
+				continue;
+
+			if (commandLists[i]->GetState() == Renderer::CommandListState::Recording || commandLists[i]->GetState() == Renderer::CommandListState::RecordingRenderPass)
+				commandLists[i]->End();
+
+			assert(commandLists[i]->GetState() == Renderer::CommandListState::Executable);
+			submitCommandLists[submitCommandListCount] = static_cast<CommandList*>(commandLists[i]);
+			++submitCommandListCount;
 		}
 
-		mSubmitters[commandQueue]->ExecuteCommandList(commandListCount, vkCommandLists.data(), static_cast<Fence*>(fence));
+		mSubmitters[commandQueue]->ExecuteCommandList(submitCommandListCount, submitCommandLists, static_cast<Fence*>(fence));
 	}
 
 	void RenderContext::EndFrame()
