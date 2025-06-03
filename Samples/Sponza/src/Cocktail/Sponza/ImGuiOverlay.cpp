@@ -120,7 +120,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		assert(mTextureUniformSlot);
 	}
 
-	Connect(sceneViewer.OnRendered(), [&](Renderer::RenderContext& rc, Renderer::FrameContext& fc, Renderer::Framebuffer& fb) {
+	Connect(sceneViewer.OnRendered(), [&](Renderer::RenderContext& rc, Renderer::Framebuffer& fb) {
 		Render(rc, fc, fb);
 	});
 }

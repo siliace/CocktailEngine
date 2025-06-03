@@ -6,9 +6,8 @@
 #include <Cocktail/Graphic/Geometry/Vertex/VertexLayout.hpp>
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramVariant.hpp>
 
-#include <Cocktail/Renderer/Buffer/BufferArea.hpp>
+#include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
 #include <Cocktail/Renderer/Command/CommandList.hpp>
-#include <Cocktail/Renderer/Context/FrameContext.hpp>
 
 namespace Ck
 {
@@ -31,10 +30,9 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param frameContext 
 		 * \param modifiers 
 		 */
-		explicit RecordDrawContext(Renderer::FrameContext& frameContext, RenderingModifiers modifiers = {});
+		explicit RecordDrawContext(RenderingModifiers modifiers = {});
 
 		/**
 		 * \brief 
@@ -103,10 +101,8 @@ namespace Ck
 		 */
 		static PixelFormat::Layout GetVertexInputAttributeFormatLayout(unsigned int elementCount);
 
-		Renderer::FrameContext* mFrameContext;
 		RenderingModifiers mModifiers;
 		const MaterialProgramVariant* mCurrentMaterialProgram;
-		std::unordered_map<CompositeKey<std::string, unsigned int>, Renderer::BufferArea> mPersistentBuffers;
 	};
 }
 

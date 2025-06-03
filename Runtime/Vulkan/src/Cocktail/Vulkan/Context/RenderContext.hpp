@@ -43,16 +43,17 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
-		 * \param createInfo 
+		 * \param renderSurface 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::CommandListPool> CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo) override;
+		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface) override;
 
 		/**
 		 * \brief 
+		 * \param createInfo 
 		 * \return 
 		 */
-		Renderer::FrameContext* BeginFrame() override;
+		Renderer::CommandList* CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
@@ -101,17 +102,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		void EndFrame() override;
-
-		/**
-		 * \brief 
-		 */
 		void Flush() override;
-
-		/**
-		 * \brief 
-		 */
-		void Synchronize() override;
 
 	private:
 
@@ -122,8 +113,7 @@ namespace Ck::Vulkan
 		unsigned int mFrameContextCount;
 		unsigned int mCurrentFrameContext;
 		std::unique_ptr<FrameContext> mFrameContexts[Swapchain::MaxSwapchainTexture];
-		Signal<Renderer::FrameContext*> mOnBeforeRedraw;
-		Signal<Renderer::FrameContext*, const Renderer::Framebuffer*> mOnRedraw;
+		ObjectPool<CommandList> mCommandListPool;
 	};
 }
 

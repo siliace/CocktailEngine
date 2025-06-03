@@ -2,10 +2,6 @@
 #define COCKTAIL_VULKAN_COMMAND_ALLOCATOR_COMMANDLISTPOOL_HPP
 
 #include <Cocktail/Core/Utility/EnumMap.hpp>
-#include <Cocktail/Core/Utility/ObjectPool.hpp>
-
-#include <Cocktail/Renderer/Command/Allocator/CommandListPool.hpp>
-#include <Cocktail/Renderer/Command/Allocator/CommandListPoolCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/Command/Allocator/CommandPool.hpp>
 #include <Cocktail/Vulkan/Command/Staging/StagingAllocator.hpp>
@@ -16,10 +12,17 @@ namespace Ck::Vulkan
 	class DescriptorSetAllocator;
 	class RenderDevice;
 
+	struct CommandListPoolCreateInfo
+	{
+		bool Transient = false;
+
+		bool Reset = false;
+	};
+
 	/**
 	 * \brief 
 	 */
-	class CommandListPool : public Renderer::CommandListPool, public std::enable_shared_from_this<CommandListPool>
+	class CommandListPool : public std::enable_shared_from_this<CommandListPool>
 	{
 	public:
 
@@ -29,24 +32,12 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
 		 */
-		~CommandListPool() override;
-
-		/**
-		 * \brief 
-		 * \param name 
-		 */
-		void SetObjectName(const char* name) const override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		~CommandListPool();
 
 		/**
 		 * \brief 
@@ -60,13 +51,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param createInfo 
 		 */
-		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
+		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param releaseResources 
 		 */
-		void Reset(bool releaseResources) override;
+		void Reset(bool releaseResources);
 
 		/**
 		 * \brief 

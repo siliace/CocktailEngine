@@ -98,8 +98,6 @@ namespace Ck
 	     */
 		std::shared_ptr<Renderer::RenderContext> GetRenderContext() const;
 
-		Renderer::FrameContext* GetFrameContext() const;
-
 		/**
 		 * \brief 
 		 * \return 
@@ -117,7 +115,6 @@ namespace Ck
 
 		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
 		std::shared_ptr<Renderer::RenderContext> mRenderContext;
-		Renderer::FrameContext* mFrameContext;
 		std::shared_ptr<ResourceUploader> mResourceUploader;
 		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
 		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<Renderer::RenderSurface>> mWindowRenderSurfaces;

@@ -1,12 +1,10 @@
 #include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 
-#include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 
 namespace Ck
 {
-	RecordDrawContext::RecordDrawContext(Renderer::FrameContext& frameContext, RenderingModifiers modifiers) :
-		mFrameContext(&frameContext),
+	RecordDrawContext::RecordDrawContext(RenderingModifiers modifiers) :
 		mModifiers(modifiers),
 		mCurrentMaterialProgram(nullptr)
 	{

@@ -72,7 +72,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&>& OnRendered();
+		Signal<Renderer::RenderContext&, Renderer::Framebuffer&>& OnRendered();
 
 	protected:
 
@@ -84,10 +84,10 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param frameContext 
+		 * \param renderContext 
 		 * \return 
 		 */
-		virtual Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const = 0;
+		virtual Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const = 0;
 
 	private:
 
@@ -125,7 +125,7 @@ namespace Ck
 		std::set<ViewportEntry, ViewportComparator> mViewports;
 		std::unique_ptr<RenderQueue> mOpaqueRenderQueue;
 		std::unique_ptr<RenderQueue> mBlendingRenderQueue;
-		Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&> mOnRendered;
+		Signal<Renderer::RenderContext&, Renderer::Framebuffer&> mOnRendered;
 	};
 }
 

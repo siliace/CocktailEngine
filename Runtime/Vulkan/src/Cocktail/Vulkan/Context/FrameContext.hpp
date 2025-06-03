@@ -3,20 +3,16 @@
 
 #include <Cocktail/Core/Utility/CompositeKey.hpp>
 
-#include <Cocktail/Renderer/Context/FrameContext.hpp>
-
 #include <Cocktail/Vulkan/Semaphore.hpp>
-#include <Cocktail/Vulkan/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Vulkan/Command/CommandList.hpp>
 #include <Cocktail/Vulkan/Command/Fence.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
-#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
 
 namespace Ck::Vulkan
 {
 	class RenderContext;
 
-	class FrameContext : public Renderer::FrameContext
+	class FrameContext
 	{
 	public:
 
@@ -43,46 +39,20 @@ namespace Ck::Vulkan
 		 * \param renderSurface
 		 * \return
 		 */
-		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface) override;
+		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
-
-		/**
-		 * \brief
-		 * \param usage
-		 * \param memoryType
-		 * \return
-		 */
-		Renderer::BufferAllocator* GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType) override;
+		std::shared_ptr<Renderer::CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo);
 
 		/**
 		 * \brief
 		 * \param queue
 		 */
 		void Present(VkQueue queue);
-
-		/**
-		 * \brief
-		 * \param name
-		 */
-		void SetObjectName(const char* name) const override;
-
-		/**
-		 * \brief
-		 * \return
-		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Renderer::FrameToken GetToken() const override;
 
 	private:
 
@@ -121,7 +91,6 @@ namespace Ck::Vulkan
 		std::vector<std::shared_ptr<Renderer::CommandList>> mCommandLists;
 		std::shared_ptr<Fence> mFrameFence;
 		std::unique_ptr<AcquiredRenderSurface[]> mAcquiredRenderSurfaces;
-		std::unordered_map<BufferAllocatorKey, std::shared_ptr<BufferAllocator>> mBufferAllocators;
 		bool mSubmitted;
 	};
 }

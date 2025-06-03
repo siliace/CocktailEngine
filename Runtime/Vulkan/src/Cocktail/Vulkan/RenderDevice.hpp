@@ -6,7 +6,6 @@
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
-#include <Cocktail/Renderer/Command/CommandListCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/RenderDeviceCreateInfo.hpp>
@@ -68,11 +67,11 @@ namespace Ck::Vulkan
 		std::shared_ptr<Renderer::BufferView> CreateBufferView(const Renderer::BufferViewCreateInfo& createInfo) override;
 
 		/**
-		 * \brief 
+		 * \brief
 		 * \param pool 
 		 * \param descriptorSetAllocator 
 		 * \param createInfo 
-		 * \return 
+		 * \return
 		 */
 		std::shared_ptr<CommandList> CreateCommandList(std::shared_ptr<CommandListPool> pool, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 

@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	CommandListPool::CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	CommandListPool::CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mTransient(createInfo.Transient),
 		mCommandListResetable(createInfo.Reset)
@@ -41,17 +41,6 @@ namespace Ck::Vulkan
 		CommandListPool::Reset(true);
 	}
 
-	void CommandListPool::SetObjectName(const char* name) const
-	{
-		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
-			mCommandPools[queueType]->SetObjectName(name);
-	}
-
-	std::shared_ptr<Renderer::RenderDevice> CommandListPool::GetRenderDevice() const
-	{
-		return mRenderDevice;
-	}
-
 	std::shared_ptr<StagingBuffer> CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
 	{
 		return mStagingAllocator->AcquireStagingBuffer(alignment, length);
@@ -66,7 +55,7 @@ namespace Ck::Vulkan
 
 		return commandList;
 	}
-
+	 
 	void CommandListPool::Reset(bool releaseResources)
 	{
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();

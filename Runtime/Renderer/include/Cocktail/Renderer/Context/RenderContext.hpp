@@ -1,15 +1,16 @@
 #ifndef COCKTAIL_RENDERER_CONTEXT_RENDERCONTEXT_HPP
 #define COCKTAIL_RENDERER_CONTEXT_RENDERCONTEXT_HPP
 
+#include <Cocktail/Renderer/RenderDeviceObject.hpp>
 #include <Cocktail/Renderer/Command/CommandQueueType.hpp>
-#include <Cocktail/Renderer/Command/Allocator/CommandListPoolCreateInfo.hpp>
+#include <Cocktail/Renderer/Command/CommandListCreateInfo.hpp>
 
 namespace Ck::Renderer
 {
 	class CommandList;
-	class CommandListPool;
 	class Fence;
-	class FrameContext;
+	class Framebuffer;
+	class RenderSurface;
 
 	/**
 	 * \brief 
@@ -17,19 +18,20 @@ namespace Ck::Renderer
 	class RenderContext : public RenderDeviceObject
 	{
 	public:
-			
+
+		/**
+		 * \brief 
+		 * \param renderSurface 
+		 * \return 
+		 */
+		virtual Framebuffer* AcquireNextFramebuffer(RenderSurface* renderSurface) = 0;
+
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		virtual std::shared_ptr<CommandListPool> CreateCommandListPool(const CommandListPoolCreateInfo& createInfo) = 0;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual FrameContext* BeginFrame() = 0;
+		virtual CommandList* CreateCommandList(const CommandListCreateInfo& createInfo) = 0;
 
 		/**
 		 * \brief 
@@ -55,17 +57,7 @@ namespace Ck::Renderer
 		/**
 		 * \brief 
 		 */
-		virtual void EndFrame() = 0;
-
-		/**
-		 * \brief 
-		 */
 		virtual void Flush() = 0;
-
-		/**
-		 * \brief Wait for all pending operations to be terminated
-		 */
-		virtual void Synchronize() = 0;
 	};
 }
 

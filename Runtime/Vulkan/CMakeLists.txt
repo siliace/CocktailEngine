@@ -32,10 +32,6 @@ cocktail_source_directory(VULKAN_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/Buffer.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/Buffer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferAllocator.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferAllocator.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferPool.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferPool.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferView.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Buffer/BufferView.cpp
 )

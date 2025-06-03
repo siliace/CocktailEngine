@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 	{
 		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
 
-		Renderer::CommandListPoolCreateInfo commandListPoolCreateInfo;
+		CommandListPoolCreateInfo commandListPoolCreateInfo;
 		mCommandListPool = std::make_shared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
@@ -39,8 +39,6 @@ namespace Ck::Vulkan
 	void FrameContext::Reset()
 	{
 		mSubmitted = false;
-		for (const auto& [bufferAllocatorKey, bufferAllocator] : mBufferAllocators)
-			bufferAllocator->Reset(false);
 
 		mCommandListPool->Reset(false);
 		mFrameFence->Reset();
@@ -97,21 +95,6 @@ namespace Ck::Vulkan
 		return commandList;
 	}
 
-	Renderer::BufferAllocator* FrameContext::GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType)
-	{
-		for (const auto& [bufferAllocatorKey, bufferAllocator] : mBufferAllocators)
-		{
-			if (std::get<0>(bufferAllocatorKey) & usage && std::get<1>(bufferAllocatorKey) == memoryType)
-				return bufferAllocator.get();
-		}
-
-		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
-		std::shared_ptr<BufferAllocator> allocator = std::make_shared<BufferAllocator>(renderDevice, usage, 1024 * 1024, memoryType);
-		mBufferAllocators[BufferAllocatorKey(usage, memoryType)] = allocator;
-
-		return allocator.get();
-	}
-
 	void FrameContext::Present(VkQueue queue)
 	{
 		// Add a new fence to be signaled by the graphic queue.
@@ -158,20 +141,5 @@ namespace Ck::Vulkan
 		}
 
 		mSubmitted = true;
-	}
-
-	void FrameContext::SetObjectName(const char* name) const
-	{
-
-	}
-
-	std::shared_ptr<Renderer::RenderDevice> FrameContext::GetRenderDevice() const
-	{
-		return mRenderContext->GetRenderDevice();
-	}
-
-	Renderer::FrameToken FrameContext::GetToken() const
-	{
-		return reinterpret_cast<Renderer::FrameToken>(this);
 	}
 }

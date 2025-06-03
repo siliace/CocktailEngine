@@ -40,18 +40,16 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::shared_ptr<Renderer::CommandListPool> RenderContext::CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo)
-	{
-		return std::make_shared<CommandListPool>(mRenderDevice, createInfo, nullptr);
-	}
-
-	Renderer::FrameContext* RenderContext::BeginFrame()
+	Renderer::Framebuffer* RenderContext::AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface)
 	{
 		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].get();
-		currentFrameContext->Synchronize();
-		currentFrameContext->Reset();
+		return currentFrameContext->AcquireNextFramebuffer(renderSurface);
+	}
 
-		return currentFrameContext;
+	Renderer::CommandList* RenderContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
+	{
+		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].get();
+		return currentFrameContext->CreateCommandList(createInfo).get();
 	}
 
 	void RenderContext::SignalQueue(Renderer::CommandQueueType queue)
@@ -123,24 +121,19 @@ namespace Ck::Vulkan
 		mSubmitters[commandQueue]->ExecuteCommandList(submitCommandListCount, submitCommandLists, static_cast<Fence*>(fence));
 	}
 
-	void RenderContext::EndFrame()
-	{
-		mFrameContexts[mCurrentFrameContext]->Present(mPresentationQueue);
-
-		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContextCount;
-	}
-
 	void RenderContext::Flush()
 	{
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 			mSubmitters[queueType]->TerminateBatch();
 
 		mScheduler->Flush();
-	}
 
-	void RenderContext::Synchronize()
-	{
-		Flush();
-		COCKTAIL_VK_CHECK(vkDeviceWaitIdle(mRenderDevice->GetHandle()));
+		mFrameContexts[mCurrentFrameContext]->Present(mPresentationQueue);
+
+		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContextCount;
+
+		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].get();
+		currentFrameContext->Synchronize();
+		currentFrameContext->Reset();
 	}
 }
