@@ -117,6 +117,7 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureView.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureViewCreateInfo.hpp
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Texture/Texture.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Texture/TextureSubResource.cpp
 )
 

@@ -40,7 +40,7 @@ namespace Ck::Vulkan
 			vkCreateInfo.arrayLayers = mArrayLayerCount;
 			vkCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 			// TODO: Handle unified memory type 
-			vkCreateInfo.tiling = createInfo.MemoryType != Renderer::MemoryType::Streamed ? VK_IMAGE_TILING_OPTIMAL : VK_IMAGE_TILING_LINEAR;
+			vkCreateInfo.tiling = createInfo.MemoryType == Renderer::MemoryType::Static ? VK_IMAGE_TILING_OPTIMAL : VK_IMAGE_TILING_LINEAR;
 			vkCreateInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 			if (createInfo.Usage & Renderer::TextureUsageFlagBits::Sampled)

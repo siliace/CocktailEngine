@@ -211,7 +211,7 @@ namespace Ck::Vulkan
 		vkGetPhysicalDeviceFormatProperties(mPhysicalDevice, ToVkType(format), &formatProperties);
 
 		Renderer::TextureUsageFlags usage;
-		VkFormatFeatureFlags formatFeatures = memoryType != Renderer::MemoryType::Streamed ? formatProperties.optimalTilingFeatures : formatProperties.linearTilingFeatures;
+		VkFormatFeatureFlags formatFeatures = memoryType == Renderer::MemoryType::Static ? formatProperties.optimalTilingFeatures : formatProperties.linearTilingFeatures;
 
 		if (formatFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT)
 			usage |= Renderer::TextureUsageFlagBits::Sampled;

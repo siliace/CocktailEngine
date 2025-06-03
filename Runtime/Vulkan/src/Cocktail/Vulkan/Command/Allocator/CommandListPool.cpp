@@ -33,7 +33,8 @@ namespace Ck::Vulkan
 			}
 		}
 
-		mStagingAllocator = std::make_unique<StagingAllocator>(mRenderDevice, 16 * 1024 * 1024);
+		Renderer::BufferUsageFlags bufferUsage;
+		mStagingAllocator = std::make_unique<StagingAllocator>(mRenderDevice, bufferUsage, 16 * 1024 * 1024);
 	}
 
 	CommandListPool::~CommandListPool()
@@ -52,7 +53,7 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::shared_ptr<StagingBuffer> CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
+	StagingBuffer& CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
 	{
 		return mStagingAllocator->AcquireStagingBuffer(alignment, length);
 	}

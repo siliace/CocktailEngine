@@ -34,21 +34,6 @@ namespace Ck
 		static std::shared_ptr<MipMaps> FromImage(const Image& image);
 
 		/**
-		 * \brief Compute the maximum number of mip maps level a texture with a given base size can support
-		 * \param baseSize 
-		 * \return 
-		 */
-		static unsigned int ComputeLevelCount(const Extent3D<unsigned int>& baseSize);
-
-		/**
-		 * \brief 
-		 * \param size 
-		 * \param level 
-		 * \return 
-		 */
-		static Extent3D<unsigned int> ComputeLevelSize(const Extent3D<unsigned int>& size, unsigned int level);
-
-		/**
 		 * \brief 
 		 * \param baseSize 
 		 * \param pixelFormat 

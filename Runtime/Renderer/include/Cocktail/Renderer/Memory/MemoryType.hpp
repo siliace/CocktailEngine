@@ -17,11 +17,6 @@ namespace Ck::Renderer
          * \brief 
          */
         Dynamic,
-
-	    /**
-         * \brief 
-         */
-        Streamed,
         
         /**
          * \brief 

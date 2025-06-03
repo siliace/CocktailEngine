@@ -12,19 +12,6 @@ namespace Ck::Vulkan
 {
 	namespace
 	{
-		Extent3D<unsigned int> ComputeLevelSize(const Extent3D<unsigned int>& size, unsigned int level)
-		{
-			Extent3D<unsigned int> levelSize = size;
-			for (unsigned int i = 0; i < level; i++)
-				levelSize /= 2u;
-
-			levelSize.Width = std::max(levelSize.Width, 1u);
-			levelSize.Height = std::max(levelSize.Height, 1u);
-			levelSize.Depth = std::max(levelSize.Depth, 1u);
-
-			return levelSize;
-		}
-
 		VkImageLayout GetResourceStateImageLayout(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
@@ -558,30 +545,27 @@ namespace Ck::Vulkan
 	{
 		assert(mState == Renderer::CommandListState::Recording);
 
-		const Buffer* vkBuffer = static_cast<const Buffer*>(buffer);
-
 		unsigned int regionCount = 0;
 		VkBufferCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferCopy, uploadCount);
 
-		std::shared_ptr<StagingBuffer> currentStagingBuffer;
+		StagingBuffer* currentStagingBuffer = nullptr;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
-			std::shared_ptr<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(0, uploads[i].Length);
-
-			if (currentStagingBuffer != stagingBuffer)
+			StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(0, uploads[i].Length);
+			if (currentStagingBuffer != &stagingBuffer)
 			{
 				if (currentStagingBuffer)
 				{
 					assert(regionCount > 0);
-					vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetHandle(), vkBuffer->GetHandle(), regionCount, regions);
+					vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
 					regionCount = 0;
 				}
 
-				currentStagingBuffer = stagingBuffer;
+				currentStagingBuffer = &stagingBuffer;
 			}
 
 			VkBufferCopy region;
-			region.srcOffset = stagingBuffer->PushData(0, uploads[i].Length, uploads[i].Data);
+			region.srcOffset = currentStagingBuffer->PushData(0, uploads[i].Length, uploads[i].Data);
 			region.dstOffset = uploads[i].Offset;
 			region.size = uploads[i].Length;
 
@@ -589,7 +573,7 @@ namespace Ck::Vulkan
 		}
 
 		assert(regionCount > 0);
-		vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetHandle(), vkBuffer->GetHandle(), regionCount, regions);
+		vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
 	}
 
 	void CommandList::UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads)
@@ -597,8 +581,7 @@ namespace Ck::Vulkan
 		assert(mState == Renderer::CommandListState::Recording);
 		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
 
-		const Texture* vkTexture = static_cast<const Texture*>(texture);
-		PixelFormat format = vkTexture->GetFormat();
+		PixelFormat format = texture->GetFormat();
 		const std::size_t alignment = format.GetBlockSize();
 
 		// Use undefined on purpose, why should be upload framebuffers attachments?
@@ -607,23 +590,23 @@ namespace Ck::Vulkan
 		unsigned int regionCount = 0;
 		VkBufferImageCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferImageCopy, uploadCount);
 
-		std::shared_ptr<StagingBuffer> currentStagingBuffer;
+		StagingBuffer* currentStagingBuffer = nullptr;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
-			Extent3D<unsigned int> levelSize = ComputeLevelSize(vkTexture->GetSize(), uploads[i].Level);
+			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), uploads[i].Level);
 			const size_t length = format.ComputeAllocationSize(levelSize);
 
-			std::shared_ptr<StagingBuffer> stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
-			if (currentStagingBuffer != stagingBuffer)
+			StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+			if (currentStagingBuffer != &stagingBuffer)
 			{
 				if (currentStagingBuffer)
 				{
 					assert(regionCount > 0);
-					vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetHandle(), vkTexture->GetHandle(), imageLayout, regionCount, regions);
+					vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
 					regionCount = 0;
 				}
 
-				currentStagingBuffer = stagingBuffer;
+				currentStagingBuffer = &stagingBuffer;
 			}
 
 			VkImageSubresourceLayers subresourceLayers;
@@ -633,7 +616,7 @@ namespace Ck::Vulkan
 			subresourceLayers.layerCount = 1;
 
 			VkBufferImageCopy region;
-			region.bufferOffset = stagingBuffer->PushData(alignment, length, uploads[i].Pixels);
+			region.bufferOffset = stagingBuffer.PushData(alignment, length, uploads[i].Pixels);
 			region.bufferRowLength = 0;
 			region.bufferImageHeight = 0;
 			region.imageSubresource = subresourceLayers;
@@ -644,7 +627,7 @@ namespace Ck::Vulkan
 		}
 
 		assert(regionCount > 0);
-		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetHandle(), vkTexture->GetHandle(), imageLayout, regionCount, regions);
+		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
 	}
 
 	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)

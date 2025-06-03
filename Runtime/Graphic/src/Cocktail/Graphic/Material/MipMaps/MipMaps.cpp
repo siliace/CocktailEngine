@@ -3,37 +3,20 @@
 
 #include <Cocktail/Graphic/Material/MipMaps/MipMaps.hpp>
 
+#include "Cocktail/Renderer/Texture/Texture.hpp"
+
 namespace Ck
 {
 	std::shared_ptr<MipMaps> MipMaps::FromImage(const Image& image)
 	{
 		Extent3D<unsigned int> baseLevelSize = MakeExtent(image.GetSize(), 1u);
 
-		unsigned int levelCount = ComputeLevelCount(baseLevelSize);
+		unsigned int levelCount = Renderer::ComputeTextureLevelCount(baseLevelSize);
 
 		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, image.GetFormat(), 1, levelCount);
 		mipMaps->GetLevel(0, 0).CopyPixels(image.GetPixels().GetData());
 
 		return mipMaps;
-	}
-
-	unsigned int MipMaps::ComputeLevelCount(const Extent3D<unsigned int>& baseSize)
-	{
-		unsigned int maxDimension = std::max({baseSize.Width, baseSize.Height, baseSize.Depth});
-		return 1 + std::floor(std::log2(maxDimension));
-	}
-
-	Extent3D<unsigned int> MipMaps::ComputeLevelSize(const Extent3D<unsigned int>& size, unsigned int level)
-	{
-		Extent3D<unsigned int> levelSize = size;
-		for (unsigned int i = 0; i < level; i++)
-			levelSize /= 2u;
-
-		levelSize.Width = std::max(levelSize.Width, 1u);
-		levelSize.Height = std::max(levelSize.Height, 1u);
-		levelSize.Depth = std::max(levelSize.Depth, 1u);
-
-		return levelSize;
 	}
 
 	MipMaps::MipMaps(const Extent3D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int mipMapCount) :
@@ -45,7 +28,7 @@ namespace Ck
 		mLevels.reserve(mArrayLayerCount * mMipMapCount);
 		for (unsigned int level = 0; level < mMipMapCount; level++)
 		{
-			Extent3D<unsigned int> levelSize = ComputeLevelSize(mBaseSize, level);
+			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(mBaseSize, level);
 			std::size_t levelAllocationSize = mPixelFormat.ComputeAllocationSize(levelSize);
 
 			for (unsigned int layer = 0; layer < mArrayLayerCount; layer++)
@@ -64,7 +47,7 @@ namespace Ck
 			}
 		}
 
-		return mMipMapCount == ComputeLevelCount(mBaseSize);
+		return mMipMapCount == Renderer::ComputeTextureLevelCount(mBaseSize);
 	}
 
 	bool MipMaps::IsCube() const

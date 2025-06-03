@@ -5,17 +5,17 @@
 
 namespace Ck::Vulkan
 {
-	class StagingBuffer : public Buffer
+	class StagingBuffer
 	{
 	public:
 
 		/**
 		 * \brief 
 		 * \param renderDevice 
-		 * \param createInfo 
-		 * \param allocationCallbacks 
+		 * \param bufferUsage 
+		 * \param bufferSize 
 		 */
-		StagingBuffer(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		StagingBuffer(const std::shared_ptr<RenderDevice>& renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
 
 		/**
 		 * \brief 
@@ -42,10 +42,17 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
+		Buffer* GetBuffer() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
 		std::size_t GetRemainingCapacity() const;
 
 	private:
 
+		std::shared_ptr<Buffer> mBuffer;
 		std::size_t mRemainingCapacity;
 	};
 }

@@ -2,7 +2,6 @@
 #define COCKTAIL_VULKAN_COMMAND_ALLOCATOR_COMMANDLISTPOOL_HPP
 
 #include <Cocktail/Core/Utility/EnumMap.hpp>
-#include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 #include <Cocktail/Renderer/Command/Allocator/CommandListPool.hpp>
 #include <Cocktail/Renderer/Command/Allocator/CommandListPoolCreateInfo.hpp>
@@ -54,7 +53,7 @@ namespace Ck::Vulkan
 		 * \param length 
 		 * \return 
 		 */
-		std::shared_ptr<StagingBuffer> AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
+		StagingBuffer& AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
 
 		/**
 		 * \brief 

@@ -3,6 +3,7 @@
 
 #include <Cocktail/Core/Extent3D.hpp>
 
+#include <Cocktail/Renderer/Export.hpp>
 #include <Cocktail/Renderer/Memory/MemoryResource.hpp>
 #include <Cocktail/Renderer/Texture/TextureCreateInfo.hpp>
 
@@ -50,6 +51,21 @@ namespace Ck::Renderer
          */
         virtual unsigned int GetArrayLayerCount() const = 0;
     };
+
+    /**
+     * \brief Compute the maximum number of mip maps level a texture with a given base size can support
+     * \param baseSize The size of the first level of the texture
+     * \return The number of level
+     */
+    COCKTAIL_RENDERER_API unsigned int ComputeTextureLevelCount(const Extent3D<unsigned int>& baseSize);
+
+    /**
+     * \brief Helper function to compute the size of a texture's mipmap
+     * \param baseSize The size of the first level of the texture
+     * \param level The level to compute
+     * \return The size of the level
+     */
+    COCKTAIL_RENDERER_API Extent3D<unsigned int> ComputeTextureLevelSize(const Extent3D<unsigned int>& baseSize, unsigned int level);
 }
 
 #endif // COCKTAIL_RENDERER_TEXTURE_HPP
