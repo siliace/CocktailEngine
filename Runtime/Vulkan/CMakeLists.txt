@@ -111,7 +111,6 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPoolCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocatorCreateInfo.hpp
 )
 
 cocktail_source_directory(VULKAN_FILES

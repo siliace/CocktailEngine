@@ -218,7 +218,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	CommandList::CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
+	CommandList::CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocator(std::move(allocator)),
 		mHandle(VK_NULL_HANDLE),

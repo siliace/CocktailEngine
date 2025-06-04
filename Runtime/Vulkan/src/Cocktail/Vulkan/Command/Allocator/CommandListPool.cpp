@@ -6,11 +6,10 @@ namespace Ck::Vulkan
 {
 	CommandListPool::CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
+		mDescriptorSetAllocator(mRenderDevice),
 		mTransient(createInfo.Transient),
 		mCommandListResetable(createInfo.Reset)
 	{
-		mDescriptorSetAllocator = mRenderDevice->CreateDescriptorSetAllocator({});
-
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
 
 		CommandPoolCreateInfo poolCreateInfo;
@@ -60,7 +59,7 @@ namespace Ck::Vulkan
 	
 	std::shared_ptr<Renderer::CommandList> CommandListPool::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		std::shared_ptr<CommandList> commandList = mRenderDevice->CreateCommandList(shared_from_this(), mDescriptorSetAllocator, createInfo);
+		std::shared_ptr<CommandList> commandList = mRenderDevice->CreateCommandList(shared_from_this(), &mDescriptorSetAllocator, createInfo);
 		commandList->Connect(mOnReset, [self = commandList.get()] {
 			self->MarkInitial();
 		});

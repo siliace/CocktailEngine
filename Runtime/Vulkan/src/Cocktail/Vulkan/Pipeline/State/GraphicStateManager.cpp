@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	GraphicStateManager::GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
+	GraphicStateManager::GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
 		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
 		mDynamicState(dynamicState),
 		mShaderProgram(nullptr),

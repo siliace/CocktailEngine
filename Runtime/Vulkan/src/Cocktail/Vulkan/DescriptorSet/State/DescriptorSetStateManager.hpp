@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param descriptorSetAllocator 
 		 */
-		explicit DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator);
+		explicit DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
 
 		/**
 		 * \brief 
@@ -220,7 +220,7 @@ namespace Ck::Vulkan
 		DescriptorState* FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
-		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
+		DescriptorSetAllocator* mDescriptorSetAllocator;
 		std::shared_ptr<DescriptorSet> mLastSet;
 		std::vector<DescriptorState> mBindingStates;
 		unsigned int mBindingDirtyFlags;

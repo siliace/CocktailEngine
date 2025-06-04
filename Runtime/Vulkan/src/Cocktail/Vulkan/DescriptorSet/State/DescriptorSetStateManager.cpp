@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorSetStateManager::DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator) :
+	DescriptorSetStateManager::DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
 		mRenderDevice(std::move(renderDevice)),
 		mDescriptorSetAllocator(std::move(descriptorSetAllocator)),
 		mBindingDirtyFlags(0)

@@ -74,7 +74,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<CommandList> CreateCommandList(std::shared_ptr<CommandListPool> pool, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		std::shared_ptr<CommandList> CreateCommandList(std::shared_ptr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		/**
 		 * \brief
@@ -88,13 +88,6 @@ namespace Ck::Vulkan
 		 * \return
 		 */
 		std::shared_ptr<DescriptorPool> CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo);
-
-		/**
-		 * \brief 
-		 * \param createInfo 
-		 * \return 
-		 */
-		std::shared_ptr<DescriptorSetAllocator> CreateDescriptorSetAllocator(const DescriptorSetAllocatorCreateInfo& createInfo);
 
 		/**
 		 * \brief 

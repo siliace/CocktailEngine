@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 	{
 	public:
 
-		CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		~CommandList() override;
 
@@ -110,7 +110,7 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		std::shared_ptr<CommandListPool> mAllocator;
-		std::shared_ptr<DescriptorSetAllocator> mDescriptorSetAllocator;
+		DescriptorSetAllocator* mDescriptorSetAllocator;
 		VkCommandBuffer mHandle;
 		bool mOneShot;
 		bool mSecondary;

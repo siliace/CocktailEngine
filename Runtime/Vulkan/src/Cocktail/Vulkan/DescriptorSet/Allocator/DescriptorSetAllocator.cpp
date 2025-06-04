@@ -4,33 +4,23 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorSetAllocator::DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice, const DescriptorSetAllocatorCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
-		mAllocationCallbacks(allocationCallbacks)
+	DescriptorSetAllocator::DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice) :
+		mRenderDevice(std::move(renderDevice))
 	{
-		DescriptorSetAllocator::SetObjectName(createInfo.Name);
+		/// Nothing
 	}
 
 	DescriptorSetAllocator::~DescriptorSetAllocator()
 	{
 		mAcquiredSets.clear();
 		mVacantSets.clear();
-		for (std::shared_ptr<DescriptorPool> descriptorPool : mDescriptorPools)
+		for (const std::shared_ptr<DescriptorPool>& descriptorPool : mDescriptorPools)
 			descriptorPool->Reset();
-	}
-
-	void DescriptorSetAllocator::SetObjectName(const char* name) const
-	{
-	}
-
-	std::shared_ptr<Renderer::RenderDevice> DescriptorSetAllocator::GetRenderDevice() const
-	{
-		return mRenderDevice;
 	}
 
 	std::shared_ptr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo)
 	{
-		auto it = std::find_if(mVacantSets.begin(), mVacantSets.end(), [&](std::shared_ptr<DescriptorSet> set) {
+		auto it = std::find_if(mVacantSets.begin(), mVacantSets.end(), [&](const std::shared_ptr<DescriptorSet>& set) {
 			return createInfo.Layout->IsCompatibleWith(*set->GetLayout());
 		});
 

@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice
 		 * \param descriptorSetAllocator
 		 */
-		ComputeStateManager(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator);
+		ComputeStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
 
 		/**
 		 * \brief 

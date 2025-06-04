@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 		return mBufferViewPool.Allocate(shared_from_this(), createInfo, nullptr);
 	}
 
-	std::shared_ptr<CommandList> RenderDevice::CreateCommandList(std::shared_ptr<CommandListPool> pool, std::shared_ptr<DescriptorSetAllocator> descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo)
+	std::shared_ptr<CommandList> RenderDevice::CreateCommandList(std::shared_ptr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo)
 	{
 		return mCommandListPool.Allocate(shared_from_this(), pool, descriptorSetAllocator, createInfo);
 	}
@@ -60,11 +60,6 @@ namespace Ck::Vulkan
 	std::shared_ptr<DescriptorPool> RenderDevice::CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo)
 	{
 		return mDescriptorPoolPool.Allocate(shared_from_this(), createInfo, nullptr);
-	}
-
-	std::shared_ptr<DescriptorSetAllocator> RenderDevice::CreateDescriptorSetAllocator(const DescriptorSetAllocatorCreateInfo& createInfo)
-	{
-		return mDescriptorSetAllocatorPool.Allocate(shared_from_this(), createInfo, nullptr);
 	}
 
 	std::shared_ptr<DescriptorSetLayout> RenderDevice::CreateDescriptorSetLayout(const DescriptorSetLayoutCreateInfo& createInfo)
