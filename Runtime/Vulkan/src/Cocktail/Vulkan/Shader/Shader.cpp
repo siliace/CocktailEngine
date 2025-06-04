@@ -126,7 +126,7 @@ namespace Ck::Vulkan
 	}
 
 	Shader::Shader(std::shared_ptr<RenderDevice> renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{

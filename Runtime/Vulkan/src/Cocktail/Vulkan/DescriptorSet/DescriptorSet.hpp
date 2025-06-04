@@ -6,7 +6,6 @@
 
 namespace Ck::Vulkan
 {
-	class DescriptorSetAllocator;
 	class RenderDevice;
 
 	class DescriptorSet : public Renderer::RenderDeviceObject

@@ -2,6 +2,8 @@
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/GraphicStateManager.hpp>
 
 namespace Ck::Vulkan

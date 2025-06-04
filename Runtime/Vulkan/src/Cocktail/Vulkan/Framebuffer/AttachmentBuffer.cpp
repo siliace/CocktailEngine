@@ -1,5 +1,6 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Framebuffer/AttachmentBuffer.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan

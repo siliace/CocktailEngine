@@ -10,26 +10,48 @@
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/RenderDeviceCreateInfo.hpp>
-#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
-#include <Cocktail/Vulkan/Buffer/BufferView.hpp>
-#include <Cocktail/Vulkan/Command/Fence.hpp>
-#include <Cocktail/Vulkan/Context/RenderContext.hpp>
-#include <Cocktail/Vulkan/Context/Swapchain.hpp>
-#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
-#include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
-#include <Cocktail/Vulkan/Framebuffer/RenderPassCreateInfo.hpp>
-#include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
-#include <Cocktail/Vulkan/Pipeline/ComputePipelineCreateInfo.hpp>
-#include <Cocktail/Vulkan/Pipeline/GraphicPipelineCreateInfo.hpp>
-#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Queue/QueueFamilyContext.hpp>
-#include <Cocktail/Vulkan/Shader/Shader.hpp>
-#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
-#include <Cocktail/Vulkan/Texture/Sampler.hpp>
-#include <Cocktail/Vulkan/Texture/Texture.hpp>
 
 namespace Ck::Vulkan
 {
+	class CommandListPool;
+	class Buffer;
+	class BufferView;
+	class CommandList;
+	class ComputePipeline;
+	struct ComputePipelineCreateInfo;
+	class DescriptorPool;
+	struct DescriptorPoolCreateInfo;
+	class DescriptorSetAllocator;
+	class DescriptorSetLayout;
+	struct DescriptorSetLayoutCreateInfo;
+	class DescriptorUpdateTemplate;
+	struct DescriptorUpdateTemplateCreateInfo;
+	class DeviceMemory;
+	struct DeviceMemoryCreateInfo;
+	class Fence;
+	class Framebuffer;
+	class GraphicPipeline;
+	struct GraphicPipelineCreateInfo;
+	class PipelineCache;
+	class PipelineLayout;
+	struct PipelineLayoutCreateInfo;
+	class RenderBuffer;
+	struct RenderBufferCreateInfo;
+	class RenderContext;
+	class RenderPass;
+	struct RenderPassCreateInfo;
+	class RenderSurface;
+	class Sampler;
+	class Semaphore;
+	struct SemaphoreCreateInfo;
+	class Shader;
+	class ShaderProgram;
+	class Swapchain;
+	struct SwapchainCreateInfo;
+	class Texture;
+	class TextureView;
+
 	/**
 	 * \brief 
 	 */
@@ -305,7 +327,6 @@ namespace Ck::Vulkan
 		ObjectPool<CommandList> mCommandListPool;
 		ObjectPool<ComputePipeline> mComputePipelinePool;
 		ObjectPool<DescriptorPool> mDescriptorPoolPool;
-		ObjectPool<DescriptorSetAllocator> mDescriptorSetAllocatorPool;
 		ObjectPool<DescriptorSetLayout> mDescriptorSetLayoutPool;
 		ObjectPool<DescriptorUpdateTemplate> mDescriptorUpdateTemplatePool;
 		ObjectPool<DeviceMemory> mDeviceMemoryPool;
@@ -318,7 +339,6 @@ namespace Ck::Vulkan
 		ObjectPool<RenderPass> mRenderPassPool;
 		ObjectPool<RenderSurface> mRenderSurfacePool;
 		ObjectPool<Sampler> mSamplerPool;
-		std::unordered_map<Renderer::SamplerCreateInfo, std::shared_ptr<Sampler>> mSamplerCache;
 		ObjectPool<Semaphore> mSemaphorePool;
 		ObjectPool<Shader> mShaderPool;
 		ObjectPool<ShaderProgram> mShaderProgramPool;

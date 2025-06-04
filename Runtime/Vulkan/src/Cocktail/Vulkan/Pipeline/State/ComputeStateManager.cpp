@@ -1,5 +1,6 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Pipeline/ComputePipelineCreateInfo.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/ComputeStateManager.hpp>
 
 namespace Ck::Vulkan

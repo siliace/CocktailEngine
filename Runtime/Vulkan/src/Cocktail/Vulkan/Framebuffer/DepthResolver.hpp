@@ -4,7 +4,8 @@
 #include <filesystem>
 
 #include <Cocktail/Renderer/Command/RenderPassBeginInfo.hpp>
-#include <Cocktail/Renderer/Texture/TextureView.hpp>
+#include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
+#include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 
 namespace Ck::Vulkan
 {
@@ -31,7 +32,7 @@ namespace Ck::Vulkan
 		 * \param attachment
 		 * \param depthResolveMode 
 		 */
-		void Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<Renderer::TextureView> multisampleAttachment, std::shared_ptr<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode);
+		void Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<TextureView> multisampleAttachment, std::shared_ptr<TextureView> attachment, Renderer::ResolveMode depthResolveMode);
 
 	private:
 
@@ -55,12 +56,12 @@ namespace Ck::Vulkan
 		 * \param attachment 
 		 * \return 
 		 */
-		Renderer::Framebuffer* GetOrCreateFramebuffer(std::shared_ptr<Renderer::TextureView> attachment);
+		Framebuffer* GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
-		std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
-		std::unordered_map<std::shared_ptr<Renderer::TextureView>, std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
+		std::shared_ptr<ShaderProgram> mShaderProgram;
+		std::unordered_map<std::shared_ptr<TextureView>, std::shared_ptr<Framebuffer>> mFramebuffers;
 	};
 	
 }

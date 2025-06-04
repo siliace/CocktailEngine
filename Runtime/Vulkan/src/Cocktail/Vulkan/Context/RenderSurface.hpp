@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		 * \param fence
 		 * \return
 		 */
-		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence);
+		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence) const;
 
 		/**
 		 * \brief 

@@ -1,7 +1,11 @@
 #ifndef COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP
 #define COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP
 
-#include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Core/Image/PixelFormat.hpp>
+
+#include <Cocktail/Renderer/RasterizationSamples.hpp>
+
+#include <Cocktail/Vulkan/Volk.hpp>
 
 namespace Ck::Vulkan
 {

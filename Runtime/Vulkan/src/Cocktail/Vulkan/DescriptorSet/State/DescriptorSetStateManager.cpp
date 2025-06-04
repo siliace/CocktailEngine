@@ -1,7 +1,10 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/State/DescriptorSetStateManager.hpp>
+#include <Cocktail/Vulkan/Texture/Sampler.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {

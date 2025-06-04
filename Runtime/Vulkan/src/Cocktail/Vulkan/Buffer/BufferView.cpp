@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	BufferView::BufferView(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mFormat(createInfo.Format),
 		mOffset(createInfo.Offset),
 		mRange(createInfo.Range),

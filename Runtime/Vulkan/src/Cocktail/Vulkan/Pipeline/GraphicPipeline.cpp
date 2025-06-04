@@ -3,6 +3,7 @@
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
 #include <Cocktail/Vulkan/Pipeline/GraphicPipeline.hpp>
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Shader/Shader.hpp>
 
 namespace Ck::Vulkan
 {

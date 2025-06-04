@@ -8,11 +8,11 @@
 
 #include <Cocktail/Vulkan/Command/Allocator/CommandPool.hpp>
 #include <Cocktail/Vulkan/Command/Staging/StagingAllocator.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp>
 
 namespace Ck::Vulkan
 {
 	class CommandList;
-	class DescriptorSetAllocator;
 	class RenderDevice;
 
 	/**

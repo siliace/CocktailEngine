@@ -7,7 +7,7 @@
 namespace Ck::Vulkan
 {
 	TextureView::TextureView(std::shared_ptr<RenderDevice> renderDevice, const Renderer::TextureViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{

@@ -1,6 +1,8 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Pipeline/ComputePipeline.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Shader/Shader.hpp>
 
 namespace Ck::Vulkan
 {

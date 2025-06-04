@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	Pipeline::Pipeline(std::shared_ptr<RenderDevice> renderDevice) :
-		mRenderDevice(renderDevice)
+		mRenderDevice(std::move(renderDevice))
 	{
 		/// Nothing
 	}
