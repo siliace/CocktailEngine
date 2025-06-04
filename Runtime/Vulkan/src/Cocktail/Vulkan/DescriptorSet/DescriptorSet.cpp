@@ -1,6 +1,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 
 namespace Ck::Vulkan
 {

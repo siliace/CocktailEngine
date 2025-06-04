@@ -3,10 +3,9 @@
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
-#include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
-
 namespace Ck::Vulkan
 {
+	class PipelineLayout;
 	class RenderDevice;
 
 	/**

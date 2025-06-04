@@ -4,6 +4,7 @@
 #include <Cocktail/Core/Flags.hpp>
 
 #include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
+#include <Cocktail/Renderer/Memory/MemoryType.hpp>
 
 namespace Ck::Renderer
 {

@@ -9,7 +9,12 @@
 
 namespace Ck::Vulkan
 {
+	class CommandList;
+	class Framebuffer;
 	class RenderDevice;
+	class Shader;
+	class ShaderProgram;
+	class TextureView;
 
 	/**
 	 * \brief 
@@ -49,7 +54,7 @@ namespace Ck::Vulkan
 		 * \param shaderType 
 		 * \return 
 		 */
-		static std::shared_ptr<Renderer::Shader> LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType);
+		static std::shared_ptr<Shader> LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType);
 
 		/**
 		 * \brief 

@@ -4,14 +4,13 @@
 #include <Cocktail/Renderer/Shader/Shader.hpp>
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 
-#include <Cocktail/Vulkan/Volk.hpp>
-#include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 #include <Cocktail/Vulkan/Shader/Reflection/DescriptorSetInfo.hpp>
 #include <Cocktail/Vulkan/Shader/Reflection/PushConstantBlock.hpp>
 
 namespace Ck::Vulkan
 {
 	class RenderDevice;
+	class ValidationCache;
 	class VertexAttributeLocation;
 	
 	/**

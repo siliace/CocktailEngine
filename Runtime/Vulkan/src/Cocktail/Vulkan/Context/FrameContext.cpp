@@ -2,7 +2,7 @@
 #include <Cocktail/Vulkan/Command/Allocator/CommandListPool.hpp>
 #include <Cocktail/Vulkan/Context/FrameContext.hpp>
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
-#include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryAllocator.hpp>
+#include <Cocktail/Vulkan/Context/Swapchain.hpp>
 
 namespace Ck::Vulkan
 {

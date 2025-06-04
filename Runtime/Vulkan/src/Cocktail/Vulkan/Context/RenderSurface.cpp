@@ -3,7 +3,10 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
+#include <Cocktail/Vulkan/Context/Swapchain.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
 
 namespace Ck::Vulkan

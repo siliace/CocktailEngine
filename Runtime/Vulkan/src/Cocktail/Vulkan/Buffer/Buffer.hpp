@@ -5,10 +5,10 @@
 #include <Cocktail/Renderer/Buffer/BufferCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
-#include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryBlock.hpp>
 
 namespace Ck::Vulkan
 {
+	class DeviceMemoryBlock;
 	class RenderDevice;
 
 	/**

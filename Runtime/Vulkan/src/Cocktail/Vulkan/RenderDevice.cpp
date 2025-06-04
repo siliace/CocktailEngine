@@ -16,8 +16,12 @@
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
 #include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPassCreateInfo.hpp>
 #include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
@@ -25,8 +29,10 @@
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
+#include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 #include <Cocktail/Vulkan/Texture/Sampler.hpp>
 #include <Cocktail/Vulkan/Texture/Texture.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {

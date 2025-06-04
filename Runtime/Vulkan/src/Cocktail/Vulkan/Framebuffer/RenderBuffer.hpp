@@ -4,11 +4,12 @@
 #include <Cocktail/Renderer/Texture/TextureCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/Framebuffer/RenderBufferCreateInfo.hpp>
-#include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryBlock.hpp>
 #include <Cocktail/Vulkan/Texture/AbstractTexture.hpp>
 
 namespace Ck::Vulkan
 {
+	class DeviceMemoryBlock;
+
 	/**
 	 * \brief 
 	 */

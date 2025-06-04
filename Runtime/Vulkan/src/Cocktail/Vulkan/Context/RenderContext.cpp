@@ -10,15 +10,14 @@ namespace Ck::Vulkan
 	RenderContext::RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mPresentationQueue(VK_NULL_HANDLE),
-		mFrameContextCount(createInfo.ConcurrentFrameCount),
 		mCurrentFrameContext(0)
 	{
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
 		const QueueFamily& queueFamily = queueFamilyContext.GetPresentationQueueFamily();
 		vkGetDeviceQueue(mRenderDevice->GetHandle(), queueFamily.GetIndex(), 0, &mPresentationQueue);
 
-		for (unsigned int i = 0; i < mFrameContextCount; i++)
-			mFrameContexts[i] = std::make_unique<FrameContext>(this, createInfo.RenderSurfaceCount, allocationCallbacks);
+		for (unsigned int i = 0; i < createInfo.ConcurrentFrameCount; i++)
+			mFrameContexts.push_back(std::make_unique<FrameContext>(this, createInfo.RenderSurfaceCount, allocationCallbacks));
 
 		mScheduler = std::make_unique<SubmitScheduler>(mRenderDevice);
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
@@ -27,8 +26,8 @@ namespace Ck::Vulkan
 
 	RenderContext::~RenderContext()
 	{
-		for (unsigned int i = 0; i < mFrameContextCount; i++)
-			mFrameContexts[i]->Synchronize();
+		for (std::unique_ptr<FrameContext>& frameContext : mFrameContexts) 
+			frameContext->Synchronize();
 	}
 
 	void RenderContext::SetObjectName(const char* name) const
@@ -127,7 +126,7 @@ namespace Ck::Vulkan
 	{
 		mFrameContexts[mCurrentFrameContext]->Present(mPresentationQueue);
 
-		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContextCount;
+		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContexts.size();
 	}
 
 	void RenderContext::Flush()

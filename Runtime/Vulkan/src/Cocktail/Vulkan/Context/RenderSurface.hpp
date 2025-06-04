@@ -10,7 +10,6 @@
 #include <Cocktail/Vulkan/Command/Fence.hpp>
 #include <Cocktail/Vulkan/Context/PresentationContext.hpp>
 #include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
-#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
 #include <Cocktail/Vulkan/Semaphore.hpp>
 
 namespace Ck::Vulkan

@@ -8,7 +8,6 @@
 #include <Cocktail/Renderer/Buffer/IndexType.hpp>
 #include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
-#include <Cocktail/Renderer/Renderer.hpp>
 #include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 #include <Cocktail/Renderer/Shader/ShaderType.hpp>
 #include <Cocktail/Renderer/Texture/SamplerCreateInfo.hpp>

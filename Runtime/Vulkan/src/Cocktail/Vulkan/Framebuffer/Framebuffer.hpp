@@ -5,12 +5,9 @@
 #include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/Framebuffer/AttachmentBuffer.hpp>
-#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {
-	class RenderPass;
-
 	/**
 	 * \brief 
 	 */

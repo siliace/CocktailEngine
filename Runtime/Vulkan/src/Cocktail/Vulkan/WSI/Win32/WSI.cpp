@@ -1,5 +1,7 @@
 #include <Windows.h>
 
+#include <Cocktail/Core/System/Window/Window.hpp>
+
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
 

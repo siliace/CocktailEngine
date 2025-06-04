@@ -5,6 +5,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Context/PresentationContext.hpp>
+#include <Cocktail/Vulkan/Context/Swapchain.hpp>
 #include <Cocktail/Vulkan/Queue/QueueFamilyContext.hpp>
 
 namespace Ck::Vulkan

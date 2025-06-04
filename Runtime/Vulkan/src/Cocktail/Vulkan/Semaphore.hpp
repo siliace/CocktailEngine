@@ -3,8 +3,8 @@
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
-#include <Cocktail/Vulkan/Volk.hpp>
 #include <Cocktail/Vulkan/SemaphoreCreateInfo.hpp>
+#include <Cocktail/Vulkan/Volk.hpp>
 
 namespace Ck::Vulkan
 {

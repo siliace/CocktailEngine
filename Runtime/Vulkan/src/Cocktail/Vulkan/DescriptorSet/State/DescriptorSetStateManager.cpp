@@ -2,6 +2,8 @@
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/State/DescriptorSetStateManager.hpp>
 #include <Cocktail/Vulkan/Texture/Sampler.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>

@@ -1,20 +1,12 @@
 #include <Cocktail/Core/Utility/FileUtils.hpp>
 
-#include <Cocktail/Renderer/Command/CommandList.hpp>
-#include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
-#include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
-#include <Cocktail/Renderer/Shader/ShaderProgram.hpp>
-#include <Cocktail/Renderer/Shader/ShaderProgramCreateInfo.hpp>
-#include <Cocktail/Renderer/Shader/UniformSlot.hpp>
-
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Command/CommandList.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
+#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
+#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 #include <Cocktail/Vulkan/Texture/AbstractTexture.hpp>
-
-#include "Cocktail/Vulkan/Command/CommandList.hpp"
-#include "Cocktail/Vulkan/Shader/ShaderProgram.hpp"
-#include "Cocktail/Vulkan/Texture/TextureView.hpp"
-#include "Cocktail/Vulkan/Framebuffer/Framebuffer.hpp"
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {
@@ -76,7 +68,7 @@ namespace Ck::Vulkan
 		commandList.Barrier(1, postBarriers);
 	}
 
-	std::shared_ptr<Renderer::Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
+	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
 	{
 		ByteArray shaderCode = FileUtils::ReadFile(path);
 
@@ -85,7 +77,7 @@ namespace Ck::Vulkan
 		createInfo.CodeLength = shaderCode.GetSize();
 		createInfo.Code = reinterpret_cast<const Uint32*>(shaderCode.GetData());
 
-		return renderDevice.CreateShader(createInfo);
+		return std::static_pointer_cast<Shader>(renderDevice.CreateShader(createInfo));
 	}
 
 	Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment)
