@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_PIPELINECACHE_HPP
 #define COCKTAIL_VULKAN_PIPELINE_PIPELINECACHE_HPP
 
+#include <Cocktail/Core/Utility/ByteArray.hpp>
+
 #include <Cocktail/Vulkan/Pipeline/ComputePipeline.hpp>
 #include <Cocktail/Vulkan/Pipeline/GraphicPipeline.hpp>
 #include <Cocktail/Vulkan/Pipeline/GraphicPipelineCreateInfo.hpp>

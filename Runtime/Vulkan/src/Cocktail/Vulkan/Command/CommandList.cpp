@@ -1,12 +1,20 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Command/CommandList.hpp>
 #include <Cocktail/Vulkan/Command/Allocator/CommandListPool.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
 #include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Pipeline/Pipeline.hpp>
+#include <Cocktail/Vulkan/Pipeline/State/ComputeStateManager.hpp>
+#include <Cocktail/Vulkan/Pipeline/State/GraphicStateManager.hpp>
+#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 #include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
+#include <Cocktail/Vulkan/Texture/Sampler.hpp>
+#include <Cocktail/Vulkan/Texture/Texture.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {
@@ -721,7 +729,7 @@ namespace Ck::Vulkan
 
 		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !mCurrentFramebuffer->GetRenderPass()->ResolveDepthStencil())
 		{
-			std::shared_ptr<Renderer::TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment();
+			std::shared_ptr<TextureView> depthStencilAttachment = std::static_pointer_cast<TextureView>(mCurrentFramebuffer->GetDepthStencilAttachment());
 			if (depthStencilAttachment)
 			{
 				PixelFormat attachmentFormat = depthStencilAttachment->GetFormat();
@@ -733,7 +741,8 @@ namespace Ck::Vulkan
 				if (shouldResolveDepth)
 				{
 					mRenderDevice->Invoke([&](DepthResolver* depthStencilResolver) {
-						depthStencilResolver->Resolve(*this, mCurrentRenderPassMode.Get(), mCurrentFramebuffer->GetDepthStencilMultisampleAttachment(), depthStencilAttachment, depthResolveMode);
+						auto depthStencilMultisampleAttachment = std::static_pointer_cast<TextureView>(mCurrentFramebuffer->GetDepthStencilMultisampleAttachment());
+						depthStencilResolver->Resolve(*this, mCurrentRenderPassMode.Get(), depthStencilMultisampleAttachment, depthStencilAttachment, depthResolveMode);
 					});
 				}
 			}

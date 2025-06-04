@@ -1,5 +1,6 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp>
 
 namespace Ck::Vulkan
@@ -37,7 +38,7 @@ namespace Ck::Vulkan
 
 			std::shared_ptr<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
 			for (unsigned int i = 0; i < MaxSetPerDescriptorPool; i++)
-				descriptorSets[i] = mDescriptorSetPool.Allocate(mRenderDevice, descriptorPool, createInfo, mAllocationCallbacks);
+				descriptorSets[i] = mDescriptorSetPool.Allocate(mRenderDevice, descriptorPool, createInfo, nullptr);
 
 			descriptorSet = descriptorSets[0];
 			for (unsigned int i = 1; i < MaxSetPerDescriptorPool; i++)

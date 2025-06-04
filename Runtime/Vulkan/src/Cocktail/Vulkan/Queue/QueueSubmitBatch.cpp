@@ -1,4 +1,5 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Command/Fence.hpp>
 #include <Cocktail/Vulkan/Queue/QueueSubmitBatch.hpp>
 
 namespace Ck::Vulkan

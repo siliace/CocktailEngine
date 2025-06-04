@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_VULKAN_DESCRIPTORSET_DESCRIPTORUPDATETEMPLATE_HPP
 #define COCKTAIL_VULKAN_DESCRIPTORSET_DESCRIPTORUPDATETEMPLATE_HPP
 
+#include <Cocktail/Vulkan/Volk.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplateCreateInfo.hpp>
 
 namespace Ck::Vulkan

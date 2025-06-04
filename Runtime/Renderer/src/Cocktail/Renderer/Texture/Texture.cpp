@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <Cocktail/Renderer/Texture/Texture.hpp>
 
 namespace Ck::Renderer

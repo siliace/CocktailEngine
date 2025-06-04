@@ -2,11 +2,10 @@
 #define COCKTAIL_VULKAN_DESCRIPTORSET_DESCRIPTORSET_HPP
 
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSetCreateInfo.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 
 namespace Ck::Vulkan
 {
-	class DescriptorSetAllocator;
+	class DescriptorPool;
 	class RenderDevice;
 
 	class DescriptorSet : public Renderer::RenderDeviceObject

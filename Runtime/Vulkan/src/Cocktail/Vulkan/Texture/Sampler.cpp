@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	Sampler::Sampler(std::shared_ptr<RenderDevice> renderDevice, const Renderer::SamplerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
 		mMagFilter(createInfo.MagFilter),

@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	DescriptorSetLayout::DescriptorSetLayout(std::shared_ptr<RenderDevice> renderDevice, const DescriptorSetLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
 		mSupportPushDescriptor(createInfo.SupportPushDescriptor)

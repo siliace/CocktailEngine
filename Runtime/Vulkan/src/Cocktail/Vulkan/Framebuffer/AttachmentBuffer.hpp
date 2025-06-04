@@ -7,7 +7,7 @@
 
 namespace Ck::Vulkan
 {
-	class RenderDevice;
+	class RenderPass;
 	class TextureView;
 
 	/**

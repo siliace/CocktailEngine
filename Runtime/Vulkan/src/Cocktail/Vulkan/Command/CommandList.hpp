@@ -5,16 +5,19 @@
 
 #include <Cocktail/Renderer/Command/CommandList.hpp>
 #include <Cocktail/Renderer/Command/CommandListCreateInfo.hpp>
+#include <Cocktail/Renderer/Shader/ShaderProgramType.hpp>
 
-#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
-#include <Cocktail/Vulkan/Pipeline/Pipeline.hpp>
-#include <Cocktail/Vulkan/Pipeline/State/ComputeStateManager.hpp>
-#include <Cocktail/Vulkan/Pipeline/State/GraphicStateManager.hpp>
+#include <Cocktail/Vulkan/Volk.hpp>
+#include <Cocktail/Vulkan/Pipeline/State/StateManager.hpp>
 
 namespace Ck::Vulkan
 {
 	class CommandListPool;
+	class ComputeStateManager;
 	class DescriptorSetAllocator;
+	class Framebuffer;
+	class GraphicStateManager;
+	class Pipeline;
 	class RenderDevice;
 
 	class CommandList : public Renderer::CommandList, public Observable, public std::enable_shared_from_this<CommandList>

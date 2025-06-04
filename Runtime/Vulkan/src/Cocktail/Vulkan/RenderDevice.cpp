@@ -2,8 +2,8 @@
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
 
-#include <Cocktail/Renderer/Renderer.hpp>
 #include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
+#include <Cocktail/Renderer/Texture/SamplerCreateInfo.hpp>
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/RenderDevice.hpp>
@@ -12,10 +12,27 @@
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Buffer/BufferView.hpp>
+#include <Cocktail/Vulkan/Command/Fence.hpp>
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
+#include <Cocktail/Vulkan/Context/Swapchain.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
+#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderPassCreateInfo.hpp>
+#include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
+#include <Cocktail/Vulkan/Pipeline/GraphicPipelineCreateInfo.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Shader/Shader.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
+#include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
+#include <Cocktail/Vulkan/Texture/Sampler.hpp>
+#include <Cocktail/Vulkan/Texture/Texture.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {
@@ -139,13 +156,7 @@ namespace Ck::Vulkan
 	
 	std::shared_ptr<Renderer::Sampler> RenderDevice::CreateSampler(const Renderer::SamplerCreateInfo& createInfo)
 	{
-		if (auto it = mSamplerCache.find(createInfo); it != mSamplerCache.end())
-			return it->second;
-
-		std::shared_ptr<Sampler> sampler = mSamplerPool.Allocate(shared_from_this(), createInfo, nullptr);
-		mSamplerCache[createInfo] = sampler;
-
-		return sampler;
+		return mSamplerPool.Allocate(shared_from_this(), createInfo, nullptr);;
 	}
 
 	std::shared_ptr<Semaphore> RenderDevice::CreateSemaphore(const SemaphoreCreateInfo& createInfo)

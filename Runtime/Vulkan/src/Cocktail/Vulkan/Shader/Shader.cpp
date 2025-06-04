@@ -3,6 +3,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
+#include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 #include <Cocktail/Vulkan/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck::Vulkan
@@ -126,7 +127,7 @@ namespace Ck::Vulkan
 	}
 
 	Shader::Shader(std::shared_ptr<RenderDevice> renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{

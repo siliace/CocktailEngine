@@ -23,8 +23,6 @@ namespace Ck::Vulkan
 		unsigned int Stride = 0;
 		bool Instanced = false;
 		unsigned int Divisor = 0;
-
-
 	};
 
 	struct VertexInputState

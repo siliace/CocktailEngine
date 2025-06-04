@@ -4,10 +4,10 @@
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSetCreateInfo.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 
 namespace Ck::Vulkan
 {
+	class DescriptorPool;
 	class DescriptorSet;
 	class RenderDevice;
 
@@ -53,7 +53,6 @@ namespace Ck::Vulkan
 		std::shared_ptr<DescriptorPool> CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
-		const VkAllocationCallbacks* mAllocationCallbacks;
 		std::vector<std::shared_ptr<DescriptorPool>> mDescriptorPools;
 		std::vector<std::shared_ptr<DescriptorSet>> mAcquiredSets;
 		std::vector<std::shared_ptr<DescriptorSet>> mVacantSets;

@@ -1,11 +1,13 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
+#include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayout.hpp>
+#include <Cocktail/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
 
 namespace Ck::Vulkan
 {
 	DescriptorUpdateTemplate::DescriptorUpdateTemplate(std::shared_ptr<RenderDevice> renderDevice, const DescriptorUpdateTemplateCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mHandle(VK_NULL_HANDLE),
 		mAllocationCallbacks(allocationCallbacks)
 	{

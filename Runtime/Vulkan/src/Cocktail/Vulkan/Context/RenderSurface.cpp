@@ -3,13 +3,16 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
+#include <Cocktail/Vulkan/Context/Swapchain.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderBuffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
 
 namespace Ck::Vulkan
 {
 	RenderSurface::RenderSurface(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mSurface(VK_NULL_HANDLE),
 	    mVSyncEnable(false)
@@ -18,7 +21,7 @@ namespace Ck::Vulkan
 
 		// Create the Surface we will render to
 		Window& window = *createInfo.Window;
-		mSurface = WSI::CreateWindowSurface(renderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
+		mSurface = WSI::CreateWindowSurface(mRenderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
 
 		// Create the PresentationContext used to manage swapchains creation
 		mPresentationContext = std::make_unique<PresentationContext>(mRenderDevice, mSurface, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
@@ -60,7 +63,7 @@ namespace Ck::Vulkan
 		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mSurface, mAllocationCallbacks);
 	}
 
-	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence)
+	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence) const
 	{
 		if (!mSwapchain)
 			return Optional<unsigned int>::Empty();
@@ -68,7 +71,7 @@ namespace Ck::Vulkan
 		unsigned int imageIndex;
 		VkSemaphore semaphoreHandle = semaphore ? semaphore->GetHandle() : VK_NULL_HANDLE;
 		VkFence fenceHandle = fence ? fence->GetHandle() : VK_NULL_HANDLE;
-		COCKTAIL_VK_CHECK(vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), UINT64_MAX, semaphoreHandle, fenceHandle, &imageIndex));
+		COCKTAIL_VK_CHECK(vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), timeout.GetCount(TimeUnit::Nanoseconds()), semaphoreHandle, fenceHandle, &imageIndex));
 
 		return Optional<unsigned int>::Of(imageIndex);
 	}

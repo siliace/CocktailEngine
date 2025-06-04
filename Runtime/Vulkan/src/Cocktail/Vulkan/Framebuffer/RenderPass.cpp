@@ -1,6 +1,7 @@
+#include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPassBuilder.hpp>
-#include <Cocktail/Vulkan/VulkanUtils.hpp>
 
 namespace Ck::Vulkan
 {
@@ -93,7 +94,7 @@ namespace Ck::Vulkan
 	}
 
 	RenderPass::RenderPass(std::shared_ptr<RenderDevice> renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks)
 	{
 		mColorAttachmentCount = createInfo.FramebufferLayout.ColorAttachmentCount;

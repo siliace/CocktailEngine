@@ -4,15 +4,14 @@
 #include <Cocktail/Core/Flags.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
-#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/State/DescriptorSetStateManager.hpp>
-#include <Cocktail/Vulkan/Shader/Shader.hpp>
-#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 
 namespace Ck::Vulkan
 {
 	class Pipeline;
-	class RenderDevice;
+	class PipelineLayout;
+	class Shader;
+	class ShaderProgram;
 
 	struct PipelineConstantRange
 	{

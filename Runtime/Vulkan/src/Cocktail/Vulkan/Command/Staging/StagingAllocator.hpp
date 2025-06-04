@@ -24,9 +24,9 @@ namespace Ck::Vulkan
 		StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
 
 		/**
-		 * \brief Acquire a staging buffer with at last \p size bytes available alignment on a specified \p alignment
+		 * \brief Acquire a staging buffer with at last \p allocationSize bytes available alignment on a specified \p alignment
 		 * The allocator will try to reuse a much as possible existing buffers.
-		 * If no staging buffer as enough space to fit \p size, a new buffer of the appropriate size will be created.
+		 * If no staging buffer as enough space to fit \p allocationSize, a new buffer of the appropriate size will be created.
 		 * \param alignment The alignment the data to fit in the staging buffer should respect
 		 * \param allocationSize The size (in bytes) of the data to fit in the staging buffer
 		 * \return A staging buffer

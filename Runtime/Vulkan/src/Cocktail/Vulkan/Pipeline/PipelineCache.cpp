@@ -1,6 +1,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Shader/Shader.hpp>
 
 namespace Ck::Vulkan
 {
@@ -152,7 +153,7 @@ namespace Ck::Vulkan
 	}
 
 	PipelineCache::PipelineCache(std::shared_ptr<RenderDevice> renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{

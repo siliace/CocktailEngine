@@ -2,7 +2,11 @@
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
+#include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/GraphicStateManager.hpp>
+#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 
 namespace Ck::Vulkan
 {

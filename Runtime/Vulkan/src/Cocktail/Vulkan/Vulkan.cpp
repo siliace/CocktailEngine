@@ -5,6 +5,8 @@
 #include <Cocktail/Vulkan/Debug/DebugMessenger.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
 #include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryAllocator.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 
 namespace Ck::Vulkan
 {

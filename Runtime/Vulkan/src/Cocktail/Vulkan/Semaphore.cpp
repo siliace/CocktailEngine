@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	Semaphore::Semaphore(std::shared_ptr<RenderDevice> renderDevice, const SemaphoreCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks)
 	{
 		VkSemaphoreTypeCreateInfoKHR vkTypeCreateInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO_KHR, nullptr };

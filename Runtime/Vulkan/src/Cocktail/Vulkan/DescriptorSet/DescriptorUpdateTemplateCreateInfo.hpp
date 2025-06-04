@@ -1,10 +1,9 @@
 #ifndef COCKTAIL_VULKAN_DESCRIPTORSET_DESCRIPTORUPDATETEMPLATECREATEINFO_HPP
 #define COCKTAIL_VULKAN_DESCRIPTORSET_DESCRIPTORUPDATETEMPLATECREATEINFO_HPP
 
-#include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayout.hpp>
-
 namespace Ck::Vulkan
 {
+	class DescriptorSetLayout;
 	class PipelineLayout;
 
 	/**

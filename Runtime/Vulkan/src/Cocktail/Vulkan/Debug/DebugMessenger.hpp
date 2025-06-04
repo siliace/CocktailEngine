@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_DEBUG_DEBUGMESSENGER_HPP
 #define COCKTAIL_VULKAN_DEBUG_DEBUGMESSENGER_HPP
 
-#include <Cocktail/Renderer/RenderDeviceObject.hpp>
-
 #include <Cocktail/Vulkan/Volk.hpp>
 #include <Cocktail/Vulkan/Debug/DebugMessengerCreateInfo.hpp>
 

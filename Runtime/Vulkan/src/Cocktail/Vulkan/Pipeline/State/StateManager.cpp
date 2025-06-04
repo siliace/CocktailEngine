@@ -3,6 +3,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/StateManager.hpp>
+#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 
 namespace Ck::Vulkan
 {

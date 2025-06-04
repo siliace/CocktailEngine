@@ -1,11 +1,12 @@
 #ifndef COCKTAIL_VULKAN_TEXTURE_TEXTURE_HPP
 #define COCKTAIL_VULKAN_TEXTURE_TEXTURE_HPP
 
-#include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryBlock.hpp>
 #include <Cocktail/Vulkan/Texture/AbstractTexture.hpp>
 
 namespace Ck::Vulkan
 {
+	class DeviceMemoryBlock;
+
 	/**
 	 * \brief 
 	 */

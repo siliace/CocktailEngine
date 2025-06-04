@@ -1,9 +1,12 @@
 #include <Cocktail/Core/Utility/FileUtils.hpp>
 
-#include <Cocktail/Renderer/Shader/UniformSlot.hpp>
-
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Command/CommandList.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
+#include <Cocktail/Vulkan/Framebuffer/Framebuffer.hpp>
+#include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
+#include <Cocktail/Vulkan/Texture/AbstractTexture.hpp>
+#include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
 namespace Ck::Vulkan
 {
@@ -17,13 +20,13 @@ namespace Ck::Vulkan
 		shaderProgramCreateInfo.Shaders[0] = LoadShader(*mRenderDevice, "builtin://vulkan/resources/depth_resolve.vert.spv", Renderer::ShaderType::Vertex);
 		shaderProgramCreateInfo.Shaders[1] = LoadShader(*mRenderDevice, "builtin://vulkan/resources/depth_resolve.frag.spv", Renderer::ShaderType::Fragment);
 
-		mShaderProgram = mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo);
+		mShaderProgram = std::static_pointer_cast<ShaderProgram>(mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo));
 
 		mDepthSamplerSlot = mShaderProgram->FindUniformSlot("inTexture");
 		assert(mDepthSamplerSlot);
 	}
 
-	void DepthResolver::Resolve(Renderer::CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<Renderer::TextureView> multisampleAttachment, std::shared_ptr<Renderer::TextureView> attachment, Renderer::ResolveMode depthResolveMode)
+	void DepthResolver::Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<TextureView> multisampleAttachment, std::shared_ptr<TextureView> attachment, Renderer::ResolveMode depthResolveMode)
 	{
 		Renderer::RenderPassBeginInfo renderPassBeginInfo;
 		renderPassBeginInfo.Mode = renderPassMode;
@@ -65,7 +68,7 @@ namespace Ck::Vulkan
 		commandList.Barrier(1, postBarriers);
 	}
 
-	std::shared_ptr<Renderer::Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
+	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
 	{
 		ByteArray shaderCode = FileUtils::ReadFile(path);
 
@@ -74,17 +77,17 @@ namespace Ck::Vulkan
 		createInfo.CodeLength = shaderCode.GetSize();
 		createInfo.Code = reinterpret_cast<const Uint32*>(shaderCode.GetData());
 
-		return renderDevice.CreateShader(createInfo);
+		return std::static_pointer_cast<Shader>(renderDevice.CreateShader(createInfo));
 	}
 
-	Renderer::Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<Renderer::TextureView> attachment)
+	Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment)
 	{
 		if (auto it = mFramebuffers.find(attachment); it != mFramebuffers.end())
 			return it->second.get();
 
 		Renderer::FramebufferCreateInfo createInfo;
 		createInfo.DepthStencilAttachment = attachment;
-		std::shared_ptr<Renderer::Framebuffer> framebuffer = mRenderDevice->CreateFramebuffer(createInfo);
+		std::shared_ptr<Framebuffer> framebuffer = std::static_pointer_cast<Framebuffer>(mRenderDevice->CreateFramebuffer(createInfo));
 		mFramebuffers[attachment] = framebuffer;
 
 		return framebuffer.get();

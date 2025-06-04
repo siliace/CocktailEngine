@@ -1,10 +1,13 @@
 #ifndef COCKTAIL_VULKAN_COMMAND_STAGING_STAGINGBUFFER_HPP
 #define COCKTAIL_VULKAN_COMMAND_STAGING_STAGINGBUFFER_HPP
 
-#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
+#include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
 
 namespace Ck::Vulkan
 {
+	class Buffer;
+	class RenderDevice;
+
 	class StagingBuffer
 	{
 	public:

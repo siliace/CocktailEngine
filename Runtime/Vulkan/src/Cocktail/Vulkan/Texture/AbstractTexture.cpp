@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	AbstractTexture::AbstractTexture(std::shared_ptr<RenderDevice> renderDevice) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mHasMutableFormat(false),
 		mViewFormatCount(0)
 	{

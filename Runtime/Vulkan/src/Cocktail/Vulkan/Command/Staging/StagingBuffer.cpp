@@ -1,6 +1,7 @@
 #include <cstring>
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Command/Staging/StagingBuffer.hpp>
 
 namespace Ck::Vulkan

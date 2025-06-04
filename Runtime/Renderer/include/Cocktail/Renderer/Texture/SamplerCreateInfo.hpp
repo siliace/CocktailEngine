@@ -131,53 +131,6 @@ namespace Ck::Renderer
          */
         const char* Name = nullptr;
 	};
-
-	/**
-	 * \brief 
-	 * \param lhs 
-	 * \param rhs 
-	 * \return 
-	 */
-	inline bool operator==(const SamplerCreateInfo& lhs, const SamplerCreateInfo& rhs)
-	{
-		return std::tie(lhs.MagFilter, lhs.MinFilter, lhs.MipmapMode, lhs.AddressModeU, lhs.AddressModeV, lhs.AddressModeW, lhs.EnableAnisotropy, lhs.MaxAnisotropy, lhs.MinLod, lhs.MaxLod, lhs.Name) == 
-			std::tie(rhs.MagFilter, rhs.MinFilter, rhs.MipmapMode, rhs.AddressModeU, rhs.AddressModeV, rhs.AddressModeW, rhs.EnableAnisotropy, rhs.MaxAnisotropy, rhs.MinLod, rhs.MaxLod, rhs.Name);
-	}
-
-	/**
-	 * \brief 
-	 * \param lhs 
-	 * \param rhs 
-	 * \return 
-	 */
-	inline bool operator!=(const SamplerCreateInfo& lhs, const SamplerCreateInfo& rhs)
-	{
-		return !(lhs == rhs);
-	}
-}
-
-namespace std
-{
-	template <>
-	struct hash<Ck::Renderer::SamplerCreateInfo>
-	{
-		size_t operator()(const Ck::Renderer::SamplerCreateInfo& samplerCreateInfo) const noexcept
-		{
-			size_t hash = 0;
-			Ck::HashCombine(hash, samplerCreateInfo.MagFilter);
-			Ck::HashCombine(hash, samplerCreateInfo.MinFilter);
-			Ck::HashCombine(hash, samplerCreateInfo.MipmapMode);
-			Ck::HashCombine(hash, samplerCreateInfo.AddressModeU);
-			Ck::HashCombine(hash, samplerCreateInfo.AddressModeV);
-			Ck::HashCombine(hash, samplerCreateInfo.AddressModeW);
-			Ck::HashCombine(hash, samplerCreateInfo.EnableAnisotropy);
-			Ck::HashCombine(hash, samplerCreateInfo.MaxAnisotropy);
-			Ck::HashCombine(hash, samplerCreateInfo.MinLod);
-			Ck::HashCombine(hash, samplerCreateInfo.MaxLod);
-
-			return hash;
-		}
-	};
 }
 
 #endif // COCKTAIL_RENDERER_TEXTRURE_SAMPLERCREATEINFO_HPP

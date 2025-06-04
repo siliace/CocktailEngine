@@ -1,13 +1,16 @@
 #ifndef COCKTAIL_VULKAN_DESCRIPTORSET_STATE_DESCRIPTORSETSTATEMANAGER_HPP
 #define COCKTAIL_VULKAN_DESCRIPTORSET_STATE_DESCRIPTORSETSTATEMANAGER_HPP
 
-#include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorSetAllocator.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayout.hpp>
+#include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 
 namespace Ck::Vulkan
 {
 	class Buffer;
+	class DescriptorSet;
+	class DescriptorSetAllocator;
+	class DescriptorSetLayout;
+	class DescriptorUpdateTemplate;
+	class RenderDevice;
 	class Sampler;
 	class TextureView;
 

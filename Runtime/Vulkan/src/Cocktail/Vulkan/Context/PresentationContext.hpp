@@ -1,11 +1,15 @@
 #ifndef COCKTAIL_VULKAN_CONTEXT_PRESENTATIONCONTEXT_HPP
 #define COCKTAIL_VULKAN_CONTEXT_PRESENTATIONCONTEXT_HPP
 
-#include <Cocktail/Vulkan/Context/Swapchain.hpp>
+#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Core/System/Monitor/VideoMode.hpp>
+
+#include <Cocktail/Vulkan/Volk.hpp>
 
 namespace Ck::Vulkan
 {
 	class RenderDevice;
+	class Swapchain;
 
 	/**
 	 * \brief

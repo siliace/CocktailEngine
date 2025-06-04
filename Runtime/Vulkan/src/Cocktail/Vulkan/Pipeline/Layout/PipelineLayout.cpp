@@ -6,7 +6,7 @@
 namespace Ck::Vulkan
 {
 	PipelineLayout::PipelineLayout(std::shared_ptr<RenderDevice> renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(renderDevice),
+		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
 		mDescriptorSetLayouts(createInfo.DescriptorSetLayouts),

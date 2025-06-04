@@ -119,9 +119,8 @@ namespace Ck::Vulkan
 		VkQueue mPresentationQueue;
 		std::unique_ptr<SubmitScheduler> mScheduler;
 		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;
-		unsigned int mFrameContextCount;
 		unsigned int mCurrentFrameContext;
-		std::unique_ptr<FrameContext> mFrameContexts[Swapchain::MaxSwapchainTexture];
+		std::vector<std::unique_ptr<FrameContext>> mFrameContexts;
 		Signal<Renderer::FrameContext*> mOnBeforeRedraw;
 		Signal<Renderer::FrameContext*, const Renderer::Framebuffer*> mOnRedraw;
 	};

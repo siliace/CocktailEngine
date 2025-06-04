@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_VULKAN_MEMORY_ALLOCATOR_DEVICEMEMORYCHUNK_HPP
 #define COCKTAIL_VULKAN_MEMORY_ALLOCATOR_DEVICEMEMORYCHUNK_HPP
 
-#include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
 #include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryBlock.hpp>
 #include <Cocktail/Vulkan/Texture/AbstractTexture.hpp>
