@@ -1,3 +1,5 @@
+#include <Cocktail/Core/System/Window/Window.hpp>
+
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
 
@@ -18,7 +20,7 @@ namespace Ck::Vulkan::WSI
 
 	VkSurfaceKHR CreateWindowSurface(VkInstance instance, const Window& window, const VkAllocationCallbacks* allocationCallbacks)
 	{
-		WindowHandle* windowHandle = (WindowHandle*)window.GetSystemHandle();
+		WindowHandle* windowHandle = static_cast<WindowHandle*>(window.GetSystemHandle());
 
 		VkXlibSurfaceCreateInfoKHR createInfo { VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR, nullptr };
 		{
