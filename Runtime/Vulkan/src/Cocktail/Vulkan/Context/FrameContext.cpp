@@ -1,33 +1,27 @@
+#include <Cocktail/Core/Utility/Time/Duration.hpp>
+
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Vulkan/Command/Allocator/CommandListPool.hpp>
 #include <Cocktail/Vulkan/Context/FrameContext.hpp>
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
+#include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
 
 namespace Ck::Vulkan
 {
-	FrameContext::FrameContext(RenderContext* renderContext, unsigned int maxRenderSurfaceCount, const VkAllocationCallbacks* allocationCallbacks) :
+	FrameContext::FrameContext(RenderContext* renderContext, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderContext(renderContext),
-		mMaxRenderSurfaceCount(maxRenderSurfaceCount),
-		mRenderSurfaceCount(0),
 		mSubmitted(false)
 	{
 		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
 
-		Renderer::CommandListPoolCreateInfo commandListPoolCreateInfo;
+		CommandListPoolCreateInfo commandListPoolCreateInfo;
 		mCommandListPool = std::make_shared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
-		fenceCreateInfo.Signaled = true;
+		fenceCreateInfo.Signaled = false;
 		mFrameFence = std::static_pointer_cast<Fence>(renderDevice->CreateFence(fenceCreateInfo));
-
-		SemaphoreCreateInfo semaphoreCreateInfo;
-		mAcquiredRenderSurfaces = std::make_unique<AcquiredRenderSurface[]>(mMaxRenderSurfaceCount);
-		for (unsigned int i = 0; i < mMaxRenderSurfaceCount; i++)
-		{
-			mAcquiredRenderSurfaces[i].ImageAvailable = renderDevice->CreateSemaphore(semaphoreCreateInfo);
-			mAcquiredRenderSurfaces[i].ImagePresentable = renderDevice->CreateSemaphore(semaphoreCreateInfo);
-		}
 	}
 
 	void FrameContext::Synchronize() const
@@ -46,34 +40,33 @@ namespace Ck::Vulkan
 		mFrameFence->Reset();
 	}
 
-	Renderer::Framebuffer* FrameContext::AcquireNextFramebuffer(Renderer::RenderSurface* renderSurface)
+	Framebuffer* FrameContext::AcquireNextFramebuffer(const RenderSurface* renderSurface)
 	{
-		RenderSurface* renderSurfaceImpl = static_cast<RenderSurface*>(renderSurface);
-		for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
+		auto it = mAcquiredImages.find(renderSurface);
+		if (it == mAcquiredImages.end())
 		{
-			if (mAcquiredRenderSurfaces[i].Swapchain == renderSurfaceImpl->GetSwapchain())
-				return renderSurfaceImpl->GetFramebuffer(mAcquiredRenderSurfaces[i].SwapchainImageIndex).get();
+			std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+
+			AcquiredImage acquiredImage;
+			acquiredImage.ImageAvailable = renderDevice->CreateSemaphore({});
+			acquiredImage.ImagePresentable = renderDevice->CreateSemaphore({});
+
+			it = mAcquiredImages.insert(std::make_pair(renderSurface, std::move(acquiredImage))).first;
 		}
 
-		assert(mRenderSurfaceCount < mMaxRenderSurfaceCount);
-		AcquiredRenderSurface& acquiredRenderSurface = mAcquiredRenderSurfaces[mRenderSurfaceCount];
-		Optional<unsigned int> imageIndex = renderSurfaceImpl->AcquireNextFramebuffer(Duration::Infinite(), acquiredRenderSurface.ImageAvailable, nullptr);
-		if (imageIndex.IsEmpty())
-			return nullptr;
+		AcquiredImage& acquiredImage = it->second;
+		if (acquiredImage.ImageIndex.IsEmpty())
+		{
+			acquiredImage.ImageIndex = renderSurface->AcquireNextFramebuffer(Duration::Infinite(), acquiredImage.ImageAvailable, nullptr);
+			mRenderContext->WaitSemaphore(Renderer::CommandQueueType::Graphic, acquiredImage.ImageAvailable, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+		}
 
-		mRenderContext->WaitSemaphore(Renderer::CommandQueueType::Graphic, acquiredRenderSurface.ImageAvailable, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-
-		acquiredRenderSurface.Swapchain = renderSurfaceImpl->GetSwapchain();
-		acquiredRenderSurface.SwapchainImageIndex = imageIndex.Get();
-
-		++mRenderSurfaceCount;
-
-		return renderSurfaceImpl->GetFramebuffer(imageIndex.Get()).get();
+		return renderSurface->GetFramebuffer(acquiredImage.ImageIndex.Get()).get();
 	}
 
-	std::shared_ptr<Renderer::CommandList> FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
+	CommandList* FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		for (std::shared_ptr<Renderer::CommandList> commandList : mCommandLists)
+		for (std::shared_ptr<CommandList> commandList : mCommandLists)
 		{
 			if (commandList->GetState() != Renderer::CommandListState::Initial)
 				continue;
@@ -88,13 +81,13 @@ namespace Ck::Vulkan
 				continue;
 
 			commandList->SetObjectName(createInfo.Name);
-			return commandList;
+			return commandList.get();
 		}
 
-		std::shared_ptr<Renderer::CommandList> commandList = mCommandListPool->CreateCommandList(createInfo);
+		std::shared_ptr<CommandList> commandList = mCommandListPool->CreateCommandList(createInfo);
 		mCommandLists.push_back(commandList);
 
-		return commandList;
+		return commandList.get();
 	}
 
 	Renderer::BufferAllocator* FrameContext::GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType)
@@ -118,60 +111,57 @@ namespace Ck::Vulkan
 		// This will ensure a future frame won't use resources from the current frame and cause errors.
 		mRenderContext->SignalFence(Renderer::CommandQueueType::Graphic, mFrameFence);
 
-		// The GPU also must to wait until the swapchain's image is not anymore involved in any rendering operations.
-		for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
-			mRenderContext->SignalSemaphore(Renderer::CommandQueueType::Graphic, mAcquiredRenderSurfaces[i].ImagePresentable);
+		// The GPU also must wait until the swapchain's image is not anymore involved in any rendering operations.
+		for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
+		{
+			if (acquiredImage.ImageIndex.IsEmpty())
+				continue;
+
+			mRenderContext->SignalSemaphore(Renderer::CommandQueueType::Graphic, acquiredImage.ImagePresentable);
+		}
 
 		// Effectively submit everything on GPU
-		mRenderContext->Flush();
+		mRenderContext->Submit();
 
-		if (mRenderSurfaceCount)
+		if (!mAcquiredImages.empty())
 		{
-			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mRenderSurfaceCount);
-			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mRenderSurfaceCount);
-			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mRenderSurfaceCount);
-			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mRenderSurfaceCount);
+			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mAcquiredImages.size());
+			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mAcquiredImages.size());
+			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mAcquiredImages.size());
+			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.size());
 
-			for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
+			unsigned int acquiredImageCount = 0;
+			for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
 			{
-				waitSemaphoreHandles[i] = mAcquiredRenderSurfaces[i].ImagePresentable->GetHandle();
-				swapchainHandles[i] = mAcquiredRenderSurfaces[i].Swapchain->GetHandle();
-				imageIndexes[i] = mAcquiredRenderSurfaces[i].SwapchainImageIndex;
+				if (acquiredImage.ImageIndex.IsEmpty())
+					continue;
+
+				waitSemaphoreHandles[acquiredImageCount] = acquiredImage.ImagePresentable->GetHandle();
+				swapchainHandles[acquiredImageCount] = acquiredSurface->GetSwapchain()->GetHandle();
+				imageIndexes[acquiredImageCount] = acquiredImage.ImageIndex.Get();
+
+				++acquiredImageCount;
 			}
 
-			VkPresentInfoKHR presentInfo{ VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, nullptr };
+			if (acquiredImageCount > 0)
 			{
-				presentInfo.waitSemaphoreCount = mRenderSurfaceCount;
-				presentInfo.pWaitSemaphores = waitSemaphoreHandles;
-				presentInfo.swapchainCount = mRenderSurfaceCount;
-				presentInfo.pSwapchains = swapchainHandles;
-				presentInfo.pImageIndices = imageIndexes;
-				presentInfo.pResults = result;
+				VkPresentInfoKHR presentInfo{ VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, nullptr };
+				{
+					presentInfo.waitSemaphoreCount = acquiredImageCount;
+					presentInfo.pWaitSemaphores = waitSemaphoreHandles;
+					presentInfo.swapchainCount = acquiredImageCount;
+					presentInfo.pSwapchains = swapchainHandles;
+					presentInfo.pImageIndices = imageIndexes;
+					presentInfo.pResults = result;
+				}
+
+				vkQueuePresentKHR(queue, &presentInfo);
+
+				for (auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
+					acquiredImage.ImageIndex = Optional<unsigned int>::Empty();
 			}
-
-			vkQueuePresentKHR(queue, &presentInfo);
-
-			for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
-				mAcquiredRenderSurfaces[i].Swapchain = nullptr;
-
-			mRenderSurfaceCount = 0;
 		}
 
 		mSubmitted = true;
-	}
-
-	void FrameContext::SetObjectName(const char* name) const
-	{
-
-	}
-
-	std::shared_ptr<Renderer::RenderDevice> FrameContext::GetRenderDevice() const
-	{
-		return mRenderContext->GetRenderDevice();
-	}
-
-	Renderer::FrameToken FrameContext::GetToken() const
-	{
-		return reinterpret_cast<Renderer::FrameToken>(this);
 	}
 }

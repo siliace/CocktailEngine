@@ -6,22 +6,23 @@
 namespace Ck::Renderer
 {
 	/**
-	 * \brief 
+	 * \brief Enumeration of possible dynamic states in a CommandList
+	 * These flags might not be used by some implementations.
 	 */
 	enum class CommandListDynamicStateBits
 	{
 		/**
-		 * \brief 
+		 * \brief Specifies the viewport state is dynamic
 		 */
 		Viewport = Bit(0),
 
 		/**
-		 * \brief 
+		 * \brief Specifies the scissor state is dynamic
 		 */
 		Scissor = Bit(1),
 
 		/**
-		 * \brief 
+		 * \brief Specifies the line width state is dynamic
 		 */
 		LineWidth = Bit(2),
 	};

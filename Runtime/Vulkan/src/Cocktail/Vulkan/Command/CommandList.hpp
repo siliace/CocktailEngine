@@ -42,9 +42,10 @@ namespace Ck::Vulkan
 		void ExecuteCommandLists(unsigned int commandListCount, Renderer::CommandList** commandLists) override;
 
 		void UploadBuffer(const Renderer::Buffer* buffer, unsigned int uploadCount, const Renderer::BufferUploadInfo* uploads) override;
-		void UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads) override;
+		void UploadBuffer(const Renderer::Buffer* buffer, std::size_t offset, std::size_t length, const void* data) override;
 
-		void Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) override;
+		void UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads) override;
+		void UploadTextureLevel(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels) override;
 
 		void BeginRenderPass(const Renderer::RenderPassBeginInfo& begin) override;
 		void EndRenderPass() override;
@@ -87,11 +88,13 @@ namespace Ck::Vulkan
 
 		void Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) override;
 		void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) override;
+
+		void Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) override;
 		
-		void Reset(bool releaseResources) override;
+		void Reset(bool releaseResources);
 
 		Renderer::CommandListState GetState() const override;
-		Renderer::CommandListUsage GetUsage() const override;
+		Renderer::CommandListUsageBits GetUsage() const override;
 		Renderer::CommandListDynamicState GetDynamicState() const override;
 		bool IsSecondary() const override;
 
@@ -118,7 +121,7 @@ namespace Ck::Vulkan
 		bool mOneShot;
 		bool mSecondary;
 		Renderer::CommandListState mState;
-		Renderer::CommandListUsage mUsage;
+		Renderer::CommandListUsageBits mUsage;
 		Renderer::CommandListDynamicState mDynamicState;
 		const Framebuffer* mCurrentFramebuffer;
 		Optional<Renderer::RenderPassMode> mCurrentRenderPassMode;

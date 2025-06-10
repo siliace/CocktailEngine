@@ -27,10 +27,10 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param frameContext 
+		 * \param renderContext 
 		 * \return 
 		 */
-		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const override;
+		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const override;
 
 	private:
 

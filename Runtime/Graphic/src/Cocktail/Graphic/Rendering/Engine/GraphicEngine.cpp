@@ -33,8 +33,7 @@ namespace Ck
 		};
 	}
 
-	GraphicEngine::GraphicEngine(Renderer::GraphicApi api) :
-		mFrameContext(nullptr)
+	GraphicEngine::GraphicEngine(Renderer::GraphicApi api) 
 	{
 		switch (api)
 		{
@@ -50,8 +49,7 @@ namespace Ck
 			Log::Trace(logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
 		});
 
-		mRenderContext = mRenderDevice->CreateRenderContext({ 1, 3, "" });
-		mFrameContext = mRenderContext->BeginFrame();
+		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });
 
 		mResourceUploader = std::make_shared<ResourceUploader>();
 		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice);
@@ -116,7 +114,8 @@ namespace Ck
 
     GraphicEngine::~GraphicEngine()
     {
-		mRenderContext->EndFrame();
+		mRenderContext->Flush();
+		mRenderContext->Synchronize();
     }
 
     std::shared_ptr<VertexBuffer> GraphicEngine::CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable, std::string_view name)
@@ -161,35 +160,27 @@ namespace Ck
 	{
 		if (mResourceUploader->HasPendingTransfer())
 		{
-			std::shared_ptr<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Transfer });
+			Renderer::CommandList* commandList = mRenderContext->CreateCommandList({ Renderer::CommandListUsageBits::Transfer });
 
 			commandList->Begin(nullptr);
 			mResourceUploader->Flush(*commandList);
 			commandList->End();
 
-			Renderer::CommandList* commandLists[] = {
-				commandList.get()
-			};
-
-			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, commandLists, nullptr);
+			mRenderContext->SubmitCommandLists(Renderer::CommandQueueType::Transfer, 1, &commandList, nullptr);
 			mRenderContext->SignalQueue(Renderer::CommandQueueType::Transfer);
 			mRenderContext->WaitQueue(Renderer::CommandQueueType::Graphic, Renderer::CommandQueueType::Transfer);
 		}
 
 		if (!mGeneratingMipMaps.empty())
 		{
-			std::shared_ptr<Renderer::CommandList> commandList = mFrameContext->CreateCommandList({ Renderer::CommandListUsage::Graphic });
+			Renderer::CommandList* commandList = mRenderContext->CreateCommandList({ Renderer::CommandListUsageBits::Graphic });
 
 			commandList->Begin(nullptr);
 			for (std::shared_ptr<TextureResource> generatingMipMap : mGeneratingMipMaps)
 				generatingMipMap->GenerateMipMaps(*commandList);
 			commandList->End();
 
-			Renderer::CommandList* commandLists[] = {
-				commandList.get()
-			};
-
-			mRenderContext->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
+			mRenderContext->SubmitCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
 
 			mGeneratingMipMaps.clear();
 		}
@@ -197,9 +188,7 @@ namespace Ck
 
 	void GraphicEngine::Present()
 	{
-		mRenderContext->EndFrame();
-
-		mFrameContext = mRenderContext->BeginFrame();
+		mRenderContext->Flush();
 		FlushTransfer();
 	}
 
@@ -211,11 +200,6 @@ namespace Ck
 	std::shared_ptr<Renderer::RenderContext> GraphicEngine::GetRenderContext() const
 	{
 		return mRenderContext;
-	}
-
-	Renderer::FrameContext* GraphicEngine::GetFrameContext() const
-	{
-		return mFrameContext;
 	}
 
 	std::shared_ptr<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const

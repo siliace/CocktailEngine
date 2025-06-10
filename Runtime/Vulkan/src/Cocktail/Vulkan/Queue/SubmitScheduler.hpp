@@ -45,15 +45,16 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		void Flush();
+		void Submit();
 
 	private:
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
-		TlsObjectPool<QueueSubmitBatch> mBatchPool;
+		bool mProcessingBatch;
 		std::queue<QueueSubmitBatch*> mBatches;
 		std::vector<QueueSubmitBatch*> mPending;
 		std::vector<QueueSubmitBatch*> mTerminated;
+		TlsObjectPool<QueueSubmitBatch> mBatchPool;
 	};
 }
 

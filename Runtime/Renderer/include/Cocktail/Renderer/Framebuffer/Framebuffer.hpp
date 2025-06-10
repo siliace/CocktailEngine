@@ -11,7 +11,8 @@ namespace Ck::Renderer
     class TextureView;
 
 	/**
-     * \brief 
+     * \brief Interface representing an opaque handle to a GPU framebuffer object
+     * A Framebuffer is a collection of specific memory attachments that a render pass instance uses.
      */
     class Framebuffer : public RenderDeviceObject
     {

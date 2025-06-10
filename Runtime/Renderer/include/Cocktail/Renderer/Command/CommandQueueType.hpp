@@ -34,7 +34,7 @@ namespace Ck::Renderer
 	 * \param usage 
 	 * \return 
 	 */
-	COCKTAIL_RENDERER_API CommandQueueType SelectQueueForUsage(const Flags<CommandListUsage>& usage);
+	COCKTAIL_RENDERER_API CommandQueueType SelectQueueForUsage(CommandListUsage usage);
 }
 
 #endif // COCKTAIL_RENDERER_COMMAND_COMMANDQUEUE_HPP

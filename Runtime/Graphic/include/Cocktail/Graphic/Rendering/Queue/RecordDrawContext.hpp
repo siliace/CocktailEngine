@@ -8,7 +8,7 @@
 
 #include <Cocktail/Renderer/Buffer/BufferArea.hpp>
 #include <Cocktail/Renderer/Command/CommandList.hpp>
-#include <Cocktail/Renderer/Context/FrameContext.hpp>
+#include <Cocktail/Renderer/Context/RenderContext.hpp>
 
 namespace Ck
 {
@@ -31,10 +31,10 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param frameContext 
+		 * \param renderContext 
 		 * \param modifiers 
 		 */
-		explicit RecordDrawContext(Renderer::FrameContext& frameContext, RenderingModifiers modifiers = {});
+		explicit RecordDrawContext(Renderer::RenderContext& renderContext, RenderingModifiers modifiers = {});
 
 		/**
 		 * \brief 
@@ -103,7 +103,7 @@ namespace Ck
 		 */
 		static PixelFormat::Layout GetVertexInputAttributeFormatLayout(unsigned int elementCount);
 
-		Renderer::FrameContext* mFrameContext;
+		Renderer::RenderContext* mRenderContext;
 		RenderingModifiers mModifiers;
 		const MaterialProgramVariant* mCurrentMaterialProgram;
 		std::unordered_map<CompositeKey<std::string, unsigned int>, Renderer::BufferArea> mPersistentBuffers;

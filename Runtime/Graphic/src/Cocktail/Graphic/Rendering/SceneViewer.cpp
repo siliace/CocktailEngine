@@ -29,16 +29,15 @@ namespace Ck
 	void SceneViewer::Render()
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
-		Renderer::FrameContext* frameContext = graphicEngine->GetFrameContext();
-		Renderer::Framebuffer* framebuffer = AcquireNextFramebuffer(*frameContext);
+		Renderer::Framebuffer* framebuffer = AcquireNextFramebuffer(*graphicEngine->GetRenderContext());
 		if (!framebuffer)
 			return;
 
-		RecordDrawContext drawContext(*frameContext);
+		RecordDrawContext drawContext(*graphicEngine->GetRenderContext());
 		
 		Renderer::CommandListCreateInfo commandListCreateInfo;
-		commandListCreateInfo.Usage = Renderer::CommandListUsage::Graphic;
-		std::shared_ptr<Renderer::CommandList> commandList = frameContext->CreateCommandList(commandListCreateInfo);
+		commandListCreateInfo.Usage = Renderer::CommandListUsageBits::Graphic;
+		Renderer::CommandList* commandList = graphicEngine->GetRenderContext()->CreateCommandList(commandListCreateInfo);
 
 		commandList->Begin(nullptr);
 
@@ -126,13 +125,9 @@ namespace Ck
 		}
 		commandList->End();
 
-		Renderer::CommandList* commandLists[] = {
-			commandList.get()
-		};
-		
-		graphicEngine->GetRenderContext()->ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
+		graphicEngine->GetRenderContext()->SubmitCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
 
-		mOnRendered.Emit(*graphicEngine->GetRenderContext(), *frameContext, *framebuffer);
+		mOnRendered.Emit(*graphicEngine->GetRenderContext(), *framebuffer);
 	}
 
 	SceneViewer::SceneViewer(std::shared_ptr<Scene> scene) :
@@ -147,7 +142,7 @@ namespace Ck
 		return mScene;
 	}
 
-	Signal<Renderer::RenderContext&, Renderer::FrameContext&, Renderer::Framebuffer&>& SceneViewer::OnRendered()
+	Signal<Renderer::RenderContext&, Renderer::Framebuffer&>& SceneViewer::OnRendered()
 	{
 		return mOnRendered;
 	}

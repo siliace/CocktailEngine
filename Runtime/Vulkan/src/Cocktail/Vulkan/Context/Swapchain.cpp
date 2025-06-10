@@ -1,5 +1,6 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
+#include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
 #include <Cocktail/Vulkan/Texture/SwapchainTexture.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
@@ -23,7 +24,7 @@ namespace Ck::Vulkan
 		VkSwapchainCreateInfoKHR vkCreateInfo{ VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR, nullptr };
 		{
 			vkCreateInfo.flags = 0;
-			vkCreateInfo.surface = createInfo.Surface;
+			vkCreateInfo.surface = createInfo.Surface->GetHandle();
 			vkCreateInfo.minImageCount = createInfo.MinImageCount;
 			vkCreateInfo.imageFormat = ToVkType(createInfo.Format);
 			vkCreateInfo.imageColorSpace = ToVkType(createInfo.ColorSpace);

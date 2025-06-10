@@ -9,7 +9,8 @@
 namespace Ck::Renderer
 {
 	/**
-     * \brief 
+     * \brief Interface representing an opaque handle to a GPU surface object
+     * A RenderSurface is an abstraction of a native platform surface or window.
      */
     class RenderSurface : public RenderDeviceObject
     {

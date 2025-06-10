@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 		 * \param alphaDepth 
 		 * \param colorSpace 
 		 */
-		PresentationContext(std::shared_ptr<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace);
+		PresentationContext(std::shared_ptr<RenderDevice> renderDevice, RenderSurface* surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace);
 
 		/**
 		 * \brief
@@ -66,7 +66,7 @@ namespace Ck::Vulkan
 	private:
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
-		VkSurfaceKHR mSurface;
+		RenderSurface* mSurface;
 		unsigned int mBufferCount;
 		PixelFormat mSurfaceFormat;
 		Renderer::ColorSpace mSurfaceColorSpace;

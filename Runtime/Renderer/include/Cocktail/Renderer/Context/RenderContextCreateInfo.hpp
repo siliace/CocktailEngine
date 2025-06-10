@@ -4,15 +4,12 @@
 namespace Ck::Renderer
 {
 	/**
-	 * \brief 
+	 * \brief RenderContext descriptor structure
+	 * Describe the set of parameters to create a RenderContext
+	 * \see RenderDevice::CreateRenderContext
 	 */
 	struct RenderContextCreateInfo
 	{
-		/**
-		 * \brief Specifies the number of RenderSurface to be acquired per frame
-		 */
-		unsigned int RenderSurfaceCount = 1;
-
 		/**
 		 * \brief Specifies the number of concurrent frame
 		 */

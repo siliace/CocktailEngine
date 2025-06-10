@@ -6,7 +6,8 @@
 namespace Ck::Vulkan
 {
 	SubmitScheduler::SubmitScheduler(std::shared_ptr<RenderDevice> renderDevice) :
-		mRenderDevice(std::move(renderDevice))
+		mRenderDevice(std::move(renderDevice)),
+		mProcessingBatch(false)
 	{
 		/// Nothing
 	}
@@ -32,21 +33,26 @@ namespace Ck::Vulkan
 	{
 		batch->AssignFence(std::move(fence));
 		batch->Connect(batch->OnCompleted(), [this, batch = batch]() {
-			auto itBatch = std::find(mPending.begin(), mPending.end(), batch);
+			if (mProcessingBatch)
+				return;
 
-			if (itBatch != mPending.end())
+			if (auto itBatch = std::find(mPending.begin(), mPending.end(), batch); itBatch != mPending.end())
 			{
+				mProcessingBatch = true;
 				std::for_each(mPending.begin(), itBatch, [](QueueSubmitBatch* pendingBatch) {
 					pendingBatch->MarkCompleted();
 				});
 
-				mTerminated.insert(mTerminated.end(), mPending.begin(), std::next(itBatch));
-				mPending.erase(mPending.begin(), std::next(itBatch));
+				auto itNextBatch = std::next(itBatch);
+				mTerminated.insert(mTerminated.end(), mPending.begin(), itNextBatch);
+				mPending.erase(mPending.begin(), itNextBatch);
 			}
+
+			mProcessingBatch = false;
 		});
 	}
 
-	void SubmitScheduler::Flush()
+	void SubmitScheduler::Submit()
 	{
 		for (QueueSubmitBatch* terminated : mTerminated)
 			mBatchPool.Recycle(terminated);

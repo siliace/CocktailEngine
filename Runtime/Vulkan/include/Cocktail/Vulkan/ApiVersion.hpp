@@ -11,30 +11,35 @@ namespace Ck::Vulkan
 	enum class ApiVersion
 	{
 		/**
-		 * \brief 
+		 * \brief Vulkan 1.0
 		 */
 		Version_1_0,
 
 		/**
-		 * \brief 
+		 * \brief Vulkan 1.1 
 		 */
 		Version_1_1,
 
 		/**
-		 * \brief 
+		 * \brief Vulkan 1.2  
 		 */
 		Version_1_2,
 
 		/**
-		 * \brief 
+		 * \brief Vulkan 1.3
 		 */
 		Version_1_3,
+
+		/**
+		 * \brief Vulkan 1.4
+		 */
+		Version_1_4,
 	};
 
 	/**
-	 * \brief 
+	 * \brief Latest version of Vulkan supported
 	 */
-	static constexpr ApiVersion LatestApiVersion = ApiVersion::Version_1_3;
+	static constexpr ApiVersion LatestApiVersion = ApiVersion::Version_1_4;
 }
 
 #endif // COCKTAIL_VULKAN_APIVERSION_HPP

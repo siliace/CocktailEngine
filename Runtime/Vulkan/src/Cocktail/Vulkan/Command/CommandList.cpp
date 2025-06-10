@@ -49,24 +49,140 @@ namespace Ck::Vulkan
 			return {};
 		}
 
-		VkAccessFlags GetSourceResourceStateAccess(Renderer::ResourceState resourceState)
+		VkAccessFlags GetSourceResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags2 GetSourceResourceStateAccess2(Renderer::ResourceState resourceState)
+		VkAccessFlags2 GetSourceResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_2_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_2_TRANSFER_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags GetDestinationResourceStateAccess(Renderer::ResourceState resourceState)
+		VkAccessFlags GetDestinationResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_SHADER_READ_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_ACCESS_INDEX_READ_BIT;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return VK_ACCESS_UNIFORM_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::ResourceState resourceState)
+		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT_KHR : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT_KHR;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_2_SHADER_READ_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_2_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_ACCESS_2_INDEX_READ_BIT;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return VK_ACCESS_2_UNIFORM_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
 		VkPipelineStageFlags GetResourceStatePipelineStage(Renderer::ResourceState resourceState, const PixelFormat& format)
@@ -103,7 +219,7 @@ namespace Ck::Vulkan
 			switch (resourceState)
 			{
 			case Renderer::ResourceState::Undefined:
-				return VK_PIPELINE_STAGE_2_NONE_KHR;
+				return VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
 
 			case Renderer::ResourceState::FramebufferAttachment:
 				return format.IsColor() ? VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR : VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR;
@@ -161,8 +277,16 @@ namespace Ck::Vulkan
 			Renderer::ResourceState newState = barrier.Buffer.NewState;
 			const Renderer::Buffer* resource = barrier.Buffer.Resource;
 
-			bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-			bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			if constexpr (std::is_same_v<T, VkBufferMemoryBarrier2KHR>)
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, PixelFormat::Undefined());
+			}
+			else
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, PixelFormat::Undefined());
+			}
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
 			{
 				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
@@ -196,8 +320,17 @@ namespace Ck::Vulkan
 			Renderer::ResourceState newState = barrier.Texture.NewState;
 			const Renderer::Texture* resource = barrier.Texture.Resource;
 
-			imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-			imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			if constexpr (std::is_same_v<T, VkImageMemoryBarrier2KHR>)
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, resource->GetFormat());
+			}
+			else
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, resource->GetFormat());
+			}
+
 			imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState, resource->GetFormat());
 			imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState, resource->GetFormat());
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
@@ -246,11 +379,11 @@ namespace Ck::Vulkan
 
 		COCKTAIL_VK_CHECK(vkAllocateCommandBuffers(mRenderDevice->GetHandle(), &allocateInfo, &mHandle));
 
-		if (mUsage != Renderer::CommandListUsage::Transfer)
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
 		{
 			mStateManagers[Renderer::ShaderProgramType::Compute] = std::make_unique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
 
-			if (mUsage == Renderer::CommandListUsage::Graphic)
+			if (mUsage == Renderer::CommandListUsageBits::Graphic)
 				mStateManagers[Renderer::ShaderProgramType::Graphic] = std::make_unique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator, mDynamicState);
 		}
 
@@ -336,6 +469,8 @@ namespace Ck::Vulkan
 
 	void CommandList::Barrier(unsigned int barrierCount, const Renderer::GpuBarrier* barriers)
 	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::Synchronization2))
 		{
 			unsigned int memoryBarrierCount = 0;
@@ -411,8 +546,8 @@ namespace Ck::Vulkan
 				if (barrier.Type == Renderer::GpuBarrierType::Memory)
 				{
 					VkMemoryBarrier memoryBarrier;
-					memoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
-					memoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT;
+					memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+					memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 
 					vkCmdPipelineBarrier(mHandle,
 						VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
@@ -535,6 +670,8 @@ namespace Ck::Vulkan
 
 	void CommandList::ExecuteCommandLists(unsigned int commandListCount, Renderer::CommandList** commandLists)
 	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
 		VkCommandBuffer* commandBufferHandles = COCKTAIL_STACK_ALLOC(VkCommandBuffer, commandListCount);
 		for (unsigned int i = 0; i < commandListCount; i++)
 		{
@@ -584,6 +721,18 @@ namespace Ck::Vulkan
 		vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
 	}
 
+	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, std::size_t offset, std::size_t length, const void* data)
+	{
+		StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(0, length);
+
+		VkBufferCopy region;
+		region.srcOffset = stagingBuffer.PushData(0, length, data);
+		region.dstOffset = offset;
+		region.size = length;
+
+		vkCmdCopyBuffer(mHandle, stagingBuffer.GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), 1, &region);
+	}
+
 	void CommandList::UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads)
 	{
 		assert(mState == Renderer::CommandListState::Recording);
@@ -601,6 +750,9 @@ namespace Ck::Vulkan
 		StagingBuffer* currentStagingBuffer = nullptr;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
+			assert(uploads[i].Level < texture->GetMipMapCount());
+			assert(uploads[i].ArrayLayer < texture->GetArrayLayerCount());
+
 			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), uploads[i].Level);
 			const size_t length = format.ComputeAllocationSize(levelSize);
 
@@ -638,14 +790,43 @@ namespace Ck::Vulkan
 		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
 	}
 
-	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
+	void CommandList::UploadTextureLevel(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels)
 	{
-		FlushComputeState();
-		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
+		assert(level < texture->GetMipMapCount());
+		assert(arrayLayer < texture->GetArrayLayerCount());
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
+
+		PixelFormat format = texture->GetFormat();
+		const std::size_t alignment = format.GetBlockSize();
+		Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), level);
+		std::size_t length = format.ComputeAllocationSize(levelSize);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined());
+
+		StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+
+		VkImageSubresourceLayers subresourceLayers;
+		subresourceLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceLayers.mipLevel = level;
+		subresourceLayers.baseArrayLayer = arrayLayer;
+		subresourceLayers.layerCount = 1;
+
+		VkBufferImageCopy region;
+		region.bufferOffset = stagingBuffer.PushData(alignment, length, pixels);
+		region.bufferRowLength = 0;
+		region.bufferImageHeight = 0;
+		region.imageSubresource = subresourceLayers;
+		region.imageOffset = { 0, 0, 0 };
+		region.imageExtent = ToVkType(levelSize);
+
+		vkCmdCopyBufferToImage(mHandle, stagingBuffer.GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, 1, &region);
 	}
 
 	void CommandList::BeginRenderPass(const Renderer::RenderPassBeginInfo& begin)
 	{
+		assert(mState == Renderer::CommandListState::Recording);
+
 		mCurrentFramebuffer = static_cast<const Framebuffer*>(begin.Framebuffer);
 		assert(mCurrentFramebuffer);
 
@@ -1020,14 +1201,26 @@ namespace Ck::Vulkan
 
 	void CommandList::Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance)
 	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
 		FlushGraphicState();
 		vkCmdDraw(mHandle, vertexCount, instanceCount, firstVertex, firstInstance);
 	}
 
 	void CommandList::DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance)
 	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
 		FlushGraphicState();
 		vkCmdDrawIndexed(mHandle, indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
+	}
+
+	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+
+		FlushComputeState();
+		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
 	}
 
 	void CommandList::Reset(bool releaseResources)
@@ -1044,7 +1237,7 @@ namespace Ck::Vulkan
 		return mState;
 	}
 
-	Renderer::CommandListUsage CommandList::GetUsage() const
+	Renderer::CommandListUsageBits CommandList::GetUsage() const
 	{
 		return mUsage;
 	}
@@ -1061,7 +1254,7 @@ namespace Ck::Vulkan
 
 	void CommandList::MarkInitial()
 	{
-		if (mUsage != Renderer::CommandListUsage::Transfer)
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
 		{
 			for (Renderer::ShaderProgramType programType : Enum<Renderer::ShaderProgramType>::Values)
 			{

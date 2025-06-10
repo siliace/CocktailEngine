@@ -13,7 +13,7 @@ namespace Ck
 
 	protected:
 
-		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const override;
+		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const override;
 
 	private:
 

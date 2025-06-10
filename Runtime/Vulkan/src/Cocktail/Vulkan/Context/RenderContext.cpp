@@ -4,20 +4,22 @@
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Command/Allocator/CommandListPool.hpp>
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
+#include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 
 namespace Ck::Vulkan
 {
 	RenderContext::RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mPresentationQueue(VK_NULL_HANDLE),
-		mCurrentFrameContext(0)
+		mCurrentFrameContext(0),
+		mFrameContexts(createInfo.ConcurrentFrameCount)
 	{
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
 		const QueueFamily& queueFamily = queueFamilyContext.GetPresentationQueueFamily();
 		vkGetDeviceQueue(mRenderDevice->GetHandle(), queueFamily.GetIndex(), 0, &mPresentationQueue);
 
 		for (unsigned int i = 0; i < createInfo.ConcurrentFrameCount; i++)
-			mFrameContexts.push_back(std::make_unique<FrameContext>(this, createInfo.RenderSurfaceCount, allocationCallbacks));
+			mFrameContexts[i] = std::make_unique<FrameContext>(this, allocationCallbacks);
 
 		mScheduler = std::make_unique<SubmitScheduler>(mRenderDevice);
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
@@ -39,33 +41,34 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::shared_ptr<Renderer::CommandListPool> RenderContext::CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo)
+	Renderer::BufferAllocator* RenderContext::GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType)
 	{
-		return std::make_shared<CommandListPool>(mRenderDevice, createInfo, nullptr);
+		return GetCurrentFrameContext()->GetBufferAllocator(usage, memoryType);
 	}
 
-	Renderer::FrameContext* RenderContext::BeginFrame()
+	Renderer::Framebuffer* RenderContext::AcquireFramebuffer(Renderer::RenderSurface* renderSurface)
 	{
-		FrameContext* currentFrameContext = mFrameContexts[mCurrentFrameContext].get();
-		currentFrameContext->Synchronize();
-		currentFrameContext->Reset();
-
-		return currentFrameContext;
+		return GetCurrentFrameContext()->AcquireNextFramebuffer(static_cast<const RenderSurface*>(renderSurface));
 	}
 
-	void RenderContext::SignalQueue(Renderer::CommandQueueType queue)
+	Renderer::CommandList* RenderContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		mSubmitters[queue]->NextSubmit();
+		return GetCurrentFrameContext()->CreateCommandList(createInfo);
+	}
+
+	void RenderContext::SignalQueue(Renderer::CommandQueueType commandQueue)
+	{
+		mSubmitters[commandQueue]->NextSubmit();
 	}
 
 	void RenderContext::SignalFence(Renderer::CommandQueueType commandQueue, std::shared_ptr<Fence> fence)
 	{
-		mSubmitters[commandQueue]->SignalFence(fence);
+		mSubmitters[commandQueue]->SignalFence(std::move(fence));
 	}
 
 	void RenderContext::SignalSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore)
 	{
-		mSubmitters[commandQueue]->SignalSemaphore(semaphore);
+		mSubmitters[commandQueue]->SignalSemaphore(std::move(semaphore));
 	}
 
 	void RenderContext::WaitQueue(Renderer::CommandQueueType waitingQueue, Renderer::CommandQueueType waitedQueue)
@@ -99,10 +102,10 @@ namespace Ck::Vulkan
 
 	void RenderContext::WaitSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
 	{
-		mSubmitters[commandQueue]->WaitExternalSemaphore(semaphore, waitStages);
+		mSubmitters[commandQueue]->WaitExternalSemaphore(std::move(semaphore), waitStages);
 	}
 
-	void RenderContext::ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence)
+	void RenderContext::SubmitCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence)
 	{
 		unsigned int submitCommandListCount = 0;
 		CommandList** submitCommandLists = COCKTAIL_STACK_ALLOC(CommandList*, commandListCount);
@@ -122,24 +125,33 @@ namespace Ck::Vulkan
 		mSubmitters[commandQueue]->ExecuteCommandList(submitCommandListCount, submitCommandLists, static_cast<Fence*>(fence));
 	}
 
-	void RenderContext::EndFrame()
-	{
-		mFrameContexts[mCurrentFrameContext]->Present(mPresentationQueue);
-
-		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContexts.size();
-	}
-
-	void RenderContext::Flush()
+	void RenderContext::Submit()
 	{
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 			mSubmitters[queueType]->TerminateBatch();
 
-		mScheduler->Flush();
+		mScheduler->Submit();
+	}
+
+	void RenderContext::Flush()
+	{
+		GetCurrentFrameContext()->Present(mPresentationQueue);
+
+		mCurrentFrameContext = (mCurrentFrameContext + 1) % mFrameContexts.GetSize();
+
+		FrameContext* currentFrameContext = GetCurrentFrameContext();
+		currentFrameContext->Synchronize();
+		currentFrameContext->Reset();
 	}
 
 	void RenderContext::Synchronize()
 	{
 		Flush();
 		COCKTAIL_VK_CHECK(vkDeviceWaitIdle(mRenderDevice->GetHandle()));
+	}
+
+	FrameContext* RenderContext::GetCurrentFrameContext() const
+	{
+		return mFrameContexts[mCurrentFrameContext].get();
 	}
 }

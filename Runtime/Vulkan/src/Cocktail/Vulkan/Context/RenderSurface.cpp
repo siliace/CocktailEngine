@@ -14,17 +14,17 @@ namespace Ck::Vulkan
 	RenderSurface::RenderSurface(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
-		mSurface(VK_NULL_HANDLE),
+		mHandle(VK_NULL_HANDLE),
 	    mVSyncEnable(false)
 	{
 		mDepthStencilFormat = createInfo.DepthStencilFormat;
 
 		// Create the Surface we will render to
 		Window& window = *createInfo.Window;
-		mSurface = WSI::CreateWindowSurface(mRenderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
+		mHandle = WSI::CreateWindowSurface(mRenderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
 
 		// Create the PresentationContext used to manage swapchains creation
-		mPresentationContext = std::make_unique<PresentationContext>(mRenderDevice, mSurface, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
+		mPresentationContext = std::make_unique<PresentationContext>(mRenderDevice, this, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
 
 		CreateRenderPass(createInfo.Samples, createInfo.DepthStencilFormat);
 
@@ -60,7 +60,7 @@ namespace Ck::Vulkan
 	RenderSurface::~RenderSurface()
 	{
 		mSwapchain = nullptr;
-		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mSurface, mAllocationCallbacks);
+		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mHandle, mAllocationCallbacks);
 	}
 
 	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence) const
@@ -81,7 +81,7 @@ namespace Ck::Vulkan
 		VkDebugUtilsObjectNameInfoEXT objectNameInfo{ VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT, nullptr };
 		{
 			objectNameInfo.objectType = VK_OBJECT_TYPE_SURFACE_KHR;
-			objectNameInfo.objectHandle = reinterpret_cast<Uint64>(mSurface);
+			objectNameInfo.objectHandle = reinterpret_cast<Uint64>(mHandle);
 			objectNameInfo.pObjectName = name;
 		}
 
@@ -139,6 +139,11 @@ namespace Ck::Vulkan
 	std::shared_ptr<Swapchain> RenderSurface::GetSwapchain() const
 	{
 		return mSwapchain;
+	}
+
+	VkSurfaceKHR RenderSurface::GetHandle() const
+	{
+		return mHandle;
 	}
 
 	void RenderSurface::CreateRenderPass(Renderer::RasterizationSamples samples, PixelFormat depthStencilFormat)
