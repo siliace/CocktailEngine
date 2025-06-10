@@ -13,38 +13,34 @@ namespace Ck::Vulkan
 
     SubmitScheduler::~SubmitScheduler()
     {
-		mBatches = {};
-		mPending.clear();
-		mTerminated.clear();
+		assert(mBatches.empty());
+		assert(mPending.empty());
+
+		for (QueueSubmitBatch* terminated : mTerminated)
+			mBatchPool.Recycle(terminated);
     }
 
-    QueueSubmitBatch *SubmitScheduler::ScheduleBatch(Renderer::CommandQueueType queueType, unsigned int queueIndex)
+    QueueSubmitBatch* SubmitScheduler::ScheduleBatch(Renderer::CommandQueueType queueType, unsigned int queueIndex)
     {
-		std::shared_ptr<QueueSubmitBatch> batch = mBatchPool.Allocate(mRenderDevice, queueType, queueIndex);
+		QueueSubmitBatch* batch = mBatchPool.AllocateUnsafe(mRenderDevice, queueType, queueIndex);
 		mBatches.push(batch);
 
-		return batch.get();
+		return batch;
 	}
 
 	void SubmitScheduler::ConnectFence(QueueSubmitBatch* batch, std::shared_ptr<Fence> fence)
 	{
-		batch->AssignFence(fence);
+		batch->AssignFence(std::move(fence));
 		batch->Connect(batch->OnCompleted(), [this, batch = batch]() {
-			auto itBatch = std::find_if(mPending.begin(), mPending.end(), [&](std::shared_ptr<QueueSubmitBatch> pendingBatch) {
-				return pendingBatch.get() == batch;
-			});
+			auto itBatch = std::find(mPending.begin(), mPending.end(), batch);
 
 			if (itBatch != mPending.end())
 			{
-				std::for_each(mPending.begin(), itBatch, [](std::shared_ptr<QueueSubmitBatch> pendingBatch) {
+				std::for_each(mPending.begin(), itBatch, [](QueueSubmitBatch* pendingBatch) {
 					pendingBatch->MarkCompleted();
 				});
 
-				mTerminated.insert(mTerminated.end(), 
-					std::make_move_iterator(mPending.begin()), 
-					std::make_move_iterator(std::next(itBatch))
-				);
-
+				mTerminated.insert(mTerminated.end(), mPending.begin(), std::next(itBatch));
 				mPending.erase(mPending.begin(), std::next(itBatch));
 			}
 		});
@@ -52,15 +48,18 @@ namespace Ck::Vulkan
 
 	void SubmitScheduler::Flush()
 	{
+		for (QueueSubmitBatch* terminated : mTerminated)
+			mBatchPool.Recycle(terminated);
+
 		mTerminated.clear();
 
 		while (!mBatches.empty())
 		{
-			std::shared_ptr<QueueSubmitBatch> batch = std::move(mBatches.front());
+			QueueSubmitBatch* batch = mBatches.front();
 			mBatches.pop();
 
 			batch->Submit();
-			mPending.emplace_back(std::move(batch));
+			mPending.emplace_back(batch);
 		}
 	}
 }

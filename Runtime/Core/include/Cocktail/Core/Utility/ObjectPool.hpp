@@ -22,6 +22,19 @@ namespace Ck
 		{
 		public:
 
+			struct Deleter
+			{
+				void operator()(T* object) const noexcept
+				{
+					Pool->Recycle(object);
+				}
+
+				ObjectPoolBase* Pool;
+			};
+
+			using SharedPtr = std::shared_ptr<T>;
+			using UniquePtr = std::unique_ptr<T, Deleter>;
+
 			/**
 			 * \brief Constructor
 			 * \param preAllocated 
@@ -92,7 +105,7 @@ namespace Ck
 			 * \return 
 			 */
 			template <typename... Args>
-			std::shared_ptr<T> Allocate(Args&&... args)
+			T* AllocateUnsafe(Args&&... args)
 			{
 				std::lock_guard<Lockable> lg(mMutex);
 				if (mVacants.empty())
@@ -104,12 +117,44 @@ namespace Ck
 				T* location = mVacants.back();
 				mVacants.pop_back();
 
-				auto deleter = [this](T* object) {
-					object->~T();
-					Recycle(object);
-				};
+				return new (location) T(std::forward<Args>(args)...);
+			}
 
-				return std::shared_ptr<T>(new (location) T(std::forward<Args>(args)...), deleter);
+			/**
+			 * \brief
+			 * \tparam Args
+			 * \param args
+			 * \return
+			 */
+			template <typename... Args>
+			SharedPtr Allocate(Args&&... args)
+			{
+				return SharedPtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
+			}
+
+			/**
+			 * \brief
+			 * \tparam Args
+			 * \param args
+			 * \return
+			 */
+			template <typename... Args>
+			UniquePtr AllocateUnique(Args&&... args)
+			{
+				return UniquePtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{this });
+			}
+
+			/**
+			 * \brief
+			 * \param object
+			 */
+			void Recycle(T* object)
+			{
+				object->~T();
+				{
+					std::lock_guard<Lockable> lg(mMutex);
+					mVacants.emplace_back(object);
+				}
 			}
 
 			/**
@@ -137,16 +182,6 @@ namespace Ck
 					mVacants.emplace_back(&vacants[i]);
 
 				mPages.emplace_back(std::move(page));
-			}
-
-			/**
-			 * \brief
-			 * \param object
-			 */
-			void Recycle(T* object)
-			{
-				std::lock_guard<Lockable> lg(mMutex);
-				mVacants.emplace_back(object);
 			}
 
 			bool mGrowable;

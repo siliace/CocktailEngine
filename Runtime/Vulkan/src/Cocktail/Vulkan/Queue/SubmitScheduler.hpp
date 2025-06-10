@@ -51,9 +51,9 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		TlsObjectPool<QueueSubmitBatch> mBatchPool;
-		std::queue<std::shared_ptr<QueueSubmitBatch>> mBatches;
-		std::vector<std::shared_ptr<QueueSubmitBatch>> mPending;
-		std::vector<std::shared_ptr<QueueSubmitBatch>> mTerminated;
+		std::queue<QueueSubmitBatch*> mBatches;
+		std::vector<QueueSubmitBatch*> mPending;
+		std::vector<QueueSubmitBatch*> mTerminated;
 	};
 }
 
