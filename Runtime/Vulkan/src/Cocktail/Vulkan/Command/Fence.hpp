@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param timeout 
 		 * \return 
 		 */
-		bool Wait(Uint64 timeout) override;
+		bool Wait(const Duration& timeout) override;
 
 		/**
 		 * \brief 

@@ -7,7 +7,7 @@
 namespace Ck::Renderer
 {
 	/**
-	 * \brief 
+     * \brief Interface representing an opaque handle to a GPU sampler object
 	 */
 	class Sampler : public RenderDeviceObject
 	{

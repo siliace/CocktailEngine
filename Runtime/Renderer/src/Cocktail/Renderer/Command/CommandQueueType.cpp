@@ -2,12 +2,12 @@
 
 namespace Ck::Renderer
 {
-	CommandQueueType SelectQueueForUsage(const Flags<CommandListUsage>& usage)
+	CommandQueueType SelectQueueForUsage(CommandListUsage usage)
 	{
-		if (usage & CommandListUsage::Graphic)
+		if (usage & CommandListUsageBits::Graphic)
 			return CommandQueueType::Graphic;
 
-		if (usage & CommandListUsage::Compute)
+		if (usage & CommandListUsageBits::Compute)
 			return CommandQueueType::Compute;
 
 		return CommandQueueType::Transfer;

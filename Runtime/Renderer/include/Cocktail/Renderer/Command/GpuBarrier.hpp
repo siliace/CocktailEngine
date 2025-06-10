@@ -11,7 +11,7 @@ namespace Ck::Renderer
     class Texture;
 
 	/**
-     * \brief 
+     * \brief Enumeration of possible barriers types
      */
     enum class GpuBarrierType
     {
@@ -26,7 +26,7 @@ namespace Ck::Renderer
         Buffer,
 
 	    /**
-         * \brief 
+         * \brief
          */
         Texture,
     };
@@ -48,17 +48,17 @@ namespace Ck::Renderer
     };
 
     /**
-     * \brief 
+     * \brief Structure describing a memory dependency
      */
     struct GpuBarrier
     {
 	    /**
-         * \brief
+         * \brief Structure describing a dependency of a Buffer memory's
          */
         struct BufferBarrier
         {
 	        /**
-             * \brief 
+             * \brief The Buffer
              */
             const Buffer* Resource = nullptr;
 
@@ -73,18 +73,18 @@ namespace Ck::Renderer
             ResourceState NewState;
 
 	        /**
-             * \brief 
+             * \brief The first byte of the memory range to synchronise
              */
             std::size_t Offset = 0;
 
 	        /**
-             * \brief 
+             * \brief The number of byte to synchronise
              */
             std::size_t Size = 0;
         };
 
 	    /**
-         * \brief 
+         * \brief Structure describing a dependency of a Texture memory's
          */
         struct TextureBarrier
         {

@@ -68,8 +68,8 @@ namespace Ck
 		mRenderSurface = renderDevice->CreateRenderSurface(renderSurfaceCreateInfo);
 	}
 
-	Renderer::Framebuffer* WindowSceneViewer::AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const
+	Renderer::Framebuffer* WindowSceneViewer::AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const
 	{
-		return frameContext.AcquireNextFramebuffer(mRenderSurface.get());
+		return renderContext.AcquireFramebuffer(mRenderSurface.get());
 	}
 }

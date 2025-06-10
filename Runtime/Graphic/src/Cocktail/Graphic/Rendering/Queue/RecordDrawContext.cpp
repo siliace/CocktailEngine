@@ -5,8 +5,8 @@
 
 namespace Ck
 {
-	RecordDrawContext::RecordDrawContext(Renderer::FrameContext& frameContext, RenderingModifiers modifiers) :
-		mFrameContext(&frameContext),
+	RecordDrawContext::RecordDrawContext(Renderer::RenderContext& renderContext, RenderingModifiers modifiers) :
+		mRenderContext(&renderContext),
 		mModifiers(modifiers),
 		mCurrentMaterialProgram(nullptr)
 	{
@@ -35,7 +35,7 @@ namespace Ck
 		unsigned int stride = vertexLayout.GetStride();
 
 		std::size_t allocationSize = vertexCount * stride;
-		Renderer::BufferArea area = mFrameContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
+		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
 		commandList.EnableVertexBinding(binding, true);
 		commandList.BindVertexBuffer(binding, area.Buffer, area.BaseOffset, stride, vertexLayout.IsInstanced(), vertexLayout.GetDivisor());
@@ -45,7 +45,7 @@ namespace Ck
 	void RecordDrawContext::BindIndexData(Renderer::CommandList& commandList, Renderer::IndexType indexType, unsigned int indexCount, const void* data) const
 	{
 		std::size_t allocationSize = indexCount * Renderer::ToDataType(indexType).GetSize();
-		Renderer::BufferArea area = mFrameContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
+		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
 		commandList.BindIndexBuffer(area.Buffer, area.BaseOffset, indexType);
 	}
@@ -53,7 +53,7 @@ namespace Ck
 	void RecordDrawContext::BindData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
 	{
 		std::size_t allocationSize = size;
-		Renderer::BufferArea area = mFrameContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
+		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
 		Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
 		assert(slot);
@@ -64,7 +64,7 @@ namespace Ck
 	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
 	{
 		std::size_t allocationSize = size;
-		Renderer::BufferArea area = mFrameContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
+		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
 		std::string n(name.data(), name.length());
 		mPersistentBuffers[CompositeKey<std::string, unsigned int>(n, arrayIndex)] = area;

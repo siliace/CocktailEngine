@@ -47,14 +47,6 @@ cocktail_source_directory(RENDERER_FILES
 )
 
 cocktail_source_directory(RENDERER_FILES    
-    FOLDER "Command/Allocator"
-    INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/Allocator/CommandListAllocator.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/Allocator/CommandListPool.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/Allocator/CommandListPoolCreateInfo.hpp
-)
-
-cocktail_source_directory(RENDERER_FILES    
     FOLDER "Command/Synchronization"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/Synchronization/Fence.hpp
@@ -64,7 +56,6 @@ cocktail_source_directory(RENDERER_FILES
 cocktail_source_directory(RENDERER_FILES    
     FOLDER "Context"
     INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Context/FrameContext.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Context/RenderContext.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Context/RenderContextCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Context/RenderSurface.hpp

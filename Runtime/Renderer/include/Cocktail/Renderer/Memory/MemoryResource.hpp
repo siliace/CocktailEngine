@@ -8,7 +8,7 @@
 namespace Ck::Renderer
 {
     /**
-     * \brief 
+     * \brief Interface shared by classes backed by GPU memory
      */
     class MemoryResource : public RenderDeviceObject
     {

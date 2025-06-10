@@ -47,14 +47,15 @@ namespace Ck::Vulkan
 
 	void Fence::Wait()
 	{
-		Wait(UINT64_MAX);
+		Wait(Duration::Infinite());
 	}
 
-	bool Fence::Wait(Uint64 timeout)
+	bool Fence::Wait(const Duration& timeout)
 	{
 		if (!mSignaled)
 		{
-			mSignaled = vkWaitForFences(mRenderDevice->GetHandle(), 1, &mHandle, VK_TRUE, timeout) == VK_SUCCESS;
+			Uint64 nanoseconds = timeout.GetCount(TimeUnit::Nanoseconds());
+			mSignaled = vkWaitForFences(mRenderDevice->GetHandle(), 1, &mHandle, VK_TRUE, nanoseconds) == VK_SUCCESS;
 			if (mSignaled)
 				mOnSignaled.Emit();
 		}

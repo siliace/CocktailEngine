@@ -246,11 +246,11 @@ namespace Ck::Vulkan
 
 		COCKTAIL_VK_CHECK(vkAllocateCommandBuffers(mRenderDevice->GetHandle(), &allocateInfo, &mHandle));
 
-		if (mUsage != Renderer::CommandListUsage::Transfer)
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
 		{
 			mStateManagers[Renderer::ShaderProgramType::Compute] = std::make_unique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
 
-			if (mUsage == Renderer::CommandListUsage::Graphic)
+			if (mUsage == Renderer::CommandListUsageBits::Graphic)
 				mStateManagers[Renderer::ShaderProgramType::Graphic] = std::make_unique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator, mDynamicState);
 		}
 
@@ -336,6 +336,8 @@ namespace Ck::Vulkan
 
 	void CommandList::Barrier(unsigned int barrierCount, const Renderer::GpuBarrier* barriers)
 	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::Synchronization2))
 		{
 			unsigned int memoryBarrierCount = 0;
@@ -535,6 +537,8 @@ namespace Ck::Vulkan
 
 	void CommandList::ExecuteCommandLists(unsigned int commandListCount, Renderer::CommandList** commandLists)
 	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
 		VkCommandBuffer* commandBufferHandles = COCKTAIL_STACK_ALLOC(VkCommandBuffer, commandListCount);
 		for (unsigned int i = 0; i < commandListCount; i++)
 		{
@@ -582,6 +586,18 @@ namespace Ck::Vulkan
 
 		assert(regionCount > 0);
 		vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
+	}
+
+	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, std::size_t offset, std::size_t length, const void* data)
+	{
+		StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(0, length);
+
+		VkBufferCopy region;
+		region.srcOffset = stagingBuffer.PushData(0, length, data);
+		region.dstOffset = offset;
+		region.size = length;
+
+		vkCmdCopyBuffer(mHandle, stagingBuffer.GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), 1, &region);
 	}
 
 	void CommandList::UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads)
@@ -638,14 +654,10 @@ namespace Ck::Vulkan
 		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
 	}
 
-	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
-	{
-		FlushComputeState();
-		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
-	}
-
 	void CommandList::BeginRenderPass(const Renderer::RenderPassBeginInfo& begin)
 	{
+		assert(mState == Renderer::CommandListState::Recording);
+
 		mCurrentFramebuffer = static_cast<const Framebuffer*>(begin.Framebuffer);
 		assert(mCurrentFramebuffer);
 
@@ -1020,14 +1032,26 @@ namespace Ck::Vulkan
 
 	void CommandList::Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance)
 	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
 		FlushGraphicState();
 		vkCmdDraw(mHandle, vertexCount, instanceCount, firstVertex, firstInstance);
 	}
 
 	void CommandList::DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance)
 	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
 		FlushGraphicState();
 		vkCmdDrawIndexed(mHandle, indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
+	}
+
+	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+
+		FlushComputeState();
+		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
 	}
 
 	void CommandList::Reset(bool releaseResources)
@@ -1044,7 +1068,7 @@ namespace Ck::Vulkan
 		return mState;
 	}
 
-	Renderer::CommandListUsage CommandList::GetUsage() const
+	Renderer::CommandListUsageBits CommandList::GetUsage() const
 	{
 		return mUsage;
 	}
@@ -1061,7 +1085,7 @@ namespace Ck::Vulkan
 
 	void CommandList::MarkInitial()
 	{
-		if (mUsage != Renderer::CommandListUsage::Transfer)
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
 		{
 			for (Renderer::ShaderProgramType programType : Enum<Renderer::ShaderProgramType>::Values)
 			{

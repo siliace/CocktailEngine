@@ -20,7 +20,8 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 * \param renderDevice 
-		 * \param createInfo 
+		 * \param createInfo
+		 * \param allocationCallbacks 
 		 */
 		RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
@@ -43,22 +44,31 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 * \param usage 
+		 * \param memoryType 
+		 * \return 
+		 */
+		Renderer::BufferAllocator* GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType) override;
+
+		/**
+		 * \brief 
+		 * \param renderSurface 
+		 * \return 
+		 */
+		Renderer::Framebuffer* AcquireFramebuffer(Renderer::RenderSurface* renderSurface) override;
+
+		/**
+		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::CommandListPool> CreateCommandListPool(const Renderer::CommandListPoolCreateInfo& createInfo) override;
+		Renderer::CommandList* CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
-		 * \return 
+		 * \param commandQueue 
 		 */
-		Renderer::FrameContext* BeginFrame() override;
-
-		/**
-		 * \brief 
-		 * \param queue 
-		 */
-		void SignalQueue(Renderer::CommandQueueType queue) override;
+		void SignalQueue(Renderer::CommandQueueType commandQueue) override;
 
 		/**
 		 * \brief Add a Fence to be signaled by the current submit batch
@@ -96,12 +106,12 @@ namespace Ck::Vulkan
 		 * \param commandLists 
 		 * \param fence 
 		 */
-		void ExecuteCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence) override;
+		void SubmitCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence) override;
 
 		/**
 		 * \brief 
 		 */
-		void EndFrame() override;
+		void Submit();
 
 		/**
 		 * \brief 
@@ -115,14 +125,18 @@ namespace Ck::Vulkan
 
 	private:
 
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		FrameContext* GetCurrentFrameContext() const;
+
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		VkQueue mPresentationQueue;
 		std::unique_ptr<SubmitScheduler> mScheduler;
 		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;
 		unsigned int mCurrentFrameContext;
-		std::vector<std::unique_ptr<FrameContext>> mFrameContexts;
-		Signal<Renderer::FrameContext*> mOnBeforeRedraw;
-		Signal<Renderer::FrameContext*, const Renderer::Framebuffer*> mOnRedraw;
+		FixedArray<std::unique_ptr<FrameContext>> mFrameContexts;
 	};
 }
 

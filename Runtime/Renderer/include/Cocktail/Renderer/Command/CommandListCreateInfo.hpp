@@ -16,10 +16,11 @@ namespace Ck::Renderer
 		/**
 		 * \brief The usage of the CommandList to create
 		 */
-		CommandListUsage Usage = CommandListUsage::Graphic;
+		CommandListUsageBits Usage = CommandListUsageBits::Graphic;
 
 		/**
 		 * \brief Specifies which states are likely to change frequently
+		 * This parameter might be ignored by some implementations and should be set only if needed.
 		 */
 		CommandListDynamicState DynamicState = {};
 

@@ -9,11 +9,8 @@
 #include <Cocktail/Renderer/RenderDevice.hpp>
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
-#include <Cocktail/Renderer/Command/Allocator/CommandListPool.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/Fence.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/FenceCreateInfo.hpp>
-#include <Cocktail/Renderer/Context/FrameContext.hpp>
-#include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
@@ -55,12 +52,8 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		mFontTextureView = renderDevice.CreateTextureView(textureViewCreateInfo);
 		mTextureSampler = renderDevice.CreateSampler(Renderer::SamplerCreateInfo{});
 
-		std::shared_ptr<Renderer::CommandListPool> commandListPool = renderContext.CreateCommandListPool({
-			Renderer::CommandListUsage::Transfer
-		});
-
-		std::shared_ptr<Renderer::CommandList> commandList = commandListPool->CreateCommandList({
-			Renderer::CommandListUsage::Transfer
+		Renderer::CommandList* commandList = renderContext.CreateCommandList({
+			Renderer::CommandListUsageBits::Transfer
 		});
 
 		Renderer::TextureSubResource fontSubResource = Renderer::TextureSubResource::All(*fontTexture);
@@ -86,12 +79,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
 		std::shared_ptr<Renderer::Fence> fence = renderDevice.CreateFence(fenceCreateInfo);
-
-		Renderer::CommandList* commandLists[] = {
-			commandList.get()
-		};
-
-		renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Transfer, 1, commandLists, fence.get());
+		renderContext.SubmitCommandLists(Renderer::CommandQueueType::Transfer, 1, &commandList, fence.get());
 		renderContext.Flush();
 
 		fence->Wait();
@@ -120,8 +108,8 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		assert(mTextureUniformSlot);
 	}
 
-	Connect(sceneViewer.OnRendered(), [&](Renderer::RenderContext& rc, Renderer::FrameContext& fc, Renderer::Framebuffer& fb) {
-		Render(rc, fc, fb);
+	Connect(sceneViewer.OnRendered(), [&](Renderer::RenderContext& rc, Renderer::Framebuffer& fb) {
+		Render(rc, fb);
 	});
 }
 
@@ -241,7 +229,7 @@ void ImGuiOverlay::SetupRenderState(Renderer::CommandList* commandList, Extent2D
 	commandList->UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
 }
 
-void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::FrameContext& frameContext, Renderer::Framebuffer& framebuffer)
+void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Framebuffer& framebuffer)
 {
 	ImDrawData* drawData = ImGui::GetDrawData();
 	if (!drawData)
@@ -253,16 +241,16 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 	if (framebufferSize.Width <= 0.f || framebufferSize.Height <= 0.f)
 		return;
 
-	std::shared_ptr<Renderer::CommandList> commandList = frameContext.CreateCommandList({ Renderer::CommandListUsage::Graphic, Renderer::CommandListDynamicStateBits::Scissor | Renderer::CommandListDynamicStateBits::Viewport });
+	Renderer::CommandList* commandList = renderContext.CreateCommandList({ Renderer::CommandListUsageBits::Graphic, Renderer::CommandListDynamicStateBits::Scissor | Renderer::CommandListDynamicStateBits::Viewport });
 
 	commandList->Begin(nullptr);
 	commandList->BeginRenderPass({ Renderer::RenderPassMode::Load, &framebuffer });
 
-	SetupRenderState(commandList.get(), framebufferSize);
+	SetupRenderState(commandList, framebufferSize);
 
 	for (ImDrawList* drawList : drawData->CmdLists)
 	{
-		Renderer::BufferAllocator* bufferAllocator = frameContext.GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex | Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified);
+		Renderer::BufferAllocator* bufferAllocator = renderContext.GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex | Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified);
 
 		Renderer::BufferArea vertexBufferArea = bufferAllocator->PushData(drawList->VtxBuffer.size_in_bytes(), drawList->VtxBuffer.Data);
 		Renderer::BufferArea indexBufferArea = bufferAllocator->PushData(drawList->IdxBuffer.size_in_bytes(), drawList->IdxBuffer.Data);
@@ -279,7 +267,7 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 			{
 				if (drawCmd.UserCallback == ImDrawCallback_ResetRenderState)
 				{
-					SetupRenderState(commandList.get(), framebufferSize);
+					SetupRenderState(commandList, framebufferSize);
 				}
 				else
 				{
@@ -318,9 +306,5 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 	commandList->EndRenderPass();
 	commandList->End();
 
-	Renderer::CommandList* commandLists[] = {
-		commandList.get()
-	};
-
-	renderContext.ExecuteCommandLists(Renderer::CommandQueueType::Graphic, 1, commandLists, nullptr);
+	renderContext.SubmitCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
 }

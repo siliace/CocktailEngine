@@ -24,7 +24,8 @@ namespace Ck::Renderer
         RenderSurfaceColorSpace,
 
 	    /**
-         * \brief 
+         * \brief Extension allowing reporting debug messages from the driver
+         * \see RenderDevice::OnDebugMessage
          */
         Debug,
 

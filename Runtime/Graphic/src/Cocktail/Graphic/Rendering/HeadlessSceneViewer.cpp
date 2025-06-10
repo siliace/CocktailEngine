@@ -55,7 +55,7 @@ namespace Ck
 		}
 	}
 
-	Renderer::Framebuffer* HeadlessSceneViewer::AcquireNextFramebuffer(Renderer::FrameContext& frameContext) const
+	Renderer::Framebuffer* HeadlessSceneViewer::AcquireNextFramebuffer(Renderer::RenderContext&) const
 	{
 		mCurrentFramebuffer = (mCurrentFramebuffer + 1) % mFramebuffers.size();
 		return mFramebuffers[mCurrentFramebuffer].get();

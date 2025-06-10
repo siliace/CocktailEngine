@@ -285,6 +285,10 @@ namespace Ck::Vulkan
 			case ApiVersion::Version_1_3:
 				applicationInfo.apiVersion = VK_API_VERSION_1_3;
 				break;
+
+			case ApiVersion::Version_1_4:
+				applicationInfo.apiVersion = VK_API_VERSION_1_4;
+				break;
 			}
 		}
 

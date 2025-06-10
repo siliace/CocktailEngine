@@ -13,7 +13,7 @@ namespace Ck::Renderer
 	enum class RenderPassMode
 	{
 		/**
-		 * \brief 
+		 * \brief Ignore previous state of framebuffer attachments
 		 */
 		Initial,
 

@@ -10,7 +10,9 @@
 namespace Ck::Renderer
 {
     /**
-     * \brief 
+     * \brief Interface representing an opaque handle to a GPU texture object
+     * A Texture is a multidimensional array of data representing pixels.
+     * Their purpose is to create TextureView objects that will be used in CommandList.
      */
     class Texture : public MemoryResource
     {

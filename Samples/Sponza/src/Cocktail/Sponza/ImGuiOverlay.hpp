@@ -35,7 +35,6 @@ private:
 	 */
 	static std::shared_ptr<Ck::Cursor> GetCursor(int mouseCursor);
 
-
 	/**
 	 * \brief 
 	 * \param commandList 
@@ -49,7 +48,7 @@ private:
 	 * \param frameContext 
 	 * \param framebuffer 
 	 */
-	void Render(Ck::Renderer::RenderContext& renderContext, Ck::Renderer::FrameContext& frameContext, Ck::Renderer::Framebuffer& framebuffer);
+	void Render(Ck::Renderer::RenderContext& renderContext, Ck::Renderer::Framebuffer& framebuffer);
 
 	Ck::Window* mWindow;
 	int mLastMouseCursor = -1;

@@ -4,7 +4,9 @@
 namespace Ck::Renderer
 {
 	/**
-	 * \brief 
+	 * \brief RenderContext descriptor structure
+	 * Describe the set of parameters to create a RenderContext
+	 * \see RenderDevice::CreateRenderContext
 	 */
 	struct RenderContextCreateInfo
 	{
