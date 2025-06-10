@@ -15,7 +15,7 @@ namespace Ck
 
 	void RenderQueue::PushCustom(const CustomRecordInfo& recordInfo, Uint64 sortingKey)
 	{
-		Emplace(std::make_shared<CustomRecord>(recordInfo), sortingKey);
+		Emplace(CustomRecord::New(recordInfo), sortingKey);
 	}
 
 	void RenderQueue::PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Uint64 sortingKey)
@@ -54,7 +54,7 @@ namespace Ck
 			return;
 		}
 
-		Emplace(std::make_shared<StaticMeshRecord>(recordInfo, materialProgramVariant.get()), sortingKey);
+		Emplace(StaticMeshRecord::New(recordInfo, materialProgramVariant.get()), sortingKey);
 	}
 
 	void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)

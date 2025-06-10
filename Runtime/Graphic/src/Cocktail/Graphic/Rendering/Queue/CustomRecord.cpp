@@ -4,10 +4,11 @@
 
 namespace Ck
 {
+	ObjectPool<CustomRecord> CustomRecord::sRecordPool;
+
 	std::shared_ptr<CustomRecord> CustomRecord::New(const CustomRecordInfo& recordInfo)
 	{
-		static ObjectPool<CustomRecord> RecordPool;
-		return RecordPool.Allocate(recordInfo);
+		return sRecordPool.Allocate(recordInfo);
 	}
 
     CustomRecord::CustomRecord(const CustomRecordInfo& recordInfo) :

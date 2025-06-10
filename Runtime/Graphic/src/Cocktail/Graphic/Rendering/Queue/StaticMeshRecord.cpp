@@ -7,6 +7,8 @@
 
 namespace Ck
 {
+	ObjectPool<StaticMeshRecord> StaticMeshRecord::sRecordPool;
+
 	bool IsStripTopology(Renderer::PrimitiveTopology primitiveTopology)
 	{
 		switch (primitiveTopology)
@@ -41,8 +43,7 @@ namespace Ck
 
 	std::shared_ptr<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
 	{
-		static ObjectPool<StaticMeshRecord> RecordPool;
-		return RecordPool.Allocate(recordInfo, materialProgramVariant);
+		return sRecordPool.Allocate(recordInfo, materialProgramVariant);
 	}
 
 	StaticMeshRecord::StaticMeshRecord(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant) :

@@ -34,6 +34,9 @@ namespace Ck
 
 	private:
 
+		friend ObjectPool<StaticMeshRecord>;
+		static ObjectPool<StaticMeshRecord> sRecordPool;
+
 		struct VertexInfo
 		{
 			Matrix4<float> Model;
@@ -46,6 +49,11 @@ namespace Ck
 			LinearColor Specular;
 			LinearColor Emissive;
 		};
+
+		/**
+		 * \brief Default constructor
+		 */
+		StaticMeshRecord() = default;
 
 		StaticMeshRecordInfo mRecordInfo;
 		MaterialProgramVariant* mMaterialProgramVariant;
