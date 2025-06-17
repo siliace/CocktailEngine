@@ -617,6 +617,9 @@ namespace Ck::Vulkan
 		StagingBuffer* currentStagingBuffer = nullptr;
 		for (unsigned int i = 0; i < uploadCount; i++)
 		{
+			assert(uploads[i].Level < texture->GetMipMapCount());
+			assert(uploads[i].ArrayLayer < texture->GetArrayLayerCount());
+
 			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), uploads[i].Level);
 			const size_t length = format.ComputeAllocationSize(levelSize);
 
@@ -652,6 +655,39 @@ namespace Ck::Vulkan
 
 		assert(regionCount > 0);
 		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
+	}
+
+	void CommandList::UploadTextureLevel(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels)
+	{
+		assert(level < texture->GetMipMapCount());
+		assert(arrayLayer < texture->GetArrayLayerCount());
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
+
+		PixelFormat format = texture->GetFormat();
+		const std::size_t alignment = format.GetBlockSize();
+		Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), level);
+		std::size_t length = format.ComputeAllocationSize(levelSize);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined());
+
+		StagingBuffer& stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+
+		VkImageSubresourceLayers subresourceLayers;
+		subresourceLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceLayers.mipLevel = level;
+		subresourceLayers.baseArrayLayer = arrayLayer;
+		subresourceLayers.layerCount = 1;
+
+		VkBufferImageCopy region;
+		region.bufferOffset = stagingBuffer.PushData(alignment, length, pixels);
+		region.bufferRowLength = 0;
+		region.bufferImageHeight = 0;
+		region.imageSubresource = subresourceLayers;
+		region.imageOffset = { 0, 0, 0 };
+		region.imageExtent = ToVkType(levelSize);
+
+		vkCmdCopyBufferToImage(mHandle, stagingBuffer.GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, 1, &region);
 	}
 
 	void CommandList::BeginRenderPass(const Renderer::RenderPassBeginInfo& begin)

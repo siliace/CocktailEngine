@@ -65,8 +65,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 			commandList->Barrier(1, barriers);
 		}
 
-		Renderer::TextureUploadInfo upload{ 0, 0, fontTexture->GetSize(), {0u, 0u, 0u}, pixels };
-		commandList->UploadTexture(fontTexture.get(), Renderer::ResourceState::CopyDestination, 1, &upload);
+		commandList->UploadTextureLevel(fontTexture.get(), Renderer::ResourceState::CopyDestination, 0, 0, pixels);
 
 		{
 			Renderer::GpuBarrier barriers[] = {

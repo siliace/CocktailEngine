@@ -101,6 +101,16 @@ namespace Ck::Renderer
 		virtual void UploadTexture(const Texture* texture, ResourceState resourceState, unsigned int uploadCount, const TextureUploadInfo* uploads) = 0;
 
 		/**
+		 * \brief Upload data into a Texture's memory
+		 * \param texture The Texture to update
+		 * \param resourceState The current state of \p texture
+		 * \param arrayLayer The layer of the level to upload
+		 * \param level The level to upload
+		 * \param pixels Pixels to upload in the level of \p texture
+		 */
+		virtual void UploadTextureLevel(const Texture* texture, ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels) = 0;
+
+		/**
 		 * \brief Start a render pass
 		 * The current state of the CommandList must be Recording.
 		 * \param begin The parameters to begin the render pass

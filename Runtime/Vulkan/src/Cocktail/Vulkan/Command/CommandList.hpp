@@ -45,6 +45,7 @@ namespace Ck::Vulkan
 		void UploadBuffer(const Renderer::Buffer* buffer, std::size_t offset, std::size_t length, const void* data) override;
 
 		void UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads) override;
+		void UploadTextureLevel(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels) override;
 
 		void BeginRenderPass(const Renderer::RenderPassBeginInfo& begin) override;
 		void EndRenderPass() override;
