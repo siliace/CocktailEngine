@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		vkGetDeviceQueue(mRenderDevice->GetHandle(), queueFamily.GetIndex(), 0, &mPresentationQueue);
 
 		for (unsigned int i = 0; i < createInfo.ConcurrentFrameCount; i++)
-			mFrameContexts[i] = std::make_unique<FrameContext>(this, createInfo.RenderSurfaceCount, allocationCallbacks);
+			mFrameContexts[i] = std::make_unique<FrameContext>(this, allocationCallbacks);
 
 		mScheduler = std::make_unique<SubmitScheduler>(mRenderDevice);
 		for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)

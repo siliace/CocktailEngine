@@ -49,7 +49,7 @@ namespace Ck
 			Log::Trace(logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
 		});
 
-		mRenderContext = mRenderDevice->CreateRenderContext({ 1, 3, "" });
+		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });
 
 		mResourceUploader = std::make_shared<ResourceUploader>();
 		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice);

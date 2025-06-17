@@ -10,9 +10,8 @@
 
 namespace Ck::Vulkan
 {
-	FrameContext::FrameContext(RenderContext* renderContext, unsigned int maxRenderSurfaceCount, const VkAllocationCallbacks* allocationCallbacks) :
+	FrameContext::FrameContext(RenderContext* renderContext, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderContext(renderContext),
-		mRenderSurfaceCount(0),
 		mSubmitted(false)
 	{
 		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
@@ -23,14 +22,6 @@ namespace Ck::Vulkan
 		Renderer::FenceCreateInfo fenceCreateInfo;
 		fenceCreateInfo.Signaled = false;
 		mFrameFence = std::static_pointer_cast<Fence>(renderDevice->CreateFence(fenceCreateInfo));
-
-		SemaphoreCreateInfo semaphoreCreateInfo;
-		mAcquiredRenderSurfaces = FixedArray<AcquiredRenderSurface>(maxRenderSurfaceCount);
-		for (unsigned int i = 0; i < maxRenderSurfaceCount; i++)
-		{
-			mAcquiredRenderSurfaces[i].ImageAvailable = renderDevice->CreateSemaphore(semaphoreCreateInfo);
-			mAcquiredRenderSurfaces[i].ImagePresentable = renderDevice->CreateSemaphore(semaphoreCreateInfo);
-		}
 	}
 
 	void FrameContext::Synchronize() const
@@ -51,26 +42,26 @@ namespace Ck::Vulkan
 
 	Framebuffer* FrameContext::AcquireNextFramebuffer(const RenderSurface* renderSurface)
 	{
-		for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
+		auto it = mAcquiredImages.find(renderSurface);
+		if (it == mAcquiredImages.end())
 		{
-			if (mAcquiredRenderSurfaces[i].Swapchain == renderSurface->GetSwapchain())
-				return renderSurface->GetFramebuffer(mAcquiredRenderSurfaces[i].SwapchainImageIndex).get();
+			std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+
+			AcquiredImage acquiredImage;
+			acquiredImage.ImageAvailable = renderDevice->CreateSemaphore({});
+			acquiredImage.ImagePresentable = renderDevice->CreateSemaphore({});
+
+			it = mAcquiredImages.insert(std::make_pair(renderSurface, std::move(acquiredImage))).first;
 		}
 
-		assert(mRenderSurfaceCount < mAcquiredRenderSurfaces.GetSize());
-		AcquiredRenderSurface& acquiredRenderSurface = mAcquiredRenderSurfaces[mRenderSurfaceCount];
-		Optional<unsigned int> imageIndex = renderSurface->AcquireNextFramebuffer(Duration::Infinite(), acquiredRenderSurface.ImageAvailable, nullptr);
-		if (imageIndex.IsEmpty())
-			return nullptr;
+		AcquiredImage& acquiredImage = it->second;
+		if (acquiredImage.ImageIndex.IsEmpty())
+		{
+			acquiredImage.ImageIndex = renderSurface->AcquireNextFramebuffer(Duration::Infinite(), acquiredImage.ImageAvailable, nullptr);
+			mRenderContext->WaitSemaphore(Renderer::CommandQueueType::Graphic, acquiredImage.ImageAvailable, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+		}
 
-		mRenderContext->WaitSemaphore(Renderer::CommandQueueType::Graphic, acquiredRenderSurface.ImageAvailable, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-
-		acquiredRenderSurface.Swapchain = renderSurface->GetSwapchain();
-		acquiredRenderSurface.SwapchainImageIndex = imageIndex.Get();
-
-		++mRenderSurfaceCount;
-
-		return renderSurface->GetFramebuffer(imageIndex.Get()).get();
+		return renderSurface->GetFramebuffer(acquiredImage.ImageIndex.Get()).get();
 	}
 
 	CommandList* FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
@@ -121,42 +112,54 @@ namespace Ck::Vulkan
 		mRenderContext->SignalFence(Renderer::CommandQueueType::Graphic, mFrameFence);
 
 		// The GPU also must wait until the swapchain's image is not anymore involved in any rendering operations.
-		for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
-			mRenderContext->SignalSemaphore(Renderer::CommandQueueType::Graphic, mAcquiredRenderSurfaces[i].ImagePresentable);
+		for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
+		{
+			if (acquiredImage.ImageIndex.IsEmpty())
+				continue;
+
+			mRenderContext->SignalSemaphore(Renderer::CommandQueueType::Graphic, acquiredImage.ImagePresentable);
+		}
 
 		// Effectively submit everything on GPU
 		mRenderContext->Submit();
 
-		if (mRenderSurfaceCount)
+		if (!mAcquiredImages.empty())
 		{
-			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mRenderSurfaceCount);
-			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mRenderSurfaceCount);
-			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mRenderSurfaceCount);
-			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mRenderSurfaceCount);
+			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mAcquiredImages.size());
+			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mAcquiredImages.size());
+			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mAcquiredImages.size());
+			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.size());
 
-			for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
+			unsigned int acquiredImageCount = 0;
+			for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
 			{
-				waitSemaphoreHandles[i] = mAcquiredRenderSurfaces[i].ImagePresentable->GetHandle();
-				swapchainHandles[i] = mAcquiredRenderSurfaces[i].Swapchain->GetHandle();
-				imageIndexes[i] = mAcquiredRenderSurfaces[i].SwapchainImageIndex;
+				if (acquiredImage.ImageIndex.IsEmpty())
+					continue;
+
+				waitSemaphoreHandles[acquiredImageCount] = acquiredImage.ImagePresentable->GetHandle();
+				swapchainHandles[acquiredImageCount] = acquiredSurface->GetSwapchain()->GetHandle();
+				imageIndexes[acquiredImageCount] = acquiredImage.ImageIndex.Get();
+
+				++acquiredImageCount;
 			}
 
-			VkPresentInfoKHR presentInfo{ VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, nullptr };
+			if (acquiredImageCount > 0)
 			{
-				presentInfo.waitSemaphoreCount = mRenderSurfaceCount;
-				presentInfo.pWaitSemaphores = waitSemaphoreHandles;
-				presentInfo.swapchainCount = mRenderSurfaceCount;
-				presentInfo.pSwapchains = swapchainHandles;
-				presentInfo.pImageIndices = imageIndexes;
-				presentInfo.pResults = result;
+				VkPresentInfoKHR presentInfo{ VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, nullptr };
+				{
+					presentInfo.waitSemaphoreCount = acquiredImageCount;
+					presentInfo.pWaitSemaphores = waitSemaphoreHandles;
+					presentInfo.swapchainCount = acquiredImageCount;
+					presentInfo.pSwapchains = swapchainHandles;
+					presentInfo.pImageIndices = imageIndexes;
+					presentInfo.pResults = result;
+				}
+
+				vkQueuePresentKHR(queue, &presentInfo);
+
+				for (auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
+					acquiredImage.ImageIndex = Optional<unsigned int>::Empty();
 			}
-
-			vkQueuePresentKHR(queue, &presentInfo);
-
-			for (unsigned int i = 0; i < mRenderSurfaceCount; i++)
-				mAcquiredRenderSurfaces[i].Swapchain = nullptr;
-
-			mRenderSurfaceCount = 0;
 		}
 
 		mSubmitted = true;

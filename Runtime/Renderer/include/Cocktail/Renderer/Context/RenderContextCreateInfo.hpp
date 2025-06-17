@@ -11,11 +11,6 @@ namespace Ck::Renderer
 	struct RenderContextCreateInfo
 	{
 		/**
-		 * \brief Specifies the number of RenderSurface to be acquired per frame
-		 */
-		unsigned int RenderSurfaceCount = 1;
-
-		/**
 		 * \brief Specifies the number of concurrent frame
 		 */
 		unsigned int ConcurrentFrameCount = 3;

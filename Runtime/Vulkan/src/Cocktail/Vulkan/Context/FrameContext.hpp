@@ -20,10 +20,9 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 * \param renderContext
-		 * \param maxRenderSurfaceCount
 		 * \param allocationCallbacks
 		 */
-		FrameContext(RenderContext* renderContext, unsigned int maxRenderSurfaceCount, const VkAllocationCallbacks* allocationCallbacks);
+		FrameContext(RenderContext* renderContext, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief
@@ -67,38 +66,18 @@ namespace Ck::Vulkan
 
 		using BufferAllocatorKey = CompositeKey<Renderer::BufferUsageFlags, Renderer::MemoryType>;
 
-		/**
-		 * \brief 
-		 */
-		struct AcquiredRenderSurface
+		struct AcquiredImage
 		{
-			/**
-			 * \brief 
-			 */
-			std::shared_ptr<Swapchain> Swapchain;
-
-			/**
-			 * \brief 
-			 */
-			unsigned int SwapchainImageIndex;
-
-			/**
-			 * \brief 
-			 */
+			Optional<unsigned int> ImageIndex;
 			std::shared_ptr<Semaphore> ImageAvailable;
-
-			/**
-			 * \brief 
-			 */
 			std::shared_ptr<Semaphore> ImagePresentable;
 		};
 
 		RenderContext* mRenderContext;
-		unsigned int mRenderSurfaceCount;
 		std::shared_ptr<CommandListPool> mCommandListPool;
 		std::vector<std::shared_ptr<CommandList>> mCommandLists;
 		std::shared_ptr<Fence> mFrameFence;
-		FixedArray<AcquiredRenderSurface> mAcquiredRenderSurfaces;
+		std::unordered_map<const RenderSurface*, AcquiredImage> mAcquiredImages;
 		std::unordered_map<BufferAllocatorKey, std::shared_ptr<BufferAllocator>> mBufferAllocators;
 		bool mSubmitted;
 	};
