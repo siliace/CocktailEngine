@@ -49,24 +49,140 @@ namespace Ck::Vulkan
 			return {};
 		}
 
-		VkAccessFlags GetSourceResourceStateAccess(Renderer::ResourceState resourceState)
+		VkAccessFlags GetSourceResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags2 GetSourceResourceStateAccess2(Renderer::ResourceState resourceState)
+		VkAccessFlags2 GetSourceResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_2_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_2_TRANSFER_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags GetDestinationResourceStateAccess(Renderer::ResourceState resourceState)
+		VkAccessFlags GetDestinationResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_SHADER_READ_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_ACCESS_INDEX_READ_BIT;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return VK_ACCESS_UNIFORM_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
-		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::ResourceState resourceState)
+		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
-			return 0;
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT_KHR : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT_KHR;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_2_SHADER_READ_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_2_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_ACCESS_2_INDEX_READ_BIT;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return VK_ACCESS_2_UNIFORM_READ_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
 		}
 
 		VkPipelineStageFlags GetResourceStatePipelineStage(Renderer::ResourceState resourceState, const PixelFormat& format)
@@ -103,7 +219,7 @@ namespace Ck::Vulkan
 			switch (resourceState)
 			{
 			case Renderer::ResourceState::Undefined:
-				return VK_PIPELINE_STAGE_2_NONE_KHR;
+				return VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
 
 			case Renderer::ResourceState::FramebufferAttachment:
 				return format.IsColor() ? VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR : VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR;
@@ -161,8 +277,16 @@ namespace Ck::Vulkan
 			Renderer::ResourceState newState = barrier.Buffer.NewState;
 			const Renderer::Buffer* resource = barrier.Buffer.Resource;
 
-			bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-			bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			if constexpr (std::is_same_v<T, VkBufferMemoryBarrier2KHR>)
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, PixelFormat::Undefined());
+			}
+			else
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, PixelFormat::Undefined());
+			}
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
 			{
 				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
@@ -196,8 +320,17 @@ namespace Ck::Vulkan
 			Renderer::ResourceState newState = barrier.Texture.NewState;
 			const Renderer::Texture* resource = barrier.Texture.Resource;
 
-			imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState);
-			imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState);
+			if constexpr (std::is_same_v<T, VkImageMemoryBarrier2KHR>)
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, resource->GetFormat());
+			}
+			else
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, resource->GetFormat());
+			}
+
 			imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState, resource->GetFormat());
 			imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState, resource->GetFormat());
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
@@ -413,8 +546,8 @@ namespace Ck::Vulkan
 				if (barrier.Type == Renderer::GpuBarrierType::Memory)
 				{
 					VkMemoryBarrier memoryBarrier;
-					memoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
-					memoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT;
+					memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+					memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 
 					vkCmdPipelineBarrier(mHandle,
 						VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
