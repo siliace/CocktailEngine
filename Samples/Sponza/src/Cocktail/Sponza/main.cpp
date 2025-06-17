@@ -1,5 +1,7 @@
 #include <cmrc/cmrc.hpp>
+
 #include <Cocktail/Core/Application/Application.hpp>
+#include <Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp>
 #include <Cocktail/Core/System/Keyboard/Keyboard.hpp>
 #include <Cocktail/Core/System/Mouse/Mouse.hpp>
 #include <Cocktail/Core/System/Window/WindowFactory.hpp>
@@ -14,8 +16,7 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
-#include "ImGuiOverlay.hpp"
-#include "Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp"
+#include <Cocktail/Sponza/ImGuiOverlay.hpp>
 
 using namespace Ck;
 
