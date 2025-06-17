@@ -110,6 +110,12 @@ namespace Ck::Vulkan
 		 */
 		std::shared_ptr<Swapchain> GetSwapchain() const;
 
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		VkSurfaceKHR GetHandle() const;
+
 	private:
 
 		/**
@@ -129,7 +135,7 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
-		VkSurfaceKHR mSurface;
+		VkSurfaceKHR mHandle;
 		PixelFormat mDepthStencilFormat;
 		std::unique_ptr<PresentationContext> mPresentationContext;
 		std::shared_ptr<RenderPass> mRenderPass;

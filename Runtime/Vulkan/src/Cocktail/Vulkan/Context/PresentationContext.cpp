@@ -5,6 +5,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Context/PresentationContext.hpp>
+#include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
 #include <Cocktail/Vulkan/Queue/QueueFamilyContext.hpp>
 
@@ -64,7 +65,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	PresentationContext::PresentationContext(std::shared_ptr<RenderDevice> renderDevice, VkSurfaceKHR surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
+	PresentationContext::PresentationContext(std::shared_ptr<RenderDevice> renderDevice, RenderSurface* surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
 		mRenderDevice(std::move(renderDevice)),
 		mSurface(surface),
 		mSurfaceColorSpace(colorSpace)
@@ -73,20 +74,20 @@ namespace Ck::Vulkan
 
 		VkBool32 supported;
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueFamilyContext.GetFamily(Renderer::CommandQueueType::Graphic).GetIndex(), mSurface, &supported));
+		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueFamilyContext.GetFamily(Renderer::CommandQueueType::Graphic).GetIndex(), mSurface->GetHandle(), &supported));
 		if (supported == VK_FALSE)
 			throw std::runtime_error("Surface not supported by physical device");
 
 		unsigned int presentModeCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface, &presentModeCount, nullptr);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface->GetHandle(), &presentModeCount, nullptr);
 
 		mPresentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface, &presentModeCount, mPresentModes.data());
+		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface->GetHandle(), &presentModeCount, mPresentModes.data());
 
-		mSurfaceFormat = ChooseSurfaceFormat(physicalDevice, mSurface, colorDepth, alphaDepth, mSurfaceColorSpace);
+		mSurfaceFormat = ChooseSurfaceFormat(physicalDevice, mSurface->GetHandle(), colorDepth, alphaDepth, mSurfaceColorSpace);
 
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mRenderDevice->GetPhysicalDeviceHandle(), mSurface, &surfaceCapabilities));
+		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mRenderDevice->GetPhysicalDeviceHandle(), mSurface->GetHandle(), &surfaceCapabilities));
 		mBufferCount = std::clamp(bufferCount, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount);
 	}
 
@@ -96,7 +97,7 @@ namespace Ck::Vulkan
 			throw std::invalid_argument("PresentMode not supported by the PresentationContext");
 
 		VkSurfaceCapabilitiesKHR surfaceCapabilities;
-		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mRenderDevice->GetPhysicalDeviceHandle(), mSurface, &surfaceCapabilities));
+		COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mRenderDevice->GetPhysicalDeviceHandle(), mSurface->GetHandle(), &surfaceCapabilities));
 
 		SwapchainCreateInfo createInfo;
 		createInfo.Surface = mSurface;

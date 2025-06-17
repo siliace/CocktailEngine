@@ -9,6 +9,7 @@
 
 namespace Ck::Vulkan
 {
+	class RenderSurface;
 	class Swapchain;
 
 	/**
@@ -19,7 +20,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		VkSurfaceKHR Surface = VK_NULL_HANDLE;
+		RenderSurface* Surface = nullptr;
 
 		/**
 		 * \brief 
