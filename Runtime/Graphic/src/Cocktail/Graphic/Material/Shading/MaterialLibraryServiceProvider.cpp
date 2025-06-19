@@ -22,6 +22,31 @@ namespace Ck
 		application->AfterBooted<SystemServiceProvider>([](Application* application, ServiceProvider* systemServiceProvider) {
 			application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
 				MaterialProgramLibrary::Entry entry;
+				entry.Name = "basic_sprite";
+				entry.RenderableType = RenderableType::Sprite;
+				entry.ShadingMode = Material::ShadingMode::Unlit;
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+				entry.Interface.Textures[Material::TextureType::BaseColor] = "ck_MaterialBaseColor";
+				entry.Interface.Textures[Material::TextureType::Alpha] = "ck_MaterialAlpha";
+
+				{
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/sprite/default.vert.spv");
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/sprite/default.frag.spv");
+
+					EnumMap<Renderer::ShaderType, ByteArray> binaries;
+					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
+					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
+
+					entry.VariantsBinaries.push_back(std::move(binaries));
+				}
+
+				materialProgramLibrary->Register(entry);
+			});
+
+			application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+				MaterialProgramLibrary::Entry entry;
 				entry.Name = "basic_mesh";
 				entry.RenderableType = RenderableType::Mesh;
 				entry.ShadingMode = Material::ShadingMode::Phong;

@@ -335,11 +335,30 @@ cocktail_add_shader(GRAPHIC_FILES
     MACRO COCKTAIL_VERTEX_HAS_UV COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE COCKTAIL_MATERIAL_HAS_ALPHA_TEXTURE COCKTAIL_VERTEX_HAS_NORMAL
 )
 
+cocktail_add_shader(GRAPHIC_FILES
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/default.vert.spv
+    TYPE vert
+    FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/basic_sprite.vert
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/default.frag.spv
+    TYPE frag
+    FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/basic_sprite.frag
+)
+
 cocktail_resource_directory(GRAPHIC_FILES
     FOLDER "shaders/mesh"
     RESOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.frag
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.vert
+)
+
+cocktail_resource_directory(GRAPHIC_FILES
+    FOLDER "shaders/sprite"
+    RESOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/basic_sprite.frag
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/sprite/basic_sprite.vert
 )
 
 cocktail_add_runtime_library(
