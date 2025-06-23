@@ -1,3 +1,4 @@
+
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/Image/ImageServiceProvider.hpp>
 #include <Cocktail/Core/Log/LogManager.hpp>

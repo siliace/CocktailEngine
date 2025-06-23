@@ -118,6 +118,7 @@ cocktail_source_directory(CORE_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/ConsoleLogChannel.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/Log.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogCategory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogChannel.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogEntry.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogLevel.hpp

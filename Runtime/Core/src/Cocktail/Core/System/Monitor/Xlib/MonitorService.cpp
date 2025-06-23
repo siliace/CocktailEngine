@@ -2,6 +2,8 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/MonitorService.hpp>
 
+CK_DEFINE_LOG_CATEGORY(XLibLogCategory, LogLevel::Info);
+
 namespace Ck::Detail::Xlib
 {
 	MonitorService::MonitorService(::Display* display) :	
@@ -11,7 +13,7 @@ namespace Ck::Detail::Xlib
 		mExtensionSupported = XQueryExtension(mDisplay, "RANDR", &version, &version, &version);
 		if (!mExtensionSupported)
 		{
-			Log::Warning("X11 extension RANDR is not supported, MonitorService will be disabled");
+			CK_LOG(XLibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
 			return;
 		}	
 		
