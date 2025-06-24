@@ -24,6 +24,11 @@ namespace Ck::Vulkan
 		StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
 
 		/**
+		 * \brief Destructor
+		 */
+		~StagingAllocator();
+
+		/**
 		 * \brief Acquire a staging buffer with at last \p allocationSize bytes available alignment on a specified \p alignment
 		 * The allocator will try to reuse a much as possible existing buffers.
 		 * If no staging buffer as enough space to fit \p allocationSize, a new buffer of the appropriate size will be created.
@@ -31,7 +36,7 @@ namespace Ck::Vulkan
 		 * \param allocationSize The size (in bytes) of the data to fit in the staging buffer
 		 * \return A staging buffer
 		 */
-		StagingBuffer& AcquireStagingBuffer(std::size_t alignment, std::size_t allocationSize);
+		StagingBuffer* AcquireStagingBuffer(std::size_t alignment, std::size_t allocationSize);
 
 		/**
 		 * \brief Ensure at least \p allocationSize is available in one of the staging buffer
@@ -54,8 +59,9 @@ namespace Ck::Vulkan
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::BufferUsageFlags mBufferUsage;
 		std::size_t mBufferSize;
-		std::vector<StagingBuffer> mAcquiredBuffers;
-		std::vector<StagingBuffer> mAvailableBuffers;
+		std::vector<StagingBuffer*> mAcquiredBuffers;
+		std::vector<StagingBuffer*> mAvailableBuffers;
+		TlsObjectPool<StagingBuffer> mStagingBufferPool;
 	};
 }
 

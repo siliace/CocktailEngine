@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		 * \param length 
 		 * \return 
 		 */
-		StagingBuffer& AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
+		StagingBuffer* AcquireStagingBuffer(std::size_t alignment, std::size_t length) const;
 
 		/**
 		 * \brief 

@@ -12,63 +12,82 @@ namespace Ck::Vulkan
 		/// Nothing
 	}
 
-	StagingBuffer& StagingAllocator::AcquireStagingBuffer(std::size_t alignment, std::size_t allocationSize)
+	StagingAllocator::~StagingAllocator()
 	{
-		for (StagingBuffer& buffer : mAcquiredBuffers)
+		Reset(true);
+	}
+
+	StagingBuffer* StagingAllocator::AcquireStagingBuffer(std::size_t alignment, std::size_t allocationSize)
+	{
+		for (StagingBuffer* buffer : mAcquiredBuffers)
 		{
-			std::size_t padding = buffer.ComputePadding(alignment);
-			if (padding + allocationSize <= buffer.GetRemainingCapacity())
+			std::size_t padding = buffer->ComputePadding(alignment);
+			if (padding + allocationSize <= buffer->GetRemainingCapacity())
 				return buffer;
 		}
 
-		auto itBuffer = std::find_if(mAvailableBuffers.begin(), mAvailableBuffers.end(), [&](const StagingBuffer& stagingBuffer) {
-			return stagingBuffer.GetRemainingCapacity() + stagingBuffer.ComputePadding(alignment) >= allocationSize;
+		auto itStagingBuffer = std::find_if(mAvailableBuffers.begin(), mAvailableBuffers.end(), [&](StagingBuffer* stagingBuffer) {
+			return stagingBuffer->GetRemainingCapacity() + stagingBuffer->ComputePadding(alignment) >= allocationSize;
 		});
 
-		if (itBuffer != mAvailableBuffers.end())
+		StagingBuffer* stagingBuffer;
+		if (itStagingBuffer != mAvailableBuffers.end())
 		{
-			StagingBuffer buffer = *itBuffer;
-
-			mAvailableBuffers.erase(itBuffer);
-			return mAcquiredBuffers.emplace_back(std::move(buffer));
+			stagingBuffer = *itStagingBuffer;
+			mAvailableBuffers.erase(itStagingBuffer);
+		}
+		else
+		{
+			stagingBuffer = mStagingBufferPool.AllocateUnsafe(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize));
 		}
 
-		return mAcquiredBuffers.emplace_back(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize));
+		mAcquiredBuffers.push_back(stagingBuffer);
+
+		return stagingBuffer;
 	}
 
 	void StagingAllocator::Reserve(std::size_t allocationSize)
 	{
-		for (const StagingBuffer& acquiredBuffer : mAcquiredBuffers)
+		for (const StagingBuffer* acquiredBuffer : mAcquiredBuffers)
 		{
-			if (allocationSize < acquiredBuffer.GetRemainingCapacity())
+			if (allocationSize < acquiredBuffer->GetRemainingCapacity())
 				return;
 		}
 
-		for (const StagingBuffer& availableBuffer : mAvailableBuffers)
+		for (const StagingBuffer* availableBuffer : mAvailableBuffers)
 		{
-			if (allocationSize < availableBuffer.GetRemainingCapacity())
+			if (allocationSize < availableBuffer->GetRemainingCapacity())
 				return;
 		}
 
-		mAvailableBuffers.emplace_back(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize));
+		mAvailableBuffers.push_back(
+			mStagingBufferPool.AllocateUnsafe(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize))
+		);
 	}
 
 	void StagingAllocator::Reset(bool release)
 	{
 		if (!release && !mAcquiredBuffers.empty())
 		{
-			for (StagingBuffer& stagingBuffer : mAcquiredBuffers)
+			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
 			{
-				stagingBuffer.Reset();
+				stagingBuffer->Reset();
 				mAvailableBuffers.push_back(stagingBuffer);
 			}
 		}
 		else
 		{
+			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
+				mStagingBufferPool.Recycle(stagingBuffer);
+
+			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
+				mStagingBufferPool.Recycle(stagingBuffer);
+
 			mAvailableBuffers.clear();
 		}
 
 		mAcquiredBuffers.clear();
+
 		mRenderDevice->Resolve<DeviceMemoryAllocator>()->GarbageCollect(release);
 	}
 }

@@ -41,7 +41,7 @@ namespace Ck::Vulkan
 		CommandListPool::Reset(true);
 	}
 
-	StagingBuffer& CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
+	StagingBuffer* CommandListPool::AcquireStagingBuffer(std::size_t alignment, std::size_t length) const
 	{
 		return mStagingAllocator->AcquireStagingBuffer(alignment, length);
 	}
