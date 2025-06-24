@@ -5,6 +5,8 @@
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfImporter.hpp>
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfSceneContainer.hpp>
 
+#include "Cocktail/Core/Log/Log.hpp"
+
 namespace Ck
 {    
     namespace
@@ -82,10 +84,17 @@ namespace Ck
     {
         tinygltf::Model model;
         std::string errors, warnings;
-        
+
+        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene {}", path.string());
         bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, path.string());
         if (!success)
+        {
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Failed to load scene {}: {}", path.string(), errors);
             return nullptr;
+        }
+
+        if (!warnings.empty())
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Scene {} loaded with warnings: {}", path.string(), warnings);
 
         return std::make_shared<GltfSceneContainer>(model);
     }

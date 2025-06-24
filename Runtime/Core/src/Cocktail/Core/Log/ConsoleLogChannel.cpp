@@ -27,7 +27,7 @@ namespace Ck
 
 		mConsole->SetColors(background, foreground);
 
-		std::string fullMessage = fmt::format("{} - {}", entry.Category->GetName(), entry.Message);
+		std::string fullMessage = fmt::format("{} - {}\n", entry.Category->GetName(), entry.Message);
 		mConsole->GetOutput().Write(fullMessage.c_str(), fullMessage.length());
 	}
 }
