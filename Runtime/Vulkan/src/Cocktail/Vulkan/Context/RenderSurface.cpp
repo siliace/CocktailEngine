@@ -1,6 +1,7 @@
 #include <Cocktail/Core/Log/Log.hpp>
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
+#include <Cocktail/Vulkan/Vulkan.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
@@ -182,7 +183,7 @@ namespace Ck::Vulkan
 			}
 			else
 			{
-				Log::Warning("RenderSurface does not support present mode immediate, vsync cannot be disabled");
+				CK_LOG(VulkanLogCategory, LogLevel::Warning, "RenderSurface does not support present mode immediate, vsync cannot be disabled");
 
 				mVSyncEnable = true;
 				presentMode = VK_PRESENT_MODE_FIFO_KHR;

@@ -5,7 +5,7 @@
 
 #include <fmt/core.h>
 
-#define COCKTAIL_DECLARE_EXCEPTION_BASE(__Name, __Message, __Base) \
+#define CK_DECLARE_EXCEPTION_BASE(__Name, __Message, __Base) \
 	class __Name : public __Base \
 	{ \
 	public: \

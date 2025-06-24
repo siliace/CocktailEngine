@@ -6,14 +6,4 @@ namespace Ck
 	{
 		ResolveFacadeInstance()->RegisterChannel(name, std::move(logChannel));
 	}
-
-	LogLevel Log::GetLevel()
-	{
-		return ResolveFacadeInstance()->GetLevel();
-	}
-
-	void Log::SetLevel(LogLevel level)
-	{
-		ResolveFacadeInstance()->SetLevel(level);
-	}
 }

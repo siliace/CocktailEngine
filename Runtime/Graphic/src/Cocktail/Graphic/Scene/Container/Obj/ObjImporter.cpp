@@ -2,6 +2,7 @@
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
 #include <Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
 #include <Cocktail/Core/Utility/StringUtils.hpp>
 
@@ -10,7 +11,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(ObjParseError, "Failed to parse obj file", std::runtime_error);
+	CK_DECLARE_EXCEPTION_BASE(ObjParseError, "Failed to parse obj file", std::runtime_error);
 
 	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
 	{
@@ -21,6 +22,7 @@ namespace Ck
 		readerConfig.vertex_color = false;
 		readerConfig.mtl_search_path = path.parent_path().string();
 
+		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
 		tinyobj::ObjReader reader;
 		if (!reader.ParseFromFile(path.string(), readerConfig))
 			throw ObjParseError(reader.Error());

@@ -26,4 +26,9 @@ namespace Ck::Main::Win32
 	{
 		return mArgv;
 	}
+
+	bool Win32Application::IsDebuggerPresent() const
+	{
+		return ::IsDebuggerPresent() == TRUE;
+	}
 }

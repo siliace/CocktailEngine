@@ -1,13 +1,14 @@
 #include <stb_image/stb_image.h>
 
 #include <Cocktail/Core/Exception.hpp>
+#include <Cocktail/Core/Image/ImageLoader.hpp>
 #include <Cocktail/Core/Image/StbLoader/StbImageImporter.hpp>
 #include <Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp>
-#include <Cocktail/Core/System/FileSystem/Storage.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(StbImportError, "Failed to import image", std::runtime_error);
+	CK_DECLARE_EXCEPTION_BASE(StbImportError, "Failed to import image", std::runtime_error);
 
 	StbImageImporter::StbImageImporter() :
 		mCallbacks()
@@ -15,6 +16,12 @@ namespace Ck
 		mCallbacks.read = &StbImageImporter::ReadCallback;
 		mCallbacks.skip = &StbImageImporter::SkipCallback;
 		mCallbacks.eof = &StbImageImporter::EofCallback;
+	}
+
+	std::shared_ptr<Image> StbImageImporter::LoadFromPath(const std::filesystem::path& path, const ImageImportParameters& parameters)
+	{
+		CK_LOG(ImageLoaderLogCategory, LogLevel::Info, "Loading image from {}", path.string());
+		return AssetImporter<Image, ImageImportParameters>::LoadFromPath(path, parameters);
 	}
 
 	std::shared_ptr<Image> StbImageImporter::LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters)

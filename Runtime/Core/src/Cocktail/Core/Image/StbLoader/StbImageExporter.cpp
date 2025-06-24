@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(StbExportError, "Failed to export image", std::runtime_error);
+	CK_DECLARE_EXCEPTION_BASE(StbExportError, "Failed to export image", std::runtime_error);
 
 	namespace
 	{

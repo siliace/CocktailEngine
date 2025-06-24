@@ -7,103 +7,20 @@
 #include <fmt/core.h>
 
 #include <Cocktail/Core/Enum.hpp>
+#include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogChannel.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
+#include <Cocktail/Core/Signal/Signal.hpp>
+#include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 namespace Ck
 {
+	/**
+	 * \brief 
+	 */
 	class COCKTAIL_CORE_API LogManager
 	{
 	public:
-
-		/**
-		 * \brief 
-		 */
-		LogManager();
-
-		LogManager(const LogManager& other) = delete;
-		LogManager(LogManager&& other) noexcept = default;
-
-		LogManager& operator=(const LogManager& other) = delete;
-		LogManager& operator=(LogManager&& other) noexcept = default;
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		void Debug(std::string_view message, Args&&... args)
-		{
-			Trace(LogLevel::Debug, message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		void Info(std::string_view message, Args&&... args)
-		{
-			Trace(LogLevel::Info, message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		void Warning(std::string_view message, Args&&... args)
-		{
-			Trace(LogLevel::Warning, message, std::forward<Args>(args)...);
-		}
-		
-		/**
-		 * \brief 
-		 * \tparam Args 
-		 * \param message 
-		 * \param args 
-		 */
-		template <typename... Args>
-		void Error(std::string_view message, Args&&... args)
-		{
-			Trace(LogLevel::Error, message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		void Critical(std::string_view message, Args&&... args)
-		{
-			Trace(LogLevel::Critical, message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief 
-		 * \tparam Args 
-		 * \param level 
-		 * \param message 
-		 * \param args 
-		 */
-		template <typename... Args>
-		void Trace(LogLevel level, std::string_view message, Args&&... args)
-		{
-			if (Enum<LogLevel>::UnderlyingCast(level) >= Enum<LogLevel>::UnderlyingCast(mLevel))
-			{
-				LogEntry entry = CreateEntry(level, message, std::forward<Args>(args)...);
-				for (const auto& [name, channel] : mChannels)
-					channel->Trace(entry);
-			}
-		}
 
 		/**
 		 * \brief
@@ -117,38 +34,52 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \return 
+		 * \param category 
+		 * \param level 
+		 * \param message 
+		 * \param file 
+		 * \param line 
+		 * \param args 
 		 */
-		LogLevel GetLevel() const;
+		template <typename... Args>
+		void Trace(const LogCategory& category, LogLevel level, std::string_view message, std::string_view file, Uint64 line, Args&&... args)
+		{
+			if (category.IsSuppressed(level))
+				return;
+
+			LogEntry* logEntry = mEntryPool.AllocateUnsafe();
+			logEntry->Category = &category;
+			logEntry->Message = fmt::format(message, std::forward<Args>(args)...);
+			logEntry->Level = level;
+			logEntry->File = file;
+			logEntry->Line = line;
+
+			for (const auto& [name, channel] : mChannels)
+				channel->WriteEntry(*logEntry);
+
+			mEntries.push_back(logEntry);
+
+			mOnTraceEntry.Emit(logEntry);
+		}
 
 		/**
 		 * \brief 
-		 * \param level 
+		 * \return 
 		 */
-		void SetLevel(LogLevel level);
+		const std::vector<LogEntry*>& GetEntries() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Signal<LogEntry*>& OnTraceEntry();
 
 	private:
 
-		/**
-		 * \brief 
-		 * \tparam Args 
-		 * \param level 
-		 * \param message 
-		 * \param args 
-		 * \return 
-		 */
-		template <typename... Args>
-		static LogEntry CreateEntry(LogLevel level, std::string_view message, Args&&... args)
-		{
-			LogEntry entry;
-			entry.Message = fmt::format(message, std::forward<Args>(args)...) + '\n';
-			entry.Level = level;
-
-			return entry;
-		}
-
-		LogLevel mLevel;
 		std::unordered_map<std::string, std::unique_ptr<LogChannel>> mChannels;
+		std::vector<LogEntry*> mEntries;
+		Signal<LogEntry*> mOnTraceEntry;
+		ObjectPool<LogEntry> mEntryPool;
 	};
 }
 

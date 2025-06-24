@@ -16,6 +16,14 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 * \param path 
+		 * \param parameters 
+		 * \return 
+		 */
+		std::shared_ptr<MipMaps> LoadFromPath(const std::filesystem::path& path, const MipMapsImportParameters& parameters) override;
+
+		/**
+		 * \brief 
 		 * \param inputStream 
 		 * \param parameters 
 		 * \return 

@@ -1,12 +1,16 @@
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
 
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfImporter.hpp>
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfSceneContainer.hpp>
 
 namespace Ck
-{    
+{
+    CK_DECLARE_EXCEPTION_BASE(GltfParseError, "Failed to parse obj file", std::runtime_error);
+
     namespace
     {
         void ToGltfImage(const Image& inImage, tinygltf::Image& outImage)
@@ -82,10 +86,14 @@ namespace Ck
     {
         tinygltf::Model model;
         std::string errors, warnings;
-        
+
+        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
         bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, path.string());
         if (!success)
-            return nullptr;
+            throw GltfParseError(errors);
+
+        if (!warnings.empty())
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Scene {} loaded with warnings: {}", path.string(), warnings);
 
         return std::make_shared<GltfSceneContainer>(model);
     }

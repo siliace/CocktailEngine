@@ -6,6 +6,8 @@
 
 namespace Ck
 {
+	CK_DEFINE_LOG_CATEGORY(RenderQueueLogCategory);
+
 	RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
 		mShadingMode(shadingMode),
 		mBlendingMode(blendingMode)
@@ -31,7 +33,7 @@ namespace Ck
 
 				if (vertexAttributes & attribute)
 				{
-					Log::Error("Duplicated VertexAttribute {} in VertexBuffer {} of StaticMeshRecordInfo", Enum<VertexAttributeSemantic>::ToString(attribute), i);
+					CK_LOG(RenderQueueLogCategory, LogLevel::Error, "Duplicated VertexAttribute {} in VertexBuffer {} of StaticMeshRecordInfo", Enum<VertexAttributeSemantic>::ToString(attribute), i);
 					return;
 				}
 				vertexAttributes |= attribute;
@@ -50,7 +52,7 @@ namespace Ck
 		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Mesh)->GetVariant(vertexAttributes, materialTextures);
 		if (!materialProgramVariant)
 		{
-			Log::Error("No MaterialProgram found for Material");
+			CK_LOG(RenderQueueLogCategory, LogLevel::Error, "No MaterialProgram found for Material");
 			return;
 		}
 

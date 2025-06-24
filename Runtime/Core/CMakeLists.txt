@@ -61,6 +61,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/PixelFormat.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/Image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageLoader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageServiceProvider.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/PixelFormat.cpp
 )
@@ -118,6 +119,7 @@ cocktail_source_directory(CORE_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/ConsoleLogChannel.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/Log.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogCategory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogChannel.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogEntry.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Log/LogLevel.hpp
@@ -126,6 +128,7 @@ cocktail_source_directory(CORE_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/ConsoleLogChannel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/Log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/LogCategory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/LogChannel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/LogManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Log/LogServiceProvider.cpp

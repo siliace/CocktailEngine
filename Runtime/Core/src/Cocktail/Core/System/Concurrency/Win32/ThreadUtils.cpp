@@ -2,6 +2,7 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
+#include <Cocktail/Core/System/Win32/WindowsServiceProvider.hpp>
 
 namespace Ck
 {
@@ -28,7 +29,7 @@ namespace Ck
 
 		if ((affinityMask | processAffinityMask) != processAffinityMask)
 		{
-			Log::Warning("Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
+			CK_LOG(Detail::Win32::Win32LogCategory, LogLevel::Warning, "Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
 			affinityMask = static_cast<unsigned int>(processAffinityMask);
 		}
 

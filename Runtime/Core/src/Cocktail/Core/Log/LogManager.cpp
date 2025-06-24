@@ -2,25 +2,18 @@
 
 namespace Ck
 {
-	LogManager::LogManager() :
-		mLevel(LogLevel::Info)
-	{
-		/// Nothing
-	}
-
 	void LogManager::RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel)
 	{
-		logChannel->SetLevel(mLevel);
-		mChannels[name] = std::move(logChannel);
+		mChannels.insert_or_assign(name, std::move(logChannel));
 	}
 
-	LogLevel LogManager::GetLevel() const
+	const std::vector<LogEntry*>& LogManager::GetEntries() const
 	{
-		return mLevel;
+		return mEntries;
 	}
 
-	void LogManager::SetLevel(LogLevel level)
+	Signal<LogEntry*>& LogManager::OnTraceEntry()
 	{
-		mLevel = level;
+		return mOnTraceEntry;
 	}
 }

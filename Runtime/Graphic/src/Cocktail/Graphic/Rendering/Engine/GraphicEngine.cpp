@@ -17,6 +17,8 @@ static constexpr bool GraphicEngine_EnableDebug = true;
 
 namespace Ck
 {
+	CK_DEFINE_LOG_CATEGORY(GraphicEngineLogCategory);
+
 	namespace
 	{
 		class RenderDeviceFactory
@@ -46,7 +48,7 @@ namespace Ck
 		}
 
 		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, std::string_view message) {
-			Log::Trace(logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
+			CK_LOG(GraphicEngineLogCategory, logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
 		});
 
 		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });

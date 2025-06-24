@@ -3,9 +3,12 @@
 
 #include <Cocktail/Core/Asset/AssetLoader.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
+#include <Cocktail/Core/Log/LogCategory.hpp>
 
 namespace Ck
 {
+	CK_DECLARE_LOG_CATEGORY(ImageLoaderLogCategory, Ck::LogLevel::Info);
+
 	/**
 	 * \brief 
 	 */

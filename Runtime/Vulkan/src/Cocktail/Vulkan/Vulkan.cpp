@@ -10,6 +10,8 @@
 
 namespace Ck::Vulkan
 {
+	CK_DEFINE_LOG_CATEGORY(VulkanLogCategory);
+
 	bool IsLayerSupported(const char* layerName)
 	{
 		return ExtensionManager::IsLayerSupported(layerName);

@@ -4,6 +4,8 @@
 #include <Cocktail/Core/Log/LogManager.hpp>
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
 
+#define CK_LOG(__Category, __Level, __Message, ...) ::Ck::Log::Trace(__Category, __Level, __Message, __FILE__, __LINE__, __VA_ARGS__)
+
 namespace Ck
 {
 	/**
@@ -12,79 +14,6 @@ namespace Ck
 	class COCKTAIL_CORE_API Log : public ServiceFacade<LogManager>
 	{
 	public:
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Debug(std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Debug(message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Info(std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Info(message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Warning(std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Warning(message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Error(std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Error(message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Critical(std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Critical(message, std::forward<Args>(args)...);
-		}
-
-		/**
-		 * \brief
-		 * \tparam Args
-		 * \param level
-		 * \param message
-		 * \param args
-		 */
-		template <typename... Args>
-		static void Trace(LogLevel level, std::string_view message, Args&&... args)
-		{
-			ResolveFacadeInstance()->Trace(level, message, std::forward<Args>(args)...);
-		}
 
 		/**
 		 * \brief
@@ -97,16 +26,20 @@ namespace Ck
 		static void RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel);
 
 		/**
-		 * \brief
-		 * \return
+		 * \brief 
+		 * \tparam Args 
+		 * \param category
+		 * \param level 
+		 * \param message 
+		 * \param file 
+		 * \param line 
+		 * \param args 
 		 */
-		static LogLevel GetLevel();
-
-		/**
-		 * \brief
-		 * \param level
-		 */
-		static void SetLevel(LogLevel level);
+		template <typename... Args>
+		static void Trace(const LogCategory& category, LogLevel level, std::string_view message, std::string_view file, Uint64 line, Args&&... args)
+		{
+			ResolveFacadeInstance()->Trace(category, level, message, file, line, std::forward<Args>(args)...);
+		}
 	};
 }
 

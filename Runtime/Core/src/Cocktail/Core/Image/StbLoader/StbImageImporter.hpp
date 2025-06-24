@@ -22,6 +22,14 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 * \param path 
+		 * \param parameters 
+		 * \return 
+		 */
+		std::shared_ptr<Image> LoadFromPath(const std::filesystem::path& path, const ImageImportParameters& parameters) override;
+
+		/**
+		 * \brief 
 		 * \param inputStream 
 		 * \param parameters
 		 * \return 

@@ -1,13 +1,15 @@
 #include <Cocktail/Core/Exception.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
 
 #include <Cocktail/Graphic/Material/MipMaps/CubeMipMaps.hpp>
+#include <Cocktail/Graphic/Material/MipMaps/MipMapsLoader.hpp>
 #include <Cocktail/Graphic/Material/MipMaps/DDS/DDSHeader.hpp>
 #include <Cocktail/Graphic/Material/MipMaps/DDS/DDSHeaderDxt10.hpp>
 #include <Cocktail/Graphic/Material/MipMaps/DDS/DDSImporter.hpp>
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(DDSImportException, "Failed to import DDS", std::runtime_error);
+	CK_DECLARE_EXCEPTION_BASE(DDSImportException, "Failed to import DDS", std::runtime_error);
 
 	namespace
 	{
@@ -80,6 +82,12 @@ namespace Ck
 		{
 			return header.FileFlags & DDSHeader::FlagBits::MipMapCount ? header.MipMapCount : 1;
 		}
+	}
+
+	std::shared_ptr<MipMaps> DDSImporter::LoadFromPath(const std::filesystem::path& path, const MipMapsImportParameters& parameters)
+	{
+		CK_LOG(MipMapsLoaderLogCategory, LogLevel::Info, "Loading mipmaps from {}", path.string());
+		return AssetImporter<MipMaps, MipMapsImportParameters>::LoadFromPath(path, parameters);
 	}
 
 	std::shared_ptr<MipMaps> DDSImporter::LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters)

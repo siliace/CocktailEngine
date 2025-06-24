@@ -7,6 +7,8 @@
 
 namespace Ck
 {
+	CK_DECLARE_LOG_CATEGORY(SceneLoaderLogCategory, LogLevel::Info);
+
 	/**
 	 * \brief 
 	 */

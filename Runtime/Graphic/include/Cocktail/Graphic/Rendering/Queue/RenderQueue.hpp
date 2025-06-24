@@ -3,6 +3,8 @@
 
 #include <queue>
 
+#include <Cocktail/Core/Log/LogCategory.hpp>
+
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
@@ -10,6 +12,8 @@
 
 namespace Ck
 {
+	CK_DECLARE_LOG_CATEGORY(RenderQueueLogCategory, Ck::LogLevel::Info);
+
 	class COCKTAIL_GRAPHIC_API RenderQueue
 	{
 	public:

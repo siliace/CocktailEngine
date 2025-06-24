@@ -104,6 +104,12 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
+		virtual bool IsDebuggerPresent() const = 0;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
 		Signal<Application*>& OnTerminate();
 
 	protected:

@@ -181,6 +181,7 @@ cocktail_source_directory(GRAPHIC_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneGraph.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneLoader.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneLoaderServiceProvider.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneLoaderServiceProvider.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneNode.cpp

@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_VULKANSERVICE_HPP
 #define COCKTAIL_VULKAN_VULKANSERVICE_HPP
 
+#include <Cocktail/Core/Log/LogCategory.hpp>
+
 #include <Cocktail/Vulkan/Export.hpp>
 #include <Cocktail/Vulkan/RenderDeviceCreateInfo.hpp>
 
@@ -13,6 +15,8 @@ namespace Ck
 
 	namespace Vulkan
 	{
+		CK_DECLARE_LOG_CATEGORY(VulkanLogCategory, LogLevel::Info);
+
 		/**
 		 * \brief
 		 * \param layerName

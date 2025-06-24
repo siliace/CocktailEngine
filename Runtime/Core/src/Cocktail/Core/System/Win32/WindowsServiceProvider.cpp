@@ -14,6 +14,8 @@
 
 namespace Ck::Detail::Win32
 {
+	CK_DEFINE_LOG_CATEGORY(Win32LogCategory);
+
 	class WsaService
 	{
 	public:

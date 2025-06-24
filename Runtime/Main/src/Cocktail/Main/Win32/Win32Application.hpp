@@ -29,6 +29,12 @@ namespace Ck::Main::Win32
 	     */
 	    const std::vector<std::string>& GetArgv() const override;
 
+	    /**
+	     * \brief 
+	     * \return 
+	     */
+	    bool IsDebuggerPresent() const override;
+
     private:
 
         std::vector<std::string> mArgv;

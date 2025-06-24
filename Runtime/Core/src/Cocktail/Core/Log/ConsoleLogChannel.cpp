@@ -1,6 +1,9 @@
 #include <Cocktail/Core/Log/ConsoleLogChannel.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
 
+#include "Cocktail/Core/Log/LogCategory.hpp"
+#include "fmt/format.h"
+
 namespace Ck
 {
 	ConsoleLogChannel::ConsoleLogChannel(ConsoleService* console):
@@ -23,6 +26,8 @@ namespace Ck
 		const auto& [background, foreground] = mColors[entry.Level];
 
 		mConsole->SetColors(background, foreground);
-		mConsole->GetOutput().Write(entry.Message.c_str(), entry.Message.length());
+
+		std::string fullMessage = fmt::format("{} - {}\n", entry.Category->GetName(), entry.Message);
+		mConsole->GetOutput().Write(fullMessage.c_str(), fullMessage.length());
 	}
 }
