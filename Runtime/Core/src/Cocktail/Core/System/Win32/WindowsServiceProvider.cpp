@@ -12,6 +12,8 @@
 #include <Cocktail/Core/System/Window/Win32/WindowEventDispatcher.hpp>
 #include <Cocktail/Core/System/Window/Win32/WindowFactory.hpp>
 
+CK_DEFINE_LOG_CATEGORY(Win32LogCategory);
+
 namespace Ck::Detail::Win32
 {
 	class WsaService

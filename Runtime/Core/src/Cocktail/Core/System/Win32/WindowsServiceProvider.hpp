@@ -2,7 +2,10 @@
 #define COCKTAIL_CORE_SYSTEM_WIN32_WINDOWSSERVICEPROVIDER_HPP
 
 #include <Cocktail/Core/Application/ServiceProvider.hpp>
+#include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
+
+CK_DECLARE_LOG_CATEGORY(Win32LogCategory, Ck::LogLevel::Info)
 
 namespace Ck::Detail::Win32
 {

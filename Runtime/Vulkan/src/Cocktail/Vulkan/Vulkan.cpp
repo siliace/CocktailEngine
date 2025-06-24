@@ -8,6 +8,8 @@
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 
+CK_DEFINE_LOG_CATEGORY(VulkanLogCategory);
+
 namespace Ck::Vulkan
 {
 	bool IsLayerSupported(const char* layerName)

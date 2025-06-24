@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	class BaseLogCategory;
+	class LogCategory;
 
 	/**
 	 * \brief Structure containing information about a log message
@@ -18,7 +18,7 @@ namespace Ck
 		/**
 		 * \brief The LogCategory that emitted this entry
 		 */
-		BaseLogCategory* Category = nullptr;
+		const LogCategory* Category = nullptr;
 
 		/**
 		 * \brief The formatted message of the entry 

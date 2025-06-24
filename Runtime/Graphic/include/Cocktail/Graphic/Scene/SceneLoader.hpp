@@ -5,6 +5,8 @@
 
 #include <Cocktail/Graphic/Scene/Container/SceneContainer.hpp>
 
+CK_DECLARE_LOG_CATEGORY(SceneLoaderLogCategory, Ck::LogLevel::Info)
+
 namespace Ck
 {
 	/**

@@ -13,33 +13,37 @@
 #include <Cocktail/Core/Signal/Signal.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
-#define CK_LOG(__Category, __Level, __Message, ...) Log::Trace(__Category, __Level, __Message, __FILE__, __LINE__, __VA_ARGS__);
-
 namespace Ck
 {
+	/**
+	 * \brief 
+	 */
 	class COCKTAIL_CORE_API LogManager
 	{
 	public:
 
 		/**
 		 * \brief 
-		 */
-		LogManager();
-
-		/**
-		 * \brief 
-		 * \tparam Args 
+		 * \param category 
 		 * \param level 
 		 * \param message 
+		 * \param file 
+		 * \param line 
 		 * \param args 
 		 */
 		template <typename... Args>
-		void Trace(const BaseLogCategory& category, LogLevel level, std::string_view message, std::string_view file, Uint64 line, Args&&... args)
+		void Trace(const LogCategory& category, LogLevel level, std::string_view message, std::string_view file, Uint64 line, Args&&... args)
 		{
 			if (category.IsSuppressed(level))
 				return;
 
 			LogEntry* logEntry = mEntryPool.AllocateUnsafe();
+			logEntry->Category = &category;
+			logEntry->Message = fmt::format(message, std::forward<Args>(args)...);
+			logEntry->Level = level;
+			logEntry->File = file;
+			logEntry->Line = line;
+
 			for (const auto& [name, channel] : mChannels)
 				channel->WriteEntry(*logEntry);
 
@@ -58,10 +62,11 @@ namespace Ck
 		 */
 		void RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel);
 
-		Signal<LogEntry*>& OnTraceEntry()
-		{
-			return mOnTraceEntry;
-		}
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Signal<LogEntry*>& OnTraceEntry();
 
 	private:
 

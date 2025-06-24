@@ -3,6 +3,8 @@
 #include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
 
+CK_DECLARE_LOG_CATEGORY(Win32LogCategory, Ck::LogLevel::Info)
+
 namespace Ck
 {
 	std::thread::native_handle_type ThreadUtils::GetCurrentThreadHandle()
@@ -28,7 +30,7 @@ namespace Ck
 
 		if ((affinityMask | processAffinityMask) != processAffinityMask)
 		{
-			Log::Warning("Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
+			CK_LOG(Win32LogCategory, LogLevel::Warning, "Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
 			affinityMask = static_cast<unsigned int>(processAffinityMask);
 		}
 

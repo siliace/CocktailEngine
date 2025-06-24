@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_ENGINE_GRAPHICENGINE_HPP
 
+#include <Cocktail/Core/Log/LogCategory.hpp>
+
 #include <Cocktail/Graphic/Material/MipMaps/MipMaps.hpp>
 #include <Cocktail/Graphic/Rendering/SceneViewer.hpp>
 #include <Cocktail/Graphic/Rendering/Engine/ResourceUploader.hpp>
@@ -10,6 +12,8 @@
 
 #include <Cocktail/Renderer/GraphicApi.hpp>
 #include <Cocktail/Renderer/RenderDevice.hpp>
+
+CK_DECLARE_LOG_CATEGORY(GraphicEngineLogCategory, Ck::LogLevel::Info);
 
 namespace Ck
 {

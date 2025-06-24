@@ -1,3 +1,5 @@
+#include <Cocktail/Core/Log/Log.hpp>
+
 #include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Win32/Win32Application.hpp>
 
@@ -16,6 +18,8 @@ int main(int argc, char* argv[])
 	);
 
 	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(application.get());
+
+	CK_LOG(MainLogCategory, Ck::LogLevel::Info, "Application exited with code {}", Ck::Enum<Ck::Main::ExitCode>::ToString(exitCode));
 
 	return static_cast<int>(exitCode);
 }

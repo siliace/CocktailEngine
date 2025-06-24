@@ -3,10 +3,14 @@
 
 #include <queue>
 
+#include <Cocktail/Core/Log/LogCategory.hpp>
+
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecordInfo.hpp>
+
+CK_DECLARE_LOG_CATEGORY(RenderQueueLogCategory, Ck::LogLevel::Info)
 
 namespace Ck
 {

@@ -2,5 +2,13 @@
 
 namespace Ck
 {
+	void LogManager::RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel)
+	{
+		mChannels.insert_or_assign(name, std::move(logChannel));
+	}
 
+	Signal<LogEntry*>& LogManager::OnTraceEntry()
+	{
+		return mOnTraceEntry;
+	}
 }
