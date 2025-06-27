@@ -88,8 +88,11 @@ namespace Ck::Vulkan
 
 		void Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) override;
 		void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) override;
+		void DrawIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride) override;
+		void DrawIndexedIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride) override;
 
 		void Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) override;
+		void DispatchIndirect(const Renderer::Buffer* buffer, std::size_t offset) override;
 		
 		void Reset(bool releaseResources);
 

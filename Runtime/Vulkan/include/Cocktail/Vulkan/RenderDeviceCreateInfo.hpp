@@ -31,7 +31,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		unsigned int DeviceMemoryBlockSize = 1024 * 1024 * 16;
+		unsigned int DeviceMemoryBlockSize = 1024 * 1024 * 64;
 
 		/**
 		 * \brief

@@ -22,6 +22,30 @@ namespace Ck::Renderer
 	class TextureView;
 	class UniformSlot;
 
+	struct DrawIndirectCommand
+	{
+		unsigned int VertexCount;
+		unsigned int InstanceCount;
+		unsigned int FirstVertex;
+		unsigned int FirstInstance;
+	};
+
+	struct DrawIndexedIndirectCommand
+	{
+		unsigned int IndexCount;
+		unsigned int InstanceCount;
+		unsigned int FirstIndex;
+		int IndexOffset;
+		unsigned int FirstInstance;
+	};
+
+	struct DispatchIndirectCommand
+	{
+		unsigned int GroupCountX;
+		unsigned int GroupCountY;
+		unsigned int GroupCountZ;
+	};
+
 	/**
 	 * \brief Interface representing an opaque handle to a GPU command list object
 	 * A CommandList is an object used to record commands which can be subsequently submitted to a RenderContext for execution.
@@ -187,6 +211,26 @@ namespace Ck::Renderer
 		virtual void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex = 0, int indexOffset = 0, unsigned int firstInstance = 0) = 0;
 
 		/**
+		 * \brief Issue an indirect draw call in the CommandList
+		 * The current state of the CommandList must be RecordingRenderPass.
+		 * \param buffer The buffer containing draw parameters
+		 * \param offset The first byte into \p buffer where parameters begin
+		 * \param drawCount The number of draw to execute
+		 * \param stride The stride in byte between two sets of draw parameters
+		 */
+		virtual void DrawIndirect(const Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride = 0) = 0;
+
+		/**
+		 * \brief Issue an indirect indexed draw call in the CommandList
+		 * The current state of the CommandList must be RecordingRenderPass.
+		 * \param buffer The buffer containing draw parameters
+		 * \param offset The first byte into \p buffer where parameters begin
+		 * \param drawCount The number of indexed draw to execute
+		 * \param stride The stride in byte between two sets of indexed draw parameters
+		 */
+		virtual void DrawIndexedIndirect(const Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride = 0) = 0;
+
+		/**
 		 * \brief Issue a dispatch call in the CommandList
 		 * The current state of the CommandList must be Recording.
 		 * When the command is executed, a global workgroup consisting of groupCountX * groupCountY * groupCountZ local workgroups is assembled.
@@ -195,6 +239,14 @@ namespace Ck::Renderer
 		 * \param groupCountZ The number of local workgroups to dispatch in the Z dimension
 		 */
 		virtual void Dispatch(unsigned int groupCountX, unsigned int groupCountY = 0, unsigned int groupCountZ = 0) = 0;
+
+		/**
+		 * \brief Issue a dispatch call in the CommandList
+		 * The current state of the CommandList must be Recording.
+		 * \param buffer The buffer containing dispatch parameters
+		 * \param offset The first byte into \p buffer where parameters begin
+		 */
+		virtual void DispatchIndirect(const Buffer* buffer, std::size_t offset) = 0;
 
 		/**
 		 * \brief

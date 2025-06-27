@@ -1215,12 +1215,39 @@ namespace Ck::Vulkan
 		vkCmdDrawIndexed(mHandle, indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
 	}
 
+	void CommandList::DrawIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushGraphicState();
+		vkCmdDrawIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset, drawCount, stride);
+	}
+
+	void CommandList::DrawIndexedIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushGraphicState();
+		vkCmdDrawIndexedIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset, drawCount, stride);
+	}
+
 	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
 	{
 		assert(mState == Renderer::CommandListState::Recording);
 
 		FlushComputeState();
 		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
+	}
+
+	void CommandList::DispatchIndirect(const Renderer::Buffer* buffer, std::size_t offset)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushComputeState();
+		vkCmdDispatchIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset);
 	}
 
 	void CommandList::Reset(bool releaseResources)
