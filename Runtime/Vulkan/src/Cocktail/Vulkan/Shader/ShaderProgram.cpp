@@ -3,12 +3,13 @@
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 #include <Cocktail/Vulkan/Shader/UniformSlot.hpp>
 #include <Cocktail/Vulkan/Shader/Reflection/DescriptorSetInfo.hpp>
+#include <Cocktail/Vulkan/Texture/StaticSamplerManager.hpp>
 
 namespace Ck::Vulkan
 {
 	namespace
 	{
-		void InsertBindingToLayoutCreateInfo(std::vector<DescriptorSetLayoutBinding>& layoutBindings, Renderer::ShaderType shaderType, const DescriptorSetBindingInfo& bindingInfo)
+		DescriptorSetLayoutBinding& InsertBindingToLayoutCreateInfo(std::vector<DescriptorSetLayoutBinding>& layoutBindings, Renderer::ShaderType shaderType, const DescriptorSetBindingInfo& bindingInfo)
 		{
 			DescriptorSetLayoutBinding* foundLayoutBinding = nullptr;
 			for (unsigned int i = 0; i < layoutBindings.size(); i++)
@@ -27,6 +28,7 @@ namespace Ck::Vulkan
 				assert(foundLayoutBinding->DescriptorCount == bindingInfo.ArrayLength);
 
 				foundLayoutBinding->ShaderStages |= shaderType;
+				return *foundLayoutBinding;
 			}
 			else
 			{
@@ -38,8 +40,7 @@ namespace Ck::Vulkan
 				layoutBinding.DescriptorCount = bindingInfo.ArrayLength;
 				layoutBinding.ShaderStages = shaderType;
 
-
-				layoutBindings.push_back(layoutBinding);
+				return layoutBindings.emplace_back(layoutBinding);
 			}
 		}
 	}
@@ -61,7 +62,7 @@ namespace Ck::Vulkan
 			mShaders[shader->GetType()] = shader;
 		}
 
-		CreatePipelineLayout();
+		CreatePipelineLayout(createInfo.StaticSamplerCount, createInfo.StaticSamplers);
 
 		CreateUniformSlots();
 
@@ -118,7 +119,7 @@ namespace Ck::Vulkan
 		return {};
 	}
 
-	void ShaderProgram::CreatePipelineLayout()
+	void ShaderProgram::CreatePipelineLayout(unsigned int staticSamplerCount, const Renderer::StaticSamplerInfo* staticSamplers)
 	{
 		static const DescriptorSetLayoutCreateInfo EmptyLayoutCreateInfo;
 
@@ -156,7 +157,19 @@ namespace Ck::Vulkan
 				}
 
 				for (const DescriptorSetBindingInfo& binding : descriptorSetInfo->Bindings)
-					InsertBindingToLayoutCreateInfo(layoutBindings, shaderType, binding);
+				{
+					DescriptorSetLayoutBinding& layoutBinding = InsertBindingToLayoutCreateInfo(layoutBindings, shaderType, binding);
+					for (unsigned int j = 0; j < staticSamplerCount; j++)
+					{
+						if (staticSamplers[j].Member == binding.Name)
+						{
+							layoutBinding.StaticSampler = mRenderDevice->Invoke([&](StaticSamplerManager* staticSamplerManager) {
+								return staticSamplerManager->GetSampler(staticSamplers[j].Sampler);
+							});
+							break;
+						}
+					}
+				}
 			}
 		}
 

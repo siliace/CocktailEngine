@@ -55,63 +55,6 @@ namespace Ck
 
 		mResourceUploader = std::make_shared<ResourceUploader>();
 		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice);
-
-		for (SamplerType samplerType : Enum<SamplerType>::Values)
-		{
-			Renderer::SamplerCreateInfo samplerCreateInfo;
-			samplerCreateInfo.EnableAnisotropy = true;
-			samplerCreateInfo.MaxAnisotropy = 8.f;
-			samplerCreateInfo.Name = Enum<SamplerType>::ToString(samplerType).data();
-
-			switch (samplerType)
-			{
-			case SamplerType::TrilinearClamp:
-			case SamplerType::TrilinearWrap:
-				samplerCreateInfo.MipmapMode = Renderer::SamplerMipmapMode::Linear;
-				break;
-
-			default:
-				samplerCreateInfo.MipmapMode = Renderer::SamplerMipmapMode::Nearest;
-				break;
-			}
-
-			switch (samplerType)
-			{
-			case SamplerType::LinearClamp:
-			case SamplerType::LinearWrap:
-			case SamplerType::TrilinearClamp:
-			case SamplerType::TrilinearWrap:
-				samplerCreateInfo.MinFilter = Renderer::Filter::Linear;
-				samplerCreateInfo.MagFilter = Renderer::Filter::Linear;
-				break;
-
-			default:
-				samplerCreateInfo.MinFilter = Renderer::Filter::Nearest;
-				samplerCreateInfo.MagFilter = Renderer::Filter::Nearest;
-				break;
-			}
-	
-			switch (samplerType)
-			{
-			case SamplerType::LinearWrap:
-			case SamplerType::NearestWrap:
-			case SamplerType::TrilinearWrap:
-				samplerCreateInfo.AddressModeU = Renderer::SamplerAddressMode::Repeat;
-				samplerCreateInfo.AddressModeV = Renderer::SamplerAddressMode::Repeat;
-				samplerCreateInfo.AddressModeW = Renderer::SamplerAddressMode::Repeat;
-				break;
-
-			case SamplerType::LinearClamp:
-			case SamplerType::NearestClamp:
-			case SamplerType::TrilinearClamp:
-				samplerCreateInfo.AddressModeU = Renderer::SamplerAddressMode::ClampToEdge;
-				samplerCreateInfo.AddressModeV = Renderer::SamplerAddressMode::ClampToEdge;
-				samplerCreateInfo.AddressModeW = Renderer::SamplerAddressMode::ClampToEdge;
-				break;
-			}
-
-			mSamplers[samplerType] = mRenderDevice->CreateSampler(samplerCreateInfo);
-		}
 	}
 
     GraphicEngine::~GraphicEngine()
@@ -207,10 +150,5 @@ namespace Ck
 	std::shared_ptr<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const
 	{
 		return mMaterialProgramManager;
-	}
-
-	std::shared_ptr<Renderer::Sampler> GraphicEngine::GetSampler(SamplerType samplerType) const
-	{
-		return mSamplers[samplerType];
 	}
 }

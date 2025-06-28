@@ -8,6 +8,8 @@
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
 
+#include "Texture/StaticSamplerManager.hpp"
+
 namespace Ck::Vulkan
 {
 	CK_DEFINE_LOG_CATEGORY(VulkanLogCategory);
@@ -71,6 +73,10 @@ namespace Ck::Vulkan
 
 		renderDevice->Singleton<PipelineCache>([renderDevice = renderDevice]() {
 			return std::make_unique<PipelineCache>(renderDevice, PipelineCacheCreateInfo{}, nullptr);
+		});
+
+		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice]() {
+			return std::make_unique<StaticSamplerManager>(renderDevice);
 		});
 
 		return renderDevice;

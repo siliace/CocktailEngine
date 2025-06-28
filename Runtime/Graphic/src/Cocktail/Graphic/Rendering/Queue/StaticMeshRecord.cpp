@@ -78,7 +78,7 @@ namespace Ck
 				if (!textureView)
 					continue;
 
-				commandList.BindTextureSampler(slot, 0, textureView.get(), mRecordInfo.Sampler.get());
+				commandList.BindTextureSampler(slot, 0, textureView.get(), nullptr);
 			}
 		}
 

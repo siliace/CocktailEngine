@@ -6,7 +6,6 @@
 #include <Cocktail/Graphic/Material/MipMaps/MipMaps.hpp>
 #include <Cocktail/Graphic/Rendering/SceneViewer.hpp>
 #include <Cocktail/Graphic/Rendering/Engine/ResourceUploader.hpp>
-#include <Cocktail/Graphic/Rendering/Engine/SamplerType.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/IndexBuffer.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/VertexBuffer.hpp>
 
@@ -108,13 +107,6 @@ namespace Ck
 		 */
 		std::shared_ptr<MaterialProgramManager> GetMaterialProgramManager() const;
 
-		/**
-		 * \brief
-		 * \param
-		 * \return
-		 */
-		std::shared_ptr<Renderer::Sampler> GetSampler(SamplerType samplerType) const;
-
 	private:
 
 		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
@@ -123,7 +115,6 @@ namespace Ck
 		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
 		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<Renderer::RenderSurface>> mWindowRenderSurfaces;
 		std::vector<std::shared_ptr<TextureResource>> mGeneratingMipMaps;
-		EnumMap<SamplerType, std::shared_ptr<Renderer::Sampler>> mSamplers;
 	};
 }
 

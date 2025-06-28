@@ -1,6 +1,7 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayout.hpp>
+#include <Cocktail/Vulkan/Texture/Sampler.hpp>
 
 namespace Ck::Vulkan
 {
@@ -14,6 +15,13 @@ namespace Ck::Vulkan
 		for (std::size_t i = 0; i < createInfo.BindingCount; i++)
 			mBindings.push_back(createInfo.Bindings[i]);
 
+		VkSampler* SamplerHandles = COCKTAIL_STACK_ALLOC(VkSampler, createInfo.BindingCount);
+		for (unsigned int i = 0; i < createInfo.BindingCount; i++)
+		{
+			const Sampler* sampler = createInfo.Bindings[i].StaticSampler;
+			SamplerHandles[i] = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
+		}
+
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 		bindings.reserve(mBindings.size());
 		for (unsigned int i = 0; i < createInfo.BindingCount; i++)
@@ -23,7 +31,7 @@ namespace Ck::Vulkan
 			binding.descriptorType = ToVkType(mBindings[i].Type);
 			binding.descriptorCount = mBindings[i].DescriptorCount;
 			binding.stageFlags = ToVkTypes(mBindings[i].ShaderStages);
-			binding.pImmutableSamplers = nullptr;
+			binding.pImmutableSamplers = SamplerHandles[i] != VK_NULL_HANDLE ? &SamplerHandles[i] : nullptr;
 
 			bindings.push_back(binding);
 		}

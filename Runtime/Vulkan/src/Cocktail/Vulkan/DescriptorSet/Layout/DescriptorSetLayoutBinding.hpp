@@ -6,6 +6,8 @@
 
 namespace Ck::Vulkan
 {
+	class Sampler;
+
 	/**
 	 * \brief 
 	 */
@@ -30,6 +32,11 @@ namespace Ck::Vulkan
 		 * \brief
 		 */
 		Flags<Renderer::ShaderType> ShaderStages;
+
+		/**
+		 * \brief 
+		 */
+		const Sampler* StaticSampler = nullptr;
 	};
 }
 
