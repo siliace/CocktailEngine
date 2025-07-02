@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_PIPELINECACHE_HPP
 #define COCKTAIL_VULKAN_PIPELINE_PIPELINECACHE_HPP
 
+#include <filesystem>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Vulkan/Pipeline/ComputePipeline.hpp>
@@ -75,6 +76,7 @@ namespace Ck::Vulkan
 	private:
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
+		std::filesystem::path mSavePath;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipelineCache mHandle;
 		std::unordered_map<PipelineStateHash, std::shared_ptr<Pipeline>> mCache;

@@ -20,11 +20,15 @@ namespace Ck
 	public:
 
 		ServiceContainer() = default;
-		ServiceContainer(const ServiceContainer&) = delete;
-		ServiceContainer(ServiceContainer&&) noexcept= default;
+		ServiceContainer(const ServiceContainer& other) = delete;
+		ServiceContainer(ServiceContainer&& other) noexcept = default;
+		ServiceContainer& operator=(const ServiceContainer& other) = delete;
+		ServiceContainer& operator=(ServiceContainer&& other) noexcept = default;
 
-		ServiceContainer& operator=(const ServiceContainer&) = delete;
-		ServiceContainer& operator=(ServiceContainer&&) noexcept= default;
+		/**
+		 * \brief 
+		 */
+		virtual ~ServiceContainer() = default;
 
 		/**
 		 * \brief 

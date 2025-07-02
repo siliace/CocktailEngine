@@ -47,7 +47,10 @@ namespace Ck
 	void FileUtils::WriteFile(const std::filesystem::path& path, ByteArrayView content)
 	{
 		if (!Storage::IsFile(path))
+		{
+			MakeDirectories(path.parent_path());
 			Storage::CreateFile(path);
+		}
 
 		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
 		file->Write(content.GetData(), content.GetSize());

@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_PIPELINECACHECREATEINFO_HPP
 #define COCKTAIL_VULKAN_PIPELINE_PIPELINECACHECREATEINFO_HPP
 
+#include <Cocktail/Core/Utility/ByteArray.hpp>
+
 namespace Ck::Vulkan
 {
 	/**
@@ -8,15 +10,12 @@ namespace Ck::Vulkan
 	 */
 	struct PipelineCacheCreateInfo
 	{
-		/**
-		 * \brief 
-		 */
-		std::size_t InitialDataSize = 0;
+		std::filesystem::path SavePath;
 
 		/**
 		 * \brief 
 		 */
-		const void* InitialData = nullptr;
+		ByteArray InitialData;
 
         /**
          * \brief Specifies the name of the PipelineCache to create

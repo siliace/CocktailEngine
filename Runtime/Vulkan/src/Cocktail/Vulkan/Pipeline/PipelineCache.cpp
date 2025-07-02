@@ -3,6 +3,8 @@
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
 
+#include "Cocktail/Core/Utility/FileUtils.hpp"
+
 namespace Ck::Vulkan
 {
 	namespace
@@ -154,14 +156,15 @@ namespace Ck::Vulkan
 
 	PipelineCache::PipelineCache(std::shared_ptr<RenderDevice> renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
+		mSavePath(createInfo.SavePath),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{
 		VkPipelineCacheCreateInfo vkCreateInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO, nullptr};
 		{
 			vkCreateInfo.flags = 0;
-			vkCreateInfo.initialDataSize = createInfo.InitialDataSize;
-			vkCreateInfo.pInitialData = createInfo.InitialData;
+			vkCreateInfo.initialDataSize = createInfo.InitialData.GetSize();
+			vkCreateInfo.pInitialData = createInfo.InitialData.GetData();
 		}
 
 		COCKTAIL_VK_CHECK(vkCreatePipelineCache(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
@@ -171,6 +174,9 @@ namespace Ck::Vulkan
 
 	PipelineCache::~PipelineCache()
 	{
+		if (!mSavePath.empty())
+			FileUtils::WriteFile(mSavePath, GetCacheData());
+
 		vkDestroyPipelineCache(mRenderDevice->GetHandle(), mHandle, mAllocationCallbacks);
 	}
 

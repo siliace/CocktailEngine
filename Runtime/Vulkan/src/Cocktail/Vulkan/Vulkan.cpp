@@ -1,3 +1,6 @@
+#include <Cocktail/Core/System/FileSystem/Storage.hpp>
+#include <Cocktail/Core/Utility/FileUtils.hpp>
+
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Vulkan.hpp>
@@ -7,8 +10,7 @@
 #include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryAllocator.hpp>
 #include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
 #include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
-
-#include "Texture/StaticSamplerManager.hpp"
+#include <Cocktail/Vulkan/Texture/StaticSamplerManager.hpp>
 
 namespace Ck::Vulkan
 {
@@ -71,8 +73,19 @@ namespace Ck::Vulkan
 			return std::make_unique<DeviceMemoryAllocator>(renderDevice, createInfo.DeviceMemoryBlockSize);
 		});
 
-		renderDevice->Singleton<PipelineCache>([renderDevice = renderDevice]() {
-			return std::make_unique<PipelineCache>(renderDevice, PipelineCacheCreateInfo{}, nullptr);
+		renderDevice->Singleton<PipelineCache>([renderDevice = renderDevice, createInfo = createInfo]() {
+			std::filesystem::path tempPath = std::filesystem::temp_directory_path();
+			std::filesystem::path pipelineCachePath = tempPath / "cocktail-engine" / createInfo.ApplicationName / "gpubin";
+
+			ByteArray pipelineBinaries;
+			PipelineCacheCreateInfo pipelineCacheCreateInfo;
+			if (Storage::IsFile(pipelineCachePath))
+				pipelineBinaries = FileUtils::ReadFile(pipelineCachePath);
+
+			pipelineCacheCreateInfo.SavePath = std::move(pipelineCachePath);
+			pipelineCacheCreateInfo.InitialData = pipelineBinaries;
+			pipelineCacheCreateInfo.Name = "MainPipelineCache";
+			return std::make_unique<PipelineCache>(renderDevice, pipelineCacheCreateInfo, nullptr);
 		});
 
 		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice]() {
