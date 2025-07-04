@@ -1,14 +1,16 @@
 #include <Cocktail/Core/Application/Application.hpp>
-#include <Cocktail/Core/Log/LogManager.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/System/Keyboard/Xlib/KeyboardService.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/MonitorService.hpp>
 #include <Cocktail/Core/System/Mouse/Xlib/MouseService.hpp>
-#include <Cocktail/Core/System/Keyboard/Xlib/KeyboardService.hpp>
+#include <Cocktail/Core/System/Unix/Xlib/XlibServiceProvider.hpp>
 #include <Cocktail/Core/System/Window/Xlib/AtomManager.hpp>
 #include <Cocktail/Core/System/Window/Xlib/WindowFactory.hpp>
-#include <Cocktail/Core/System/Unix/Xlib/XlibServiceProvider.hpp>
 
 namespace Ck::Detail::Xlib
 {
+	CK_DEFINE_LOG_CATEGORY(XlibLogCategory);
+
     XlibServiceProvider::XlibServiceProvider(Application* application) :
 		ServiceProvider(application)
 	{
@@ -41,9 +43,7 @@ namespace Ck::Detail::Xlib
 		}	
 		else
 		{
-			application->Invoke([](LogManager* log) {
-				log->Warning("X11 extension RANDR is not supported, MonitorService will be disabled");
-			});
+			CK_LOG(XlibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
 		}
 
 		application->Singleton<Ck::MouseService>([display = mDisplay](Application* app) -> std::unique_ptr<Ck::MouseService> {

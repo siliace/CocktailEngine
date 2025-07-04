@@ -9,6 +9,9 @@
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 #include <Cocktail/Core/Utility/Time/Instant.hpp>
 
+#define CK_REGISTER_SERVICE_PROVIDER(__ServiceProvider) \
+	::Ck::Detail::ServiceProviderRegisterer<__ServiceProvider> COCKTAIL_CONCATENATE_STRING2(__ServiceProvider, Registerer)
+
 namespace Ck
 {
 	/**
@@ -142,6 +145,26 @@ namespace Ck
 		Signal<Application*> mOnTerminate;
 		Instant mStart;
 	};
+
+	namespace Detail
+	{
+		/**
+		 * \brief Helper class to register a service provider from everywhere
+		 * \tparam T Type of the ServiceProvider to register
+		 */
+		template <typename T>
+		class ServiceProviderRegisterer
+		{
+		public:
+
+			ServiceProviderRegisterer()
+			{
+				ServiceFacadeBase::OnApplicationReady([](Application* application) {
+					application->RegisterServiceProvider<T>();
+				});
+			}
+		};
+	}
 }
 
 #endif // COCKTAIL_CORE_APPLICATION_APPLICATION_HPP

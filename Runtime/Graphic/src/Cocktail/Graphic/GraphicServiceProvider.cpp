@@ -9,7 +9,7 @@ CMRC_DECLARE(Graphic);
 
 namespace Ck
 {
-	COCKTAIL_REGISTER_SERVICE_PROVIDER(GraphicServiceProvider);
+	CK_REGISTER_SERVICE_PROVIDER(GraphicServiceProvider);
 
 	GraphicServiceProvider::GraphicServiceProvider(Application* application) :
 		ServiceProvider(std::move(application))

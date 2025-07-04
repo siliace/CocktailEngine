@@ -62,9 +62,9 @@
 	#if defined COCKTAIL_COMPILER_MSC
 		#define COCKTAIL_UNREACHABLE() __assume(0)
 	#elif defined COCKTAIL_COMPILER_GCC
-		#define COCKTAIL_UNREACHABLE() assert(false)
+		#define COCKTAIL_UNREACHABLE() assert(false && "Unreachable code reached")
 	#elif defined COCKTAIL_COMPILER_CLANG
-		#define COCKTAIL_UNREACHABLE() assert(false)
+		#define COCKTAIL_UNREACHABLE() assert(false && "Unreachable code reached")
 	#else
 		#define COCKTAIL_UNREACHABLE()
 	#endif

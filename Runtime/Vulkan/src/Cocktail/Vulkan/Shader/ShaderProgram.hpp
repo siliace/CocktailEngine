@@ -70,9 +70,11 @@ namespace Ck::Vulkan
 	private:
 
 		/**
-		 * \brief Create the pipeline layout to use along with this shader
+		 * \brief 
+		 * \param staticSamplerCount 
+		 * \param staticSamplers 
 		 */
-		void CreatePipelineLayout();
+		void CreatePipelineLayout(unsigned int staticSamplerCount, const Renderer::StaticSamplerInfo* staticSamplers);
 
 		/**
 		 * \brief Create uniform locations from the pipeline layout

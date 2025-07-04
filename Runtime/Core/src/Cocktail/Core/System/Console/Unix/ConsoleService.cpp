@@ -47,6 +47,7 @@ namespace Ck::Detail::Unix
             }
 
             COCKTAIL_UNREACHABLE();
+		    return 0;
         }
 
         int ConsoleColorToBackgroundAttribute(ConsoleColor color)
@@ -88,6 +89,7 @@ namespace Ck::Detail::Unix
             }
 
             COCKTAIL_UNREACHABLE();
+		    return 0;
         }
 	}
 

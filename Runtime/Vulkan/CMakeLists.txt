@@ -255,6 +255,8 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/AbstractTexture.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/Sampler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/Sampler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/StaticSamplerManager.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/StaticSamplerManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/SwapchainTexture.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/SwapchainTexture.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Texture/Texture.hpp

@@ -4,7 +4,7 @@
 #include <Cocktail/Core/Log/LogManager.hpp>
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
 
-#define CK_LOG(__Category, __Level, __Message, ...) ::Ck::Log::Trace(__Category, __Level, __Message, __FILE__, __LINE__, __VA_ARGS__)
+#define CK_LOG(__Category, __Level, __Message, ...) ::Ck::Log::Trace(__Category, __Level, __Message, __FILE__, __LINE__, ## __VA_ARGS__)
 
 namespace Ck
 {

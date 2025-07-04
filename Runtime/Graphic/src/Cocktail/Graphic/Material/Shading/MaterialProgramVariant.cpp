@@ -21,7 +21,7 @@ namespace Ck
 
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-			const std::string& textureSlotName = interface.Textures[textureType];
+			const std::string& textureSlotName = interface.Textures[textureType].Name;
 			if (textureSlotName.empty())
 				continue;
 

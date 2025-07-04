@@ -118,8 +118,16 @@ namespace Ck
 		/// Nothing
 	}
 
+	bool Duration::IsInfinite() const
+	{
+		return mCount == std::numeric_limits<Uint64>::max();
+	}
+
 	Duration Duration::As(const TimeUnit& unit) const
 	{
+		if (IsInfinite())
+			return Duration(std::numeric_limits<Uint64>::max(), unit);
+
 		return { unit.ConvertFrom(mCount, mUnit), unit };
 	}
 

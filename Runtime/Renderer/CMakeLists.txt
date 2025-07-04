@@ -102,6 +102,7 @@ cocktail_source_directory(RENDERER_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/Sampler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/SamplerCreateInfo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/StaticSampler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/Texture.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureSubResource.hpp

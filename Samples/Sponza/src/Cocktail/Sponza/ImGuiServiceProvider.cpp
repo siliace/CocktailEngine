@@ -234,4 +234,4 @@ void ImGuiServiceProvider::ConnectWindowEvents(Window& window)
 	});
 }
 
-COCKTAIL_REGISTER_SERVICE_PROVIDER(ImGuiServiceProvider);
+CK_REGISTER_SERVICE_PROVIDER(ImGuiServiceProvider);

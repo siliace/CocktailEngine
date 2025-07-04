@@ -13,4 +13,9 @@ namespace Ck::Main::Unix
     {
         return mArgv;
     }
+
+    bool UnixApplication::IsDebuggerPresent() const
+    {
+        return false;
+    }
 }

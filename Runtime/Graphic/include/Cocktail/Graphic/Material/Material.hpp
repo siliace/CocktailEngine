@@ -8,7 +8,6 @@
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
-#include <Cocktail/Graphic/Rendering/Engine/SamplerType.hpp>
 
 namespace Ck
 {
@@ -50,9 +49,10 @@ namespace Ck
 		/**
 		 * \brief 
 		 * \param name 
-		 * \param shadingMode 
+		 * \param shadingMode
+		 * \param doubleSided 
 		 */
-		Material(std::string name, ShadingMode shadingMode, SamplerType samplerType = SamplerType::NearestClamp, bool doubleSided = false);
+		Material(std::string name, ShadingMode shadingMode, bool doubleSided = false);
 
 		/**
 		 * \brief
@@ -119,16 +119,12 @@ namespace Ck
 		bool IsOpaque() const;
 		void SetOpaque(bool opaque);
 
-		SamplerType GetSamplerType() const;
-		void SetSamplerType(SamplerType samplerType);
-
 	private:
 
 		std::string mName;
 		ShadingMode mShadingMode;
 		UniformColors mUniformColors;
 		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;
-		SamplerType mSamplerType;
 		bool mDoubleSided;
 		bool mOpaque;
 	};

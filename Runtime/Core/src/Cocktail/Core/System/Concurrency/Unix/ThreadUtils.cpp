@@ -4,8 +4,7 @@
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
-
-CK_DEFINE_LOG_CATEGORY(UnixLogCategory, LogLevel::Info);
+#include <Cocktail/Core/System/Unix/UnixServiceProvider.hpp>
 
 namespace Ck
 {
@@ -52,8 +51,8 @@ namespace Ck
 		unsigned int processAffinityMask = GetProcessAffinityMask();
 		if ((affinityMask | processAffinityMask) != processAffinityMask)
 		{
-			CK_LOG(UnixLogCategory, LogLevel::Warning, "Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
-			affinityMask = static_cast<unsigned int>(processAffinityMask);
+			CK_LOG(Detail::Unix::UnixLogCategory, LogLevel::Warning, "Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
+			affinityMask = processAffinityMask;
 		}
 
 		cpu_set_t threadAffinity;

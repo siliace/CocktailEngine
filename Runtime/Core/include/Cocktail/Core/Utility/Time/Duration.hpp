@@ -108,6 +108,13 @@ namespace Ck
 		Duration As(const TimeUnit& unit) const;
 
 		/**
+		 * \brief
+		 * \param
+		 * \return
+		 */
+		bool IsInfinite() const;
+
+		/**
 		 * \brief 
 		 * \return 
 		 */

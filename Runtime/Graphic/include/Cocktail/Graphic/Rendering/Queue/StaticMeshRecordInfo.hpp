@@ -97,11 +97,6 @@ namespace Ck
 		LinearColor MaterialEmissiveColor;
 
 		/**
-		 * \brief Sampler to use to access to material's textures
-		 */
-		std::shared_ptr<Renderer::Sampler> Sampler;
-
-		/**
 		 * \brief 
 		 */
 		EnumMap<Material::TextureType, std::shared_ptr<Renderer::TextureView>> MaterialTextures;

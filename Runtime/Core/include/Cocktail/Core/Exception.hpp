@@ -24,5 +24,6 @@
 		{} \
 	} \
 
-#define COCKTAIL_DECLARE_EXCEPTION(__Name, __Message) COCKTAIL_DECLARE_EXCEPTION_BASE(__Name, __Message, std::exception);
+#define CK_DECLARE_EXCEPTION(__Name, __Message) CK_DECLARE_EXCEPTION_BASE(__Name, __Message, std::exception)
+
 #endif // COCKTAIL_CORE_EXCEPTION_HPP

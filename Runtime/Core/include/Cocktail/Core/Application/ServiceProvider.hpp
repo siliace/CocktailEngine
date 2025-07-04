@@ -7,14 +7,6 @@
 #include <Cocktail/Core/Signal/Observable.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
-#define COCKTAIL_REGISTER_SERVICE_PROVIDER(__ServiceProvider)                                    \
-	static int COCKTAIL_CONCATENATE_STRING(dummy_init, __COUNTER__) = []() {                     \
-		::Ck::Detail::ServiceFacadeBase::OnApplicationReady([](::Ck::Application* application) { \
-			application->RegisterServiceProvider<__ServiceProvider>();                           \
-		});                                                                                      \
-		return __COUNTER__;                                                                      \
-	}();                                                                                         \
-
 namespace Ck
 {
 	class Application;
@@ -51,7 +43,7 @@ namespace Ck
 		/**
 		 * \brief Destructor
 		 */
-		virtual ~ServiceProvider();
+		~ServiceProvider() override;
 
 		/**
 		 * \brief 

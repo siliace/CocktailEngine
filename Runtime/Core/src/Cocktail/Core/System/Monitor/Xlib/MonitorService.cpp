@@ -1,8 +1,6 @@
 #include <Cocktail/Core/Log/Log.hpp>
-#include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/MonitorService.hpp>
-
-CK_DEFINE_LOG_CATEGORY(XLibLogCategory, LogLevel::Info);
+#include <Cocktail/Core/System/Unix/Xlib/XlibServiceProvider.hpp>
 
 namespace Ck::Detail::Xlib
 {
@@ -13,12 +11,11 @@ namespace Ck::Detail::Xlib
 		mExtensionSupported = XQueryExtension(mDisplay, "RANDR", &version, &version, &version);
 		if (!mExtensionSupported)
 		{
-			CK_LOG(XLibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
+			CK_LOG(XlibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
 			return;
 		}	
 		
 		::Window root = DefaultRootWindow(mDisplay);
-		RROutput primaryOuput = XRRGetOutputPrimary(mDisplay, root);
 		XRRScreenResources* screenResources = XRRGetScreenResourcesCurrent(mDisplay, root);
 		for (int i = 0; i < screenResources->ncrtc; i++)
 		{

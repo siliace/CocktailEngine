@@ -9,13 +9,20 @@ namespace Ck::Main::Unix
     {
     public:
 
-        UnixApplication(int argc, char** argv);
+	    /**
+	     * \brief Constructor
+	     * \param argc
+	     * \param argv
+	     */
+	    UnixApplication(int argc, char** argv);
 
 	    /**
 	     * \brief 
 	     * \return 
 	     */
 	    const std::vector<std::string>& GetArgv() const override;
+
+	    bool IsDebuggerPresent() const override;
 
     private:
 

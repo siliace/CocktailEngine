@@ -2,10 +2,9 @@
 
 namespace Ck
 {
-	Material::Material(std::string name, ShadingMode shadingMode, SamplerType samplerType, bool doubleSided) :
+	Material::Material(std::string name, ShadingMode shadingMode, bool doubleSided) :
 		mName(std::move(name)),
 		mShadingMode(shadingMode),
-		mSamplerType(samplerType),
 		mDoubleSided(doubleSided),
 		mOpaque(true)
 	{
@@ -70,15 +69,5 @@ namespace Ck
 	void Material::SetOpaque(bool opaque)
 	{
 		mOpaque = opaque;
-	}
-
-	SamplerType Material::GetSamplerType() const
-	{
-		return mSamplerType;
-	}
-
-	void Material::SetSamplerType(SamplerType samplerType)
-	{
-		mSamplerType = samplerType;
 	}
 }

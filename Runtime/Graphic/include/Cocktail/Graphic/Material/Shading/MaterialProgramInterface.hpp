@@ -6,6 +6,8 @@
 #include <Cocktail/Graphic/Geometry/Vertex/VertexAttributeSemantic.hpp>
 #include <Cocktail/Graphic/Material/Material.hpp>
 
+#include <Cocktail/Renderer/Texture/StaticSampler.hpp>
+
 namespace Ck
 {
 	/**
@@ -18,10 +20,23 @@ namespace Ck
 		 */
 		EnumMap<VertexAttributeSemantic, std::string> VertexAttributes;
 
+		struct TextureInterface
+		{
+			/**
+			 * \brief 
+			 */
+			std::string Name;
+
+			/**
+			 * \brief 
+			 */
+			Renderer::StaticSampler Sampler = Renderer::StaticSampler::LinearClamp;
+		};
+
 		/**
 		 * \brief Names of the slots of the material textures in the program
 		 */
-		EnumMap<Material::TextureType, std::string> Textures;
+		EnumMap<Material::TextureType, TextureInterface> Textures;
 	};
 }
 

@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	COCKTAIL_REGISTER_SERVICE_PROVIDER(MaterialLibraryServiceProvider);
+	CK_REGISTER_SERVICE_PROVIDER(MaterialLibraryServiceProvider);
 
 	MaterialLibraryServiceProvider::MaterialLibraryServiceProvider(Application* application) :
 		ServiceProvider(application)
@@ -29,8 +29,8 @@ namespace Ck
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-				entry.Interface.Textures[Material::TextureType::BaseColor] = "ck_MaterialBaseColor";
-				entry.Interface.Textures[Material::TextureType::Alpha] = "ck_MaterialAlpha";
+				entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
 
 				{
 					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/default.vert.spv");

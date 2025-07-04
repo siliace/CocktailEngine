@@ -41,7 +41,8 @@ namespace Ck
 			 * \param growable
 			 */
 			explicit ObjectPoolBase(std::size_t preAllocated = 0, bool growable = true) :
-				mGrowable(growable)
+				mGrowable(growable),
+				mAllocatedObjectCount(0)
 			{
 				assert(preAllocated > 0 || mGrowable);
 
@@ -117,6 +118,8 @@ namespace Ck
 				T* location = mVacants.back();
 				mVacants.pop_back();
 
+				++mAllocatedObjectCount;
+
 				return new (location) T(std::forward<Args>(args)...);
 			}
 
@@ -154,6 +157,8 @@ namespace Ck
 				{
 					std::lock_guard<Lockable> lg(mMutex);
 					mVacants.emplace_back(object);
+
+					--mAllocatedObjectCount;
 				}
 			}
 
@@ -188,6 +193,7 @@ namespace Ck
 			Lockable mMutex;
 			std::vector<T*> mVacants;
 			std::vector<std::unique_ptr<unsigned char[]>> mPages;
+			std::size_t mAllocatedObjectCount;
 		};
 	}
 

@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	COCKTAIL_REGISTER_SERVICE_PROVIDER(MipMapsServiceProvider);
+	CK_REGISTER_SERVICE_PROVIDER(MipMapsServiceProvider);
 
 	MipMapsServiceProvider::MipMapsServiceProvider(Application* application) :
 		ServiceProvider(application)

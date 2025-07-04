@@ -6,6 +6,8 @@
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramCreateInfo.hpp>
 
+#include "Cocktail/Graphic/Material/Material.hpp"
+
 namespace Ck
 {
 	namespace
@@ -59,6 +61,21 @@ namespace Ck
 
 			assert(shaderCount > 0);
 			shaderProgramCreateInfo.ShaderCount = shaderCount;
+
+			int staticSamplerCount = 0;
+			Renderer::StaticSamplerInfo* staticSamplers = COCKTAIL_STACK_ALLOC(Renderer::StaticSamplerInfo, Enum<Material::TextureType>::ValueCount);
+			for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
+			{
+				if (createInfo.Interface.Textures[textureType].Name.empty())
+					continue;
+
+				staticSamplers[staticSamplerCount].Member = createInfo.Interface.Textures[textureType].Name;
+				staticSamplers[staticSamplerCount].Sampler = createInfo.Interface.Textures[textureType].Sampler;
+				++staticSamplerCount;
+			}
+
+			shaderProgramCreateInfo.StaticSamplerCount = staticSamplerCount;
+			shaderProgramCreateInfo.StaticSamplers = staticSamplers;
 
 			std::shared_ptr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
 			std::shared_ptr<MaterialProgramVariant> variant = std::make_shared<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));

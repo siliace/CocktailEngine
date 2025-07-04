@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	COCKTAIL_REGISTER_SERVICE_PROVIDER(SceneLoaderServiceProvider);
+	CK_REGISTER_SERVICE_PROVIDER(SceneLoaderServiceProvider);
 
 	SceneLoaderServiceProvider::SceneLoaderServiceProvider(Application* application) :
 		ServiceProvider(application)

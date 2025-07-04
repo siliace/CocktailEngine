@@ -30,7 +30,7 @@ namespace Ck
 				{
 					const MaterialInfo& materialInfo = mMaterials[subMeshInfo.MaterialIndex];
 
-					std::shared_ptr<Material> material = std::make_shared<Material>(materialInfo.Name, materialInfo.ShadingMode, SamplerType::TrilinearWrap, materialInfo.DoubleSided);
+					std::shared_ptr<Material> material = std::make_shared<Material>(materialInfo.Name, materialInfo.ShadingMode, materialInfo.DoubleSided);
 					material->SetBaseColor(materialInfo.Colors.Base);
 					material->SetSpecularColor(materialInfo.Colors.Specular);
 					material->SetEmissiveColor(materialInfo.Colors.Emission);

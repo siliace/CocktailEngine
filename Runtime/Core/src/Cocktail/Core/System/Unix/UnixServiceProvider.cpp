@@ -8,7 +8,9 @@
 #include <Cocktail/Core/System/Unix/Xlib/XlibServiceProvider.hpp>
 
 namespace Ck::Detail::Unix
-{  
+{
+	CK_DEFINE_LOG_CATEGORY(UnixLogCategory);
+
     UnixServiceProvider::UnixServiceProvider(Application* application) :
         ServiceProvider(application)
     {

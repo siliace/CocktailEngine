@@ -129,7 +129,6 @@ namespace Ck
 				recordInfo.MaterialBaseColor = material->GetUniformColors().Base;
 				recordInfo.MaterialSpecularColor = material->GetUniformColors().Specular;
 				recordInfo.MaterialEmissiveColor = material->GetUniformColors().Emission;
-				recordInfo.Sampler = mScene->GetGraphicEngine()->GetSampler(material->GetSamplerType());
 				for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 				{
 					if (std::shared_ptr<TextureResource> texture = material->GetTexture(textureType))
