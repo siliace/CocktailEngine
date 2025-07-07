@@ -92,10 +92,9 @@ namespace Ck
 		 * \param other 
 		 */
 		Optional(const Optional& other) :
-			mEmpty(other.mEmpty),
-			mStorage(other.mStorage)
+			mEmpty(true)
 		{
-			/// Nothing
+			*this = other;
 		}
 
 		/**
@@ -103,14 +102,17 @@ namespace Ck
 		 * \param other 
 		 */
 		Optional(Optional&& other) noexcept :
-			mEmpty(std::exchange(other.mEmpty, true)),
-			mStorage{}
+			mEmpty(true)
 		{
-			mStorage = std::move(other.mStorage);
+			*this = std::move(other);
 		}
 
+		/**
+		 * \brief 
+		 */
 		~Optional()
 		{
+			Destroy();
 		}
 
 		/**
@@ -120,12 +122,14 @@ namespace Ck
 		 */
 		Optional& operator=(const Optional& other)
 		{
-			if (!mEmpty)
-				Destroy();
+			if (this == &other)
+				return *this;
+
+			Destroy();
 
 			mEmpty = other.mEmpty;
 			if (!mEmpty)
-				new (&mStorage) T(other.Get());
+				new (&mStorage) T(other.GetValue());
 
 			return *this;
 		}
@@ -137,14 +141,14 @@ namespace Ck
 		 */
 		Optional& operator=(Optional&& other) noexcept
 		{
-			if (!mEmpty)
-				Destroy();
+			if (this == &other)
+				return *this;
 
-			if (!other.mEmpty)
-			{
-				new (&mStorage) T(std::move(other.Get()));
-				mEmpty = std::exchange(other.mEmpty, true);
-			}
+			Destroy();
+
+			mEmpty = std::exchange(other.mEmpty, true);
+			if (!mEmpty)
+				new (&mStorage) T(std::move(other.GetValue()));
 
 			return *this;
 		}
@@ -181,10 +185,12 @@ namespace Ck
 		 * \param callable 
 		 */
 		template <typename Callable>
-		void Then(Callable&& callable) const
+		Optional<T> Then(Callable&& callable) const
 		{
 			if (!mEmpty)
 				callable(GetValue());
+
+			return *this;
 		}
 
 		/**
@@ -320,6 +326,9 @@ namespace Ck
 		 */
 		void Destroy()
 		{
+			if (mEmpty)
+				return;
+
 			std::destroy_at(reinterpret_cast<T*>(&mStorage));
 			mEmpty = true;
 		}
@@ -344,6 +353,259 @@ namespace Ck
 
 		bool mEmpty;
 		std::aligned_storage_t<sizeof(T), alignof(T)> mStorage;
+	};
+
+	template <typename T>
+	class Optional<T&>
+	{
+		template <typename>
+		friend class Optional;
+
+	public:
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		static Optional Empty()
+		{
+			return {};
+		}
+
+		/**
+		 * \brief
+		 * \param value
+		 * \return
+		 */
+		static Optional Of(T& value)
+		{
+			return Optional<T&>(&value);
+		}
+
+		/**
+		 * \brief
+		 */
+		Optional() :
+			mValue(nullptr)
+		{
+			/// Nothing
+		}
+
+		/**
+		 * \brief
+		 * \param other
+		 */
+		Optional(const Optional& other) :
+			mValue(other.mValue)
+		{
+			/// Nothing
+		}
+
+		template <typename U,
+			typename = std::enable_if_t<
+				std::is_same_v<
+					std::remove_const_t<T>, U
+				>
+			>
+		>
+		Optional(const Optional<U&>& other) :
+			mValue(other.mValue)
+		{
+			/// Nothing
+		}
+
+		/**
+		 * \brief
+		 * \param other
+		 */
+		Optional(Optional&& other) noexcept
+		{
+			mValue = std::exchange(other.mValue, nullptr);
+		}
+
+		/**
+		 * \brief
+		 * \param other
+		 * \return
+		 */
+		Optional& operator=(const Optional& other)
+		{
+			if (this == &other)
+				return *this;
+
+			mValue = other.mValue;
+			return *this;
+		}
+
+		template <typename U,
+			typename = std::enable_if_t<
+				std::is_same_v<
+					std::remove_const_t<T>, U
+				>
+			>
+		>
+		Optional& operator=(const Optional<U&>& other)
+		{
+			mValue = other.mValue;
+			return *this;
+		}
+
+		/**
+		 * \brief
+		 * \param other
+		 * \return
+		 */
+		Optional& operator=(Optional&& other) noexcept
+		{
+			mValue = std::exchange(other.mValue, nullptr);
+			return *this;
+		}
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		bool IsEmpty() const
+		{
+			return mValue == nullptr;
+		}
+
+		/**
+		 * \brief
+		 * \tparam Callable
+		 * \param mapper
+		 * \return
+		 */
+		template <typename Callable>
+		auto Map(Callable&& mapper) const -> Optional<decltype(mapper(T{})) >
+		{
+			using U = decltype(mapper(T{}));
+
+			if (mValue)
+				return Optional<U>::Empty();
+
+			return Optional<U>::Of(mapper(*mValue));
+		}
+
+		/**
+		 * \brief
+		 * \tparam Callable
+		 * \param callable
+		 */
+		template <typename Callable>
+		Optional<T&> Then(Callable&& callable) const
+		{
+			if (mValue)
+				callable(*mValue);
+
+			return *this;
+		}
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		T& Get()
+		{
+			return GetOrThrow<EmptyOptionalException>();
+		}
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		const T& Get() const
+		{
+			return GetOrThrow<EmptyOptionalException>();
+		}
+
+		/**
+		 * \brief
+		 * \param fallback
+		 * \return
+		 */
+		T& GetOr(T& fallback)
+		{
+			return mValue ? Get() : fallback;
+		}
+
+		/**
+		 * \brief
+		 * \param fallback
+		 * \return
+		 */
+		const T& GetOr(const T& fallback) const
+		{
+			return mValue ? Get() : fallback;
+		}
+
+		/**
+		 * \brief
+		 * \param fallback
+		 * \return
+		 */
+		template <typename Callable>
+		auto GetOrElse(Callable&& fallback) -> decltype(fallback())
+		{
+			return mValue ? Get() : fallback();
+		}
+
+		/**
+		 * \brief
+		 * \param fallback
+		 * \return
+		 */
+		template <typename Callable>
+		auto GetOrElse(Callable&& fallback) const -> decltype(fallback())
+		{
+			return mValue ? Get() : fallback();
+		}
+
+		/**
+		 * \brief
+		 * \tparam E
+		 * \tparam Args
+		 * \param args
+		 * \return
+		 */
+		template <typename E, typename... Args>
+		T& GetOrThrow(Args&&... args)
+		{
+			if (!mValue)
+				throw E(std::forward<Args>(args)...);
+
+			return *mValue;
+		}
+
+		/**
+		 * \brief
+		 * \tparam E
+		 * \tparam Args
+		 * \param args
+		 * \return
+		 */
+		template <typename E, typename... Args>
+		const T& GetOrThrow(Args&&... args) const
+		{
+			if (!mValue)
+				throw E(std::forward<Args>(args)...);
+
+			return *mValue;
+		}
+
+	private:
+
+		/**
+		 * \brief Constructor
+		 * \param value 
+		 */
+		explicit Optional(T* value) :
+			mValue(value)
+		{
+			/// Nothing
+		}
+
+		T* mValue;
 	};
 }
 

@@ -15,6 +15,16 @@ TEST_CASE("Construct optional in-place", "[Optional]")
 	REQUIRE(opt.Get() == "Hello world");
 }
 
+TEST_CASE("Construct optional from a reference", "[Optional]")
+{
+	std::string str = "Hello World";
+	Ck::Optional<std::string&> opt = Ck::Optional<std::string&>::Of(str);
+	Ck::Optional<const std::string&> constOpt = opt;
+
+	std::string& stringRef = opt.Get();
+	REQUIRE(&str == &stringRef);
+}
+
 TEST_CASE("Move construct leave optional empty", "[Optional]")
 {
 	const std::string str = "foo";
