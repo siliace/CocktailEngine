@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 namespace Ck
@@ -47,6 +48,9 @@ namespace Ck
 		 */
 		AcyclicGraph& operator=(AcyclicGraph&& other) noexcept = default;
 
+		/**
+		 * \brief 
+		 */
 		~AcyclicGraph()
 		{
 			mRoot = nullptr;
@@ -120,7 +124,7 @@ namespace Ck
 				parent->RemoveChild(child);
 
 			child->mParent = static_cast<T*>(this);
-			mChildren.push_back(std::move(child));
+			mChildren.Add(std::move(child));
 		}
 
 		/**
@@ -130,17 +134,7 @@ namespace Ck
 		 */
 		void RemoveChild(const std::shared_ptr<T>& child)
 		{
-			for (auto it = mChildren.begin(); it != mChildren.end();)
-			{
-				if (*it == child)
-				{
-					it = mChildren.erase(it);
-				}
-				else
-				{
-					++it;
-				}
-			}
+			mChildren.Remove(child);
 		}
 
 		/**
@@ -161,7 +155,7 @@ namespace Ck
 			return mParent;
 		}
 
-		const std::vector<std::shared_ptr<T>>& GetChildren() const
+		const Array<std::shared_ptr<T>>& GetChildren() const
 		{
 			return mChildren;
 		}
@@ -169,7 +163,7 @@ namespace Ck
 	private:
 
 		T* mParent = nullptr;
-		std::vector<std::shared_ptr<T>> mChildren;
+		Array<std::shared_ptr<T>> mChildren;
 	};
 }
 

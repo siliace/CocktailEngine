@@ -88,14 +88,14 @@ namespace Ck
 		 * \param camera
 		 * \return
 		 */
-		std::vector<Renderable*> CollectRenderables(const Camera& camera) const;
+		Array<Renderable*> CollectRenderables(const Camera& camera) const;
 
 		/**
 		 * \brief 
 		 * \param camera 
 		 * \return 
 		 */
-		std::vector<Light*> CollectLights(const Camera& camera) const;
+		Array<Light*> CollectLights(const Camera& camera) const;
 
 		/**
 		 * \brief 
@@ -108,8 +108,8 @@ namespace Ck
 		std::shared_ptr<GraphicEngine> mGraphicEngine;
 		std::unique_ptr<TransformationGraph> mTransformationGraph;
 		std::unique_ptr<SceneGraph> mSceneGraph;
-		std::vector<std::unique_ptr<Camera>> mCameras;
-		std::vector<std::unique_ptr<Light>> mLights;
+		Array<std::unique_ptr<Camera>> mCameras;
+		Array<std::unique_ptr<Light>> mLights;
 		Signal<Camera*> mOnCameraAdded;
 		Signal<Light*> mOnLightAdded;
 		Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;

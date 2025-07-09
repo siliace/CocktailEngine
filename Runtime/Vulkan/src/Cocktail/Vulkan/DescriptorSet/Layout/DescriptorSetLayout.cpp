@@ -11,30 +11,25 @@ namespace Ck::Vulkan
 		mHandle(VK_NULL_HANDLE),
 		mSupportPushDescriptor(createInfo.SupportPushDescriptor)
 	{
-		mBindings.reserve(createInfo.BindingCount);
-		for (std::size_t i = 0; i < createInfo.BindingCount; i++)
-			mBindings.push_back(createInfo.Bindings[i]);
+		mBindings.Append(createInfo.Bindings, createInfo.BindingCount);
 
-		VkSampler* SamplerHandles = COCKTAIL_STACK_ALLOC(VkSampler, createInfo.BindingCount);
+		VkSampler* staticSamplerHandles = COCKTAIL_STACK_ALLOC(VkSampler, createInfo.BindingCount);
 		for (unsigned int i = 0; i < createInfo.BindingCount; i++)
 		{
 			const Sampler* sampler = createInfo.Bindings[i].StaticSampler;
-			SamplerHandles[i] = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
+			staticSamplerHandles[i] = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
 		}
 
-		std::vector<VkDescriptorSetLayoutBinding> bindings;
-		bindings.reserve(mBindings.size());
-		for (unsigned int i = 0; i < createInfo.BindingCount; i++)
-		{
+		Array<VkDescriptorSetLayoutBinding> bindings = mBindings.Transform([&](const DescriptorSetLayoutBinding& layoutBinding, unsigned int index) -> VkDescriptorSetLayoutBinding {
 			VkDescriptorSetLayoutBinding binding;
-			binding.binding = mBindings[i].Binding;
-			binding.descriptorType = ToVkType(mBindings[i].Type);
-			binding.descriptorCount = mBindings[i].DescriptorCount;
-			binding.stageFlags = ToVkTypes(mBindings[i].ShaderStages);
-			binding.pImmutableSamplers = SamplerHandles[i] != VK_NULL_HANDLE ? &SamplerHandles[i] : nullptr;
+			binding.binding = layoutBinding.Binding;
+			binding.descriptorType = ToVkType(layoutBinding.Type);
+			binding.descriptorCount = layoutBinding.DescriptorCount;
+			binding.stageFlags = ToVkTypes(layoutBinding.ShaderStages);
+			binding.pImmutableSamplers = staticSamplerHandles[index] != VK_NULL_HANDLE ? &staticSamplerHandles[index] : nullptr;
 
-			bindings.push_back(binding);
-		}
+			return binding;
+		});
 
 		VkDescriptorSetLayoutCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr };
 		{
@@ -42,8 +37,8 @@ namespace Ck::Vulkan
 			if (mSupportPushDescriptor)
 				vkCreateInfo.flags |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_PUSH_DESCRIPTOR_BIT_KHR;
 
-			vkCreateInfo.bindingCount = static_cast<unsigned int>(bindings.size());
-			vkCreateInfo.pBindings = bindings.data();
+			vkCreateInfo.bindingCount = bindings.GetSize();
+			vkCreateInfo.pBindings = bindings.GetData();
 		}
 
 		COCKTAIL_VK_CHECK(vkCreateDescriptorSetLayout(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
@@ -75,13 +70,13 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetLayout::IsCompatibleWith(const DescriptorSetLayout& other) const
 	{
-		if (mBindings.size() != other.mBindings.size())
+		if (mBindings.GetSize() != other.mBindings.GetSize())
 			return false;
 
-		for (unsigned int i = 0; i < mBindings.size(); i++)
+		for (unsigned int i = 0; i < mBindings.GetSize(); i++)
 		{
 			const DescriptorSetLayoutBinding* otherBinding = nullptr;
-			for (unsigned int j = 0; j < mBindings.size() && !otherBinding; j++)
+			for (unsigned int j = 0; j < mBindings.GetSize() && !otherBinding; j++)
 			{
 				if (mBindings[i].Binding == other.mBindings[j].Binding)
 					otherBinding = &other.mBindings[j];
@@ -108,24 +103,16 @@ namespace Ck::Vulkan
 		return mSupportPushDescriptor;
 	}
 
-	unsigned int DescriptorSetLayout::GetBindingCount() const
-	{
-		return static_cast<unsigned int>(mBindings.size());
-	}
-
 	unsigned int DescriptorSetLayout::GetDescriptorCount() const
 	{
-		unsigned int descriptorCount = 0;
-		for (const DescriptorSetLayoutBinding& binding : mBindings)
-			descriptorCount += binding.DescriptorCount;
-
-		return descriptorCount;
+		return mBindings.Reduce(0, [](unsigned int current, const DescriptorSetLayoutBinding& binding) {
+			return current + binding.DescriptorCount;
+		});
 	}
 
-	const DescriptorSetLayoutBinding* DescriptorSetLayout::GetBinding(unsigned int index) const
+	const Array<DescriptorSetLayoutBinding>& DescriptorSetLayout::GetBindings() const
 	{
-		assert(index < mBindings.size());
-		return &mBindings[index];
+		return mBindings;
 	}
 
 	DescriptorSetLayoutSignature DescriptorSetLayout::ToSignature() const

@@ -59,8 +59,8 @@ namespace Ck::Vulkan
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::BufferUsageFlags mBufferUsage;
 		std::size_t mBufferSize;
-		std::vector<StagingBuffer*> mAcquiredBuffers;
-		std::vector<StagingBuffer*> mAvailableBuffers;
+		Array<StagingBuffer*> mAcquiredBuffers;
+		Array<StagingBuffer*> mAvailableBuffers;
 		TlsObjectPool<StagingBuffer> mStagingBufferPool;
 	};
 }

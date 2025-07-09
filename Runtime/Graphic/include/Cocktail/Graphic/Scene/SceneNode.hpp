@@ -44,7 +44,7 @@ namespace Ck
 			Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
 		};
 
-		Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const std::vector<std::shared_ptr<Material>>& materials);
+		Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials);
 
 		const std::shared_ptr<Mesh>& GetMesh() const;
 
@@ -54,7 +54,7 @@ namespace Ck
 
 		const std::unordered_set<std::shared_ptr<Material>>& GetMaterials() const;
 
-		const std::vector<Geometry>& GetGeometries(const Material* material) const;
+		const Array<Geometry>& GetGeometries(const Material* material) const;
 
 	private:
 
@@ -62,7 +62,7 @@ namespace Ck
 		std::shared_ptr<VertexBuffer> mVertexBuffer;
 		std::shared_ptr<IndexBuffer> mIndexBuffer;
 		std::unordered_set<std::shared_ptr<Material>> mMaterials;
-		std::unordered_map<const Material*, std::vector<Geometry>> mGeometries;
+		std::unordered_map<const Material*, Array<Geometry>> mGeometries;
 	};
 
 	class COCKTAIL_GRAPHIC_API SceneNode : public AcyclicGraphNode<SceneNode>, public Renderable, public Transformable
@@ -110,7 +110,7 @@ namespace Ck
 
 		Scene* mScene;
 		bool mVisible;
-		std::vector<std::shared_ptr<Shape>> mShapes;
+		Array<std::shared_ptr<Shape>> mShapes;
 		Box<float> mBoundingBox;
 	};
 }

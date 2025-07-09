@@ -25,14 +25,14 @@ namespace Ck
 		mArrayLayerCount(arrayLayerCount),
 		mMipMapCount(mipMapCount)
 	{
-		mLevels.reserve(mArrayLayerCount * mMipMapCount);
+		mLevels.Reserve(mArrayLayerCount * mMipMapCount);
 		for (unsigned int level = 0; level < mMipMapCount; level++)
 		{
 			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(mBaseSize, level);
 			std::size_t levelAllocationSize = mPixelFormat.ComputeAllocationSize(levelSize);
 
 			for (unsigned int layer = 0; layer < mArrayLayerCount; layer++)
-				mLevels.push_back(MipMapLevel(levelSize, mPixelFormat, levelAllocationSize));
+				mLevels.Add(MipMapLevel(levelSize, mPixelFormat, levelAllocationSize));
 		}
 	}
 
@@ -62,12 +62,12 @@ namespace Ck
 
 	MipMapLevel& MipMaps::GetLevel(unsigned int slice, unsigned int level)
 	{
-		return mLevels.at(level * mArrayLayerCount + slice);
+		return mLevels.At(level * mArrayLayerCount + slice);
 	}
 
 	const MipMapLevel& MipMaps::GetLevel(unsigned int slice, unsigned int level) const
 	{
-		return mLevels.at(level * mArrayLayerCount + slice);
+		return mLevels.At(level * mArrayLayerCount + slice);
 	}
 
 	const Extent3D<unsigned int>& MipMaps::GetBaseSize() const

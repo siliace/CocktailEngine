@@ -29,7 +29,7 @@ namespace Ck
 		return ByteArray(reinterpret_cast<char*>(buffer.get()), read);
 	}
 
-	std::vector<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
+	Array<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
 	{
 		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
@@ -37,9 +37,9 @@ namespace Ck
 		InputStreamReader inputStreamReader(inputStream);
 		BufferedReader reader(inputStreamReader);
 
-		std::vector<std::string> lines;
+		Array<std::string> lines;
 		while (!reader.IsEof())
-			lines.push_back(reader.ReadLine());
+			lines.Add(reader.ReadLine());
 
 		return lines;
 	}
@@ -53,11 +53,11 @@ namespace Ck
 		file->Write(content.GetData(), content.GetSize());
 	}
 
-	void FileUtils::WriteFileLines(const std::filesystem::path& path, const std::vector<std::string>& lines)
+	void FileUtils::WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
 	{
 	}
 
-	void FileUtils::AppendFileLines(const std::filesystem::path& path, const std::vector<std::string>& lines)
+	void FileUtils::AppendFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
 	{
 	}
 }

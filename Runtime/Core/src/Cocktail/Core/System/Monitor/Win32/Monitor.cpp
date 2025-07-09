@@ -95,9 +95,9 @@ namespace Ck::Detail::Win32
 			throw SystemError::GetLastError();
 	}
 
-	std::vector<VideoMode> Monitor::GetSupportedVideoModes() const
+	Array<VideoMode> Monitor::GetSupportedVideoModes() const
 	{
-		std::vector<VideoMode> videoModes;
+		Array<VideoMode> videoModes;
 
 		DEVMODE devMode;
 		devMode.dmSize = sizeof(DEVMODE);
@@ -107,7 +107,7 @@ namespace Ck::Detail::Win32
 		{
 			VideoMode videoMode = DevModeToVideoMode(devMode);
 			if (std::find(videoModes.begin(), videoModes.end(), videoMode) == videoModes.end())
-				videoModes.push_back(videoMode);
+				videoModes.Add(videoMode);
 		}
 
 		return videoModes;

@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_APPLICATION_DETAIL_SERVICEFACADEBASE_HPP
 #define COCKTAIL_CORE_APPLICATION_DETAIL_SERVICEFACADEBASE_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
 namespace Ck
@@ -30,7 +31,7 @@ namespace Ck
 			template <typename Callable>
 			static void OnApplicationReady(Callable&& callable)
 			{
-				sReadyConnections.push_back(
+				sReadyConnections.Add(
 					sOnFacadeApplicationReady.Connect(callable)
 				);
 			}
@@ -52,7 +53,7 @@ namespace Ck
 
 			static Application* sFacadeApplication;
 			static Signal<Application*> sOnFacadeApplicationReady;
-			static std::vector<Connection> sReadyConnections;
+			static Array<Connection> sReadyConnections;
 		};
 	}
 }

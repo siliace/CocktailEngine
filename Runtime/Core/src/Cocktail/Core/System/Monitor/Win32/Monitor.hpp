@@ -59,7 +59,7 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<VideoMode> GetSupportedVideoModes() const override;
+		Array<VideoMode> GetSupportedVideoModes() const override;
 
 		/**
 		 * \brief 

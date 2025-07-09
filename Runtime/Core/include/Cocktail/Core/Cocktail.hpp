@@ -4,9 +4,10 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <type_traits>
-#include <vector>
+#include <utility>
 
 #define COCKTAIL_MAJOR_VERSION 0
 #define COCKTAIL_MINOR_VERSION 1
@@ -62,7 +63,7 @@
 	#if defined COCKTAIL_COMPILER_MSC
 		#define COCKTAIL_UNREACHABLE() __assume(0)
 	#elif defined COCKTAIL_COMPILER_GCC
-		#define COCKTAIL_UNREACHABLE() assert(false && "Unreachable code reached")
+		#define COCKTAIL_UNREACHABLE() __builtin_unreachable()
 	#elif defined COCKTAIL_COMPILER_CLANG
 		#define COCKTAIL_UNREACHABLE() assert(false && "Unreachable code reached")
 	#else
@@ -147,6 +148,65 @@ namespace Ck
 	constexpr void HashCombine(std::size_t& hash, const T& value)
 	{
 		hash = HashMerge(hash, std::hash<T>()(value));
+	}
+
+	template <typename T>
+	T NextPowerOfTwo(T n)
+	{
+		--n;
+
+		n |= n >> 1;
+		n |= n >> 2;
+		n |= n >> 4;
+		n |= n >> 8;
+		n |= n >> 16;
+
+		return n + 1;
+	}
+
+	template <typename T, typename... TArgs>
+	void Construct(T* element, TArgs... args)
+	{
+		new (element) T(std::forward<TArgs>(args)...);
+	}
+
+	template <typename T, typename TSizeType, typename... TArgs>
+	void ConstructRange(TSizeType size, T* elements, TArgs... args)
+	{
+		static_assert(std::is_integral_v<TSizeType>, "TSizeType must be an integral type");
+
+		for (TSizeType i = 0; i < size; ++i)
+			new (&elements[i]) T(std::forward<TArgs>(args)...);
+	}
+
+	template <typename T, typename TSizeType>
+	void MoveRange(TSizeType size, T* destination, T* source)
+	{
+		for (TSizeType i = 0; i < size; ++i)
+		{
+			T& element = source[i];
+			new (&destination[i]) T(std::move(element));
+			element.~T();
+		}
+	}
+
+	template <typename T>
+	void Destroy(T* element)
+	{
+		if constexpr (!std::is_trivially_destructible_v<T>)
+			element->~T();
+	}
+
+	template <typename T, typename TSizeType>
+	void DestroyRange(TSizeType size, T* elements)
+	{
+		static_assert(std::is_integral_v<TSizeType>, "TSizeType must be an integral type");
+
+		if constexpr (!std::is_trivially_destructible_v<T>)
+		{
+			for (TSizeType i = 0; i < size; ++i)
+				elements[i].~T();
+		}
 	}
 
 	template<typename T, typename = std::enable_if_t<std::is_enum_v<T>>>

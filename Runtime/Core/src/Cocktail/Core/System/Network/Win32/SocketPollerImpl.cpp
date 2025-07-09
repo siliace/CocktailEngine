@@ -13,28 +13,19 @@ namespace Ck
 		if (flags & EventFlagBits::Write)
 			descriptor.events |= POLLWRNORM;
 
-		mDescriptors.push_back(descriptor);
+		mDescriptors.Add(descriptor);
 	}
 
 	void SocketPoller::Impl::Remove(Socket::Handle socketHandle)
 	{
-		auto it = mDescriptors.begin();
-		while (it != mDescriptors.end())
-		{
-			if (it->fd == socketHandle)
-			{
-				it = mDescriptors.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
+		mDescriptors.FilterInPlace([&](const WSAPOLLFD& descriptor) {
+			return descriptor.fd == socketHandle;
+		});
 	}
 
 	void SocketPoller::Impl::Clear()
 	{
-		mDescriptors.clear();
+		mDescriptors.Clear();
 	}
 
 	bool SocketPoller::Impl::Has(Socket::Handle socketHandle) const
@@ -44,11 +35,11 @@ namespace Ck
 
 	bool SocketPoller::Impl::Wait(const Duration& duration)
 	{
-		if (mDescriptors.empty())
+		if (mDescriptors.IsEmpty())
 			return false;
 
 		Uint64 timeout = duration.GetCount(TimeUnit::Milliseconds());
-		int updated = WSAPoll(mDescriptors.data(), static_cast<ULONG>(mDescriptors.size()), static_cast<INT>(timeout));
+		int updated = WSAPoll(mDescriptors.GetData(), mDescriptors.GetSize(), static_cast<INT>(timeout));
 		if (updated == -1)
 			throw SystemError::GetLastError();
 

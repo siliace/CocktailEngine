@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_set>
 
+#include <Cocktail/Core/Array.hpp>
+
 #include <Cocktail/Renderer/RenderDeviceExtension.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
@@ -86,13 +88,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<const char*> GetInstanceExtensions() const;
+		Array<const char*> GetInstanceExtensions() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<const char*> GetDeviceExtensions() const;
+		Array<const char*> GetDeviceExtensions() const;
 
 	private:
 
@@ -120,7 +122,7 @@ namespace Ck::Vulkan
 		 * \param extensionNames
 		 * \return
 		 */
-		bool CheckExtensionSupport(const std::vector<VkExtensionProperties>& properties, unsigned int extensionCount, const char* const* extensionNames) const;
+		bool CheckExtensionSupport(const Array<VkExtensionProperties>& properties, unsigned int extensionCount, const char* const* extensionNames) const;
 
 		/**
 		 * \brief 

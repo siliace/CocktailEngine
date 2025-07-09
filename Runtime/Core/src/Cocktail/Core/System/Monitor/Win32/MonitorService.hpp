@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_WIN32_MONITORSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_WIN32_MONITORSERVICE_HPP
 
-#include <vector>
-
 #include <Cocktail/Core/System/Monitor/MonitorService.hpp>
 #include <Cocktail/Core/System/Monitor/Win32/Monitor.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -60,7 +58,7 @@ namespace Ck::Detail::Win32
 		static BOOL CALLBACK EnumMonitorCallback(HMONITOR handle, HDC deviceContext, LPRECT area, LPARAM userParam);
 
 		std::shared_ptr<Monitor> mPrimaryMonitor;
-		std::vector<std::shared_ptr<Monitor>> mMonitors;
+		Array<std::shared_ptr<Monitor>> mMonitors;
 	};
 }
 

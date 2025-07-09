@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Ck::Array&lt;*&gt;">
+		<DisplayString Condition="mSize == 0 &amp;&amp; mCapacity == 0">Empty</DisplayString>
+		<DisplayString Condition="mSize == 0 &amp;&amp; mCapacity &gt; 0">Empty, Capacity={mCapacity}</DisplayString>
+		<DisplayString Condition="mSize &gt; 0">{{ Size={mSize} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mSize</Item>
+			<Item Name="[capacity]" ExcludeView="simple">mCapacity</Item>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>($T1*)mAllocator.mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+</AutoVisualizer>

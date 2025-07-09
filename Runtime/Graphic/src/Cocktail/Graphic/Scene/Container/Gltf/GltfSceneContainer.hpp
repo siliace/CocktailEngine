@@ -23,7 +23,7 @@ namespace Ck
         void ProcessMesh(const tinygltf::Model& model, unsigned int meshIndex, const tinygltf::Mesh& gltfMesh);
         NodeInfo ProcessNode(const tinygltf::Model& model, const tinygltf::Node& gltfNode);
 
-        std::unordered_map<unsigned int, std::vector<unsigned int>> mMeshIndirections; /*!< gltf meshs can issue several MeshInfo, bind them together here */
+        std::unordered_map<unsigned int, Array<unsigned int>> mMeshIndirections; /*!< gltf meshs can issue several MeshInfo, bind them together here */
     };
 }
 

@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP
 #define COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Image/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
@@ -63,12 +64,12 @@ namespace Ck::Vulkan
 		static VkAttachmentDescription CreateAttachmentDescription(const PixelFormat& format, Renderer::RasterizationSamples samples, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp, bool presentable);
 
 		Renderer::RasterizationSamples mSamples;
-		std::vector<VkAttachmentDescription> mAttachmentDescriptions;
-		std::vector<VkAttachmentReference> mColorAttachmentReference;
+		Array<VkAttachmentDescription> mAttachmentDescriptions;
+		Array<VkAttachmentReference> mColorAttachmentReference;
 		VkAttachmentReference mDepthStencilAttachmentReference;
-		std::vector<VkAttachmentReference> mResolveAttachmentReference;
-		std::vector<VkSubpassDescription> mSubpassDescriptions;
-		std::vector<VkSubpassDependency> mSubpassDependencies;
+		Array<VkAttachmentReference> mResolveAttachmentReference;
+		Array<VkSubpassDescription> mSubpassDescriptions;
+		Array<VkSubpassDependency> mSubpassDependencies;
 	};
 }
 #endif // COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP

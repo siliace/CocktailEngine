@@ -8,7 +8,7 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryBlock::DeviceMemoryBlock(DeviceMemoryChunk* chunk, std::size_t offset, std::size_t size, void* ptr) :
+	DeviceMemoryBlock::DeviceMemoryBlock(DeviceMemoryChunk* chunk, VkDeviceSize offset, VkDeviceSize size, void* ptr) :
 		mChunk(chunk),
 		mOffset(offset),
 		mPadding(0),
@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		/// Nothing
 	}
 
-	std::size_t DeviceMemoryBlock::ComputeAllocationPadding(std::size_t alignment) const
+	VkDeviceSize DeviceMemoryBlock::ComputeAllocationPadding(VkDeviceSize alignment) const
 	{
 		return mOffset != 0 && alignment != 0 ? alignment - (mOffset % alignment) : 0;
 	}
@@ -34,7 +34,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkBindImageMemory(renderDevice.GetHandle(), texture.GetHandle(), GetChunk()->GetDeviceMemory()->GetHandle(), mOffset + mPadding));
 	}
 
-	std::shared_ptr<DeviceMemoryBlock> DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t alignment, std::size_t size)
+	std::shared_ptr<DeviceMemoryBlock> DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size)
 	{
 		assert(mFree);
 
@@ -60,7 +60,7 @@ namespace Ck::Vulkan
 		mSize += block.mSize;
 	}
 
-	void* DeviceMemoryBlock::Map(std::size_t offset) const
+	void* DeviceMemoryBlock::Map(VkDeviceSize offset) const
 	{
 		if (!mPtr)
 			return nullptr;
@@ -82,8 +82,8 @@ namespace Ck::Vulkan
 	{
 		return mChunk;
 	}
-	
-	std::size_t DeviceMemoryBlock::GetSize() const
+
+	VkDeviceSize DeviceMemoryBlock::GetSize() const
 	{
 		return mSize;
 	}

@@ -16,16 +16,14 @@ namespace Ck::Vulkan
 		unsigned int k = 0;
 		const std::size_t elementStride = GetElementStride();
 		VkDescriptorUpdateTemplateEntry* entries = COCKTAIL_STACK_ALLOC(VkDescriptorUpdateTemplateEntry, mDescriptorSetLayout->GetDescriptorCount());
-		for (unsigned int i = 0; i < mDescriptorSetLayout->GetBindingCount(); i++)
+		for (const DescriptorSetLayoutBinding& binding : mDescriptorSetLayout->GetBindings())
 		{
-			const DescriptorSetLayoutBinding* binding = mDescriptorSetLayout->GetBinding(i);
-
-			for (unsigned int j = 0; j < binding->DescriptorCount; j++)
+			for (unsigned int j = 0; j < binding.DescriptorCount; j++)
 			{
-				entries[k].dstBinding = binding->Binding;
+				entries[k].dstBinding = binding.Binding;
 				entries[k].dstArrayElement = j;
 				entries[k].descriptorCount = 1;
-				entries[k].descriptorType = ToVkType(binding->Type);
+				entries[k].descriptorType = ToVkType(binding.Type);
 				entries[k].offset = k * elementStride;
 				entries[k].stride = elementStride;
 

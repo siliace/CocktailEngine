@@ -9,10 +9,10 @@ namespace Ck::Vulkan
 {
 	namespace
 	{
-		DescriptorSetLayoutBinding& InsertBindingToLayoutCreateInfo(std::vector<DescriptorSetLayoutBinding>& layoutBindings, Renderer::ShaderType shaderType, const DescriptorSetBindingInfo& bindingInfo)
+		DescriptorSetLayoutBinding& InsertBindingToLayoutCreateInfo(Array<DescriptorSetLayoutBinding>& layoutBindings, Renderer::ShaderType shaderType, const DescriptorSetBindingInfo& bindingInfo)
 		{
 			DescriptorSetLayoutBinding* foundLayoutBinding = nullptr;
-			for (unsigned int i = 0; i < layoutBindings.size(); i++)
+			for (unsigned int i = 0; i < layoutBindings.GetSize(); i++)
 			{
 				DescriptorSetLayoutBinding& layoutBinding = layoutBindings[i];
 				if (bindingInfo.Binding == layoutBinding.Binding)
@@ -40,7 +40,7 @@ namespace Ck::Vulkan
 				layoutBinding.DescriptorCount = bindingInfo.ArrayLength;
 				layoutBinding.ShaderStages = shaderType;
 
-				return layoutBindings.emplace_back(layoutBinding);
+				return layoutBindings.Emplace(layoutBinding);
 			}
 		}
 	}
@@ -127,7 +127,7 @@ namespace Ck::Vulkan
 		pipelineLayoutCreateInfo.BindPoint = BindPointFromProgramType(mType);
 
 		std::map<unsigned int, DescriptorSetLayoutCreateInfo> descriptorSetLayoutsCreateInfo;
-		std::map<unsigned int, std::vector<DescriptorSetLayoutBinding>> descriptorSetLayoutsBindings;
+		std::map<unsigned int, Array<DescriptorSetLayoutBinding>> descriptorSetLayoutsBindings;
 
 		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
 		{
@@ -147,7 +147,7 @@ namespace Ck::Vulkan
 			{
 				const DescriptorSetInfo* descriptorSetInfo = shader->GetDescriptorSetInfo(i);
 				DescriptorSetLayoutCreateInfo& layoutCreateInfo = descriptorSetLayoutsCreateInfo[descriptorSetInfo->Set];
-				std::vector<DescriptorSetLayoutBinding>& layoutBindings = descriptorSetLayoutsBindings[descriptorSetInfo->Set];
+				Array<DescriptorSetLayoutBinding>& layoutBindings = descriptorSetLayoutsBindings[descriptorSetInfo->Set];
 
 				// Fill missing layouts with dummy values
 				for (unsigned int j = 0; j < descriptorSetInfo->Set; j++)
@@ -187,13 +187,13 @@ namespace Ck::Vulkan
 
 		for (auto&[descriptorSetIndex, layoutCreateInfo] : descriptorSetLayoutsCreateInfo)
 		{
-			std::vector<DescriptorSetLayoutBinding>& layoutBindings = descriptorSetLayoutsBindings[descriptorSetIndex];
+			Array<DescriptorSetLayoutBinding>& layoutBindings = descriptorSetLayoutsBindings[descriptorSetIndex];
 
-			layoutCreateInfo.BindingCount = static_cast<unsigned>(layoutBindings.size());
-			layoutCreateInfo.Bindings = layoutBindings.data();
+			layoutCreateInfo.BindingCount = layoutBindings.GetSize();
+			layoutCreateInfo.Bindings = layoutBindings.GetData();
 
 			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mRenderDevice->CreateDescriptorSetLayout(layoutCreateInfo);
-			pipelineLayoutCreateInfo.DescriptorSetLayouts.push_back(descriptorSetLayout);
+			pipelineLayoutCreateInfo.DescriptorSetLayouts.Add(descriptorSetLayout);
 		}
 
 		mPipelineLayout = mRenderDevice->CreatePipelineLayout(pipelineLayoutCreateInfo);
@@ -205,20 +205,18 @@ namespace Ck::Vulkan
 		{
 			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
 
-			for (unsigned int j = 0; j < descriptorSetLayout->GetBindingCount(); j++)
+			for (const DescriptorSetLayoutBinding& binding : descriptorSetLayout->GetBindings())
 			{
-				const DescriptorSetLayoutBinding* binding = descriptorSetLayout->GetBinding(j);
-
 				// Get name of the uniform, keep the first one found.
 				std::string name;
-				std::vector<BlockMember> members;
+				Array<BlockMember> members;
 				for (Renderer::ShaderType type : Enum<Renderer::ShaderType>::Values)
 				{
 					std::shared_ptr<Shader> shader = mShaders[type];
 					if (!shader)
 						continue;
 
-					Optional<DescriptorSetBindingInfo> bindingInfo = shader->GetDescriptorSetBindingInfo(i, binding->Binding);
+					Optional<DescriptorSetBindingInfo> bindingInfo = shader->GetDescriptorSetBindingInfo(i, binding.Binding);
 					if (bindingInfo.IsEmpty())
 						continue;
 
@@ -227,7 +225,7 @@ namespace Ck::Vulkan
 					break;
 				}
 
-				mUniformSlots.emplace_back(new UniformSlot(mType, members, std::move(name), *binding, i));
+				mUniformSlots.Emplace(new UniformSlot(mType, members, std::move(name), binding, i));
 			}
 		}
 	}

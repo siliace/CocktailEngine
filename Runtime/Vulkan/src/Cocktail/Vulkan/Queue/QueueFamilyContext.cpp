@@ -9,8 +9,8 @@ namespace Ck::Vulkan
 		unsigned int propertyCount;
 		vkGetPhysicalDeviceQueueFamilyProperties(mPhysicalDevice, &propertyCount, nullptr);
 
-		std::vector<VkQueueFamilyProperties> properties(propertyCount);
-		vkGetPhysicalDeviceQueueFamilyProperties(mPhysicalDevice, &propertyCount, properties.data());
+		Array<VkQueueFamilyProperties> properties(propertyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(mPhysicalDevice, &propertyCount, properties.GetData());
 
 		QueueFamily graphicQueueFamily = SelectGraphicQueueFamily(properties);
 		mFamilies[Renderer::CommandQueueType::Graphic] = graphicQueueFamily;
@@ -35,9 +35,9 @@ namespace Ck::Vulkan
 		return mUnified;
 	}
 
-	std::vector<unsigned int> QueueFamilyContext::FindFamilyIndexes(bool unique) const
+	Array<unsigned int> QueueFamilyContext::FindFamilyIndexes(bool unique) const
 	{
-		std::vector<unsigned int> queueIndexes;
+		Array<unsigned int> queueIndexes;
 		for (Renderer::CommandQueueType queueFamilyType : Enum<Renderer::CommandQueueType>::Values)
 		{
 			const QueueFamily& family = GetFamily(queueFamilyType);
@@ -50,7 +50,7 @@ namespace Ck::Vulkan
 					continue;
 			}
 
-			queueIndexes.push_back(queueFamilyIndex);
+			queueIndexes.Add(queueFamilyIndex);
 		}
 
 		return queueIndexes;
@@ -73,9 +73,9 @@ namespace Ck::Vulkan
 		COCKTAIL_UNREACHABLE();
 	}
 
-	QueueFamily QueueFamilyContext::SelectGraphicQueueFamily(const std::vector<VkQueueFamilyProperties>& properties)
+	QueueFamily QueueFamilyContext::SelectGraphicQueueFamily(const Array<VkQueueFamilyProperties>& properties)
 	{
-		for (unsigned int i = 0; i < properties.size(); i++)
+		for (unsigned int i = 0; i < properties.GetSize(); i++)
 		{
 			const VkQueueFamilyProperties& property = properties[i];
 			if (property.queueFlags & VK_QUEUE_GRAPHICS_BIT)
@@ -85,12 +85,12 @@ namespace Ck::Vulkan
 		COCKTAIL_UNREACHABLE();
 	}
 
-	QueueFamily QueueFamilyContext::SelectTransferQueueFamily(const std::vector<VkQueueFamilyProperties>& properties)
+	QueueFamily QueueFamilyContext::SelectTransferQueueFamily(const Array<VkQueueFamilyProperties>& properties)
 	{
 		Optional<unsigned int> transferFamilyIndex;
 
 		// First look for a family dedicated to transfer
-		for (unsigned int i = 0; i < properties.size() && transferFamilyIndex.IsEmpty(); i++)
+		for (unsigned int i = 0; i < properties.GetSize() && transferFamilyIndex.IsEmpty(); i++)
 		{
 			const VkQueueFamilyProperties& property = properties[i];
 			if ((property.queueFlags & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT)) == 0)
@@ -98,14 +98,14 @@ namespace Ck::Vulkan
 		}
 
 		unsigned int queueIndex = transferFamilyIndex.GetOrElse([&]() {
-			for (unsigned int i = 0; i < properties.size(); i++)
+			for (unsigned int i = 0; i < properties.GetSize(); i++)
 			{
 				const VkQueueFamilyProperties& property = properties[i];
 				if ((property.queueFlags & VK_QUEUE_COMPUTE_BIT) == 0)
 					return i;
 			}
 
-			for (unsigned int i = 0; i < properties.size(); i++)
+			for (unsigned int i = 0; i < properties.GetSize(); i++)
 			{
 				const VkQueueFamilyProperties& property = properties[i];
 				if (property.queueFlags & VK_QUEUE_TRANSFER_BIT)
@@ -118,12 +118,12 @@ namespace Ck::Vulkan
 		return QueueFamily(Renderer::CommandQueueType::Transfer, queueIndex, properties[queueIndex]);
 	}
 
-	QueueFamily QueueFamilyContext::SelectComputeQueueFamily(const std::vector<VkQueueFamilyProperties>& properties)
+	QueueFamily QueueFamilyContext::SelectComputeQueueFamily(const Array<VkQueueFamilyProperties>& properties)
 	{
 		Optional<unsigned int> computeFamilyIndex;
 
 		// First look for a family dedicated to compute
-		for (unsigned int i = 0; i < properties.size() && computeFamilyIndex.IsEmpty(); i++)
+		for (unsigned int i = 0; i < properties.GetSize() && computeFamilyIndex.IsEmpty(); i++)
 		{
 			const VkQueueFamilyProperties& property = properties[i];
 			if ((property.queueFlags & VK_QUEUE_COMPUTE_BIT) > 0 && (property.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)
@@ -132,7 +132,7 @@ namespace Ck::Vulkan
 
 		unsigned int queueIndex = computeFamilyIndex.GetOrElse([&]() {
 			// If there is no dedicated compute family, fallback on the first family with compute capabilities
-			for (unsigned int i = 0; i < properties.size() && computeFamilyIndex.IsEmpty(); i++)
+			for (unsigned int i = 0; i < properties.GetSize() && computeFamilyIndex.IsEmpty(); i++)
 			{
 				const VkQueueFamilyProperties& property = properties[i];
 				if (property.queueFlags & VK_QUEUE_COMPUTE_BIT)

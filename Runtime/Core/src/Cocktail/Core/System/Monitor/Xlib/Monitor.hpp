@@ -62,7 +62,7 @@ namespace Ck::Detail::Xlib
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<VideoMode> GetSupportedVideoModes() const override;
+		Array<VideoMode> GetSupportedVideoModes() const override;
 
 		/**
 		 * \brief 
@@ -82,7 +82,6 @@ namespace Ck::Detail::Xlib
 		Orientation mOrientation;
 		std::string mName;
 		VideoMode mCurrentVideoMode;
-		std::vector<VideoMode> mVideoModes;
 	};
 }
 

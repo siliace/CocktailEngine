@@ -51,7 +51,7 @@ namespace Ck::Detail::Xlib
 		::Display* mDisplay;
 		bool mExtensionSupported;
 		std::shared_ptr<Monitor> mPrimaryMonitor;
-		std::vector<std::shared_ptr<Monitor>> mMonitors;
+		Array<std::shared_ptr<Monitor>> mMonitors;
 	};
 }
 

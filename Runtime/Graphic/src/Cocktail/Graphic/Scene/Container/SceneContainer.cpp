@@ -6,19 +6,19 @@ namespace Ck
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
-		std::vector<std::shared_ptr<Mesh>> meshes;
-		meshes.reserve(mMeshes.size());
+		Array<std::shared_ptr<Mesh>> meshes;
+		meshes.Reserve(mMeshes.GetSize());
 
-		std::vector<std::shared_ptr<Material>> materials;
-		materials.resize(mMaterials.size());
+		Array<std::shared_ptr<Material>> materials;
+		materials.Resize(mMaterials.GetSize());
 
 		for (const MeshInfo& meshInfo : mMeshes)
 		{
-			std::vector<Mesh::SubMesh> subMeshes;
-			subMeshes.reserve(meshInfo.SubMeshes.size());
+			Array<Mesh::SubMesh> subMeshes;
+			subMeshes.Reserve(meshInfo.SubMeshes.GetSize());
 			for (const SubMeshInfo& subMeshInfo : meshInfo.SubMeshes)
 			{
-				subMeshes.push_back({
+				subMeshes.Add(Mesh::SubMesh{
 					subMeshInfo.Count,
 					subMeshInfo.FirstVertex,
 					subMeshInfo.FirstIndex,
@@ -52,7 +52,7 @@ namespace Ck
 			}
 
 			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meshInfo.Vertices, meshInfo.Indices, std::move(subMeshes));
-			meshes.push_back(std::move(mesh));
+			meshes.Add(std::move(mesh));
 		}
 
 		std::shared_ptr<SceneNode> sceneNode = ProcessNode(scene, nullptr, mRoot, meshes, materials);
@@ -61,7 +61,7 @@ namespace Ck
 		return sceneNode;
 	}
 
-	std::shared_ptr<SceneNode> SceneContainer::ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const std::vector<std::shared_ptr<Mesh>>& meshes, const std::vector<std::shared_ptr<Material>>& materials)
+	std::shared_ptr<SceneNode> SceneContainer::ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials)
 	{
 		std::shared_ptr<SceneNode> sceneNode = scene.CreateSceneNode();
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();

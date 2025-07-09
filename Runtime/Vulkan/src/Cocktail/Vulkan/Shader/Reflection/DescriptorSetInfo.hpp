@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		std::vector<DescriptorSetBindingInfo> Bindings;
+		Array<DescriptorSetBindingInfo> Bindings;
 	};
 }
 

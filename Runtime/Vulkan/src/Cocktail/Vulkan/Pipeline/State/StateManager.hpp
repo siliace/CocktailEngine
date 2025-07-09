@@ -233,7 +233,7 @@ namespace Ck::Vulkan
 		Flags<DirtyFlagBits> mDirtyFlags;
 		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaderStages;
 		unsigned int mDescriptorSetDirtyFlags;
-		std::vector<DescriptorSetStateManager> mDescriptorSetStateManagers;
+		Array<DescriptorSetStateManager> mDescriptorSetStateManagers;
 		unsigned int mPipelineConstantStorageSize;
 		std::unique_ptr<unsigned char[]> mPipelineConstantStorage;
 		EnumMap<Renderer::ShaderType, PipelineConstantRangeState> mPipelineConstantRanges;

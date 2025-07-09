@@ -42,19 +42,15 @@ namespace Ck::Vulkan
 
 	void DeviceMemoryAllocator::GarbageCollect(bool compact)
 	{
-		for (auto it = mChunks.begin(); it != mChunks.end();)
-		{
-			if ((*it)->IsFree())
-			{
-				it = mChunks.erase(it);
-			}
-			else
-			{
-				if (compact)
-					(*it)->Compact();
+		mChunks.FilterInPlace([](const std::shared_ptr<DeviceMemoryChunk>& chunk) {
+			return chunk->IsFree();
+		});
 
-				++it;
-			}
+		if (compact)
+		{
+			mChunks.ForEach([](const std::shared_ptr<DeviceMemoryChunk>& chunk) {
+				chunk->Compact();
+			});
 		}
 	}
 

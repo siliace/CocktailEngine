@@ -37,7 +37,7 @@ namespace Ck
             if (inserted)
                 ++mCurrentIndex;
 
-            mIndices.push_back(it->second);
+            mIndices.Add(it->second);
         }
 
         /**
@@ -60,8 +60,8 @@ namespace Ck
             const bool useShortIndices = mVertices.size() < std::numeric_limits<Uint16>::max();
             const Renderer::IndexType indexType = useShortIndices ? Renderer::IndexType::Short : Renderer::IndexType::Integer;
 
-            std::shared_ptr<IndexArray> indices = std::make_shared<IndexArray>(indexType, mIndices.size());
-            for (std::size_t i = 0; i < mIndices.size(); i++)
+            std::shared_ptr<IndexArray> indices = std::make_shared<IndexArray>(indexType, mIndices.GetSize());
+            for (std::size_t i = 0; i < mIndices.GetSize(); i++)
             {
                 IndexRef indexRef = indices->At(i);
                 unsigned int value = mIndices[i];
@@ -111,7 +111,7 @@ namespace Ck
          */
         std::size_t GetIndexCount() const
         {
-            return mIndices.size();
+            return mIndices.GetSize();
         }
 
     protected:
@@ -128,7 +128,7 @@ namespace Ck
         std::shared_ptr<VertexLayout> mVertexLayout;
         unsigned int mCurrentIndex;
         std::unordered_map<T, unsigned int, Hasher, Equal> mVertices;
-        std::vector<unsigned int> mIndices;
+        Array<unsigned int> mIndices;
     };
 }
 

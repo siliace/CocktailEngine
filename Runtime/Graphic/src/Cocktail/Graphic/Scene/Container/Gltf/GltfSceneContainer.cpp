@@ -32,12 +32,12 @@ namespace Ck
             DataType dataType = GltfUtils::ConvertComponentType(gltfImage.pixel_type);
             std::shared_ptr<Image> image = std::make_shared<Image>(size, PixelFormat::Color(pixelFormatLayout, dataType), gltfImage.image.data());
 
-            mMipMaps.push_back(MipMaps::FromImage(*image));
+            mMipMaps.Add(MipMaps::FromImage(*image));
         }
 
         for (const tinygltf::Material& gltfMaterial : model.materials)
         {
-            mMaterials.push_back(
+            mMaterials.Add(
                 ProcessMaterial(model, gltfMaterial)
             );
         }
@@ -46,11 +46,12 @@ namespace Ck
             ProcessMesh(model, i, model.meshes[i]);
 
         const tinygltf::Scene& defautlScene = model.scenes[model.defaultScene];
-        std::vector<NodeInfo> childrenNodeInfo;
-        childrenNodeInfo.reserve(defautlScene.nodes.size());
+
+    	Array<NodeInfo> childrenNodeInfo;
+        childrenNodeInfo.Reserve(defautlScene.nodes.size());
         for (int sceneNodeIndex : defautlScene.nodes)
         {
-            childrenNodeInfo.push_back(
+            childrenNodeInfo.Add(
                 ProcessNode(model, model.nodes[sceneNodeIndex])
             );
         }
@@ -86,7 +87,7 @@ namespace Ck
 
     void GltfSceneContainer::ProcessMesh(const tinygltf::Model& model, unsigned int meshIndex, const tinygltf::Mesh& gltfMesh)
     {
-        std::vector<MeshInfo> primitiveMeshes;
+        Array<MeshInfo> primitiveMeshes;
         for (const tinygltf::Primitive& primitive : gltfMesh.primitives)
         {
             VertexLayout::Builder vertexLayoutBuilder;
@@ -200,7 +201,7 @@ namespace Ck
 
                 compatibleMeshInfo->Indices->Merge(*indices);
                 compatibleMeshInfo->Vertices->Merge(*vertices);
-        		compatibleMeshInfo->SubMeshes.push_back(subMesh);
+        		compatibleMeshInfo->SubMeshes.Add(subMesh);
             }
             else
             {
@@ -211,26 +212,26 @@ namespace Ck
                 meshInfo.Name = gltfMesh.name;
                 meshInfo.Vertices = std::move(vertices);
                 meshInfo.Indices = std::move(indices);
-                meshInfo.SubMeshes.push_back(subMesh);
+                meshInfo.SubMeshes.Add(subMesh);
 
-                primitiveMeshes.push_back(meshInfo);
+                primitiveMeshes.Add(meshInfo);
             }
         }
 
         for (auto it = primitiveMeshes.begin(); it != primitiveMeshes.end(); ++it)
         {
-            mMeshes.push_back(std::move(*it));
-            mMeshIndirections[meshIndex].push_back(mMeshes.size() - 1);
+            mMeshes.Add(std::move(*it));
+            mMeshIndirections[meshIndex].Add(mMeshes.GetSize() - 1);
         }
     }
 
     SceneContainer::NodeInfo GltfSceneContainer::ProcessNode(const tinygltf::Model& model, const tinygltf::Node& gltfNode)
     {
-        std::vector<NodeInfo> childrenNodes;
-        childrenNodes.reserve(gltfNode.children.size());
+        Array<NodeInfo> childrenNodes;
+        childrenNodes.Reserve(gltfNode.children.size());
         for (int childSceneNodeIndex : gltfNode.children)
         {
-            childrenNodes.push_back(
+            childrenNodes.Add(
                 ProcessNode(model, model.nodes[childSceneNodeIndex])
             );
         }

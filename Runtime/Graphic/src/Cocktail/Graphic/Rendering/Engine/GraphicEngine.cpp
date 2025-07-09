@@ -86,7 +86,7 @@ namespace Ck
 			textureResource->LoadLevels(layer, 0, mipMaps->GetMipMapCount() - 1);
 
 		if (!mipMaps->IsComplete())
-			mGeneratingMipMaps.push_back(textureResource);
+			mGeneratingMipMaps.Add(textureResource);
 
 		return textureResource;
 	}
@@ -116,7 +116,7 @@ namespace Ck
 			mRenderContext->WaitQueue(Renderer::CommandQueueType::Graphic, Renderer::CommandQueueType::Transfer);
 		}
 
-		if (!mGeneratingMipMaps.empty())
+		if (!mGeneratingMipMaps.IsEmpty())
 		{
 			Renderer::CommandList* commandList = mRenderContext->CreateCommandList({ Renderer::CommandListUsageBits::Graphic });
 
@@ -127,7 +127,7 @@ namespace Ck
 
 			mRenderContext->SubmitCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);
 
-			mGeneratingMipMaps.clear();
+			mGeneratingMipMaps.Clear();
 		}
 	}
 

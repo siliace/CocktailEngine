@@ -4,12 +4,12 @@ namespace Ck::Main::Unix
 {
     UnixApplication::UnixApplication(int argc, char** argv)
     {
-        mArgv.reserve(argc - 1);
+        mArgv.Reserve(argc - 1);
         for (int i = 1; i < argc; i++)
-            mArgv.emplace_back(argv[i]);
+            mArgv.Emplace(argv[i]);
     }
 
-    const std::vector<std::string>& UnixApplication::GetArgv() const
+    const Array<std::string>& UnixApplication::GetArgv() const
     {
         return mArgv;
     }

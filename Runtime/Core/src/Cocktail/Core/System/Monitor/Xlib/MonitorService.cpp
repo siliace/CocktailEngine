@@ -29,7 +29,7 @@ namespace Ck::Detail::Xlib
 					if (monitor->IsPrimary())
 						mPrimaryMonitor = monitor;
 
-					mMonitors.push_back(std::move(monitor));
+					mMonitors.Add(std::move(monitor));
 				}
 				
 				XRRFreeOutputInfo(outputInfo);
@@ -48,12 +48,12 @@ namespace Ck::Detail::Xlib
 
 	std::size_t MonitorService::GetMonitorCount() const
 	{
-		return mMonitors.size();
+		return mMonitors.GetSize();
 	}
 
 	std::shared_ptr<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
 	{
-		return mMonitors.at(index);
+		return mMonitors.At(index);
 	}
 
 	std::shared_ptr<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const

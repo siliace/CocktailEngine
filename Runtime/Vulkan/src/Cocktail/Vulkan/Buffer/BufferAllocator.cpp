@@ -27,17 +27,15 @@ namespace Ck::Vulkan
 
     BufferAllocator::~BufferAllocator()
     {
-		mAcquiredBufferPools.clear();
-		mAvailableBufferPools.clear();
-		mBufferPool.Clear();
+		Reset(true);
     }
 
     Renderer::BufferArea BufferAllocator::PushData(std::size_t size, const void *data)
     {
-		std::shared_ptr<BufferPool> bufferPool = AcquirePool(size);
+		BufferPool* bufferPool = AcquirePool(size);
 
 		Renderer::BufferArea bufferArea;
-		bufferArea.Buffer = bufferPool.get();
+		bufferArea.Buffer = bufferPool;
 		bufferArea.BaseOffset = bufferPool->PushData(mMinAlignment, size, data);
 		bufferArea.Range = size;
 
@@ -46,13 +44,13 @@ namespace Ck::Vulkan
 
 	void BufferAllocator::Reserve(std::size_t size)
 	{
-		for (std::shared_ptr<BufferPool> acquiredBufferPools : mAcquiredBufferPools)
+		for (BufferPool* acquiredBufferPools : mAcquiredBufferPools)
 		{
 			if (size < acquiredBufferPools->GetRemainingCapacity())
 				return;
 		}
 
-		for (std::shared_ptr<BufferPool> availableBufferPool : mAvailableBufferPools)
+		for (BufferPool* availableBufferPool : mAvailableBufferPools)
 		{
 			if (size < availableBufferPool->GetRemainingCapacity())
 				return;
@@ -63,20 +61,26 @@ namespace Ck::Vulkan
 
 	void BufferAllocator::Reset(bool release)
 	{
-		if (!release)
+		if (!release && !mAcquiredBufferPools.IsEmpty())
 		{
-			for (std::shared_ptr<BufferPool> bufferPool : mAcquiredBufferPools)
+			for (BufferPool* bufferPool : mAcquiredBufferPools)
 			{
 				bufferPool->Reset();
-				mAvailableBufferPools.push_back(bufferPool);
+				mAvailableBufferPools.Add(bufferPool);
 			}
 		}
 		else
 		{
-			mAvailableBufferPools.clear();
+			for (BufferPool* bufferPool : mAcquiredBufferPools)
+				mBufferPool.Recycle(bufferPool);
+
+			for (BufferPool* bufferPool : mAvailableBufferPools)
+				mBufferPool.Recycle(bufferPool);
+
+			mAvailableBufferPools.Clear();
 		}
 
-		mAcquiredBufferPools.clear();
+		mAcquiredBufferPools.Clear();
 		mRenderDevice->Resolve<DeviceMemoryAllocator>()->GarbageCollect(release);
 	}
 
@@ -85,37 +89,30 @@ namespace Ck::Vulkan
 		return mBufferSize;
 	}
 
-	std::shared_ptr<BufferPool> BufferAllocator::AcquirePool(std::size_t size)
+	BufferPool* BufferAllocator::AcquirePool(std::size_t size)
 	{
-		for (std::shared_ptr<BufferPool> buffer : mAcquiredBufferPools)
+		for (BufferPool* buffer : mAcquiredBufferPools)
 		{
 			std::size_t padding = buffer->ComputePadding(mMinAlignment);
 			if (padding + size <= buffer->GetRemainingCapacity())
 				return buffer;
 		}
 
-		auto itBuffer = std::find_if(mAvailableBufferPools.begin(), mAvailableBufferPools.end(), [&](std::shared_ptr<BufferPool> bufferPool) {
+		BufferPool* buffer = mAvailableBufferPools.FindIndexIf([&](BufferPool* bufferPool) {
 			return bufferPool->GetRemainingCapacity() + bufferPool->ComputePadding(mMinAlignment) > size;
-		});
-
-		std::shared_ptr<BufferPool> buffer;
-		if (itBuffer != mAvailableBufferPools.end())
-		{
-			buffer = std::move(*itBuffer);
-			mAvailableBufferPools.erase(itBuffer);
-		}
-		else
-		{
+		}).Map([&](unsigned int index) {
+			return mAvailableBufferPools.RemoveAt(index);
+		}).GetOrElse([&]() {
 			Renderer::BufferCreateInfo bufferCreateInfo;
 			bufferCreateInfo.Usage = mUsage;
 			bufferCreateInfo.Size = std::max(mBufferSize, size);
 			bufferCreateInfo.MemoryType = mMemoryType;
 			bufferCreateInfo.Exclusive = true;
 
-			buffer = mBufferPool.Allocate(mRenderDevice, bufferCreateInfo, nullptr);
-		}
+			return mBufferPool.AllocateUnsafe(mRenderDevice, bufferCreateInfo, nullptr);
+		});
 
-		mAcquiredBufferPools.push_back(buffer);
+		mAcquiredBufferPools.Add(buffer);
 
 		return buffer;
 	}

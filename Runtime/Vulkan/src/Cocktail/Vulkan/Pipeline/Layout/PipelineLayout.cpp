@@ -14,9 +14,9 @@ namespace Ck::Vulkan
 	{
 		mBindPoint = createInfo.BindPoint;
 
-		std::vector<VkDescriptorSetLayout> descriptorSetLayoutHandles(mDescriptorSetLayouts.size());
-		for (unsigned int i = 0; i < descriptorSetLayoutHandles.size(); i++)
-			descriptorSetLayoutHandles[i] = mDescriptorSetLayouts[i]->GetHandle();
+		Array<VkDescriptorSetLayout> descriptorSetLayoutHandles = mDescriptorSetLayouts.Transform([](std::shared_ptr<DescriptorSetLayout> descriptorSetLayout) {
+			return descriptorSetLayout->GetHandle();
+		});
 
 		unsigned int pushConstantRangeCount = 0;
 		VkPushConstantRange pushConstantRanges[Enum<Renderer::ShaderType>::ValueCount];
@@ -41,8 +41,8 @@ namespace Ck::Vulkan
 		VkPipelineLayoutCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, nullptr };
 		{
 			vkCreateInfo.flags = 0;
-			vkCreateInfo.setLayoutCount = static_cast<unsigned int>(descriptorSetLayoutHandles.size());
-			vkCreateInfo.pSetLayouts = descriptorSetLayoutHandles.data();
+			vkCreateInfo.setLayoutCount = descriptorSetLayoutHandles.GetSize();
+			vkCreateInfo.pSetLayouts = descriptorSetLayoutHandles.GetData();
 			vkCreateInfo.pushConstantRangeCount = pushConstantRangeCount;
 			vkCreateInfo.pPushConstantRanges = pushConstantRanges;
 		}
@@ -51,24 +51,17 @@ namespace Ck::Vulkan
 
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::DescriptorUpdateTemplate))
 		{
-			mUpdateTemplates.reserve(mDescriptorSetLayouts.size());
-			for (unsigned int i = 0; i < mDescriptorSetLayouts.size(); i++)
-			{
-				if (mDescriptorSetLayouts[i]->GetDescriptorCount() == 0)
-				{
-					mUpdateTemplates.push_back(nullptr);
-					continue;
-				}
+			mUpdateTemplates = mDescriptorSetLayouts.Transform([&](std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, unsigned int index) -> std::shared_ptr<DescriptorUpdateTemplate> {
+				if (descriptorSetLayout->GetDescriptorCount() == 0)
+					return nullptr;
 
 				DescriptorUpdateTemplateCreateInfo descriptorUpdateTemplateCreateInfo;
-				descriptorUpdateTemplateCreateInfo.DescriptorSetLayout = mDescriptorSetLayouts[i];
+				descriptorUpdateTemplateCreateInfo.DescriptorSetLayout = descriptorSetLayout;
 				descriptorUpdateTemplateCreateInfo.PipelineLayout = this;
-				descriptorUpdateTemplateCreateInfo.Set = i;
+				descriptorUpdateTemplateCreateInfo.Set = index;
 
-				mUpdateTemplates.push_back(
-					mRenderDevice->CreateDescriptorUpdateTemplate(descriptorUpdateTemplateCreateInfo)
-				);
-			}
+				return mRenderDevice->CreateDescriptorUpdateTemplate(descriptorUpdateTemplateCreateInfo);
+			});
 		}
 
 		PipelineLayout::SetObjectName(createInfo.Name);
@@ -98,20 +91,25 @@ namespace Ck::Vulkan
 
 	unsigned int PipelineLayout::GetDescriptorSetLayoutCount() const
 	{
-		return static_cast<unsigned int>(mDescriptorSetLayouts.size());
+		return mDescriptorSetLayouts.GetSize();
 	}
 
 	std::shared_ptr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(unsigned int set) const
 	{
-		if (set >= mDescriptorSetLayouts.size())
+		if (set >= mDescriptorSetLayouts.GetSize())
 			return nullptr;
 
 		return mDescriptorSetLayouts[set];
 	}
 
+	const Array<std::shared_ptr<DescriptorSetLayout>>& PipelineLayout::GetDescriptorSetLayouts()
+	{
+		return mDescriptorSetLayouts;
+	}
+
 	std::shared_ptr<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
 	{
-		if (set >= mUpdateTemplates.size())
+		if (set >= mUpdateTemplates.GetSize())
 			return nullptr;
 
 		return mUpdateTemplates[set];

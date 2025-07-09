@@ -1,6 +1,11 @@
 project(CoreTest)
 
 cocktail_source_directory(CORE_TEST_FILES
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Array.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Application"    
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Application/ServiceContainer.cpp

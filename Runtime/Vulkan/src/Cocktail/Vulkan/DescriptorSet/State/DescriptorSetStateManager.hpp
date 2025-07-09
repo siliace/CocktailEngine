@@ -193,7 +193,7 @@ namespace Ck::Vulkan
 		 * \param sampler
 		 * \return
 		 */
-		static bool FillImageState(DescriptorState* state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler);
+		static bool FillImageState(DescriptorState& state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler);
 
 		/**
 		 * \brief 
@@ -204,7 +204,7 @@ namespace Ck::Vulkan
 		 * \param range 
 		 * \return 
 		 */
-		static bool FillBufferState(DescriptorState* state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range);
+		static bool FillBufferState(DescriptorState& state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief
@@ -212,7 +212,7 @@ namespace Ck::Vulkan
 		 * \param arrayElement
 		 * \return
 		 */
-		DescriptorState* FindDescriptorState(unsigned int binding, unsigned int arrayElement);
+		Optional<DescriptorState&> FindDescriptorState(unsigned int binding, unsigned int arrayElement);
 
 		/**
 		 * \brief 
@@ -220,12 +220,12 @@ namespace Ck::Vulkan
 		 * \param arrayElement 
 		 * \return 
 		 */
-		DescriptorState* FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement);
+		DescriptorState& FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		DescriptorSetAllocator* mDescriptorSetAllocator;
 		std::shared_ptr<DescriptorSet> mLastSet;
-		std::vector<DescriptorState> mBindingStates;
+		Array<DescriptorState> mBindingStates;
 		unsigned int mBindingDirtyFlags;
 	};
 }

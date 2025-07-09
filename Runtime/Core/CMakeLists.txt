@@ -2,6 +2,7 @@ project(Core)
 
 cocktail_source_directory(CORE_FILES    
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Array.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Cocktail.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Color.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/DataType.hpp
@@ -180,6 +181,12 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Frustum.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Sphere.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Volume.hpp
+)
+
+cocktail_source_directory(CORE_FILES    
+    FOLDER "Memory/Allocator"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp
 )
 
 cocktail_source_directory(CORE_FILES    

@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 		 * \param members 
 		 * \param name 
 		 */
-		UniformSlot(Renderer::ShaderProgramType programType, const std::vector<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
+		UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
 
 		/**
 		 * \brief 
@@ -88,7 +88,7 @@ namespace Ck::Vulkan
 	private:
 
 		Renderer::ShaderProgramType mProgramType;
-		std::vector<std::unique_ptr<Renderer::UniformMember>> mMembers;
+		Array<std::unique_ptr<Renderer::UniformMember>> mMembers;
 		std::string mName;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;

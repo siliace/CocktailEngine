@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
 #include <Cocktail/Core/Application/ServiceProvider.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
@@ -101,7 +102,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual const std::vector<std::string>& GetArgv() const = 0;
+		virtual const Array<std::string>& GetArgv() const = 0;
 
 		/**
 		 * \brief 
@@ -141,7 +142,7 @@ namespace Ck
 	private:
 
 		bool mBooted;
-		std::vector<std::unique_ptr<ServiceProvider>> mServiceProviders;
+		Array<std::unique_ptr<ServiceProvider>> mServiceProviders;
 		Signal<Application*> mOnTerminate;
 		Instant mStart;
 	};

@@ -16,7 +16,7 @@ namespace Ck::Vulkan
 		mAllocationCallbacks(allocationCallbacks)
 	{
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-		std::vector<unsigned int> queueIndexes = queueFamilyContext.FindFamilyIndexes();
+		Array<unsigned int> queueIndexes = queueFamilyContext.FindFamilyIndexes();
 
 		const bool hasAttachmentFlag = createInfo.Usage & Renderer::TextureUsageFlagBits::Attachment;
 		if (mFormat.IsCompressed() && hasAttachmentFlag)
@@ -71,8 +71,8 @@ namespace Ck::Vulkan
 			else
 			{
 				vkCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
-				vkCreateInfo.queueFamilyIndexCount = static_cast<unsigned int>(queueIndexes.size());
-				vkCreateInfo.pQueueFamilyIndices = queueIndexes.data();
+				vkCreateInfo.queueFamilyIndexCount = queueIndexes.GetSize();
+				vkCreateInfo.pQueueFamilyIndices = queueIndexes.GetData();
 			}
 			vkCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		}

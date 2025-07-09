@@ -28,7 +28,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<std::filesystem::path> GetContent() const override;
+		Array<std::filesystem::path> GetContent() const override;
 
 		/**
 		 * \brief 

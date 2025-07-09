@@ -13,39 +13,32 @@ namespace Ck::Vulkan
 
 	DescriptorSetAllocator::~DescriptorSetAllocator()
 	{
-		mAcquiredSets.clear();
-		mVacantSets.clear();
+		mAcquiredSets.Clear();
+		mVacantSets.Clear();
 		for (const std::shared_ptr<DescriptorPool>& descriptorPool : mDescriptorPools)
 			descriptorPool->Reset();
 	}
 
 	std::shared_ptr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo)
 	{
-		auto it = std::find_if(mVacantSets.begin(), mVacantSets.end(), [&](const std::shared_ptr<DescriptorSet>& set) {
+		std::shared_ptr<DescriptorSet> descriptorSet = mVacantSets.FindIndexIf([&](const std::shared_ptr<DescriptorSet> &set) {
 			return createInfo.Layout->IsCompatibleWith(*set->GetLayout());
-		});
-
-		std::shared_ptr<DescriptorSet> descriptorSet;
-		if (it != mVacantSets.end())
-		{
-			descriptorSet = std::move(*it);
-
-			mVacantSets.erase(it);
-		}
-		else
-		{
+		}).Map([&](unsigned int index) {
+			return mVacantSets.RemoveAt(index);
+		}).GetOrElse([&]() {
 			std::shared_ptr<DescriptorPool> descriptorPool = CreateDescriptorPool(createInfo.Layout);
 
 			std::shared_ptr<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
 			for (unsigned int i = 0; i < MaxSetPerDescriptorPool; i++)
 				descriptorSets[i] = mDescriptorSetPool.Allocate(mRenderDevice, descriptorPool, createInfo, nullptr);
 
-			descriptorSet = descriptorSets[0];
 			for (unsigned int i = 1; i < MaxSetPerDescriptorPool; i++)
-				mVacantSets.push_back(std::move(descriptorSets[i]));
-		}
+				mVacantSets.Add(std::move(descriptorSets[i]));
 
-		mAcquiredSets.push_back(descriptorSet);
+			return descriptorSets[0];
+		});
+
+		mAcquiredSets.Add(descriptorSet);
 
 		return descriptorSet;
 	}
@@ -53,9 +46,9 @@ namespace Ck::Vulkan
 	void DescriptorSetAllocator::Reset()
 	{
 		for (std::shared_ptr<DescriptorSet>& descriptorSet : mAcquiredSets)
-			mVacantSets.push_back(std::move(descriptorSet));
+			mVacantSets.Add(std::move(descriptorSet));
 
-		mAcquiredSets.clear();
+		mAcquiredSets.Clear();
 	}
 
 	std::shared_ptr<DescriptorPool> DescriptorSetAllocator::CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout)
@@ -65,7 +58,7 @@ namespace Ck::Vulkan
 		createInfo.LayoutSignature = layout->ToSignature();
 
 		std::shared_ptr<DescriptorPool> descriptorPool = mRenderDevice->CreateDescriptorPool(createInfo);
-		mDescriptorPools.push_back(descriptorPool);
+		mDescriptorPools.Add(descriptorPool);
 
 		return descriptorPool;
 	}

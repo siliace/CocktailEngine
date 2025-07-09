@@ -27,7 +27,7 @@ namespace Ck::Main::Win32
 	     * \brief 
 	     * \return 
 	     */
-	    const std::vector<std::string>& GetArgv() const override;
+	    const Array<std::string>& GetArgv() const override;
 
 	    /**
 	     * \brief 
@@ -37,7 +37,7 @@ namespace Ck::Main::Win32
 
     private:
 
-        std::vector<std::string> mArgv;
+        Array<std::string> mArgv;
     };
 }
 

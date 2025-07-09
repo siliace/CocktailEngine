@@ -2,8 +2,8 @@
 #define COCKTAIL_VULKAN_SHADER_REFLECTION_BLOCKMEMBER_HPP
 
 #include <string>
-#include <vector>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/DataType.hpp>
 
 namespace Ck::Vulkan
@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 	{
 		std::size_t GetSize() const
 		{
-			if (!Members.empty())
+			if (!Members.IsEmpty())
 			{
 				std::size_t membersSize = 0;
 				for (const BlockMember& member : Members)
@@ -55,7 +55,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		std::vector<BlockMember> Members;
+		Array<BlockMember> Members;
 	};
 }
 

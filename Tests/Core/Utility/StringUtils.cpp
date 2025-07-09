@@ -14,9 +14,9 @@ TEST_CASE("String ends with", "[StringUtils]")
 
 TEST_CASE("Split string", "[StringUtils]")
 {
-	std::vector<std::string> tokens = Ck::StringUtils::Split("Hello world what a nice day", ' ');
+	Ck::Array<std::string> tokens = Ck::StringUtils::Split("Hello world what a nice day", ' ');
 
-	REQUIRE(tokens.size() == 6);
+	REQUIRE(tokens.GetSize() == 6);
 	REQUIRE(tokens[0] == "Hello");
 	REQUIRE(tokens[1] == "world");
 	REQUIRE(tokens[2] == "what");
@@ -27,7 +27,7 @@ TEST_CASE("Split string", "[StringUtils]")
 
 TEST_CASE("Join string", "[StringUtils]")
 {
-	std::vector<std::string> tokens = {
+	Ck::Array<std::string> tokens = {
 	"Hello", "world", "what", "a", "nice", "day"
 	};
 	REQUIRE(Ck::StringUtils::Join(tokens.begin(), tokens.end(), " ") == "Hello world what a nice day");

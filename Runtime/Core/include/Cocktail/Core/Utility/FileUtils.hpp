@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 namespace Ck
@@ -32,7 +33,7 @@ namespace Ck
 		 * \param path 
 		 * \return 
 		 */
-		static std::vector<std::string> ReadFileLines(const std::filesystem::path& path);
+		static Array<std::string> ReadFileLines(const std::filesystem::path& path);
 
 		/**
 		 * \brief 
@@ -46,14 +47,14 @@ namespace Ck
 		 * \param path
 		 * \param lines
 		 */
-		static void WriteFileLines(const std::filesystem::path& path, const std::vector<std::string>& lines);
+		static void WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines);
 
 		/**
 		 * \brief 
 		 * \param path 
 		 * \param lines 
 		 */
-		static void AppendFileLines(const std::filesystem::path& path, const std::vector<std::string>& lines);
+		static void AppendFileLines(const std::filesystem::path& path, const Array<std::string>& lines);
 	};
 }
 

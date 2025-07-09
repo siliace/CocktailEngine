@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/System/Monitor/VideoMode.hpp>
 
 namespace Ck
@@ -83,7 +84,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::vector<VideoMode> GetSupportedVideoModes() const = 0;
+		virtual Array<VideoMode> GetSupportedVideoModes() const = 0;
 
 		/**
 		 * \brief 

@@ -84,7 +84,7 @@ namespace Ck
 
 	private:
 
-		std::vector<cmrc::embedded_filesystem> mFileSystems;
+		Array<cmrc::embedded_filesystem> mFileSystems;
 	};
 }
 

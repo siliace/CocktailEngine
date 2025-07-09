@@ -26,24 +26,17 @@ namespace Ck::Vulkan
 				return buffer;
 		}
 
-		auto itStagingBuffer = std::find_if(mAvailableBuffers.begin(), mAvailableBuffers.end(), [&](StagingBuffer* stagingBuffer) {
+		StagingBuffer* buffer = mAvailableBuffers.FindIndexIf([&](StagingBuffer* stagingBuffer) {
 			return stagingBuffer->GetRemainingCapacity() + stagingBuffer->ComputePadding(alignment) >= allocationSize;
+		}).Map([&](unsigned int index) {
+			return mAvailableBuffers.RemoveAt(index);
+		}).GetOrElse([&]() {
+			return mStagingBufferPool.AllocateUnsafe(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize));
 		});
 
-		StagingBuffer* stagingBuffer;
-		if (itStagingBuffer != mAvailableBuffers.end())
-		{
-			stagingBuffer = *itStagingBuffer;
-			mAvailableBuffers.erase(itStagingBuffer);
-		}
-		else
-		{
-			stagingBuffer = mStagingBufferPool.AllocateUnsafe(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize));
-		}
+		mAcquiredBuffers.Add(buffer);
 
-		mAcquiredBuffers.push_back(stagingBuffer);
-
-		return stagingBuffer;
+		return buffer;
 	}
 
 	void StagingAllocator::Reserve(std::size_t allocationSize)
@@ -60,19 +53,19 @@ namespace Ck::Vulkan
 				return;
 		}
 
-		mAvailableBuffers.push_back(
+		mAvailableBuffers.Add(
 			mStagingBufferPool.AllocateUnsafe(mRenderDevice, mBufferUsage, std::max(mBufferSize, allocationSize))
 		);
 	}
 
 	void StagingAllocator::Reset(bool release)
 	{
-		if (!release && !mAcquiredBuffers.empty())
+		if (!release && !mAcquiredBuffers.IsEmpty())
 		{
 			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
 			{
 				stagingBuffer->Reset();
-				mAvailableBuffers.push_back(stagingBuffer);
+				mAvailableBuffers.Add(stagingBuffer);
 			}
 		}
 		else
@@ -83,10 +76,10 @@ namespace Ck::Vulkan
 			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
 				mStagingBufferPool.Recycle(stagingBuffer);
 
-			mAvailableBuffers.clear();
+			mAvailableBuffers.Clear();
 		}
 
-		mAcquiredBuffers.clear();
+		mAcquiredBuffers.Clear();
 
 		mRenderDevice->Resolve<DeviceMemoryAllocator>()->GarbageCollect(release);
 	}

@@ -80,8 +80,8 @@ namespace Ck
 	void RecordDrawContext::SetVertexInputAttributes(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout& vertexLayout) const
 	{
 		commandList.EnableVertexBinding(binding, true);
-		const std::vector<VertexAttribute>& attributes = vertexLayout.GetAttributes();
-		Renderer::VertexInputAttribute* vertexInputAttributes = COCKTAIL_STACK_ALLOC(Renderer::VertexInputAttribute, attributes.size());
+		const Array<VertexAttribute>& attributes = vertexLayout.GetAttributes();
+		Renderer::VertexInputAttribute* vertexInputAttributes = COCKTAIL_STACK_ALLOC(Renderer::VertexInputAttribute, attributes.GetSize());
 
 		unsigned int attributeCount = 0;
 		for (const VertexAttribute& attribute : attributes)

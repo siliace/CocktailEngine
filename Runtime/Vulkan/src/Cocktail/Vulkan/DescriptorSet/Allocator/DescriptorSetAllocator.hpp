@@ -53,9 +53,9 @@ namespace Ck::Vulkan
 		std::shared_ptr<DescriptorPool> CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
-		std::vector<std::shared_ptr<DescriptorPool>> mDescriptorPools;
-		std::vector<std::shared_ptr<DescriptorSet>> mAcquiredSets;
-		std::vector<std::shared_ptr<DescriptorSet>> mVacantSets;
+		Array<std::shared_ptr<DescriptorPool>> mDescriptorPools;
+		Array<std::shared_ptr<DescriptorSet>> mAcquiredSets;
+		Array<std::shared_ptr<DescriptorSet>> mVacantSets;
 		TlsObjectPool<DescriptorSet> mDescriptorSetPool;
 	};
 }

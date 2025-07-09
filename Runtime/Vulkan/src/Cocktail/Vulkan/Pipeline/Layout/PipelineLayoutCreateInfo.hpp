@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		std::vector<std::shared_ptr<DescriptorSetLayout>> DescriptorSetLayouts;
+		Array<std::shared_ptr<DescriptorSetLayout>> DescriptorSetLayouts;
 
 		/**
 		 * \brief 

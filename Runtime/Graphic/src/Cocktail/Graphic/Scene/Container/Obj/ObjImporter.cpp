@@ -38,7 +38,7 @@ namespace Ck
 
 		std::string objText, mtlText;
 		{
-			std::vector<std::string> tokens;
+			Array<std::string> tokens;
 			InputStreamReader inputStreamReader(inputStream);
 			BufferedReader reader(inputStreamReader);
 			while (!reader.IsEof())

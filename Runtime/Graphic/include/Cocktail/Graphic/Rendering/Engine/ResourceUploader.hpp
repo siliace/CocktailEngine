@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_ENGIN_RESOURCEUPLOADER_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_ENGIN_RESOURCEUPLOADER_HPP
 
+#include <Cocktail/Core/Array.hpp>
+
 #include <Cocktail/Graphic/Rendering/Resource/BufferResource.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/TextureResource.hpp>
 
@@ -36,17 +38,17 @@ namespace Ck
 		struct BufferUploadRequest
 		{
 			std::shared_ptr<BufferResource> Buffer;
-			std::vector<Renderer::BufferUploadInfo> UploadInfo;
+			Array<Renderer::BufferUploadInfo> UploadInfo;
 		};
 
 		struct TextureUploadRequest
 		{
 			std::shared_ptr<TextureResource> Texture;
-			std::vector<Renderer::TextureUploadInfo> UploadInfo;
+			Array<Renderer::TextureUploadInfo> UploadInfo;
 		};
 
-		std::vector<BufferUploadRequest> mBufferUploadRequests;
-		std::vector<TextureUploadRequest> mTextureUploadRequests;
+		Array<BufferUploadRequest> mBufferUploadRequests;
+		Array<TextureUploadRequest> mTextureUploadRequests;
 	};
 }
 

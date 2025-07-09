@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMLIBRARY_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMLIBRARY_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Graphic/Material/Material.hpp>
@@ -43,7 +44,7 @@ namespace Ck
 			/**
 			 * \brief An array of binaries per shader stage
 			 */
-			std::vector<EnumMap<Renderer::ShaderType, ByteArray>> VariantsBinaries;
+			Array<EnumMap<Renderer::ShaderType, ByteArray>> VariantsBinaries;
 		};
 
 		void Register(const Entry& entry);
@@ -52,11 +53,11 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::vector<Entry>& GetEntries() const;
+		const Array<Entry>& GetEntries() const;
 
 	private:
 
-		std::vector<Entry> mEntries;
+		Array<Entry> mEntries;
 	};
 }
 #endif // COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMLIBRARY_HPP

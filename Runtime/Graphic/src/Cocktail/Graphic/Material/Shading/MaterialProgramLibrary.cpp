@@ -4,10 +4,10 @@ namespace Ck
 {
 	void MaterialProgramLibrary::Register(const Entry& entry)
 	{
-		mEntries.push_back(entry);
+		mEntries.Add(entry);
 	}
 
-	const std::vector<MaterialProgramLibrary::Entry>& MaterialProgramLibrary::GetEntries() const
+	const Array<MaterialProgramLibrary::Entry>& MaterialProgramLibrary::GetEntries() const
 	{
 		return mEntries;
 	}

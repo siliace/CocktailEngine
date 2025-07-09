@@ -114,7 +114,7 @@ namespace Ck
 		std::shared_ptr<ResourceUploader> mResourceUploader;
 		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
 		std::unordered_map<std::shared_ptr<Window>, std::shared_ptr<Renderer::RenderSurface>> mWindowRenderSurfaces;
-		std::vector<std::shared_ptr<TextureResource>> mGeneratingMipMaps;
+		Array<std::shared_ptr<TextureResource>> mGeneratingMipMaps;
 	};
 }
 

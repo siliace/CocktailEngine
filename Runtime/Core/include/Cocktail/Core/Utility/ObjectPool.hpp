@@ -3,8 +3,8 @@
 
 #include <mutex>
 #include <memory>
-#include <vector>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/System/Concurrency/NullMutex.hpp>
 #include <Cocktail/Core/System/Concurrency/SpinMutex.hpp>
 
@@ -109,14 +109,13 @@ namespace Ck
 			T* AllocateUnsafe(Args&&... args)
 			{
 				std::lock_guard<Lockable> lg(mMutex);
-				if (mVacants.empty())
+				if (mVacants.IsEmpty())
 				{
 					assert(mGrowable);
-					AllocatePage((mPages.size() + 1) * 32);
+					AllocatePage((mPages.GetSize() + 1) * 32);
 				}
 
-				T* location = mVacants.back();
-				mVacants.pop_back();
+				T* location = mVacants.PopLast();
 
 				++mAllocatedObjectCount;
 
@@ -144,7 +143,7 @@ namespace Ck
 			template <typename... Args>
 			UniquePtr AllocateUnique(Args&&... args)
 			{
-				return UniquePtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{this });
+				return UniquePtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
 			}
 
 			/**
@@ -156,7 +155,7 @@ namespace Ck
 				object->~T();
 				{
 					std::lock_guard<Lockable> lg(mMutex);
-					mVacants.emplace_back(object);
+					mVacants.Add(object);
 
 					--mAllocatedObjectCount;
 				}
@@ -168,9 +167,8 @@ namespace Ck
 			void Clear()
 			{
 				std::lock_guard<Lockable> lg(mMutex);
-				
-				mVacants.clear();
-				mPages.clear();
+				mVacants.Clear();
+				mPages.Clear();
 			}
 
 		private:
@@ -184,15 +182,15 @@ namespace Ck
 				auto page = std::make_unique<unsigned char[]>(sizeof(T) * objectCount);
 				T* vacants = reinterpret_cast<T*>(page.get());
 				for (std::size_t i = 0; i < objectCount; i++)
-					mVacants.emplace_back(&vacants[i]);
+					mVacants.Add(&vacants[i]);
 
-				mPages.emplace_back(std::move(page));
+				mPages.Add(std::move(page));
 			}
 
 			bool mGrowable;
 			Lockable mMutex;
-			std::vector<T*> mVacants;
-			std::vector<std::unique_ptr<unsigned char[]>> mPages;
+			Array<T*> mVacants;
+			Array<std::unique_ptr<unsigned char[]>> mPages;
 			std::size_t mAllocatedObjectCount;
 		};
 	}

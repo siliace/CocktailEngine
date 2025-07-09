@@ -16,7 +16,7 @@ namespace Ck
 		if (mBooted)
 			serviceProvider->Boot();
 
-		mServiceProviders.emplace_back(std::move(serviceProvider));
+		mServiceProviders.Add(std::move(serviceProvider));
 	}
 
 	bool Application::IsBooted() const
@@ -26,14 +26,16 @@ namespace Ck
 
 	void Application::Boot()
 	{
-		for (std::unique_ptr<ServiceProvider>& serviceProvider : mServiceProviders)
+		mServiceProviders.ForEach([](const std::unique_ptr<ServiceProvider>& serviceProvider) {
 			serviceProvider->Register();
+		});
 		
 		mBooted = true;
 		Detail::ServiceFacadeBase::Boot(this);
 
-		for (std::unique_ptr<ServiceProvider>& serviceProvider : mServiceProviders)
+		mServiceProviders.ForEach([](const std::unique_ptr<ServiceProvider>& serviceProvider) {
 			serviceProvider->Boot();
+		});
 
 		mStart = Instant::Now();
 	}

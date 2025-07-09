@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_DESCRIPTORSET_LAYOUT_DESCRIPTORSETLAYOUT_HPP
 #define COCKTAIL_VULKAN_DESCRIPTORSET_LAYOUT_DESCRIPTORSETLAYOUT_HPP
 
-#include <vector>
+#include <Cocktail/Core/Array.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 
@@ -61,20 +61,13 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		unsigned int GetBindingCount() const;
+		unsigned int GetDescriptorCount() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		unsigned int GetDescriptorCount() const;
-		
-		/**
-		 * \brief 
-		 * \param index 
-		 * \return 
-		 */
-		const DescriptorSetLayoutBinding* GetBinding(unsigned int index) const;
+		const Array<DescriptorSetLayoutBinding>& GetBindings() const;
 
 		/**
 		 * \brief 
@@ -94,7 +87,7 @@ namespace Ck::Vulkan
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDescriptorSetLayout mHandle;
 		bool mSupportPushDescriptor;
-		std::vector<DescriptorSetLayoutBinding> mBindings;
+		Array<DescriptorSetLayoutBinding> mBindings;
 	};
 }
 

@@ -67,7 +67,7 @@ namespace Ck
 
 		const WSAPOLLFD* GetSocketDescriptor(Socket::Handle socket) const;
 
-		std::vector<WSAPOLLFD> mDescriptors;
+		Array<WSAPOLLFD> mDescriptors;
 	};
 }
 

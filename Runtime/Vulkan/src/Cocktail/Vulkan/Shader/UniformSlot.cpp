@@ -10,9 +10,9 @@ namespace Ck::Vulkan
 			mSlot(slot),
 			mBlock(blockMember)
 		{
-			mMembers.reserve(blockMember.Members.size());
-			for (unsigned int i = 0; i < mMembers.size(); i++)
-				mMembers.emplace_back(new MyUniformMember(mSlot, mBlock.Members[i]));
+			mMembers.Reserve(blockMember.Members.GetSize());
+			for (unsigned int i = 0; i < mMembers.GetSize(); i++)
+				mMembers.Emplace(new MyUniformMember(mSlot, mBlock.Members[i]));
 		}
 
 		const std::string& GetName() const override
@@ -37,13 +37,13 @@ namespace Ck::Vulkan
 
 		std::size_t GetMemberCount() const override
 		{
-			return mBlock.Members.size();
+			return mBlock.Members.GetSize();
 		}
 
 		std::size_t GetMembers(UniformMember** members, std::size_t memberCount, std::size_t firstMember) const override
 		{
 			std::size_t i = 0;
-			const std::size_t total = mMembers.size();
+			const std::size_t total = mMembers.GetSize();
 			if (firstMember < total)
 			{
 				for (; i < memberCount && i + firstMember < total; i++)
@@ -67,18 +67,18 @@ namespace Ck::Vulkan
 
 		UniformSlot* mSlot;
 		BlockMember mBlock;
-		std::vector<std::unique_ptr<MyUniformMember>> mMembers;
+		Array<std::unique_ptr<MyUniformMember>> mMembers;
 	};
 
-	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const std::vector<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
+	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
 		mProgramType(programType),
 		mName(std::move(name)),
 		mLayoutBindingInfo(layoutBindingInfo),
 		mSet(set)
 	{
-		mMembers.reserve(members.size());
-		for (unsigned int i = 0; i < members.size(); i++)
-			mMembers.emplace_back(new MyUniformMember(this, members[i]));
+		mMembers.Reserve(members.GetSize());
+		for (unsigned int i = 0; i < members.GetSize(); i++)
+			mMembers.Emplace(new MyUniformMember(this, members[i]));
 	}
 
 	Renderer::ShaderProgramType UniformSlot::GetProgramType() const
@@ -103,13 +103,13 @@ namespace Ck::Vulkan
 
 	std::size_t UniformSlot::GetMemberCount() const
 	{
-		return mMembers.size();
+		return mMembers.GetSize();
 	}
 
 	std::size_t UniformSlot::GetMembers(Renderer::UniformMember** members, std::size_t memberCount, std::size_t firstMember) const
 	{
 		std::size_t i = 0;
-		const std::size_t total = mMembers.size();
+		const std::size_t total = mMembers.GetSize();
 		if (firstMember < total)
 		{
 			for (; i < memberCount && i + firstMember < total; i++)

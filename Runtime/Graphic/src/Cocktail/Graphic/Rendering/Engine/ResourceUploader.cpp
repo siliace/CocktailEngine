@@ -8,14 +8,14 @@ namespace Ck
 		{
 			if (bufferUploadRequest.Buffer == buffer)
 			{
-				bufferUploadRequest.UploadInfo.push_back({ offset, length, data });
+				bufferUploadRequest.UploadInfo.Add({ offset, length, data });
 				return;
 			}
 		}
 
 		BufferUploadRequest bufferUploadRequest{ buffer };
-		bufferUploadRequest.UploadInfo.push_back({ offset, length, data });
-		mBufferUploadRequests.push_back(std::move(bufferUploadRequest));
+		bufferUploadRequest.UploadInfo.Add({ offset, length, data });
+		mBufferUploadRequests.Add(std::move(bufferUploadRequest));
 	}
 
 	void ResourceUploader::RequestTextureUpload(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
@@ -26,31 +26,31 @@ namespace Ck
 		{
 			if (textureUploadRequest.Texture == texture)
 			{
-				textureUploadRequest.UploadInfo.push_back({ arrayLayer, mipMapLevel, uploadSize, MakeExtent(0u, 0u, 0u), data });
+				textureUploadRequest.UploadInfo.Add({ arrayLayer, mipMapLevel, uploadSize, MakeExtent(0u, 0u, 0u), data });
 				return;
 			}
 		}
 
 		TextureUploadRequest textureUploadRequest{ texture };
-		textureUploadRequest.UploadInfo.push_back({ arrayLayer, mipMapLevel, uploadSize, MakeExtent(0u, 0u, 0u), data });
-		mTextureUploadRequests.push_back(std::move(textureUploadRequest));
+		textureUploadRequest.UploadInfo.Add({ arrayLayer, mipMapLevel, uploadSize, MakeExtent(0u, 0u, 0u), data });
+		mTextureUploadRequests.Add(std::move(textureUploadRequest));
 	}
 
 	bool ResourceUploader::HasPendingTransfer() const
 	{
-		return !mBufferUploadRequests.empty() || !mTextureUploadRequests.empty();
+		return !mBufferUploadRequests.IsEmpty() || !mTextureUploadRequests.IsEmpty();
 	}
 
 	void ResourceUploader::Flush(Renderer::CommandList& commandList)
 	{
 		for (const auto& bufferUploadRequest : mBufferUploadRequests)
-			commandList.UploadBuffer(bufferUploadRequest.Buffer->GetUnderlyingResource(), bufferUploadRequest.UploadInfo.size(), bufferUploadRequest.UploadInfo.data());
+			commandList.UploadBuffer(bufferUploadRequest.Buffer->GetUnderlyingResource(), bufferUploadRequest.UploadInfo.GetSize(), bufferUploadRequest.UploadInfo.GetData());
 
 		for (const auto& textureUploadRequest : mTextureUploadRequests)
 		{
 			{
-				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, textureUploadRequest.UploadInfo.size());
-				for (std::size_t i = 0; i < textureUploadRequest.UploadInfo.size(); i++)
+				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, textureUploadRequest.UploadInfo.GetSize());
+				for (std::size_t i = 0; i < textureUploadRequest.UploadInfo.GetSize(); i++)
 				{
 					Renderer::TextureSubResource subResource;
 					subResource.BaseArrayLayer = textureUploadRequest.UploadInfo[i].ArrayLayer;
@@ -63,14 +63,14 @@ namespace Ck
 						subResource
 					);
 				}
-				commandList.Barrier(textureUploadRequest.UploadInfo.size(), barriers);
+				commandList.Barrier(textureUploadRequest.UploadInfo.GetSize(), barriers);
 			}
 
-			commandList.UploadTexture(textureUploadRequest.Texture->GetUnderlyingResource(), Renderer::ResourceState::CopyDestination, textureUploadRequest.UploadInfo.size(), textureUploadRequest.UploadInfo.data());
+			commandList.UploadTexture(textureUploadRequest.Texture->GetUnderlyingResource(), Renderer::ResourceState::CopyDestination, textureUploadRequest.UploadInfo.GetSize(), textureUploadRequest.UploadInfo.GetData());
 
 			{
-				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, mTextureUploadRequests.size());
-				for (std::size_t i = 0; i < textureUploadRequest.UploadInfo.size(); i++)
+				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, mTextureUploadRequests.GetSize());
+				for (std::size_t i = 0; i < textureUploadRequest.UploadInfo.GetSize(); i++)
 				{
 					Renderer::TextureSubResource subResource;
 					subResource.BaseArrayLayer = textureUploadRequest.UploadInfo[i].ArrayLayer;
@@ -83,11 +83,11 @@ namespace Ck
 						subResource
 					);
 				}
-				commandList.Barrier(textureUploadRequest.UploadInfo.size(), barriers);
+				commandList.Barrier(textureUploadRequest.UploadInfo.GetSize(), barriers);
 			}
 		}
 
-		mBufferUploadRequests.clear();
-		mTextureUploadRequests.clear();
+		mBufferUploadRequests.Clear();
+		mTextureUploadRequests.Clear();
 	}
 }

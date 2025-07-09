@@ -27,7 +27,7 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		std::vector<EnumMap<Renderer::ShaderType, ByteArray>> VariantsBinaries;
+		Array<EnumMap<Renderer::ShaderType, ByteArray>> VariantsBinaries;
 	};
 }
 

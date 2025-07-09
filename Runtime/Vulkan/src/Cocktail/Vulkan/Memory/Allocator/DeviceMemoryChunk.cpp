@@ -38,50 +38,48 @@ namespace Ck::Vulkan
 
 	DeviceMemoryBlock* DeviceMemoryChunk::AllocateBlock(std::size_t alignment, std::size_t size)
 	{
-		auto it = std::find_if(mBlocks.begin(), mBlocks.end(), [&](const auto& block) {
+		return mBlocks.FindIndexIf([&](const auto& block) {
 			if (!block->IsFree())
 				return false;
 
 			std::size_t padding = block->ComputeAllocationPadding(alignment);
 			std::size_t allocationSize = size + padding;
-			
+
 			return block->GetSize() >= allocationSize;
-		});
+		}).Map([&](unsigned int index) {
+			DeviceMemoryBlock* allocatedBlock = mBlocks[index].get();
+			std::shared_ptr<DeviceMemoryBlock> remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
+			if (remainingBlock)
+				mBlocks.AddAt(index + 1, std::move(remainingBlock));
 
-		if (it == mBlocks.end())
-			return nullptr;
+			allocatedBlock->Acquire();
 
-		DeviceMemoryBlock* allocatedBlock = it->get();
-		std::shared_ptr<DeviceMemoryBlock> remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
-		if (remainingBlock)
-			mBlocks.insert(std::next(it), std::move(remainingBlock));
-
-		allocatedBlock->Acquire();
-		
-		return allocatedBlock;
+			return allocatedBlock;
+		}).GetOr(nullptr);
 	}
 
 	void DeviceMemoryChunk::Compact()
 	{
-		for (auto it = mBlocks.begin(); it != mBlocks.end();)
+		for (unsigned int i = 0; i < mBlocks.GetSize();)
 		{
-			auto itNext = std::next(it);
-			DeviceMemoryBlock* block = it->get();
-			if (block->IsFree() && itNext != mBlocks.end() && (*itNext)->IsFree())
+			DeviceMemoryBlock* block = mBlocks[i].get();
+			DeviceMemoryBlock* nextBlock = mBlocks.TryAt(i + 1).GetOr(nullptr).get();
+
+			if (block->IsFree() && nextBlock && nextBlock->IsFree())
 			{
-				block->Merge(**itNext);
-				it = mBlocks.erase(itNext);
+				block->Merge(*nextBlock);
+				mBlocks.RemoveAt(i + 1);
 			}
 			else
 			{
-				it = itNext;
+				++i;
 			}
 		}
 	}
 
 	bool DeviceMemoryChunk::IsFree() const
 	{
-		return std::all_of(mBlocks.begin(), mBlocks.end(), [](const auto& block) {
+		return mBlocks.AllOf([](const auto& block) {
 			return block->IsFree();
 		});
 	}
@@ -124,6 +122,6 @@ namespace Ck::Vulkan
 		if (memoryProperties.memoryTypes[mMemoryTypeIndex].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
 			vkMapMemory(mRenderDevice->GetHandle(), mDeviceMemory->GetHandle(), 0, VK_WHOLE_SIZE, 0, &mPtr);
 
-		mBlocks.push_back(mBlockPool.Allocate(this, 0, mSize, mPtr));
+		mBlocks.Add(mBlockPool.Allocate(this, 0, mSize, mPtr));
 	}
 }

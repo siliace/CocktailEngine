@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 		VkPhysicalDevice physicalDevice = mRenderDevice->GetPhysicalDeviceHandle();
 				
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-		std::vector<unsigned int> presentationFamilyQueueIndexes = queueFamilyContext.FindFamilyIndexes([&](const QueueFamily& queueFamily) {
+		Array<unsigned int> presentationFamilyQueueIndexes = queueFamilyContext.FindFamilyIndexes([&](const QueueFamily& queueFamily) {
 			return WSI::GetPhysicalDevicePresentationSupport(physicalDevice, queueFamily.GetIndex());
 		});
 
@@ -33,7 +33,7 @@ namespace Ck::Vulkan
 			vkCreateInfo.imageArrayLayers = 1;
 			vkCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-			if (queueFamilyContext.IsUnified() || presentationFamilyQueueIndexes.size() == 1)
+			if (queueFamilyContext.IsUnified() || presentationFamilyQueueIndexes.GetSize() == 1)
 			{
 				vkCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 				vkCreateInfo.queueFamilyIndexCount = 0;
@@ -42,8 +42,8 @@ namespace Ck::Vulkan
 			else
 			{
 				vkCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-				vkCreateInfo.queueFamilyIndexCount = static_cast<unsigned int>(presentationFamilyQueueIndexes.size());
-				vkCreateInfo.pQueueFamilyIndices = presentationFamilyQueueIndexes.data();
+				vkCreateInfo.queueFamilyIndexCount = presentationFamilyQueueIndexes.GetSize();
+				vkCreateInfo.pQueueFamilyIndices = presentationFamilyQueueIndexes.GetData();
 			}
 
 			vkCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;

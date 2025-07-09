@@ -75,7 +75,7 @@ namespace Ck::Vulkan
 
 		RenderContext* mRenderContext;
 		std::shared_ptr<CommandListPool> mCommandListPool;
-		std::vector<std::shared_ptr<CommandList>> mCommandLists;
+		Array<std::shared_ptr<CommandList>> mCommandLists;
 		std::shared_ptr<Fence> mFrameFence;
 		std::unordered_map<const RenderSurface*, AcquiredImage> mAcquiredImages;
 		std::unordered_map<BufferAllocatorKey, std::shared_ptr<BufferAllocator>> mBufferAllocators;
