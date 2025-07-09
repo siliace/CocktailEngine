@@ -133,6 +133,8 @@ namespace Ck::Vulkan
 				{
 					VkPhysicalDeviceProperties2KHR physicalDeviceProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR, nullptr };
 					VkPhysicalDeviceDepthStencilResolvePropertiesKHR depthStencilResolveProperties{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_STENCIL_RESOLVE_PROPERTIES_KHR, nullptr };
+
+					Chain(physicalDeviceProperties, depthStencilResolveProperties);
 					vkGetPhysicalDeviceProperties2KHR(mRenderDevice->GetPhysicalDeviceHandle(), &physicalDeviceProperties);
 
 					mResolveDepthStencil &= depthStencilResolveProperties.independentResolve == VK_TRUE || mDepthResolveMode == mStencilResolveMode;
