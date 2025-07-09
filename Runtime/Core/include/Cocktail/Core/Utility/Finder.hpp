@@ -54,7 +54,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<std::filesystem::path> Get() const;
+		Array<std::filesystem::path> Get() const;
 
 	private:
 
@@ -64,13 +64,13 @@ namespace Ck
 		 * \param depth 
 		 * \return 
 		 */
-		std::vector<std::filesystem::path> Get(const std::filesystem::path& source, unsigned int depth) const;
+		Array<std::filesystem::path> Get(const std::filesystem::path& source, unsigned int depth) const;
 
 		bool mIgnoreFiles = false;
 		bool mIgnoreDirectories = false;
 		unsigned int mDepth = 0;
 		std::string mFileExtension;
-		std::vector<std::filesystem::path> mSource;
+		Array<std::filesystem::path> mSource;
 	};
 
 }

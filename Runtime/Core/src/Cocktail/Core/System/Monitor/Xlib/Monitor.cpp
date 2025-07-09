@@ -143,9 +143,9 @@ namespace Ck::Detail::Xlib
 		mCurrentVideoMode = videoMode;
     }
 
-    std::vector<VideoMode> Monitor::GetSupportedVideoModes() const
+    Array<VideoMode> Monitor::GetSupportedVideoModes() const
     {
-		std::vector<VideoMode> videoModes;
+		Array<VideoMode> videoModes;
 
 		for (int i = 0; i < mOutputInfo->nmode; i++)
 		{
@@ -156,10 +156,8 @@ namespace Ck::Detail::Xlib
 				continue;
 
 			VideoMode videoMode = ModeInfoToVideoMode(mDisplay, mCrtcInfo, modeInfo);
-			if (std::find(mVideoModes.begin(), mVideoModes.end(), videoMode) != mVideoModes.end())
-				continue;
-
-			videoModes.push_back(videoMode);
+			if (!videoModes.Contains(videoMode))
+				videoModes.Add(videoMode);
 		}
 
 		return videoModes;

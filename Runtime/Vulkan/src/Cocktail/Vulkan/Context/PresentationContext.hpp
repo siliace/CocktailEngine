@@ -70,7 +70,7 @@ namespace Ck::Vulkan
 		unsigned int mBufferCount;
 		PixelFormat mSurfaceFormat;
 		Renderer::ColorSpace mSurfaceColorSpace;
-		std::vector<VkPresentModeKHR> mPresentModes;
+		Array<VkPresentModeKHR> mPresentModes;
 	};
 }
 

@@ -15,15 +15,15 @@ namespace Ck::Vulkan
 		if (mSamples != Renderer::RasterizationSamples::e1)
 		{
 			VkAttachmentDescription attachmentDescription = CreateAttachmentDescription(format, mSamples, loadOp, storeOp, false);
-			mAttachmentDescriptions.push_back(attachmentDescription);
+			mAttachmentDescriptions.Add(attachmentDescription);
 
 			VkAttachmentReference attachmentReference;
-			attachmentReference.attachment = static_cast<unsigned int>(mAttachmentDescriptions.size() - 1);
+			attachmentReference.attachment = mAttachmentDescriptions.GetSize() - 1;
 
 			if (format.IsColor())
 			{
 				attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-				mColorAttachmentReference.push_back(attachmentReference);
+				mColorAttachmentReference.Add(attachmentReference);
 			}
 			else
 			{
@@ -33,14 +33,14 @@ namespace Ck::Vulkan
 		}
 
 		VkAttachmentDescription attachmentDescription = CreateAttachmentDescription(format, Renderer::RasterizationSamples::e1, loadOp, storeOp, presentable);
-		mAttachmentDescriptions.push_back(attachmentDescription);
+		mAttachmentDescriptions.Add(attachmentDescription);
 
 		VkAttachmentReference attachmentReference;
-		attachmentReference.attachment = static_cast<unsigned int>(mAttachmentDescriptions.size() - 1);
+		attachmentReference.attachment = mAttachmentDescriptions.GetSize() - 1;
 		if (format.IsColor())
 		{
 			attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			mResolveAttachmentReference.push_back(attachmentReference);
+			mResolveAttachmentReference.Add(attachmentReference);
 		}
 		else if (!format.IsColor() && mSamples == Renderer::RasterizationSamples::e1) /// In multisample case, the depth stencil attachment is the multisampmled one
 		{
@@ -59,15 +59,15 @@ namespace Ck::Vulkan
 
 		if (mSamples != Renderer::RasterizationSamples::e1)
 		{
-			subpassDescription.colorAttachmentCount = static_cast<unsigned int>(mColorAttachmentReference.size());
-			subpassDescription.pColorAttachments = mColorAttachmentReference.data();
-			subpassDescription.pResolveAttachments = mResolveAttachmentReference.data();
+			subpassDescription.colorAttachmentCount = mColorAttachmentReference.GetSize();
+			subpassDescription.pColorAttachments = mColorAttachmentReference.GetData();
+			subpassDescription.pResolveAttachments = mResolveAttachmentReference.GetData();
 
 		}
 		else
 		{
-			subpassDescription.colorAttachmentCount = static_cast<unsigned int>(mResolveAttachmentReference.size());
-			subpassDescription.pColorAttachments = mResolveAttachmentReference.data();
+			subpassDescription.colorAttachmentCount = mResolveAttachmentReference.GetSize();
+			subpassDescription.pColorAttachments = mResolveAttachmentReference.GetData();
 			subpassDescription.pResolveAttachments = nullptr;
 		}
 
@@ -75,7 +75,7 @@ namespace Ck::Vulkan
 		subpassDescription.preserveAttachmentCount = 0;
 		subpassDescription.pPreserveAttachments = nullptr;
 
-		mSubpassDescriptions.push_back(subpassDescription);
+		mSubpassDescriptions.Add(subpassDescription);
 	}
 
 	void RenderPassBuilder::CreateDependency()
@@ -87,12 +87,12 @@ namespace Ck::Vulkan
 		VkRenderPassCreateInfo renderPassCreateInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, nullptr };
 		{
 			renderPassCreateInfo.flags = 0;
-			renderPassCreateInfo.attachmentCount = static_cast<unsigned int>(mAttachmentDescriptions.size());
-			renderPassCreateInfo.pAttachments = mAttachmentDescriptions.data();
-			renderPassCreateInfo.subpassCount = static_cast<unsigned int>(mSubpassDescriptions.size());
-			renderPassCreateInfo.pSubpasses = mSubpassDescriptions.data();
-			renderPassCreateInfo.dependencyCount = static_cast<unsigned int>(mSubpassDependencies.size());
-			renderPassCreateInfo.pDependencies = mSubpassDependencies.data();
+			renderPassCreateInfo.attachmentCount = mAttachmentDescriptions.GetSize();
+			renderPassCreateInfo.pAttachments = mAttachmentDescriptions.GetData();
+			renderPassCreateInfo.subpassCount = mSubpassDescriptions.GetSize();
+			renderPassCreateInfo.pSubpasses = mSubpassDescriptions.GetData();
+			renderPassCreateInfo.dependencyCount = mSubpassDependencies.GetSize();
+			renderPassCreateInfo.pDependencies = mSubpassDependencies.GetData();
 		}
 
 		return renderPassCreateInfo;

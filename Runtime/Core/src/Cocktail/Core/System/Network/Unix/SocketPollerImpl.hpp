@@ -68,7 +68,7 @@ namespace Ck
 
 		const pollfd* GetSocketDescriptor(Socket::Handle socket) const;
 
-		std::vector<pollfd> mDescriptors;
+		Array<pollfd> mDescriptors;
 	};
 }
 

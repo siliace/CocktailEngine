@@ -7,7 +7,7 @@ namespace Ck::Main::Win32
 		int argc = 0;
 		PWSTR* wideArgument = CommandLineToArgvW(pCmdLine, &argc);
 
-		mArgv.reserve(argc);
+		mArgv.Reserve(argc);
 		for (int i = 0; i < argc; i++)
 		{
 			int wideArgumentLength = wcslen(wideArgument[i]);
@@ -16,13 +16,13 @@ namespace Ck::Main::Win32
 			std::string argument(argumentLength, 0);
 			WideCharToMultiByte(CP_UTF8, 0, wideArgument[i], wideArgumentLength, argument.data(), argumentLength, nullptr, nullptr);
 
-			mArgv.push_back(std::move(argument));
+			mArgv.Add(std::move(argument));
 		}
 
 		LocalFree(wideArgument);
 	}
 
-	const std::vector<std::string>& Win32Application::GetArgv() const
+	const Array<std::string>& Win32Application::GetArgv() const
 	{
 		return mArgv;
 	}

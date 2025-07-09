@@ -18,7 +18,7 @@ namespace Ck
 	private:
 
 		mutable unsigned int mCurrentFramebuffer;
-		std::vector<std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
+		Array<std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
 	};
 }
 

@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_QUEUE_SUBMITSCHEDULER_HPP
 #define COCKTAIL_VULKAN_QUEUE_SUBMITSCHEDULER_HPP
 
-#include <queue>
-
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
 #include <Cocktail/Vulkan/Queue/QueueSubmitBatch.hpp>
@@ -51,9 +49,9 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		bool mProcessingBatch;
-		std::queue<QueueSubmitBatch*> mBatches;
-		std::vector<QueueSubmitBatch*> mPending;
-		std::vector<QueueSubmitBatch*> mTerminated;
+		Array<QueueSubmitBatch*> mBatches;
+		Array<QueueSubmitBatch*> mPending;
+		Array<QueueSubmitBatch*> mTerminated;
 		TlsObjectPool<QueueSubmitBatch> mBatchPool;
 	};
 }

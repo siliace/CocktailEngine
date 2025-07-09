@@ -3,6 +3,7 @@
 
 #include <functional>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Application/Detail/ServiceBinding.hpp>
 
 namespace Ck
@@ -56,7 +57,7 @@ namespace Ck
 
 		private:
 
-			std::vector<ServiceDecoratorFactory<T>> mDecoratorFactories;
+			Array<ServiceDecoratorFactory<T>> mDecoratorFactories;
 		};
 	}
 }

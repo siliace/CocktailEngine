@@ -220,8 +220,8 @@ namespace Ck::Vulkan
 		unsigned int propertyCount;
 		vkEnumerateInstanceLayerProperties(&propertyCount, nullptr);
 
-		std::vector<VkLayerProperties> properties(propertyCount);
-		vkEnumerateInstanceLayerProperties(&propertyCount, properties.data());
+		Array<VkLayerProperties> properties(propertyCount);
+		vkEnumerateInstanceLayerProperties(&propertyCount, properties.GetData());
 
 		for (const VkLayerProperties& property : properties)
 		{
@@ -238,7 +238,7 @@ namespace Ck::Vulkan
 		const char* disableExtensionsString = std::getenv("COCKTAIL_VULKAN_DISABLED_EXTENSIONS");
 		if (disableExtensionsString)
 		{
-			std::vector<std::string> disabledExtensions = StringUtils::Split(std::string(disableExtensionsString), ';');
+			Array<std::string> disabledExtensions = StringUtils::Split(std::string(disableExtensionsString), ';');
 			for (std::string& disabledExtension : disabledExtensions)
 				mDisabledExtensions.emplace(std::move(disabledExtension));
 		}
@@ -391,14 +391,22 @@ namespace Ck::Vulkan
 		return std::find(mDeviceExtensions.begin(), mDeviceExtensions.end(), extensionName) != mDeviceExtensions.end();
 	}
 
-	std::vector<const char*> ExtensionManager::GetInstanceExtensions() const
+	Array<const char*> ExtensionManager::GetInstanceExtensions() const
 	{
-		return std::vector<const char*>(mInstanceExtensions.begin(), mInstanceExtensions.end());
+		Array<const char*> extensions;
+		for (auto it = mInstanceExtensions.begin(); it != mInstanceExtensions.end(); ++it)
+			extensions.Add(*it);
+
+		return extensions;
 	}
 
-	std::vector<const char*> ExtensionManager::GetDeviceExtensions() const
+	Array<const char*> ExtensionManager::GetDeviceExtensions() const
 	{
-		return std::vector<const char*>(mDeviceExtensions.begin(), mDeviceExtensions.end());
+		Array<const char*> extensions;
+		for (auto it = mDeviceExtensions.begin(); it != mDeviceExtensions.end(); ++it)
+			extensions.Add(*it);
+
+		return extensions;
 	}
 
 	bool ExtensionManager::CheckExtensionsInstanceSupport(unsigned int extensionCount, const char* const* extensionNames) const
@@ -406,8 +414,8 @@ namespace Ck::Vulkan
 		unsigned int propertyCount;
 		vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
 
-		std::vector<VkExtensionProperties> properties(propertyCount);
-		vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, properties.data());
+		Array<VkExtensionProperties> properties(propertyCount);
+		vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, properties.GetData());
 
 		return CheckExtensionSupport(properties, extensionCount, extensionNames);
 	}
@@ -417,13 +425,13 @@ namespace Ck::Vulkan
 		unsigned int propertyCount;
 		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &propertyCount, nullptr);
 
-		std::vector<VkExtensionProperties> properties(propertyCount);
-		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &propertyCount, properties.data());
+		Array<VkExtensionProperties> properties(propertyCount);
+		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &propertyCount, properties.GetData());
 
 		return CheckExtensionSupport(properties, extensionCount, extensionNames);
 	}
 
-	bool ExtensionManager::CheckExtensionSupport(const std::vector<VkExtensionProperties>& properties, unsigned int extensionCount, const char* const* extensionNames) const
+	bool ExtensionManager::CheckExtensionSupport(const Array<VkExtensionProperties>& properties, unsigned int extensionCount, const char* const* extensionNames) const
 	{
 		bool extensionsSupported = true;
 		for (unsigned int i = 0; i < extensionCount && extensionsSupported; i++)

@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	std::vector<std::unique_ptr<IpAddress>> IpAddress::Resolve(const std::string& hostname)
+	Array<std::unique_ptr<IpAddress>> IpAddress::Resolve(const std::string& hostname)
 	{
 		addrinfo hints = {};
 		hints.ai_family = AF_UNSPEC;
@@ -16,7 +16,7 @@ namespace Ck
 		if (getaddrinfo(hostname.c_str(), nullptr, &hints, &results) != 0)
 			throw SystemError::GetLastError();
 
-		std::vector<std::unique_ptr<IpAddress>> ipAddresses;
+		Array<std::unique_ptr<IpAddress>> ipAddresses;
 		for (addrinfo* result = results; result; result = result->ai_next)
 		{
 			std::unique_ptr<IpAddress> ipAddress;
@@ -45,7 +45,7 @@ namespace Ck
 				continue;
 			}
 
-			ipAddresses.push_back(std::move(ipAddress));
+			ipAddresses.Add(std::move(ipAddress));
 		}
 
 		return ipAddresses;

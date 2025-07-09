@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/DataType.hpp>
 #include <Cocktail/Core/Flags.hpp>
 
@@ -137,7 +138,7 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		const std::vector<VertexAttribute>& GetAttributes() const;
+		const Array<VertexAttribute>& GetAttributes() const;
 
 		/**
 		 * \brief 
@@ -169,7 +170,7 @@ namespace Ck
 		unsigned int mDivisor;
 		unsigned int mStride;
 		Flags<VertexAttributeSemantic> mUsageMask;
-		std::vector<VertexAttribute> mAttributes;
+		Array<VertexAttribute> mAttributes;
 	};
 }
 

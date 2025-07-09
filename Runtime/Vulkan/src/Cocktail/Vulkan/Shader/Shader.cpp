@@ -163,19 +163,18 @@ namespace Ck::Vulkan
 
 			if (reflectDescriptorSetCount)
 			{
-				std::vector<SpvReflectDescriptorSet*> reflectDescriptorSets(reflectDescriptorSetCount);
-				result = spvReflectEnumerateDescriptorSets(&module, &reflectDescriptorSetCount, reflectDescriptorSets.data());
+				Array<SpvReflectDescriptorSet*> reflectDescriptorSets(reflectDescriptorSetCount);
+				result = spvReflectEnumerateDescriptorSets(&module, &reflectDescriptorSetCount, reflectDescriptorSets.GetData());
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mDescriptorSetInfo = std::vector<DescriptorSetInfo>(reflectDescriptorSetCount);
-				for (unsigned int i = 0; i < mDescriptorSetInfo.size(); i++)
+				mDescriptorSetInfo = Array<DescriptorSetInfo>(reflectDescriptorSetCount);
+				for (unsigned int i = 0; i < mDescriptorSetInfo.GetSize(); i++)
 				{
 					DescriptorSetInfo descriptorSetInfo;
 					SpvReflectDescriptorSet* reflectDescriptorSet = reflectDescriptorSets[i];
 
-
 					descriptorSetInfo.Set = reflectDescriptorSet->set;
-					descriptorSetInfo.Bindings = std::vector<DescriptorSetBindingInfo>(reflectDescriptorSet->binding_count);
+					descriptorSetInfo.Bindings = Array<DescriptorSetBindingInfo>(reflectDescriptorSet->binding_count);
 					for (unsigned int j = 0; j < reflectDescriptorSet->binding_count; j++)
 					{
 						SpvReflectDescriptorBinding* reflectBinding = reflectDescriptorSet->bindings[j];
@@ -186,8 +185,8 @@ namespace Ck::Vulkan
 
 						if (descriptorType == Renderer::DescriptorType::UniformBuffer || descriptorType == Renderer::DescriptorType::StorageBuffer)
 						{
-							std::vector<BlockMember> members(reflectBinding->block.member_count);
-							for (unsigned int k = 0; k < members.size(); k++)
+							Array<BlockMember> members(reflectBinding->block.member_count);
+							for (unsigned int k = 0; k < members.GetSize(); k++)
 								members[k] = ReflectBlockMember(reflectBinding->block.members[k]);
 
 							descriptorSetInfo.Bindings[j].Members = std::move(members);
@@ -218,18 +217,18 @@ namespace Ck::Vulkan
 
 			if (reflectPushConstantBlockCount)
 			{
-				std::vector<SpvReflectBlockVariable*> reflectPushConstantBlocks(reflectPushConstantBlockCount);
-				result = spvReflectEnumeratePushConstantBlocks(&module, &reflectPushConstantBlockCount, reflectPushConstantBlocks.data());
+				Array<SpvReflectBlockVariable*> reflectPushConstantBlocks(reflectPushConstantBlockCount);
+				result = spvReflectEnumeratePushConstantBlocks(&module, &reflectPushConstantBlockCount, reflectPushConstantBlocks.GetData());
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mPushConstantBlockInfo.resize(reflectPushConstantBlockCount);
-				for (unsigned int i = 0; i < mPushConstantBlockInfo.size(); i++)
+				mPushConstantBlockInfo.Resize(reflectPushConstantBlockCount);
+				for (unsigned int i = 0; i < mPushConstantBlockInfo.GetSize(); i++)
 				{
 					PushConstantBlockInfo pushConstantBlockInfo;
 					SpvReflectBlockVariable* reflectPushConstantBlock = reflectPushConstantBlocks[i];
 
-					std::vector<BlockMember> members(reflectPushConstantBlock->member_count);
-					for (unsigned int j = 0; j < members.size(); j++)
+					Array<BlockMember> members(reflectPushConstantBlock->member_count);
+					for (unsigned int j = 0; j < members.GetSize(); j++)
 						members[j] = ReflectBlockMember(reflectPushConstantBlock->members[j]);
 
 					pushConstantBlockInfo.Name = reflectPushConstantBlock->name;
@@ -250,11 +249,11 @@ namespace Ck::Vulkan
 
 			if (reflectInputVertexAttributeCount)
 			{
-				std::vector<SpvReflectInterfaceVariable*> reflectInputVariables(reflectInputVertexAttributeCount);
-				result = spvReflectEnumerateInputVariables(&module, &reflectInputVertexAttributeCount, reflectInputVariables.data());
+				Array<SpvReflectInterfaceVariable*> reflectInputVariables(reflectInputVertexAttributeCount);
+				result = spvReflectEnumerateInputVariables(&module, &reflectInputVertexAttributeCount, reflectInputVariables.GetData());
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mInputAttributeLocations.resize(reflectInputVertexAttributeCount);
+				mInputAttributeLocations.Resize(reflectInputVertexAttributeCount);
 				for (unsigned int i = 0; i < reflectInputVertexAttributeCount; i++)
 				{
 					if (reflectInputVariables[i]->location == static_cast<unsigned int>(-1))
@@ -273,11 +272,11 @@ namespace Ck::Vulkan
 
 			if (reflectOutputVertexAttributeCount)
 			{
-				std::vector<SpvReflectInterfaceVariable*> reflectOutputVariables(reflectOutputVertexAttributeCount);
+				Array<SpvReflectInterfaceVariable*> reflectOutputVariables(reflectOutputVertexAttributeCount);
 				result = spvReflectEnumerateOutputVariables(&module, &reflectOutputVertexAttributeCount, &reflectOutputVariables[0]);
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mOutputAttributeLocations.resize(reflectOutputVertexAttributeCount);
+				mOutputAttributeLocations.Resize(reflectOutputVertexAttributeCount);
 				for (unsigned int i = 0; i < reflectOutputVertexAttributeCount; i++)
 				{
 					if (reflectOutputVariables[i]->location == static_cast<unsigned int>(-1))
@@ -342,7 +341,7 @@ namespace Ck::Vulkan
 
 	unsigned int Shader::GetDescriptorSetInfoCount() const
 	{
-		return mDescriptorSetInfo.size();
+		return mDescriptorSetInfo.GetSize();
 	}
 
 	const DescriptorSetInfo* Shader::GetDescriptorSetInfo(unsigned int index) const
@@ -352,7 +351,7 @@ namespace Ck::Vulkan
 
 	unsigned Shader::GetPushConstantBlockCount() const
 	{
-		return mPushConstantBlockInfo.size();
+		return mPushConstantBlockInfo.GetSize();
 	}
 
 	const PushConstantBlockInfo* Shader::GetPushConstantBlock(unsigned index) const

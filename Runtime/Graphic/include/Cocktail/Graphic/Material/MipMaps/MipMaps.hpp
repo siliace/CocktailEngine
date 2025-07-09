@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
 
 #include <Cocktail/Graphic/Material/MipMaps/MipMapLevel.hpp>
@@ -112,7 +113,7 @@ namespace Ck
 		PixelFormat mPixelFormat;
 		unsigned int mArrayLayerCount;
 		unsigned int mMipMapCount;
-		std::vector<MipMapLevel> mLevels;
+		Array<MipMapLevel> mLevels;
 		ByteArray mPixels;
 	};
 }

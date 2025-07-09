@@ -84,7 +84,7 @@ namespace Ck::Vulkan
 			if (resource)
 			{
 				std::shared_ptr<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, resource, memoryRequirements.size, memoryTypeIndex);
-				mChunks.push_back(chunk);
+				mChunks.Add(chunk);
 
 				block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
 			}
@@ -104,7 +104,7 @@ namespace Ck::Vulkan
 				if (!block)
 				{
 					std::shared_ptr<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
-					mChunks.push_back(chunk);
+					mChunks.Add(chunk);
 
 					block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
 				}
@@ -115,7 +115,7 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		std::size_t mDefaultChuckSize;
-		std::vector<std::shared_ptr<DeviceMemoryChunk>> mChunks;
+		Array<std::shared_ptr<DeviceMemoryChunk>> mChunks;
 		ObjectPool<DeviceMemoryChunk> mChunkPool;
 		ObjectPool<DeviceMemoryBlock> mBlockPool;
 	}; 

@@ -174,13 +174,9 @@ namespace Ck
 		 */
 		bool SupportExtensionImport(std::string_view extension)
 		{
-			for (AssetImporter<T, ImportParam>* importer : mImporters)
-			{
-				if (importer->SupportExtension(extension))
-					return true;
-			}
-
-			return false;
+			return mImporters.AnyOf([&](AssetImporter<T, ImportParam>* importer) {
+				return importer->SupportExtension(extension);
+			});
 		}
 
 		/**
@@ -190,13 +186,9 @@ namespace Ck
 		 */
 		bool SupportExtensionExport(std::string_view extension)
 		{
-			for (AssetExporter<T, ExportParam>* exporter : mExporters)
-			{
-				if (exporter->SupportExtension(extension))
-					return true;
-			}
-
-			return false;
+			return mExporters.AnyOf([&](AssetExporter<T, ExportParam>* exporter) {
+				return exporter->SupportExtension(extension);
+			});
 		}
 
 		/**
@@ -205,7 +197,7 @@ namespace Ck
 		 */
 		void RegisterImporter(AssetImporter<T, ImportParam>* importer)
 		{
-			mImporters.push_back(importer);
+			mImporters.Add(importer);
 		}
 
 		/**
@@ -214,13 +206,13 @@ namespace Ck
 		 */
 		void RegisterExporter(AssetExporter<T, ExportParam>* exporter)
 		{
-			mExporters.push_back(exporter);
+			mExporters.Add(exporter);
 		}
 
 	private:
 
-		std::vector<AssetImporter<T, ImportParam>*> mImporters;
-		std::vector<AssetExporter<T, ExportParam>*> mExporters;
+		Array<AssetImporter<T, ImportParam>*> mImporters;
+		Array<AssetExporter<T, ExportParam>*> mExporters;
 	};
 }
 

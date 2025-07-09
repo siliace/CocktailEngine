@@ -55,7 +55,7 @@ namespace Ck
 			const std::shared_ptr<Viewport>& viewport = viewportEntry.Viewport;
 			viewport->Bind(*commandList, *framebuffer, drawContext, viewportEntry.Index == 0);
 
-			std::vector<Light*> lights = mScene->CollectLights(*viewport->GetCamera());
+			Array<Light*> lights = mScene->CollectLights(*viewport->GetCamera());
 
 			struct LightInstance
 			{
@@ -71,7 +71,7 @@ namespace Ck
 				float __Padding[3];
 			};
 
-			unsigned int lightCount = static_cast<unsigned int>(lights.size());
+			unsigned int lightCount = lights.GetSize();
 			LightInstance* lightsInfo = COCKTAIL_STACK_ALLOC(LightInstance, lightCount);
 			for (unsigned int i = 0; i < lightCount; i++)
 			{

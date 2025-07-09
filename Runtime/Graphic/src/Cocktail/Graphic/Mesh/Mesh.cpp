@@ -4,13 +4,13 @@
 
 namespace Ck
 {
-	Mesh::Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, std::vector<SubMesh> subMeshes) :
+	Mesh::Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Array<SubMesh> subMeshes) :
 		mVertices(std::move(vertices)),
 		mIndices(std::move(indices)),
 		mSubMeshes(std::move(subMeshes))
 	{
 		assert(mVertices);
-		assert(!mSubMeshes.empty());
+		assert(!mSubMeshes.IsEmpty());
 
 		for (const SubMesh& subMesh : mSubMeshes)
 			mMaterialIndices.insert(subMesh.MaterialIndex);
@@ -28,7 +28,7 @@ namespace Ck
 		subMesh.Count = mIndices ? mIndices->GetIndexCount() : mVertices->GetVertexCount();
 		subMesh.PrimitiveTopology = primitiveTopology;
 		subMesh.MaterialIndex = 0;
-		mSubMeshes.push_back(subMesh);
+		mSubMeshes.Add(subMesh);
 
 		mMaterialIndices.insert(0);
 
@@ -50,7 +50,7 @@ namespace Ck
 		return mIndices;
 	}
 
-	const std::vector<Mesh::SubMesh>& Mesh::GetSubMeshes() const
+	const Array<Mesh::SubMesh>& Mesh::GetSubMeshes() const
 	{
 		return mSubMeshes;
 	}

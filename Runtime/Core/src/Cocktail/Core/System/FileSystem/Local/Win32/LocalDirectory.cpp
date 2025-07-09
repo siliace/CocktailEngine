@@ -40,7 +40,7 @@ namespace Ck::Detail::Win32
 		CloseHandle(mHandle);
 	}
 
-	std::vector<std::filesystem::path> LocalDirectory::GetContent() const
+	Array<std::filesystem::path> LocalDirectory::GetContent() const
 	{
 		std::filesystem::path base = mPath / "*";
 
@@ -49,13 +49,12 @@ namespace Ck::Detail::Win32
 		if (findHandle == INVALID_HANDLE_VALUE)
 			throw SystemError::GetLastError();
 
-		std::vector<std::filesystem::path> content;
+		Array<std::filesystem::path> content;
 
 		do
 		{
-			content.emplace_back(result.cFileName);
-		}
-		while (FindNextFileW(findHandle, &result));
+			content.Emplace(result.cFileName);
+		} while (FindNextFileW(findHandle, &result));
 
 		FindClose(findHandle);
 

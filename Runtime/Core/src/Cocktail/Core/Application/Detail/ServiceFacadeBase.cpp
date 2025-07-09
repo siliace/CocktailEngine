@@ -7,7 +7,7 @@ namespace Ck::Detail
 {
 	Application* ServiceFacadeBase::sFacadeApplication = nullptr;
 	Signal<Application*> ServiceFacadeBase::sOnFacadeApplicationReady;
-	std::vector<Connection> ServiceFacadeBase::sReadyConnections;
+	Array<Connection> ServiceFacadeBase::sReadyConnections;
 	
 	Application* ServiceFacadeBase::GetApplicationFacade()
 	{
@@ -23,7 +23,7 @@ namespace Ck::Detail
 
 	void ServiceFacadeBase::Terminate()
 	{
-		sReadyConnections.clear();
+		sReadyConnections.Clear();
 		sFacadeApplication = nullptr;
 	}
 }

@@ -17,8 +17,9 @@ namespace Ck::Vulkan
 		VkPhysicalDeviceProperties physicalDeviceProperties;
 		vkGetPhysicalDeviceProperties(mRenderDevice->GetPhysicalDeviceHandle(), &physicalDeviceProperties);
 
+		mDescriptorSetStateManagers.Reserve(physicalDeviceProperties.limits.maxBoundDescriptorSets);
 		for (unsigned int i = 0; i < physicalDeviceProperties.limits.maxBoundDescriptorSets; i++)
-			mDescriptorSetStateManagers.emplace_back(mRenderDevice, mDescriptorSetAllocator);
+			mDescriptorSetStateManagers.Emplace(mRenderDevice, mDescriptorSetAllocator);
 
 		mPipelineConstantStorageSize = physicalDeviceProperties.limits.maxPushConstantsSize;
 		mPipelineConstantStorage = std::make_unique<unsigned char[]>(mPipelineConstantStorageSize);
@@ -120,7 +121,7 @@ namespace Ck::Vulkan
 
 	void StateManager::ResetBindings(unsigned int set)
 	{
-		mDescriptorSetStateManagers.at(set).ResetBindings();
+		mDescriptorSetStateManagers[set].ResetBindings();
 	}
 
 	void StateManager::ResetBindings()

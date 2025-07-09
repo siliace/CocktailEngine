@@ -3,7 +3,8 @@
 
 #include <sstream>
 #include <string>
-#include <vector>
+
+#include <Cocktail/Core/Array.hpp>
 
 namespace Ck
 {
@@ -195,9 +196,9 @@ namespace Ck
 		 * \param delimiter 
 		 */
 		template <typename Char, typename Traits, typename Alloc>
-		static std::vector<std::basic_string<Char, Traits, Alloc>> Split(const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
+		static Array<std::basic_string<Char, Traits, Alloc>> Split(const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
 		{
-			std::vector<std::basic_string<Char, Traits, Alloc>> tokens;
+			Array<std::basic_string<Char, Traits, Alloc>> tokens;
 			Split(tokens, string, delimiter);
 
 			return tokens;
@@ -211,9 +212,9 @@ namespace Ck
 		 * \param delimiter
 		 */
 		template <typename Char, typename Traits>
-		static std::vector<std::basic_string<Char, Traits>> Split(const std::basic_string_view<Char, Traits>& string, Char delimiter)
+		static Array<std::basic_string<Char, Traits>> Split(const std::basic_string_view<Char, Traits>& string, Char delimiter)
 		{
-			std::vector<std::basic_string<Char, Traits>> tokens;
+			Array<std::basic_string<Char, Traits>> tokens;
 			Split(tokens, string, delimiter);
 
 			return tokens;
@@ -226,9 +227,9 @@ namespace Ck
 		 * \param delimiter
 		 */
 		template <typename Char>
-		static std::vector<std::basic_string<Char>> Split(const Char* string, Char delimiter)
+		static Array<std::basic_string<Char>> Split(const Char* string, Char delimiter)
 		{
-			std::vector<std::basic_string<Char>> tokens;
+			Array<std::basic_string<Char>> tokens;
 			Split(tokens, string, delimiter);
 
 			return tokens;
@@ -244,16 +245,16 @@ namespace Ck
 		 * \param delimiter
 		 */
 		template <typename Char, typename Traits, typename Alloc>
-		static void Split(std::vector<std::basic_string<Char, Traits, Alloc>>& tokens, const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
+		static void Split(Array<std::basic_string<Char, Traits, Alloc>>& tokens, const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
 		{
-			tokens.clear();
+			tokens.Clear();
 
 			std::basic_string<Char, Traits, Alloc> token;
 			std::basic_istringstream<Char, Traits, Alloc> iss(string);
 			while (std::getline(iss, token, delimiter))
 			{
 				if (!token.empty())
-					tokens.push_back(token);
+					tokens.Add(token);
 			}
 		}
 
@@ -266,7 +267,7 @@ namespace Ck
 		 * \param delimiter
 		 */
 		template <typename Char, typename Traits>
-		static void Split(std::vector<std::basic_string<Char, Traits>>& tokens, const std::basic_string_view<Char, Traits>& string, Char delimiter)
+		static void Split(Array<std::basic_string<Char, Traits>>& tokens, const std::basic_string_view<Char, Traits>& string, Char delimiter)
 		{
 			Split(tokens, std::basic_string<Char, Traits>(string), delimiter);
 		}
@@ -279,7 +280,7 @@ namespace Ck
 		 * \param delimiter
 		 */
 		template <typename Char>
-		static void Split(std::vector<std::basic_string<Char>>& tokens, const char* string, Char delimiter)
+		static void Split(Array<std::basic_string<Char>>& tokens, const char* string, Char delimiter)
 		{
 			Split(tokens, std::basic_string_view<Char>(string), delimiter);
 		}

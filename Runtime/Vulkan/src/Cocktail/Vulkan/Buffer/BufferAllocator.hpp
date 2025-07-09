@@ -65,15 +65,15 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \return
 		 */
-		std::shared_ptr<BufferPool> AcquirePool(std::size_t size);
+		BufferPool* AcquirePool(std::size_t size);
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		Renderer::BufferUsageFlags mUsage;
 		std::size_t mBufferSize;
 		Renderer::MemoryType mMemoryType;
 		std::size_t mMinAlignment;
-		std::vector<std::shared_ptr<BufferPool>> mAcquiredBufferPools;
-		std::vector<std::shared_ptr<BufferPool>> mAvailableBufferPools;
+		Array<BufferPool*> mAcquiredBufferPools;
+		Array<BufferPool*> mAvailableBufferPools;
 		TlsObjectPool<BufferPool> mBufferPool;
 	};
 }

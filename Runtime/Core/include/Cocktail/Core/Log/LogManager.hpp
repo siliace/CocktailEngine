@@ -6,6 +6,7 @@
 
 #include <fmt/core.h>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
 #include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogChannel.hpp>
@@ -21,6 +22,11 @@ namespace Ck
 	class COCKTAIL_CORE_API LogManager
 	{
 	public:
+
+		/**
+		 * \brief 
+		 */
+		~LogManager();
 
 		/**
 		 * \brief
@@ -57,7 +63,7 @@ namespace Ck
 			for (const auto& [name, channel] : mChannels)
 				channel->WriteEntry(*logEntry);
 
-			mEntries.push_back(logEntry);
+			mEntries.Add(logEntry);
 
 			mOnTraceEntry.Emit(logEntry);
 		}
@@ -66,7 +72,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::vector<LogEntry*>& GetEntries() const;
+		const Array<LogEntry*>& GetEntries() const;
 
 		/**
 		 * \brief 
@@ -77,7 +83,7 @@ namespace Ck
 	private:
 
 		std::unordered_map<std::string, std::unique_ptr<LogChannel>> mChannels;
-		std::vector<LogEntry*> mEntries;
+		Array<LogEntry*> mEntries;
 		Signal<LogEntry*> mOnTraceEntry;
 		ObjectPool<LogEntry> mEntryPool;
 	};

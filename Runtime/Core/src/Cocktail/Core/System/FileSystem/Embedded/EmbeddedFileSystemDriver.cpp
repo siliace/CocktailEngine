@@ -75,6 +75,6 @@ namespace Ck
 
 	void EmbeddedFileSystemDriver::Register(cmrc::embedded_filesystem fileSystem)
 	{
-		mFileSystems.push_back(std::move(fileSystem));
+		mFileSystems.Add(std::move(fileSystem));
 	}
 }

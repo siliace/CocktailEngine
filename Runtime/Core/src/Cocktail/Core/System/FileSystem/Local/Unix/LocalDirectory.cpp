@@ -14,13 +14,13 @@ namespace Ck::Detail::Unix
 		closedir(mHandle);
 	}
 
-	std::vector<std::filesystem::path> LocalDirectory::GetContent() const
+	Array<std::filesystem::path> LocalDirectory::GetContent() const
 	{
 		dirent64* result;
-		std::vector<std::filesystem::path> content;
+		Array<std::filesystem::path> content;
 
 		while ((result = readdir64(mHandle)))
-			content.emplace_back(mPath / result->d_name);
+			content.Emplace(mPath / result->d_name);
 
 		return content;
 	}

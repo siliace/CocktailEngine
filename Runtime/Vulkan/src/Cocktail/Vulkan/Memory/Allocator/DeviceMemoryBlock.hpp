@@ -24,14 +24,14 @@ namespace Ck::Vulkan
 		 * \param size
 		 * \param ptr 
 		 */
-		DeviceMemoryBlock(DeviceMemoryChunk* chunk, std::size_t offset, std::size_t size, void* ptr);
+		DeviceMemoryBlock(DeviceMemoryChunk* chunk, VkDeviceSize offset, VkDeviceSize size, void* ptr);
 
 		/**
 		 * \brief 
 		 * \param alignment 
 		 * \return 
 		 */
-		std::size_t ComputeAllocationPadding(std::size_t alignment) const;
+		VkDeviceSize ComputeAllocationPadding(VkDeviceSize alignment) const;
 
 		/**
 		 * \brief 
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \return 
 		 */
-		std::shared_ptr<DeviceMemoryBlock> Split(ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t alignment, std::size_t size);
+		std::shared_ptr<DeviceMemoryBlock> Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size);
 
 		/**
 		 * \brief 
@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		 * \param offset 
 		 * \return 
 		 */
-		void* Map(std::size_t offset) const;
+		void* Map(VkDeviceSize offset) const;
 
 		/**
 		 * \brief 
@@ -87,7 +87,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::size_t GetSize() const;
+		VkDeviceSize GetSize() const;
 
 		/**
 		 * \brief 
@@ -98,9 +98,9 @@ namespace Ck::Vulkan
 	private:
 
 		DeviceMemoryChunk* mChunk;
-		std::size_t mOffset;
-		std::size_t mPadding;
-		std::size_t mSize;
+		VkDeviceSize mOffset;
+		VkDeviceSize mPadding;
+		VkDeviceSize mSize;
 		void* mPtr;
 		bool mFree;
 	};

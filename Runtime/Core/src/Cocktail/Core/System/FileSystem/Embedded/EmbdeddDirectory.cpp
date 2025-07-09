@@ -9,18 +9,16 @@ namespace Ck
 		/// Nothing
 	}
 
-	std::vector<std::filesystem::path> EmbeddedDirectory::GetContent() const
+	Array<std::filesystem::path> EmbeddedDirectory::GetContent() const
 	{
-		std::vector<std::filesystem::path> childrens;
+		Array<std::filesystem::path> childrens;
 		cmrc::directory_iterator iterable = mFileSystem.iterate_directory(mPath.string());
 
 		std::filesystem::path basePath = "builtin://" / mPath;
-		childrens.reserve(std::distance(iterable.begin(), iterable.end()));
+
+		childrens.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
-		{
-			std::string childPath = basePath.string() + '/' + (*it).filename();
-			childrens.emplace_back(std::move(childPath));
-		}	
+			childrens.Emplace(basePath.string() + '/' + (*it).filename());
 
 		return childrens;
 	}

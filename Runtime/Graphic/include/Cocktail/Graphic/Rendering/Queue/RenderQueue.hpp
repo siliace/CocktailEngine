@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERQUEUE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERQUEUE_HPP
 
-#include <queue>
-
 #include <Cocktail/Core/Log/LogCategory.hpp>
 
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
@@ -81,7 +79,7 @@ namespace Ck
 		Material::ShadingMode mShadingMode;
 		BlendingMode mBlendingMode;
 		std::shared_ptr<MaterialProgramSet> mMaterialProgramSet;
-		std::vector<RecordInfo> mRecords;
+		Array<RecordInfo> mRecords;
 	};
 }
 

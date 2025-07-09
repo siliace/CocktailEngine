@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include <Cocktail/Core/Array.hpp>
+
 namespace Ck
 {
 	/**
@@ -21,7 +23,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::vector<std::filesystem::path> GetContent() const = 0;
+		virtual Array<std::filesystem::path> GetContent() const = 0;
 
 		/**
 		 * \brief 

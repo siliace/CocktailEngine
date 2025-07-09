@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindSampler(unsigned int binding, unsigned int arrayIndex, const Sampler* sampler)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
 		bool dirty = FillImageState(state, Renderer::DescriptorType::Sampler, nullptr, sampler);
 
 		if (dirty)
@@ -31,7 +31,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindTextureSampler(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
  		bool dirty = FillImageState(state, Renderer::DescriptorType::TextureSampler, textureView, sampler);
 
 		if (dirty)
@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
 		bool dirty = FillImageState(state, Renderer::DescriptorType::Texture, textureView, nullptr);
 
 		if (dirty)
@@ -53,7 +53,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindStorageTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
 		bool dirty = FillImageState(state, Renderer::DescriptorType::StorageTexture, textureView, nullptr);
 
 		if (dirty)
@@ -64,7 +64,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindUniformBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
 		bool dirty = FillBufferState(state, Renderer::DescriptorType::UniformBuffer, buffer, offset, range);
 
 		if (dirty)
@@ -75,7 +75,7 @@ namespace Ck::Vulkan
 
 	bool DescriptorSetStateManager::BindStorageBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
-		DescriptorState* state = FindOrCreateDescriptorState(binding, arrayIndex);
+		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
 		bool dirty = FillBufferState(state, Renderer::DescriptorType::StorageBuffer, buffer, offset, range);
 
 		if (dirty)
@@ -86,7 +86,7 @@ namespace Ck::Vulkan
 
 	void DescriptorSetStateManager::ResetBindings()
 	{
-		mBindingStates.clear();
+		mBindingStates.Clear();
 		mBindingDirtyFlags = 0;
 		mDescriptorSetAllocator->Reset();
 	}
@@ -106,39 +106,36 @@ namespace Ck::Vulkan
 
 			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
 			{
-				DescriptorState* descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement);
-				if (!descriptorState)
-					throw std::runtime_error("Missing state in descriptor set compilation");
-
-				if (!descriptorState->Dirty)
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
+				if (!descriptorState.Dirty)
 					continue;
 
-				descriptorState->Dirty = false;
+				descriptorState.Dirty = false;
 
 				VkWriteDescriptorSet& write = writes[descriptorCount];
 				write = VkWriteDescriptorSet{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr};
 				{
 					write.dstSet = VK_NULL_HANDLE;
-					write.dstBinding = descriptorState->Binding;
-					write.dstArrayElement = descriptorState->ArrayElement;
+					write.dstBinding = descriptorState.Binding;
+					write.dstArrayElement = descriptorState.ArrayElement;
 					write.descriptorCount = 1;
-					write.descriptorType = ToVkType(descriptorState->Type);
+					write.descriptorType = ToVkType(descriptorState.Type);
 				}
 
-				switch (descriptorState->Type)
+				switch (descriptorState.Type)
 				{
 					case Renderer::DescriptorType::Sampler:
 					case Renderer::DescriptorType::TextureSampler:
 					case Renderer::DescriptorType::Texture:
 					case Renderer::DescriptorType::StorageTexture:
 						{
-							const Sampler* sampler = descriptorState->ImageInfo.Sampler;
-							const TextureView* textureView = descriptorState->ImageInfo.TextureView;
+							const Sampler* sampler = descriptorState.ImageInfo.Sampler;
+							const TextureView* textureView = descriptorState.ImageInfo.TextureView;
 
 							VkDescriptorImageInfo& imageInfo = imagesInfo[descriptorImageCount];
 							imageInfo.sampler = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
 							imageInfo.imageView = textureView ? textureView->GetHandle() : VK_NULL_HANDLE;
-							imageInfo.imageLayout = descriptorState->Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+							imageInfo.imageLayout = descriptorState.Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 							write.pImageInfo = &imageInfo;
 							++descriptorImageCount;
@@ -148,12 +145,12 @@ namespace Ck::Vulkan
 					case Renderer::DescriptorType::UniformBuffer:
 					case Renderer::DescriptorType::StorageBuffer:
 						{
-							const Buffer* buffer = descriptorState->BufferInfo.Buffer;
+							const Buffer* buffer = descriptorState.BufferInfo.Buffer;
 
 							VkDescriptorBufferInfo& bufferInfo = buffersInfo[descriptorBufferCount];
 							bufferInfo.buffer = buffer->GetHandle();
-							bufferInfo.offset = descriptorState->BufferInfo.Offset;
-							bufferInfo.range = descriptorState->BufferInfo.Range;
+							bufferInfo.offset = descriptorState.BufferInfo.Offset;
+							bufferInfo.range = descriptorState.BufferInfo.Range;
 
 							write.pBufferInfo = &bufferInfo;
 							++descriptorBufferCount;
@@ -179,37 +176,35 @@ namespace Ck::Vulkan
 
 			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
 			{
-				DescriptorState* descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement);
-				if (!descriptorState)
-					throw std::runtime_error("Missing state in descriptor set compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptors compilation");
 
 				unsigned char* descriptor = descriptors + k * elementStride;
-				switch (descriptorState->Type)
+				switch (descriptorState.Type)
 				{
 					case Renderer::DescriptorType::Sampler:
 					case Renderer::DescriptorType::TextureSampler:
 					case Renderer::DescriptorType::Texture:
 					case Renderer::DescriptorType::StorageTexture:
 						{
-							const Sampler* sampler = descriptorState->ImageInfo.Sampler;
-							const TextureView* textureView = descriptorState->ImageInfo.TextureView;
+							const Sampler* sampler = descriptorState.ImageInfo.Sampler;
+							const TextureView* textureView = descriptorState.ImageInfo.TextureView;
 
 							VkDescriptorImageInfo& imageInfo = *reinterpret_cast<VkDescriptorImageInfo*>(descriptor);
 							imageInfo.sampler = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
 							imageInfo.imageView = textureView ? textureView->GetHandle() : VK_NULL_HANDLE;
-							imageInfo.imageLayout = descriptorState->Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+							imageInfo.imageLayout = descriptorState.Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 						}
 						break;
 
 					case Renderer::DescriptorType::UniformBuffer:
 					case Renderer::DescriptorType::StorageBuffer:
 						{
-							const Buffer* buffer = descriptorState->BufferInfo.Buffer;
+							const Buffer* buffer = descriptorState.BufferInfo.Buffer;
 
 							VkDescriptorBufferInfo& bufferInfo = *reinterpret_cast<VkDescriptorBufferInfo*>(descriptor);
 							bufferInfo.buffer = buffer->GetHandle();
-							bufferInfo.offset = descriptorState->BufferInfo.Offset;
-							bufferInfo.range = descriptorState->BufferInfo.Range;
+							bufferInfo.offset = descriptorState.BufferInfo.Offset;
+							bufferInfo.range = descriptorState.BufferInfo.Range;
 						}
 						break;
 				}
@@ -241,37 +236,35 @@ namespace Ck::Vulkan
 
 			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
 			{
-				DescriptorState* descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement);
-				if (!descriptorState)
-					throw std::runtime_error("Missing state in descriptor set compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
 
-				if (descriptorState->Type != layoutBinding->Type)
+				if (descriptorState.Type != layoutBinding->Type)
 					throw std::runtime_error("Incoherence between descriptor set layout binding type and descriptor state type");
 
 				VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr};
 				{
 					write.dstSet = descriptorSet->GetHandle();
-					write.dstBinding = descriptorState->Binding;
-					write.dstArrayElement = descriptorState->ArrayElement;
+					write.dstBinding = descriptorState.Binding;
+					write.dstArrayElement = descriptorState.ArrayElement;
 					write.descriptorCount = 1;
-					write.descriptorType = ToVkType(descriptorState->Type);
+					write.descriptorType = ToVkType(descriptorState.Type);
 
-					switch (descriptorState->Type)
+					switch (descriptorState.Type)
 					{
 						case Renderer::DescriptorType::Sampler:
 						case Renderer::DescriptorType::TextureSampler:
 						case Renderer::DescriptorType::Texture:
 						case Renderer::DescriptorType::StorageTexture:
 							{
-								const Sampler* sampler = descriptorState->ImageInfo.Sampler;
-								const TextureView* textureView = descriptorState->ImageInfo.TextureView;
+								const Sampler* sampler = descriptorState.ImageInfo.Sampler;
+								const TextureView* textureView = descriptorState.ImageInfo.TextureView;
 
 								assert(sampler || textureView);
 
 								VkDescriptorImageInfo& imageInfo = imagesInfo[descriptorImageCount];
 								imageInfo.sampler = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
 								imageInfo.imageView = textureView ? textureView->GetHandle() : VK_NULL_HANDLE;
-								imageInfo.imageLayout = descriptorState->Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+								imageInfo.imageLayout = descriptorState.Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 								write.pImageInfo = &imageInfo;
 								++descriptorImageCount;
@@ -281,12 +274,12 @@ namespace Ck::Vulkan
 						case Renderer::DescriptorType::UniformBuffer:
 						case Renderer::DescriptorType::StorageBuffer:
 							{
-								const Buffer* buffer = descriptorState->BufferInfo.Buffer;
+								const Buffer* buffer = descriptorState.BufferInfo.Buffer;
 
 								VkDescriptorBufferInfo& bufferInfo = buffersInfo[descriptorBufferCount];
 								bufferInfo.buffer = buffer->GetHandle();
-								bufferInfo.offset = descriptorState->BufferInfo.Offset;
-								bufferInfo.range = descriptorState->BufferInfo.Range;
+								bufferInfo.offset = descriptorState.BufferInfo.Offset;
+								bufferInfo.range = descriptorState.BufferInfo.Range;
 
 								write.pBufferInfo = &bufferInfo;
 								++descriptorBufferCount;
@@ -325,36 +318,35 @@ namespace Ck::Vulkan
 
 			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
 			{
-				DescriptorState* descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement);
-				assert(descriptorState != nullptr && descriptorState->Type == layoutBinding->Type);
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
 
 				unsigned char* descriptor = descriptors + k * elementStride;
-				switch (descriptorState->Type)
+				switch (descriptorState.Type)
 				{
 					case Renderer::DescriptorType::Sampler:
 					case Renderer::DescriptorType::TextureSampler:
 					case Renderer::DescriptorType::Texture:
 					case Renderer::DescriptorType::StorageTexture:
 						{
-							const Sampler* sampler = descriptorState->ImageInfo.Sampler;
-							const TextureView* textureView = descriptorState->ImageInfo.TextureView;
+							const Sampler* sampler = descriptorState.ImageInfo.Sampler;
+							const TextureView* textureView = descriptorState.ImageInfo.TextureView;
 
 							VkDescriptorImageInfo& imageInfo = *reinterpret_cast<VkDescriptorImageInfo*>(descriptor);
 							imageInfo.sampler = sampler ? sampler->GetHandle() : VK_NULL_HANDLE;
 							imageInfo.imageView = textureView ? textureView->GetHandle() : VK_NULL_HANDLE;
-							imageInfo.imageLayout = descriptorState->Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+							imageInfo.imageLayout = descriptorState.Type == Renderer::DescriptorType::StorageTexture ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 						}
 						break;
 
 					case Renderer::DescriptorType::UniformBuffer:
 					case Renderer::DescriptorType::StorageBuffer:
 						{
-							const Buffer* buffer = descriptorState->BufferInfo.Buffer;
+							const Buffer* buffer = descriptorState.BufferInfo.Buffer;
 
 							VkDescriptorBufferInfo& bufferInfo = *reinterpret_cast<VkDescriptorBufferInfo*>(descriptor);
 							bufferInfo.buffer = buffer->GetHandle();
-							bufferInfo.offset = descriptorState->BufferInfo.Offset;
-							bufferInfo.range = descriptorState->BufferInfo.Range;
+							bufferInfo.offset = descriptorState.BufferInfo.Offset;
+							bufferInfo.range = descriptorState.BufferInfo.Range;
 						}
 						break;
 				}
@@ -373,54 +365,46 @@ namespace Ck::Vulkan
 		return mBindingDirtyFlags & Bit(binding);
 	}
 
-	bool DescriptorSetStateManager::FillImageState(DescriptorState* state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler)
+	bool DescriptorSetStateManager::FillImageState(DescriptorState& state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler)
 	{
 		bool changed = false;
 
-		changed |= CheckedAssign(state->Type, type);
-		changed |= CheckedAssign(state->ImageInfo.TextureView, textureView);
-		changed |= CheckedAssign(state->ImageInfo.Sampler, sampler);
-		state->Dirty = changed;
+		changed |= CheckedAssign(state.Type, type);
+		changed |= CheckedAssign(state.ImageInfo.TextureView, textureView);
+		changed |= CheckedAssign(state.ImageInfo.Sampler, sampler);
+		state.Dirty = changed;
 
 		return changed;
 	}
 
-	bool DescriptorSetStateManager::FillBufferState(DescriptorState* state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range)
+	bool DescriptorSetStateManager::FillBufferState(DescriptorState& state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
 		bool changed = false;
 
-		changed |= CheckedAssign(state->Type, type);
-		changed |= CheckedAssign(state->BufferInfo.Buffer, buffer);
-		changed |= CheckedAssign(state->BufferInfo.Offset, offset);
-		changed |= CheckedAssign(state->BufferInfo.Range, range);
-		state->Dirty = changed;
+		changed |= CheckedAssign(state.Type, type);
+		changed |= CheckedAssign(state.BufferInfo.Buffer, buffer);
+		changed |= CheckedAssign(state.BufferInfo.Offset, offset);
+		changed |= CheckedAssign(state.BufferInfo.Range, range);
+		state.Dirty = changed;
 
 		return changed;
 	}
 
-	DescriptorState* DescriptorSetStateManager::FindDescriptorState(unsigned binding, unsigned int arrayElement)
+	Optional<DescriptorState&> DescriptorSetStateManager::FindDescriptorState(unsigned binding, unsigned int arrayElement)
 	{
-		for (std::size_t i = 0; i < mBindingStates.size(); i++)
-		{
-			DescriptorState* state = &mBindingStates[i];
-			if (state->Binding == binding && state->ArrayElement == arrayElement)
-				return state;
-		}
-
-		return nullptr;
+		return mBindingStates.FindIf([&](const DescriptorState& descriptorState) {
+			return descriptorState.Binding == binding && descriptorState.ArrayElement == arrayElement;
+		});
 	}
 
-	DescriptorState* DescriptorSetStateManager::FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement)
+	DescriptorState& DescriptorSetStateManager::FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement)
 	{
-		DescriptorState* state = FindDescriptorState(binding, arrayElement);
-		if (!state)
-		{
-			state = &mBindingStates.emplace_back();
+		return FindDescriptorState(binding, arrayElement).GetOrElse([&]() -> DescriptorState& {
+			DescriptorState &descriptorState = mBindingStates.Emplace();
+			descriptorState.Binding = binding;
+			descriptorState.ArrayElement = arrayElement;
 
-			state->Binding = binding;
-			state->ArrayElement = arrayElement;
-		}
-
-		return state;
+			return descriptorState;
+		});
 	}
 }

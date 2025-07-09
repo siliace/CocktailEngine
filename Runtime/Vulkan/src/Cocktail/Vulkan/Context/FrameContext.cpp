@@ -66,28 +66,27 @@ namespace Ck::Vulkan
 
 	CommandList* FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		for (std::shared_ptr<CommandList> commandList : mCommandLists)
-		{
+		return mCommandLists.FindIf([&](std::shared_ptr<CommandList>& commandList) {
 			if (commandList->GetState() != Renderer::CommandListState::Initial)
-				continue;
+				return false;
 
 			if (commandList->GetUsage() != createInfo.Usage)
-				continue;
+				return false;
 
 			if (commandList->GetDynamicState() != createInfo.DynamicState)
-				continue;
+				return false;
 
 			if (commandList->IsSecondary() != createInfo.Secondary)
-				continue;
+				return false;
 
+			return true;
+		}).Then([&](std::shared_ptr<CommandList>& commandList) {
 			commandList->SetObjectName(createInfo.Name);
-			return commandList.get();
-		}
-
-		std::shared_ptr<CommandList> commandList = mCommandListPool->CreateCommandList(createInfo);
-		mCommandLists.push_back(commandList);
-
-		return commandList.get();
+		}).GetOrElse([&]() {
+			return mCommandLists.Emplace(
+				mCommandListPool->CreateCommandList(createInfo)
+			);
+		}).get();
 	}
 
 	Renderer::BufferAllocator* FrameContext::GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType)

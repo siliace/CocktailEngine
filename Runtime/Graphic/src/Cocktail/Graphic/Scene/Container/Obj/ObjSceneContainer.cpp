@@ -32,15 +32,15 @@ namespace Ck
 		vertexLayoutBuilder.AddAttribute(VertexAttributeSemantic::Normal, DataType::Float32, 3);
 		mVertexLayout = vertexLayoutBuilder.Get();
 
-		mMaterials.push_back(CreateDefaultMaterial(LinearColor(0.f, 0.f, 0.f)));
+		mMaterials.Add(CreateDefaultMaterial(LinearColor(0.f, 0.f, 0.f)));
 		for (const tinyobj::material_t& objMaterial : materials)
 		{
-			mMaterials.push_back(
+			mMaterials.Add(
 				ProcessMaterial(objMaterial)
 			);
 		}
 
-		mMeshes.push_back(
+		mMeshes.Add(
 			ProcessMesh(attributes, shapes)
 		);
 
@@ -145,7 +145,7 @@ namespace Ck
 		}
 	}
 
-	bool ObjSceneContainer::ProcessSubMesh(ObjVertexCache& vertexCache, std::vector<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape)
+	bool ObjSceneContainer::ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape)
 	{
 		SubMeshInfo subMesh;
 		subMesh.Name = shape.name;
@@ -173,7 +173,7 @@ namespace Ck
 
 					ProcessIndices(vertexCache, attributes, &indices[subMeshStart], subMesh.Count);
 
-					subMeshes.push_back(subMesh);
+					subMeshes.Add(subMesh);
 
 					subMeshStart = next;
 				}
@@ -208,7 +208,7 @@ namespace Ck
 
 			ProcessIndices(vertexCache, attributes, indices->data(), indices->size());
 
-			subMeshes.push_back(subMesh);
+			subMeshes.Add(subMesh);
 
 			return true;
 		}
@@ -218,8 +218,8 @@ namespace Ck
 	{
 		ObjVertexCache vertexCache(mVertexLayout);
 
-		std::vector<SubMeshInfo> subMeshes;
-		subMeshes.reserve(shapes.size());
+		Array<SubMeshInfo> subMeshes;
+		subMeshes.Reserve(shapes.size());
 		for (const tinyobj::shape_t& shape : shapes)
 		{
 			bool processed = ProcessSubMesh(vertexCache, subMeshes, attributes, shape);

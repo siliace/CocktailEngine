@@ -112,10 +112,10 @@ namespace Ck::Vulkan
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkShaderModule mHandle;
 		Renderer::ShaderType mType;
-		std::vector<DescriptorSetInfo> mDescriptorSetInfo;
-		std::vector<PushConstantBlockInfo> mPushConstantBlockInfo;
-		std::vector<std::unique_ptr<VertexAttributeLocation>> mInputAttributeLocations;
-		std::vector<std::unique_ptr<VertexAttributeLocation>> mOutputAttributeLocations;
+		Array<DescriptorSetInfo> mDescriptorSetInfo;
+		Array<PushConstantBlockInfo> mPushConstantBlockInfo;
+		Array<std::unique_ptr<VertexAttributeLocation>> mInputAttributeLocations;
+		Array<std::unique_ptr<VertexAttributeLocation>> mOutputAttributeLocations;
 	};
 }
 

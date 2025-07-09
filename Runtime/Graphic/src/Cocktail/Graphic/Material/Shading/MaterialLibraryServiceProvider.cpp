@@ -40,7 +40,7 @@ namespace Ck
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
 					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
 
-					entry.VariantsBinaries.push_back(std::move(binaries));
+					entry.VariantsBinaries.Add(std::move(binaries));
 				}
 
 				{
@@ -51,7 +51,7 @@ namespace Ck
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
 					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
 
-					entry.VariantsBinaries.push_back(std::move(binaries));
+					entry.VariantsBinaries.Add(std::move(binaries));
 				}
 
 				{
@@ -62,7 +62,7 @@ namespace Ck
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
 					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
 
-					entry.VariantsBinaries.push_back(std::move(binaries));
+					entry.VariantsBinaries.Add(std::move(binaries));
 				}
 
 				{
@@ -73,7 +73,7 @@ namespace Ck
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
 					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
 
-					entry.VariantsBinaries.push_back(std::move(binaries));
+					entry.VariantsBinaries.Add(std::move(binaries));
 				}
 
 				{
@@ -84,7 +84,7 @@ namespace Ck
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
 					binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
 
-					entry.VariantsBinaries.push_back(std::move(binaries));
+					entry.VariantsBinaries.Add(std::move(binaries));
 				}
 
 				materialProgramLibrary->Register(entry);

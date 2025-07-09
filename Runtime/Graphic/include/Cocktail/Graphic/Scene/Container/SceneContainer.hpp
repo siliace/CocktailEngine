@@ -43,20 +43,20 @@ namespace Ck
 			std::string Name;
 			std::shared_ptr<VertexArray> Vertices;
 			std::shared_ptr<IndexArray> Indices;
-			std::vector<SubMeshInfo> SubMeshes;
+			Array<SubMeshInfo> SubMeshes;
 		};
 
 		struct NodeInfo
 		{
-			std::vector<NodeInfo> Children;
-			std::vector<unsigned int> MeshIndices;
+			Array<NodeInfo> Children;
+			Array<unsigned int> MeshIndices;
 			Transformation LocalTransformation = Transformation::Identity();
 		};
 
 		NodeInfo mRoot;
-		std::vector<MeshInfo> mMeshes;
-		std::vector<std::shared_ptr<MipMaps>> mMipMaps;
-		std::vector<MaterialInfo> mMaterials;
+		Array<MeshInfo> mMeshes;
+		Array<std::shared_ptr<MipMaps>> mMipMaps;
+		Array<MaterialInfo> mMaterials;
 
 	private:
 
@@ -69,7 +69,7 @@ namespace Ck
 		 * \param materials 
 		 * \return 
 		 */
-		std::shared_ptr<SceneNode> ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const std::vector<std::shared_ptr<Mesh>>& meshes, const std::vector<std::shared_ptr<Material>>& materials);
+		std::shared_ptr<SceneNode> ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials);
 	};
 }
 

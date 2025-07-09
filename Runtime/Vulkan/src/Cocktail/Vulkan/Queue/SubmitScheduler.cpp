@@ -14,8 +14,8 @@ namespace Ck::Vulkan
 
     SubmitScheduler::~SubmitScheduler()
     {
-		assert(mBatches.empty());
-		assert(mPending.empty());
+		assert(mBatches.IsEmpty());
+		assert(mPending.IsEmpty());
 
 		for (QueueSubmitBatch* terminated : mTerminated)
 			mBatchPool.Recycle(terminated);
@@ -24,7 +24,7 @@ namespace Ck::Vulkan
     QueueSubmitBatch* SubmitScheduler::ScheduleBatch(Renderer::CommandQueueType queueType, unsigned int queueIndex)
     {
 		QueueSubmitBatch* batch = mBatchPool.AllocateUnsafe(mRenderDevice, queueType, queueIndex);
-		mBatches.push(batch);
+		mBatches.Add(batch);
 
 		return batch;
 	}
@@ -36,17 +36,17 @@ namespace Ck::Vulkan
 			if (mProcessingBatch)
 				return;
 
-			if (auto itBatch = std::find(mPending.begin(), mPending.end(), batch); itBatch != mPending.end())
-			{
+			mPending.FindIndex(batch).Then([&](unsigned int index) {
 				mProcessingBatch = true;
-				std::for_each(mPending.begin(), itBatch, [](QueueSubmitBatch* pendingBatch) {
-					pendingBatch->MarkCompleted();
-				});
 
-				auto itNextBatch = std::next(itBatch);
-				mTerminated.insert(mTerminated.end(), mPending.begin(), itNextBatch);
-				mPending.erase(mPending.begin(), itNextBatch);
-			}
+				for (unsigned int i = 0; i < index + 1; i++)
+				{
+					mPending[i]->MarkCompleted();
+					mTerminated.Add(mPending[i]);
+				}
+
+				mPending.SliceInPlace(0, index + 1);
+			});
 
 			mProcessingBatch = false;
 		});
@@ -57,15 +57,14 @@ namespace Ck::Vulkan
 		for (QueueSubmitBatch* terminated : mTerminated)
 			mBatchPool.Recycle(terminated);
 
-		mTerminated.clear();
+		mTerminated.Clear();
 
-		while (!mBatches.empty())
+		while (!mBatches.IsEmpty())
 		{
-			QueueSubmitBatch* batch = mBatches.front();
-			mBatches.pop();
+			QueueSubmitBatch* batch = mBatches.PopFirst();
 
 			batch->Submit();
-			mPending.emplace_back(batch);
+			mPending.Add(batch);
 		}
 	}
 }

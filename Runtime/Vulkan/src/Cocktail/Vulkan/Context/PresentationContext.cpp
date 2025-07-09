@@ -18,8 +18,8 @@ namespace Ck::Vulkan
 			unsigned int surfaceFormatCount;
 			COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, nullptr));
 
-			std::vector<VkSurfaceFormatKHR> surfaceFormats(surfaceFormatCount);
-			COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, surfaceFormats.data()));
+			Array<VkSurfaceFormatKHR> surfaceFormats(surfaceFormatCount);
+			COCKTAIL_VK_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &surfaceFormatCount, surfaceFormats.GetData()));
 
 			for (const VkSurfaceFormatKHR& surfaceFormat : surfaceFormats)
 			{
@@ -81,8 +81,8 @@ namespace Ck::Vulkan
 		unsigned int presentModeCount;
 		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface->GetHandle(), &presentModeCount, nullptr);
 
-		mPresentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface->GetHandle(), &presentModeCount, mPresentModes.data());
+		mPresentModes.Resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, mSurface->GetHandle(), &presentModeCount, mPresentModes.GetData());
 
 		mSurfaceFormat = ChooseSurfaceFormat(physicalDevice, mSurface->GetHandle(), colorDepth, alphaDepth, mSurfaceColorSpace);
 
@@ -113,7 +113,7 @@ namespace Ck::Vulkan
 
 	bool PresentationContext::IsPresentationModeSupported(VkPresentModeKHR presentMode) const
 	{
-		return std::find(mPresentModes.begin(), mPresentModes.end(), presentMode) != mPresentModes.end();
+		return mPresentModes.Contains(presentMode);
 	}
 
 	PixelFormat PresentationContext::GetSurfaceFormat() const

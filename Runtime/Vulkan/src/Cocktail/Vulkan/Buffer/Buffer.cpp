@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 		mExclusive(createInfo.Exclusive)
 	{
 		const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-		std::vector<unsigned int> queueFamilyIndexes = queueFamilyContext.FindFamilyIndexes();
+		Array<unsigned int> queueFamilyIndexes = queueFamilyContext.FindFamilyIndexes();
 
 		VkBufferCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, nullptr };
 		{
@@ -34,8 +34,8 @@ namespace Ck::Vulkan
 			else
 			{
 				vkCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
-				vkCreateInfo.queueFamilyIndexCount = static_cast<unsigned int>(queueFamilyIndexes.size());
-				vkCreateInfo.pQueueFamilyIndices = queueFamilyIndexes.data();
+				vkCreateInfo.queueFamilyIndexCount = queueFamilyIndexes.GetSize();
+				vkCreateInfo.pQueueFamilyIndices = queueFamilyIndexes.GetData();
 			}
 		}
 

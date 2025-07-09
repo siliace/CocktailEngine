@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_VULKAN_QUEUE_QUEUEFAMILYCONTEXT_HPP
 #define COCKTAIL_VULKAN_QUEUE_QUEUEFAMILYCONTEXT_HPP
 
-#include <vector>
-
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Renderer/Command/CommandQueueType.hpp>
@@ -37,7 +36,7 @@ namespace Ck::Vulkan
 		 * \param unique 
 		 * \return 
 		 */
-		std::vector<unsigned int> FindFamilyIndexes(bool unique = true) const;
+		Array<unsigned int> FindFamilyIndexes(bool unique = true) const;
 
 		/**
 		 * \brief 
@@ -47,9 +46,9 @@ namespace Ck::Vulkan
 		 * \return 
 		 */
 		template <typename Callable>
-		std::vector<unsigned int> FindFamilyIndexes(Callable&& callable, bool unique = true) const
+		Array<unsigned int> FindFamilyIndexes(Callable&& callable, bool unique = true) const
 		{
-			std::vector<unsigned int> queueIndexes;
+			Array<unsigned int> queueIndexes;
 			for (Renderer::CommandQueueType queueFamilyType : Enum<Renderer::CommandQueueType>::Values)
 			{
 				const QueueFamily& family = GetFamily(queueFamilyType);
@@ -65,7 +64,7 @@ namespace Ck::Vulkan
 						continue;
 				}
 					
-				queueIndexes.push_back(queueFamilyIndex);
+				queueIndexes.Add(queueFamilyIndex);
 			}
 
 			return queueIndexes;
@@ -91,21 +90,21 @@ namespace Ck::Vulkan
 		 * \param properties
 		 * \return 
 		 */
-		static QueueFamily SelectGraphicQueueFamily(const std::vector<VkQueueFamilyProperties>& properties);
+		static QueueFamily SelectGraphicQueueFamily(const Array<VkQueueFamilyProperties>& properties);
 
 		/**
 		 * \brief
 		 * \param properties
 		 * \return
 		 */
-		static QueueFamily SelectTransferQueueFamily(const std::vector<VkQueueFamilyProperties>& properties);
+		static QueueFamily SelectTransferQueueFamily(const Array<VkQueueFamilyProperties>& properties);
 
 		/**
 		 * \brief 
 		 * \param properties 
 		 * \return 
 		 */
-		static QueueFamily SelectComputeQueueFamily(const std::vector<VkQueueFamilyProperties>& properties);
+		static QueueFamily SelectComputeQueueFamily(const Array<VkQueueFamilyProperties>& properties);
 
 		VkPhysicalDevice mPhysicalDevice;
 		bool mUnified;

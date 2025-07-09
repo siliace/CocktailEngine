@@ -68,12 +68,12 @@ namespace Ck
 		for (const RecordInfo& recordInfo : mRecords)
 			recordInfo.Record->Draw(commandList, drawContext);
 
-		mRecords.clear();
+		mRecords.Clear();
 	}
 
 	void RenderQueue::Clear()
 	{
-		mRecords.clear();
+		mRecords.Clear();
 	}
 
 	RenderQueue::BlendingMode RenderQueue::GetBlendingMode() const
@@ -88,6 +88,6 @@ namespace Ck
 
 	void RenderQueue::Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey)
 	{
-		mRecords.emplace_back(RecordInfo{ std::move(record), sortingKey });
+		mRecords.Emplace(RecordInfo{ std::move(record), sortingKey });
 	}
 }

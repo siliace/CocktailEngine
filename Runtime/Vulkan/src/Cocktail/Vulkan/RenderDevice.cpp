@@ -295,9 +295,9 @@ namespace Ck::Vulkan
 		// Check for supported layers
 		constexpr static const char* ValidationLayerName = "VK_LAYER_KHRONOS_validation";
 
-		std::vector<const char*> enabledLayerNames;
+		Array<const char*> enabledLayerNames;
 		if (enableValidationLayer && ExtensionManager::IsLayerSupported(ValidationLayerName))
-			enabledLayerNames.emplace_back(ValidationLayerName);
+			enabledLayerNames.Add(ValidationLayerName);
 
 		for (Renderer::RenderDeviceExtension extension : Enum<Renderer::RenderDeviceExtension>::Values)
 			mSupportedExtensions[extension] = mExtensionManager.EnableInstanceExtension(extension);
@@ -305,15 +305,15 @@ namespace Ck::Vulkan
 		for (RenderDeviceFeature feature : Enum<RenderDeviceFeature>::Values)
 			mSupportedFeatures[feature] = mExtensionManager.EnableInstanceExtension(feature);
 
-		std::vector<const char*> enabledExtensionNames = mExtensionManager.GetInstanceExtensions();
+		Array<const char*> enabledExtensionNames = mExtensionManager.GetInstanceExtensions();
 		VkInstanceCreateInfo createInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, nullptr };
 		{
 			createInfo.flags = 0;
 			createInfo.pApplicationInfo = &applicationInfo;
-			createInfo.enabledLayerCount = static_cast<unsigned int>(enabledLayerNames.size());
-			createInfo.ppEnabledLayerNames = enabledLayerNames.data();
-			createInfo.enabledExtensionCount = static_cast<unsigned int>(enabledExtensionNames.size());
-			createInfo.ppEnabledExtensionNames = enabledExtensionNames.data();
+			createInfo.enabledLayerCount = enabledLayerNames.GetSize();
+			createInfo.ppEnabledLayerNames = enabledLayerNames.GetData();
+			createInfo.enabledExtensionCount = enabledExtensionNames.GetSize();
+			createInfo.ppEnabledExtensionNames = enabledExtensionNames.GetData();
 		}
 
 		COCKTAIL_VK_CHECK(vkCreateInstance(&createInfo, nullptr, &mInstance));
@@ -362,8 +362,8 @@ namespace Ck::Vulkan
 		unsigned int physicalDeviceCount = 0;
 		COCKTAIL_VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &physicalDeviceCount, nullptr));
 
-		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
-		COCKTAIL_VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &physicalDeviceCount, physicalDevices.data()));
+		Array<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
+		COCKTAIL_VK_CHECK(vkEnumeratePhysicalDevices(mInstance, &physicalDeviceCount, physicalDevices.GetData()));
 
 		unsigned int bestScore = 0;
 		for (VkPhysicalDevice physicalDevice : physicalDevices)
@@ -384,7 +384,7 @@ namespace Ck::Vulkan
 		const bool hasPhysicalDeviceFeatures2 = mExtensionManager.IsSupportedInstanceExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
 		const float priorities = 1.f;
-		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		Array<VkDeviceQueueCreateInfo> queueCreateInfos;
 		for (unsigned int family : mQueueFamilyContext->FindFamilyIndexes(true))
 		{
 			VkDeviceQueueCreateInfo queueCreateInfo{ VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO, nullptr };
@@ -393,7 +393,7 @@ namespace Ck::Vulkan
 			queueCreateInfo.queueCount = 1;
 			queueCreateInfo.pQueuePriorities = &priorities;
 
-			queueCreateInfos.push_back(queueCreateInfo);
+			queueCreateInfos.Add(queueCreateInfo);
 		}
 
 		for (Renderer::RenderDeviceExtension extension : Enum<Renderer::RenderDeviceExtension>::Values)
@@ -437,19 +437,19 @@ namespace Ck::Vulkan
 		if (physicalDeviceFeatures.features.wideLines == VK_FALSE)
 			mSupportedFeatures[RenderDeviceFeature::WideLine] = false;
 
-		std::vector<const char*> enabledExtensionNames = mExtensionManager.GetDeviceExtensions();
+		Array<const char*> enabledExtensionNames = mExtensionManager.GetDeviceExtensions();
 		VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, nullptr };
 		{
 			if (hasPhysicalDeviceFeatures2)
 				Chain(createInfo, physicalDeviceFeatures);
 
 			createInfo.flags = 0;
-			createInfo.queueCreateInfoCount = static_cast<unsigned int>(queueCreateInfos.size());
-			createInfo.pQueueCreateInfos = queueCreateInfos.data();
+			createInfo.queueCreateInfoCount = queueCreateInfos.GetSize();
+			createInfo.pQueueCreateInfos = queueCreateInfos.GetData();
 			createInfo.enabledLayerCount = 0;
 			createInfo.ppEnabledLayerNames = nullptr;
-			createInfo.enabledExtensionCount = static_cast<unsigned int>(enabledExtensionNames.size());
-			createInfo.ppEnabledExtensionNames = enabledExtensionNames.data();
+			createInfo.enabledExtensionCount = enabledExtensionNames.GetSize();
+			createInfo.ppEnabledExtensionNames = enabledExtensionNames.GetData();
 			createInfo.pEnabledFeatures = hasPhysicalDeviceFeatures2 ? nullptr : &physicalDeviceFeatures.features;
 		}
 

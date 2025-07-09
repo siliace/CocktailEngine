@@ -25,12 +25,12 @@ namespace Ck::Detail::Win32
 
 	std::size_t MonitorService::GetMonitorCount() const
 	{
-		return mMonitors.size();
+		return mMonitors.GetSize();
 	}
 
 	std::shared_ptr<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
 	{
-		return mMonitors.at(index);
+		return mMonitors.At(index);
 	}
 
 	std::shared_ptr<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
@@ -57,7 +57,8 @@ namespace Ck::Detail::Win32
 
 		if (monitor->IsPrimary())
 			self->mPrimaryMonitor = monitor;
-		self->mMonitors.push_back(std::move(monitor));
+
+		self->mMonitors.Add(std::move(monitor));
 
 		return TRUE;
 	}

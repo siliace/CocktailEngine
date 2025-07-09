@@ -7,7 +7,7 @@ namespace Ck::Vulkan
 {
 	namespace
 	{
-		VkAttachmentReference2KHR CreateAttachmentDescription2(std::vector<VkAttachmentDescription2KHR>& attachmentDescriptions, const PixelFormat& format, Renderer::RasterizationSamples samples, VkAttachmentLoadOp loadOp, bool presentable)
+		VkAttachmentReference2KHR CreateAttachmentDescription2(Array<VkAttachmentDescription2KHR>& attachmentDescriptions, const PixelFormat& format, Renderer::RasterizationSamples samples, VkAttachmentLoadOp loadOp, bool presentable)
 		{
 			const bool isMultisample = samples != Renderer::RasterizationSamples::e1;
 
@@ -75,7 +75,7 @@ namespace Ck::Vulkan
 			}
 
 			VkAttachmentReference2KHR attachmentReference{ VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2_KHR, nullptr };
-			attachmentReference.attachment = static_cast<unsigned int>(attachmentDescriptions.size());
+			attachmentReference.attachment = attachmentDescriptions.GetSize();
 			if (format.IsColor())
 			{
 				attachmentReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -87,7 +87,7 @@ namespace Ck::Vulkan
 				attachmentReference.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 			}
 
-			attachmentDescriptions.push_back(attachmentDescription);
+			attachmentDescriptions.Add(attachmentDescription);
 
 			return attachmentReference;
 		}
@@ -122,9 +122,9 @@ namespace Ck::Vulkan
 
 			if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::RenderPass2))
 			{
-				std::vector<VkAttachmentDescription2KHR> attachmentDescriptions;
-				std::vector<VkAttachmentReference2KHR> multisampleColorAttachmentReferences;
-				std::vector<VkAttachmentReference2KHR> colorAttachmentReferences;
+				Array<VkAttachmentDescription2KHR> attachmentDescriptions;
+				Array<VkAttachmentReference2KHR> multisampleColorAttachmentReferences;
+				Array<VkAttachmentReference2KHR> colorAttachmentReferences;
 				VkAttachmentReference2KHR multiSampleDephtStencilAttachmentReference;
 				VkAttachmentReference2KHR dephtStencilAttachmentReference;
 
@@ -147,12 +147,12 @@ namespace Ck::Vulkan
 
 					if (mSamples != Renderer::RasterizationSamples::e1)
 					{
-						multisampleColorAttachmentReferences.push_back(
+						multisampleColorAttachmentReferences.Add(
 							CreateAttachmentDescription2(attachmentDescriptions, depthStencilFormat, mSamples, loadOp, false)
 						);
 					}
 
-					colorAttachmentReferences.push_back(
+					colorAttachmentReferences.Add(
 						CreateAttachmentDescription2(attachmentDescriptions, depthStencilFormat, Renderer::RasterizationSamples::e1, loadOp, createInfo.Presentable)
 					);
 				}
@@ -179,19 +179,19 @@ namespace Ck::Vulkan
 					subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 					subpassDescription.inputAttachmentCount = 0;
 					subpassDescription.pInputAttachments = nullptr;
-					subpassDescription.colorAttachmentCount = static_cast<unsigned int>(colorAttachmentReferences.size());
+					subpassDescription.colorAttachmentCount = colorAttachmentReferences.GetSize();
 					if (mSamples != Renderer::RasterizationSamples::e1)
 					{
 						if (mResolveDepthStencil)
 							Chain(subpassDescription, resolveDepthStencil);
 
-						subpassDescription.pColorAttachments = multisampleColorAttachmentReferences.data();
-						subpassDescription.pResolveAttachments = colorAttachmentReferences.data();
+						subpassDescription.pColorAttachments = multisampleColorAttachmentReferences.GetData();
+						subpassDescription.pResolveAttachments = colorAttachmentReferences.GetData();
 						subpassDescription.pDepthStencilAttachment = &multiSampleDephtStencilAttachmentReference;
 					}
 					else
 					{
-						subpassDescription.pColorAttachments = colorAttachmentReferences.data();
+						subpassDescription.pColorAttachments = colorAttachmentReferences.GetData();
 						subpassDescription.pResolveAttachments = nullptr;
 						subpassDescription.pDepthStencilAttachment = &dephtStencilAttachmentReference;
 					}
@@ -203,8 +203,8 @@ namespace Ck::Vulkan
 				VkRenderPassCreateInfo2KHR vkCreateInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2_KHR, nullptr };
 				{
 					vkCreateInfo.flags = 0;
-					vkCreateInfo.attachmentCount = static_cast<unsigned int>(attachmentDescriptions.size());
-					vkCreateInfo.pAttachments = attachmentDescriptions.data();
+					vkCreateInfo.attachmentCount = attachmentDescriptions.GetSize();
+					vkCreateInfo.pAttachments = attachmentDescriptions.GetData();
 					vkCreateInfo.subpassCount = 1;
 					vkCreateInfo.pSubpasses = &subpassDescription;
 					vkCreateInfo.dependencyCount = 0;

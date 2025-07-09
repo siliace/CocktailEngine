@@ -4,10 +4,10 @@
 
 namespace Ck
 {
-	Shape::Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const std::vector<std::shared_ptr<Material>>& materials):
+	Shape::Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials):
 		mMesh(std::move(mesh))
 	{
-		mMaterials.reserve(materials.size());
+		mMaterials.reserve(materials.GetSize());
 
 		mVertexBuffer = graphicEngine.CreateVertexBuffer(mMesh->GetVertices());
 		if (mMesh->IsIndexed())
@@ -20,7 +20,7 @@ namespace Ck
 			std::shared_ptr<Material> material = materials[materialIndex];
 
 			mMaterials.insert(material);
-			mGeometries[material.get()].push_back({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
+			mGeometries[material.get()].Add({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
 		}
 	}
 
@@ -44,7 +44,7 @@ namespace Ck
 		return mMaterials;
 	}
 
-	const std::vector<Shape::Geometry>& Shape::GetGeometries(const Material* material) const
+	const Array<Shape::Geometry>& Shape::GetGeometries(const Material* material) const
 	{
 		assert(material != nullptr);
 		return mGeometries.at(material);
@@ -83,7 +83,7 @@ namespace Ck
 			}
 		}
 
-		mShapes.emplace_back(std::move(shape));
+		mShapes.Add(std::move(shape));
 	}
 
 	void SceneNode::AddToQueue(RenderQueue& queue, const Camera& camera)

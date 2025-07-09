@@ -51,13 +51,13 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::vector<unsigned char> ValidationCache::GetCacheData() const
+	ByteArray ValidationCache::GetCacheData() const
 	{
 		std::size_t cacheDataSize;
 		COCKTAIL_VK_CHECK(vkGetValidationCacheDataEXT(mRenderDevice->GetHandle(), mHandle, &cacheDataSize, nullptr));
 
-		std::vector<unsigned char> cacheData(cacheDataSize);
-		COCKTAIL_VK_CHECK(vkGetValidationCacheDataEXT(mRenderDevice->GetHandle(), mHandle, &cacheDataSize, cacheData.data()));
+		ByteArray cacheData(cacheDataSize);
+		COCKTAIL_VK_CHECK(vkGetValidationCacheDataEXT(mRenderDevice->GetHandle(), mHandle, &cacheDataSize, cacheData.GetData()));
 
 		return cacheData;
 	}

@@ -51,13 +51,13 @@ namespace Ck
 			framebufferCreateInfo.DepthResolveMode = Renderer::ResolveMode::Average;
 			framebufferCreateInfo.StencilResolveMode = Renderer::ResolveMode::SampleZero;
 
-			mFramebuffers.push_back(renderDevice->CreateFramebuffer(framebufferCreateInfo));
+			mFramebuffers.Add(renderDevice->CreateFramebuffer(framebufferCreateInfo));
 		}
 	}
 
 	Renderer::Framebuffer* HeadlessSceneViewer::AcquireNextFramebuffer(Renderer::RenderContext&) const
 	{
-		mCurrentFramebuffer = (mCurrentFramebuffer + 1) % mFramebuffers.size();
+		mCurrentFramebuffer = (mCurrentFramebuffer + 1) % mFramebuffers.GetSize();
 		return mFramebuffers[mCurrentFramebuffer].get();
 	}
 }

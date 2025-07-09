@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		std::vector<BlockMember> Members;
+		Array<BlockMember> Members;
 
 		/**
 		 * \brief

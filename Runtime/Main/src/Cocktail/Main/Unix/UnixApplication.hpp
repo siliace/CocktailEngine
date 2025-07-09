@@ -20,13 +20,13 @@ namespace Ck::Main::Unix
 	     * \brief 
 	     * \return 
 	     */
-	    const std::vector<std::string>& GetArgv() const override;
+	    const Array<std::string>& GetArgv() const override;
 
 	    bool IsDebuggerPresent() const override;
 
     private:
 
-        std::vector<std::string> mArgv;
+        Array<std::string> mArgv;
     };
 }
 

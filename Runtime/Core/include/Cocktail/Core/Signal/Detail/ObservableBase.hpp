@@ -1,9 +1,9 @@
 #ifndef COCKTAIL_CORE_SIGNAL_DETAIL_OBSERVABLEBASE_HPP
 #define COCKTAIL_CORE_SIGNAL_DETAIL_OBSERVABLEBASE_HPP
 
-#include <vector>
 #include <mutex>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Signal/Connection.hpp>
 
 namespace Ck::Detail
@@ -76,7 +76,7 @@ namespace Ck::Detail
 		{
 			std::lock_guard<Lockable> lg(mMutex);
 			Connection connection = signal.Connect(std::forward<Callback>(callback));
-			mConnections.emplace_back(std::move(connection));
+			mConnections.Add(std::move(connection));
 		}
 
 	protected:
@@ -87,13 +87,13 @@ namespace Ck::Detail
 		void DisconnectAll()
 		{
 			std::lock_guard<Lockable> lg(mMutex);
-			mConnections.clear();
+			mConnections.Clear();
 		}
 
 	private:
 
 		Lockable mMutex;
-		std::vector<Connection> mConnections;
+		Array<Connection> mConnections;
 	};
 }
 

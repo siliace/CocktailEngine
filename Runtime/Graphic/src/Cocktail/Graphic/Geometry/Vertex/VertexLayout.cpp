@@ -58,7 +58,7 @@ namespace Ck
 	{
 		assert(!(mUsageMask & semantic));
 
-		VertexAttribute& attribute = mAttributes.emplace_back(
+		VertexAttribute& attribute = mAttributes.Emplace(
 			VertexAttribute(semantic, dataType, GetStride(), elementCount, arrayLength, normalized)
 		);
 
@@ -111,7 +111,7 @@ namespace Ck
 		return mDivisor;
 	}
 
-	const std::vector<VertexAttribute>& VertexLayout::GetAttributes() const
+	const Array<VertexAttribute>& VertexLayout::GetAttributes() const
 	{
 		return mAttributes;
 	}

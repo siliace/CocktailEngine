@@ -3,6 +3,8 @@
 
 #include <volk.h>
 
+#include <Cocktail/Core/Utility/ByteArray.hpp>
+
 namespace Ck::Vulkan
 {
 	class RenderDevice;
@@ -69,7 +71,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::vector<unsigned char> GetCacheData() const;
+		ByteArray GetCacheData() const;
 
 		/**
 		 * \brief 

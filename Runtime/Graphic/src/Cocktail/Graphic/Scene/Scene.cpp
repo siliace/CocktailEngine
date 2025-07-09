@@ -11,7 +11,7 @@ namespace Ck
 		explicit FrustumCullAction(const Frustum<float>& frustum) :
 			mFrustum(frustum)
 		{
-			mRenderables.reserve(1024);
+			mRenderables.Reserve(1024);
 		}
 
 		void ProcessSceneNode(SceneNode* sceneNode)
@@ -38,14 +38,14 @@ namespace Ck
 
 				if (mFrustum.Intersect(obb) != Intersection::Outside || obb.Intersect(mFrustum) != Intersection::Outside)
 				{
-					mRenderables.push_back(sceneNode);
+					mRenderables.Add(sceneNode);
 					for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
 						ProcessSceneNode(childSceneNode.get());
 				}
 			}
 		}
 
-		const std::vector<Renderable*>& GetRenderables() const
+		const Array<Renderable*>& GetRenderables() const
 		{
 			return mRenderables;
 		}
@@ -53,7 +53,7 @@ namespace Ck
 	private:
 
 		Frustum<float> mFrustum;
-		std::vector<Renderable*> mRenderables;
+		Array<Renderable*> mRenderables;
 	};
 
 	Scene::Scene(std::shared_ptr<GraphicEngine> graphicEngine) :
@@ -71,34 +71,30 @@ namespace Ck
 
 	void Scene::AddCamera(std::unique_ptr<Camera> camera)
 	{
-		mCameras.push_back(std::move(camera));
-		mOnCameraAdded.Emit(mCameras.back().get());
+		mOnCameraAdded.Emit(
+			mCameras.Emplace(std::move(camera)).get()
+		);
 	}
 
 	void Scene::RemoveCamera(const Camera* camera)
 	{
-		auto it = std::find_if(mCameras.begin(), mCameras.end(), [&](const std::unique_ptr<Camera>& existingCamera) {
-			return existingCamera.get() == camera;
+		mCameras.FilterInPlace([&](const std::unique_ptr<Camera>& sceneCamera) {
+			return sceneCamera.get() == camera;
 		});
-
-		if (it != mCameras.end())
-			mCameras.erase(it);
 	}
 
 	void Scene::AddLight(std::unique_ptr<Light> light)
 	{
-		mLights.push_back(std::move(light));
-		mOnLightAdded.Emit(mLights.back().get());
+		mOnLightAdded.Emit(
+			mLights.Emplace(std::move(light)).get()
+		);
 	}
 
 	void Scene::RemoveLight(const Light* light)
 	{
-		auto it = std::find_if(mLights.begin(), mLights.end(), [&](const std::unique_ptr<Light>& existingLight) {
-			return existingLight.get() == light;
+		mLights.FilterInPlace([&](const std::unique_ptr<Light>&sceneLight) {
+			return sceneLight.get() == light;
 		});
-
-		if (it != mLights.end())
-			mLights.erase(it);
 	}
 
 	std::shared_ptr<SceneNode> Scene::CreateSceneNode()
@@ -137,7 +133,7 @@ namespace Ck
 		return mOnSceneNodeAdded;
 	}
 
-	std::vector<Renderable*> Scene::CollectRenderables(const Camera& camera) const
+	Array<Renderable*> Scene::CollectRenderables(const Camera& camera) const
 	{
 		FrustumCullAction action(camera.ComputeFrustum());
 		action.ProcessSceneNode(mSceneGraph->GetRoot().get());
@@ -145,19 +141,24 @@ namespace Ck
 		return action.GetRenderables();
 	}
 
-	std::vector<Light*> Scene::CollectLights(const Camera& camera) const
+	Array<Light*> Scene::CollectLights(const Camera& camera) const
 	{
-		std::vector<Light*> lights;
+		Array<Light*> lights;
+		lights.Reserve(mLights.GetSize());
+
 		Frustum<float> cameraFrustum = camera.ComputeFrustum();
-		for (const std::unique_ptr<Light>& light : mLights)
+
+		for (unsigned int i = 0; i < mLights.GetSize(); i++)
 		{
+			Light* light = mLights[i].get();
+
 			if (NearlyEqual(light->GetIntensity(), 0.f))
 				continue;
 
 			if (light->FrustumCull(cameraFrustum) == Intersection::Outside)
 				continue;
 
-			lights.push_back(light.get());
+			lights.Add(light);
 		}
 
 		return lights;

@@ -1,11 +1,11 @@
 #ifndef COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREESEQUENCE_HPP
 #define COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREESEQUENCE_HPP
 
-#include <vector>
-
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/TranslatorCast.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/PropertyTreeNode.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/PropertyTreePath.hpp>
+
 namespace Ck
 {
     template <typename Key, typename Data>
@@ -42,7 +42,7 @@ namespace Ck
             std::size_t index = GetSize();
             Key keyIndex = TranslatorCast<Key>(index);
             std::unique_ptr<Node> clone = static_cast<const Node&>(node).Clone(this, keyIndex);
-            Node* inserted = mChildren.emplace_back(std::move(clone)).get();
+            Node* inserted = mChildren.Emplace(std::move(clone)).get();
             return static_cast<NodeType<Key, Data>*>(inserted);
         }
 
@@ -83,7 +83,7 @@ namespace Ck
         {
             Path p(path);
             std::size_t index = p.template Reduce<std::size_t>();
-            if (index >= mChildren.size())
+            if (index >= mChildren.GetSize())
                 throw std::runtime_error("");
 
             const Node* child = mChildren[index].get();
@@ -143,7 +143,7 @@ namespace Ck
          */
         bool IsEmpty() const
         {
-            return mChildren.empty();
+            return mChildren.IsEmpty();
         }
 
 	    /**
@@ -152,7 +152,7 @@ namespace Ck
          */
         std::size_t GetSize() const
         {
-            return mChildren.size();
+            return mChildren.GetSize();
         }
 
         /**
@@ -162,7 +162,7 @@ namespace Ck
          */
         Node& At(std::size_t index)
         {
-            return *mChildren.at(index);
+            return *mChildren.At(index);
         }
 
         /**
@@ -172,7 +172,7 @@ namespace Ck
          */
         const Node& At(std::size_t index) const
         {
-            return *mChildren.at(index);
+            return *mChildren.At(index);
         }
 
         /**
@@ -242,7 +242,7 @@ namespace Ck
 
     private:
 
-        std::vector<std::unique_ptr<Node>> mChildren;
+        Array<std::unique_ptr<Node>> mChildren;
     };
 }
 

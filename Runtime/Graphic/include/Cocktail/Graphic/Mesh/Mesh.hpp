@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Math/Volume/Box.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
@@ -60,7 +61,7 @@ namespace Ck
 		 * \param indices 
 		 * \param subMeshes 
 		 */
-		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, std::vector<SubMesh> subMeshes);
+		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Array<SubMesh> subMeshes);
 
 		/**
 		 * \brief
@@ -92,7 +93,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::vector<SubMesh>& GetSubMeshes() const;
+		const Array<SubMesh>& GetSubMeshes() const;
 
 		/**
 		 * \brief 
@@ -115,7 +116,7 @@ namespace Ck
 
 		std::shared_ptr<VertexArray> mVertices;
 		std::shared_ptr<IndexArray> mIndices;
-		std::vector<SubMesh> mSubMeshes;
+		Array<SubMesh> mSubMeshes;
 		std::unordered_set<unsigned int> mMaterialIndices;
 		Box<float> mBoundingBox;
 	};

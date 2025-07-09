@@ -3,8 +3,8 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Export.hpp>
 
 namespace Ck
@@ -37,7 +37,7 @@ namespace Ck
          * \param hostname 
          * \return 
          */
-        static std::vector<std::unique_ptr<IpAddress>> Resolve(const std::string& hostname);
+        static Array<std::unique_ptr<IpAddress>> Resolve(const std::string& hostname);
 
         /**
          * \brief Destructor
