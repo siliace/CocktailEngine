@@ -58,6 +58,12 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 * \return 
+		 */
+		const Array<std::shared_ptr<DescriptorSetLayout>>& GetDescriptorSetLayouts();
+
+		/**
+		 * \brief 
 		 * \param set 
 		 * \return 
 		 */

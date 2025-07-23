@@ -90,9 +90,7 @@ namespace Ck
 			void ResizeAllocation(SizeType currentSize, SizeType nextSize, std::size_t elementSize)
 			{
 				if (mData || nextSize)
-				{
 					mData = std::realloc(mData, nextSize * elementSize);
-				}
 			}
 
 			SizeType GetInitialCapacity() const
@@ -130,12 +128,7 @@ namespace Ck
 			void ResizeAllocation(SizeType currentSize, SizeType nextSize, std::size_t elementSize)
 			{
 				T* block = static_cast<T*>(std::malloc(nextSize * elementSize));
-				for (SizeType i = 0; i < currentSize; ++i)
-				{
-					T* element = GetAllocation() + i;
-					new (block + i) T(std::move(*element));
-					element->~T();
-				}
+				MoveRange(currentSize, block, GetAllocation());
 
 				std::free(Raw::mData);
 				Raw::mData = block;

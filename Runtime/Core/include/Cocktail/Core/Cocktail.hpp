@@ -179,6 +179,17 @@ namespace Ck
 			new (&elements[i]) T(std::forward<TArgs>(args)...);
 	}
 
+	template <typename T, typename TSizeType>
+	void MoveRange(TSizeType size, T* destination, T* source)
+	{
+		for (TSizeType i = 0; i < size; ++i)
+		{
+			T& element = source[i];
+			new (&destination[i]) T(std::move(element));
+			element.~T();
+		}
+	}
+
 	template <typename T>
 	void Destroy(T* element)
 	{

@@ -102,6 +102,11 @@ namespace Ck::Vulkan
 		return mDescriptorSetLayouts[set];
 	}
 
+	const Array<std::shared_ptr<DescriptorSetLayout>>& PipelineLayout::GetDescriptorSetLayouts()
+	{
+		return mDescriptorSetLayouts;
+	}
+
 	std::shared_ptr<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
 	{
 		if (set >= mUpdateTemplates.GetSize())

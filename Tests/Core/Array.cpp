@@ -219,6 +219,33 @@ TEST_CASE("Filter an array", "[Array]")
     }
 }
 
+TEST_CASE("Reduce an array", "[Array]")
+{
+    Ck::Array<int> array = { 1, 2, 3, 4 };
+    int sum = array.Reduce(0, [](int current, int value) {
+        return current + value;
+    });
+
+    REQUIRE(sum == 10);
+}
+
+TEST_CASE("Reverse an array", "[Array]")
+{
+    Ck::Array<int> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("To another array")
+    {
+        Ck::Array<int> reversed = array.Reverse();
+        REQUIRE(reversed == Ck::Array<int>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
+    }
+
+    SECTION("In place")
+    {
+        array.ReverseInPlace();
+        REQUIRE(array == Ck::Array<int>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
+    }
+}
+
 TEST_CASE("Slice an array", "[Array]")
 {
     Ck::Array<int> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };

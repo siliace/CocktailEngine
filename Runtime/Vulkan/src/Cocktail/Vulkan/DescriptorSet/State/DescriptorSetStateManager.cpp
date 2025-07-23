@@ -91,22 +91,24 @@ namespace Ck::Vulkan
 		mDescriptorSetAllocator->Reset();
 	}
 
-	unsigned int DescriptorSetStateManager::CompileDescriptors(std::shared_ptr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
+	unsigned int DescriptorSetStateManager::CompileDescriptors(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
 	{
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
 		unsigned int descriptorBufferCount = 0;
 
-		for (unsigned int i = 0; i < layout->GetBindingCount(); i++)
+		const auto& layoutBindings = descriptorSetLayout->GetBindings();
+
+		for (unsigned int i = 0; i < layoutBindings.GetSize(); i++)
 		{
 			if (!IsBindingDirty(i))
 				continue;
 
-			const DescriptorSetLayoutBinding* layoutBinding = layout->GetBinding(i);
+			const DescriptorSetLayoutBinding& layoutBinding = layoutBindings[i];
 
-			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
+			for (unsigned arrayElement = 0; arrayElement < layoutBinding.DescriptorCount; arrayElement++)
 			{
-				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding.Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
 				if (!descriptorState.Dirty)
 					continue;
 
@@ -165,18 +167,16 @@ namespace Ck::Vulkan
 		return descriptorCount;
 	}
 
-	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> layout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors)
+	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors)
 	{
 		unsigned int k = 0;
 		const std::size_t elementStride = descriptorUpdateTemplate->GetElementStride();
 
-		for (unsigned int i = 0; i < layout->GetBindingCount(); i++)
+		for (const DescriptorSetLayoutBinding& layoutBinding : descriptorSetLayout->GetBindings())
 		{
-			const DescriptorSetLayoutBinding* layoutBinding = layout->GetBinding(i);
-
-			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
+			for (unsigned arrayElement = 0; arrayElement < layoutBinding.DescriptorCount; arrayElement++)
 			{
-				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptors compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding.Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptors compilation");
 
 				unsigned char* descriptor = descriptors + k * elementStride;
 				switch (descriptorState.Type)
@@ -214,10 +214,10 @@ namespace Ck::Vulkan
 		}
 	}
 
-	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSet(std::shared_ptr<DescriptorSetLayout> setLayout)
+	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSet(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout)
 	{
 		DescriptorSetCreateInfo createInfo;
-		createInfo.Layout = setLayout;
+		createInfo.Layout = descriptorSetLayout;
 
 		mBindingDirtyFlags = 0;
 
@@ -226,19 +226,17 @@ namespace Ck::Vulkan
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
 		unsigned int descriptorBufferCount = 0;
-		VkDescriptorImageInfo* imagesInfo = COCKTAIL_STACK_ALLOC(VkDescriptorImageInfo, setLayout->GetDescriptorCount());
-		VkDescriptorBufferInfo* buffersInfo = COCKTAIL_STACK_ALLOC(VkDescriptorBufferInfo, setLayout->GetDescriptorCount());
-		VkWriteDescriptorSet* writes = COCKTAIL_STACK_ALLOC(VkWriteDescriptorSet, setLayout->GetDescriptorCount());
+		VkDescriptorImageInfo* imagesInfo = COCKTAIL_STACK_ALLOC(VkDescriptorImageInfo, descriptorSetLayout->GetDescriptorCount());
+		VkDescriptorBufferInfo* buffersInfo = COCKTAIL_STACK_ALLOC(VkDescriptorBufferInfo, descriptorSetLayout->GetDescriptorCount());
+		VkWriteDescriptorSet* writes = COCKTAIL_STACK_ALLOC(VkWriteDescriptorSet, descriptorSetLayout->GetDescriptorCount());
 
-		for (unsigned int i = 0; i < setLayout->GetBindingCount(); i++)
+		for (const DescriptorSetLayoutBinding& layoutBinding : descriptorSetLayout->GetBindings())
 		{
-			const DescriptorSetLayoutBinding* layoutBinding = setLayout->GetBinding(i);
-
-			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
+			for (unsigned arrayElement = 0; arrayElement < layoutBinding.DescriptorCount; arrayElement++)
 			{
-				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding.Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
 
-				if (descriptorState.Type != layoutBinding->Type)
+				if (descriptorState.Type != layoutBinding.Type)
 					throw std::runtime_error("Incoherence between descriptor set layout binding type and descriptor state type");
 
 				VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, nullptr};
@@ -312,13 +310,11 @@ namespace Ck::Vulkan
 		const unsigned int descriptorCount = descriptorSetLayout->GetDescriptorCount();
 		const std::size_t elementStride = std::max(sizeof(VkDescriptorBufferInfo), sizeof(VkDescriptorImageInfo));
 		unsigned char* descriptors = COCKTAIL_STACK_ALLOC(unsigned char, descriptorCount * elementStride);
-		for (unsigned int i = 0; i < descriptorSetLayout->GetBindingCount(); i++)
+		for (const DescriptorSetLayoutBinding& layoutBinding : descriptorSetLayout->GetBindings())
 		{
-			const DescriptorSetLayoutBinding* layoutBinding = descriptorSetLayout->GetBinding(i);
-
-			for (unsigned arrayElement = 0; arrayElement < layoutBinding->DescriptorCount; arrayElement++)
+			for (unsigned arrayElement = 0; arrayElement < layoutBinding.DescriptorCount; arrayElement++)
 			{
-				DescriptorState& descriptorState = FindDescriptorState(layoutBinding->Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
+				DescriptorState& descriptorState = FindDescriptorState(layoutBinding.Binding, arrayElement).GetOrThrow<std::runtime_error>("Missing state in descriptor set compilation");
 
 				unsigned char* descriptor = descriptors + k * elementStride;
 				switch (descriptorState.Type)

@@ -103,24 +103,16 @@ namespace Ck::Vulkan
 		return mSupportPushDescriptor;
 	}
 
-	unsigned int DescriptorSetLayout::GetBindingCount() const
-	{
-		return mBindings.GetSize();
-	}
-
 	unsigned int DescriptorSetLayout::GetDescriptorCount() const
 	{
-		unsigned int descriptorCount = 0;
-		for (const DescriptorSetLayoutBinding& binding : mBindings)
-			descriptorCount += binding.DescriptorCount;
-
-		return descriptorCount;
+		return mBindings.Reduce(0, [](unsigned int current, const DescriptorSetLayoutBinding& binding) {
+			return current + binding.DescriptorCount;
+		});
 	}
 
-	const DescriptorSetLayoutBinding* DescriptorSetLayout::GetBinding(unsigned int index) const
+	const Array<DescriptorSetLayoutBinding>& DescriptorSetLayout::GetBindings() const
 	{
-		assert(index < mBindings.GetSize());
-		return &mBindings[index];
+		return mBindings;
 	}
 
 	DescriptorSetLayoutSignature DescriptorSetLayout::ToSignature() const

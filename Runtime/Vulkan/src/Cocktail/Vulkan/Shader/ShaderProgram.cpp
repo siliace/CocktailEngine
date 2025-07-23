@@ -205,10 +205,8 @@ namespace Ck::Vulkan
 		{
 			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
 
-			for (unsigned int j = 0; j < descriptorSetLayout->GetBindingCount(); j++)
+			for (const DescriptorSetLayoutBinding& binding : descriptorSetLayout->GetBindings())
 			{
-				const DescriptorSetLayoutBinding* binding = descriptorSetLayout->GetBinding(j);
-
 				// Get name of the uniform, keep the first one found.
 				std::string name;
 				Array<BlockMember> members;
@@ -218,7 +216,7 @@ namespace Ck::Vulkan
 					if (!shader)
 						continue;
 
-					Optional<DescriptorSetBindingInfo> bindingInfo = shader->GetDescriptorSetBindingInfo(i, binding->Binding);
+					Optional<DescriptorSetBindingInfo> bindingInfo = shader->GetDescriptorSetBindingInfo(i, binding.Binding);
 					if (bindingInfo.IsEmpty())
 						continue;
 
@@ -227,7 +225,7 @@ namespace Ck::Vulkan
 					break;
 				}
 
-				mUniformSlots.Emplace(new UniformSlot(mType, members, std::move(name), *binding, i));
+				mUniformSlots.Emplace(new UniformSlot(mType, members, std::move(name), binding, i));
 			}
 		}
 	}

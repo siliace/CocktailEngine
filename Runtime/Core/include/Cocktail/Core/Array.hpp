@@ -11,15 +11,12 @@ namespace Ck
     CK_DECLARE_EXCEPTION_BASE(ArrayEmpty, "Array is empty", std::runtime_error);
     CK_DECLARE_EXCEPTION_BASE(ArrayOutOfRange, "Array subscript has been out of range", std::runtime_error);
 
-	using DefaultAllocator = SizedHeapAllocator<32>;
-	using DefaultAllocator64 = SizedHeapAllocator<64>;
-
     /**
      * \brief Template class implementing a dynamic array similar to std::vector.
      * \tparam E The element type stored in the array.
      * \tparam TAllocator The allocator type used for memory management.
      */
-    template <typename E, typename TAllocator = DefaultAllocator>
+    template <typename E, typename TAllocator = SizedHeapAllocator<32>>
     class Array
     {
         template <typename, typename>
@@ -956,6 +953,44 @@ namespace Ck
         }
 
         /**
+         * \brief Applies a reduction operation to all elements in the array.
+         *
+         * This method accumulates a value by successively applying a binary function
+         * to each element of the array, starting from an initial value.
+         *
+         * \tparam T The type of the accumulated value (the result).
+         * \tparam TFunction The type of the reduction function.
+         *         It must be callable with the signature:
+         *         (T accumulated, const ElementType& current) -> T
+         *
+         * \param initialValue The starting value for the reduction process.
+         * \param function A binary function that combines the accumulated value with each
+         *        array element. It must return the updated accumulated value.
+         *
+         * \return The final accumulated result after applying the reduction function to all elements.
+         *
+         * \note The iteration order is the same as the element order in the array.
+         *
+         * \warning The `function` should ideally be associative and side-effect free to ensure predictable behavior.
+         *
+         * \example
+         * Array<int> array = {1, 2, 3, 4};
+         * int sum = array.Reduce(0, [](int acc, int value) {
+         *     return acc + value;
+         * });
+         * // sum == 10
+         */
+        template <typename T, typename TFunction>
+        T Reduce(T initialValue, TFunction function) const
+        {
+            ForEach([&](const ElementType& element) {
+                initialValue = function(std::move(initialValue), element);
+            });
+
+            return initialValue;
+        }
+
+        /**
          * \brief Returns a reversed copy of the array.
          * \return New reversed array.
          */
@@ -1268,6 +1303,13 @@ namespace Ck
         SizeType mCapacity;
         ElementAllocatorType mAllocator;
     };
+
+    /**
+     * \brief 
+     * \tparam E 
+     */
+    template <typename E>
+    using Array64 = Array<E, SizedHeapAllocator<64>>;
 }
 
 #endif // COCKTAIL_CORE_ARRAY_HPP
