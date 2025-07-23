@@ -10,9 +10,40 @@
 
 namespace Ck::Vulkan
 {
+	namespace
+	{
+		Uint64 ComputeBindingStateHash(const Array<DescriptorState>& descriptorStates)
+		{
+			Uint64 hash = 0;
+			for (const DescriptorState& descriptorState : descriptorStates)
+			{
+				Uint64 localHash = 0;
+				HashCombine(localHash, descriptorState.Binding);
+				HashCombine(localHash, descriptorState.ArrayElement);
+				HashCombine(localHash, descriptorState.Type);
+
+				if (descriptorState.Type == Renderer::DescriptorType::UniformBuffer || descriptorState.Type == Renderer::DescriptorType::StorageBuffer)
+				{
+					HashCombine(localHash, descriptorState.BufferInfo.Buffer);
+					HashCombine(localHash, descriptorState.BufferInfo.Offset);
+					HashCombine(localHash, descriptorState.BufferInfo.Range);
+				}
+				else
+				{
+					HashCombine(localHash, descriptorState.ImageInfo.Sampler);
+					HashCombine(localHash, descriptorState.ImageInfo.TextureView);
+				}
+
+				hash = HashMerge(hash, localHash);
+			}
+
+			return hash;
+		}
+	}
+
 	DescriptorSetStateManager::DescriptorSetStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
 		mRenderDevice(std::move(renderDevice)),
-		mDescriptorSetAllocator(std::move(descriptorSetAllocator)),
+		mDescriptorSetAllocator(descriptorSetAllocator),
 		mBindingDirtyFlags(0)
 	{
 		/// Nothing
@@ -88,7 +119,6 @@ namespace Ck::Vulkan
 	{
 		mBindingStates.Clear();
 		mBindingDirtyFlags = 0;
-		mDescriptorSetAllocator->Reset();
 	}
 
 	unsigned int DescriptorSetStateManager::CompileDescriptors(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
@@ -221,7 +251,11 @@ namespace Ck::Vulkan
 
 		mBindingDirtyFlags = 0;
 
-		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
+		bool cached;
+		Uint64 hash = ComputeBindingStateHash(mBindingStates);
+		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
+		if (cached)
+			return descriptorSet;
 
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
@@ -304,7 +338,11 @@ namespace Ck::Vulkan
 
 		mBindingDirtyFlags = 0;
 
-		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo);
+		bool cached = false;
+		Uint64 hash = ComputeBindingStateHash(mBindingStates);
+		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
+		if (cached)
+			return descriptorSet;
 
 		unsigned int k = 0;
 		const unsigned int descriptorCount = descriptorSetLayout->GetDescriptorCount();
