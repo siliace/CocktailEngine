@@ -155,11 +155,11 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
-		 * \param layout 
+		 * \param descriptorSetLayout 
 		 * \param descriptorUpdateTemplate 
 		 * \param descriptors 
 		 */
-		void CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> layout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
+		void CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
 
 		/**
 		 * \brief 
