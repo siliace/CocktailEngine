@@ -34,7 +34,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkBindImageMemory(renderDevice.GetHandle(), texture.GetHandle(), GetChunk()->GetDeviceMemory()->GetHandle(), mOffset + mPadding));
 	}
 
-	std::shared_ptr<DeviceMemoryBlock> DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size)
+	DeviceMemoryBlock* DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size)
 	{
 		assert(mFree);
 
@@ -51,7 +51,7 @@ namespace Ck::Vulkan
 		if (mPtr)
 			ptr = static_cast<unsigned char*>(mPtr) + mSize;
 
-		return blockPool.Allocate(mChunk, mOffset + mSize, oldSize - mSize, ptr);
+		return blockPool.AllocateUnsafe(mChunk, mOffset + mSize, oldSize - mSize, ptr);
 	}
 
 	void DeviceMemoryBlock::Merge(const DeviceMemoryBlock& block)

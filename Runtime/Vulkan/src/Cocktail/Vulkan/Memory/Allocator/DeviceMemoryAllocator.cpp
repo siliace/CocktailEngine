@@ -11,6 +11,13 @@ namespace Ck::Vulkan
 		/// Nothing
 	}
 
+	DeviceMemoryAllocator::~DeviceMemoryAllocator()
+	{
+		mChunks.ForEach([&](DeviceMemoryChunk* chunk) {
+			mChunkPool.Recycle(chunk);
+		});
+	}
+
 	DeviceMemoryBlock* DeviceMemoryAllocator::Allocate(const AbstractTexture& texture)
 	{
 		bool dedicated;
@@ -42,13 +49,13 @@ namespace Ck::Vulkan
 
 	void DeviceMemoryAllocator::GarbageCollect(bool compact)
 	{
-		mChunks.FilterInPlace([](const std::shared_ptr<DeviceMemoryChunk>& chunk) {
+		mChunks.FilterInPlace([](const DeviceMemoryChunk* chunk) {
 			return chunk->IsFree();
 		});
 
 		if (compact)
 		{
-			mChunks.ForEach([](const std::shared_ptr<DeviceMemoryChunk>& chunk) {
+			mChunks.ForEach([](DeviceMemoryChunk* chunk) {
 				chunk->Compact();
 			});
 		}

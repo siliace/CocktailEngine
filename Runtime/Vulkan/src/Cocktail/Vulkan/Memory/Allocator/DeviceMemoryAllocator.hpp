@@ -24,6 +24,11 @@ namespace Ck::Vulkan
 		DeviceMemoryAllocator(std::shared_ptr<RenderDevice> renderDevice, std::size_t defaultChuckSize);
 
 		/**
+		 * \brief Destructor
+		 */
+		~DeviceMemoryAllocator();
+
+		/**
 		 * \brief 
 		 * \param texture
 		 * \return 
@@ -83,14 +88,14 @@ namespace Ck::Vulkan
 			DeviceMemoryBlock* block = nullptr;
 			if (resource)
 			{
-				std::shared_ptr<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, resource, memoryRequirements.size, memoryTypeIndex);
+				DeviceMemoryChunk* chunk = mChunkPool.AllocateUnsafe(mRenderDevice, mBlockPool, resource, memoryRequirements.size, memoryTypeIndex);
 				mChunks.Add(chunk);
 
 				block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
 			}
 			else
 			{
-				for (std::shared_ptr<DeviceMemoryChunk> chunk : mChunks)
+				for (DeviceMemoryChunk* chunk : mChunks)
 				{
 					if (chunk->IsDedicated())
 						continue;
@@ -103,7 +108,7 @@ namespace Ck::Vulkan
 
 				if (!block)
 				{
-					std::shared_ptr<DeviceMemoryChunk> chunk = mChunkPool.Allocate(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
+					DeviceMemoryChunk* chunk = mChunkPool.AllocateUnsafe(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
 					mChunks.Add(chunk);
 
 					block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
@@ -115,7 +120,7 @@ namespace Ck::Vulkan
 
 		std::shared_ptr<RenderDevice> mRenderDevice;
 		std::size_t mDefaultChuckSize;
-		Array<std::shared_ptr<DeviceMemoryChunk>> mChunks;
+		Array<DeviceMemoryChunk*> mChunks;
 		ObjectPool<DeviceMemoryChunk> mChunkPool;
 		ObjectPool<DeviceMemoryBlock> mBlockPool;
 	}; 

@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \return 
 		 */
-		std::shared_ptr<DeviceMemoryBlock> Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size);
+		DeviceMemoryBlock* Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size);
 
 		/**
 		 * \brief 

@@ -42,6 +42,11 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
+		 */
+		~DeviceMemoryChunk();
+
+		/**
+		 * \brief 
 		 * \param alignment 
 		 * \param size 
 		 */
@@ -98,7 +103,7 @@ namespace Ck::Vulkan
 		bool mDedicated;
 		void* mPtr;
 		std::shared_ptr<DeviceMemory> mDeviceMemory;
-		Array<std::shared_ptr<DeviceMemoryBlock>> mBlocks;
+		Array<DeviceMemoryBlock*> mBlocks;
 	};
 }
 

@@ -36,6 +36,13 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(nullptr, buffer);
 	}
 
+	DeviceMemoryChunk::~DeviceMemoryChunk()
+	{
+		mBlocks.ForEach([&](DeviceMemoryBlock* deviceMemoryBlock) {
+			mBlockPool.Recycle(deviceMemoryBlock);
+		});
+	}
+
 	DeviceMemoryBlock* DeviceMemoryChunk::AllocateBlock(std::size_t alignment, std::size_t size)
 	{
 		return mBlocks.FindIndexIf([&](const auto& block) {
@@ -47,10 +54,10 @@ namespace Ck::Vulkan
 
 			return block->GetSize() >= allocationSize;
 		}).Map([&](unsigned int index) {
-			DeviceMemoryBlock* allocatedBlock = mBlocks[index].get();
-			std::shared_ptr<DeviceMemoryBlock> remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
+			DeviceMemoryBlock* allocatedBlock = mBlocks[index];
+			DeviceMemoryBlock* remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
 			if (remainingBlock)
-				mBlocks.AddAt(index + 1, std::move(remainingBlock));
+				mBlocks.AddAt(index + 1, remainingBlock);
 
 			allocatedBlock->Acquire();
 
@@ -62,13 +69,15 @@ namespace Ck::Vulkan
 	{
 		for (unsigned int i = 0; i < mBlocks.GetSize();)
 		{
-			DeviceMemoryBlock* block = mBlocks[i].get();
-			DeviceMemoryBlock* nextBlock = mBlocks.TryAt(i + 1).GetOr(nullptr).get();
+			DeviceMemoryBlock* block = mBlocks[i];
+			DeviceMemoryBlock* nextBlock = mBlocks.TryAt(i + 1).GetOr(nullptr);
 
 			if (block->IsFree() && nextBlock && nextBlock->IsFree())
 			{
 				block->Merge(*nextBlock);
 				mBlocks.RemoveAt(i + 1);
+
+				mBlockPool.Recycle(nextBlock);
 			}
 			else
 			{
@@ -79,7 +88,7 @@ namespace Ck::Vulkan
 
 	bool DeviceMemoryChunk::IsFree() const
 	{
-		return mBlocks.AllOf([](const auto& block) {
+		return mBlocks.AllOf([](const DeviceMemoryBlock* block) {
 			return block->IsFree();
 		});
 	}
@@ -122,6 +131,6 @@ namespace Ck::Vulkan
 		if (memoryProperties.memoryTypes[mMemoryTypeIndex].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
 			vkMapMemory(mRenderDevice->GetHandle(), mDeviceMemory->GetHandle(), 0, VK_WHOLE_SIZE, 0, &mPtr);
 
-		mBlocks.Add(mBlockPool.Allocate(this, 0, mSize, mPtr));
+		mBlocks.Add(mBlockPool.AllocateUnsafe(this, 0, mSize, mPtr));
 	}
 }
