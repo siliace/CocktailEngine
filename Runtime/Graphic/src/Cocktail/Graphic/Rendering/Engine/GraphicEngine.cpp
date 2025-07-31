@@ -17,7 +17,7 @@ static constexpr bool GraphicEngine_EnableDebug = true;
 
 namespace Ck
 {
-	CK_DEFINE_LOG_CATEGORY(GraphicEngineLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(GraphicEngineLogCategory);
 
 	namespace
 	{

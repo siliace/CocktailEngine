@@ -84,6 +84,10 @@
 	#define COCKTAIL_CONCATENATE_STRING(__Left, __Right) COCKTAIL_CONCATENATE_STRING2(__Left, __Right)
 #endif
 
+#ifndef COCKTAIL_DECLARE_TAG
+	#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr __Name##Tag __Name;
+#endif // COCKTAIL_DECLARE_TAG
+
 namespace Ck
 {
 	using Uint8 = std::uint8_t;
@@ -94,6 +98,9 @@ namespace Ck
 	using Int16 = std::int16_t;
 	using Int32 = std::int32_t;
 	using Int64 = std::int64_t;
+
+	COCKTAIL_DECLARE_TAG(InPlace);
+	COCKTAIL_DECLARE_TAG(InOptional);
 
 	/**
 	 * \brief 

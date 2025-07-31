@@ -7,7 +7,7 @@
 
 namespace Ck::Detail::Win32
 {
-	CK_DECLARE_LOG_CATEGORY(Win32LogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(Win32LogCategory, LogLevel::Info);
 
     class WindowsServiceProvider : public ServiceProvider
     {

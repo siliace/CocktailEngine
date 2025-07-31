@@ -1,31 +1,12 @@
 #ifndef COCKTAIL_CORE_UTILITY_OPTIONAL_HPP
 #define COCKTAIL_CORE_UTILITY_OPTIONAL_HPP
 
-#include <stdexcept>
-#include <utility>
-
-#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr __Name##Tag __Name;
+#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Exception.hpp>
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_TAG(InPlace)
-
-	/**
-	 * \brief 
-	 */
-	class EmptyOptionalException : public std::runtime_error
-	{
-	public:
-
-		/**
-		 * \brief 
-		 */
-		EmptyOptionalException() :
-			std::runtime_error("Optional has been empty")
-		{
-			/// Nothing
-		}
-	};
+	COCKTAIL_DECLARE_EXCEPTION_BASE(EmptyOptionalException, "Optional has been empty", std::runtime_error);
 
 	/**
 	 * \brief 

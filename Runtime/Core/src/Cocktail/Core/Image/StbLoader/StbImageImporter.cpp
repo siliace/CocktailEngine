@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	CK_DECLARE_EXCEPTION_BASE(StbImportError, "Failed to import image", std::runtime_error);
+	COCKTAIL_DECLARE_EXCEPTION_BASE(StbImportError, "Failed to import image", std::runtime_error);
 
 	StbImageImporter::StbImageImporter() :
 		mCallbacks()

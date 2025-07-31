@@ -11,7 +11,7 @@ extern Ck::Main::ExitCode ApplicationMain(Ck::Application* application);
 
 namespace Ck::Main
 {
-	CK_DEFINE_LOG_CATEGORY(MainLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(MainLogCategory);
 
 	ExitCode InvokeMain(Application* application)
 	{

@@ -15,7 +15,7 @@ namespace Ck
 
 	namespace Vulkan
 	{
-		CK_DECLARE_LOG_CATEGORY(VulkanLogCategory, LogLevel::Info);
+		COCKTAIL_DECLARE_LOG_CATEGORY(VulkanLogCategory, LogLevel::Info);
 
 		/**
 		 * \brief

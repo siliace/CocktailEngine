@@ -7,7 +7,7 @@
 
 namespace Ck::Detail::Xlib
 {
-	CK_DECLARE_LOG_CATEGORY(XlibLogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(XlibLogCategory, LogLevel::Info);
 
     class XlibServiceProvider : public ServiceProvider
 	{

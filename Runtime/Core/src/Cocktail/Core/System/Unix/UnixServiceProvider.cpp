@@ -9,7 +9,7 @@
 
 namespace Ck::Detail::Unix
 {
-	CK_DEFINE_LOG_CATEGORY(UnixLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(UnixLogCategory);
 
     UnixServiceProvider::UnixServiceProvider(Application* application) :
         ServiceProvider(application)

@@ -10,7 +10,7 @@
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 #include <Cocktail/Core/Utility/Time/Instant.hpp>
 
-#define CK_REGISTER_SERVICE_PROVIDER(__ServiceProvider) \
+#define COCKTAIL_REGISTER_SERVICE_PROVIDER(__ServiceProvider) \
 	::Ck::Detail::ServiceProviderRegisterer<__ServiceProvider> COCKTAIL_CONCATENATE_STRING2(__ServiceProvider, Registerer)
 
 namespace Ck

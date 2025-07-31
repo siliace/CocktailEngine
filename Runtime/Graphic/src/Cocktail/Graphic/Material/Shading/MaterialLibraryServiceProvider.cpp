@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	CK_REGISTER_SERVICE_PROVIDER(MaterialLibraryServiceProvider);
+	COCKTAIL_REGISTER_SERVICE_PROVIDER(MaterialLibraryServiceProvider);
 
 	MaterialLibraryServiceProvider::MaterialLibraryServiceProvider(Application* application) :
 		ServiceProvider(application)

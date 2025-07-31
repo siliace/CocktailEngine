@@ -2,5 +2,5 @@
 
 namespace Ck
 {
-	CK_DEFINE_LOG_CATEGORY(MipMapsLoaderLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(MipMapsLoaderLogCategory);
 }

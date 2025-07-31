@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	CK_DECLARE_LOG_CATEGORY(ImageLoaderLogCategory, Ck::LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(ImageLoaderLogCategory, Ck::LogLevel::Info);
 
 	/**
 	 * \brief 

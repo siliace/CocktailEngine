@@ -8,7 +8,7 @@
 
 namespace Ck::Main
 {
-	CK_DECLARE_LOG_CATEGORY(MainLogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(MainLogCategory, LogLevel::Info);
 
 	/**
 	 * \brief 

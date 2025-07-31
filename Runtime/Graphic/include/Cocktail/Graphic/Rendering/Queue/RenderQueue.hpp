@@ -10,7 +10,7 @@
 
 namespace Ck
 {
-	CK_DECLARE_LOG_CATEGORY(RenderQueueLogCategory, Ck::LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(RenderQueueLogCategory, Ck::LogLevel::Info);
 
 	class COCKTAIL_GRAPHIC_API RenderQueue
 	{

@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	CK_DEFINE_LOG_CATEGORY(RenderQueueLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(RenderQueueLogCategory);
 
 	RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
 		mShadingMode(shadingMode),

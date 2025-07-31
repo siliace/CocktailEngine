@@ -9,7 +9,7 @@
 
 namespace Ck
 {
-	CK_DECLARE_EXCEPTION_BASE(DDSImportException, "Failed to import DDS", std::runtime_error);
+	COCKTAIL_DECLARE_EXCEPTION_BASE(DDSImportException, "Failed to import DDS", std::runtime_error);
 
 	namespace
 	{

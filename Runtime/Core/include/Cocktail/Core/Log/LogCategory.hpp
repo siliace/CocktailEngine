@@ -7,7 +7,7 @@
 #include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/Log/LogLevel.hpp>
 
-#define CK_DECLARE_LOG_CATEGORY(__Name, __Level)       \
+#define COCKTAIL_DECLARE_LOG_CATEGORY(__Name, __Level)       \
 extern class __Name ## Type : public ::Ck::LogCategory \
 {                                                      \
 public:                                                \
@@ -17,7 +17,7 @@ public:                                                \
     }                                                  \
 } __Name                                               \
 
-#define CK_DEFINE_LOG_CATEGORY(__Name)  __Name ## Type __Name
+#define COCKTAIL_DEFINE_LOG_CATEGORY(__Name)  __Name ## Type __Name
  
 namespace Ck
 {

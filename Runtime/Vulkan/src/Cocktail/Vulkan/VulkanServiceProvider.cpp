@@ -10,7 +10,7 @@ CMRC_DECLARE(Vulkan);
 
 namespace Ck::Vulkan
 {
-	CK_REGISTER_SERVICE_PROVIDER(VulkanServiceProvider);
+	COCKTAIL_REGISTER_SERVICE_PROVIDER(VulkanServiceProvider);
 
 	VulkanServiceProvider::VulkanServiceProvider(Application* application) :
 		ServiceProvider(application)

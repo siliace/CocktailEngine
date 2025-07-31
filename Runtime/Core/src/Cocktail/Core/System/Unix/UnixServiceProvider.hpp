@@ -6,7 +6,7 @@
 
 namespace Ck::Detail::Unix
 {
-	CK_DECLARE_LOG_CATEGORY(UnixLogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(UnixLogCategory, LogLevel::Info);
 
 	class UnixServiceProvider : public ServiceProvider
     {

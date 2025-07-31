@@ -16,7 +16,7 @@ namespace Ck
 {
 	class Window;
 
-	CK_DECLARE_LOG_CATEGORY(GraphicEngineLogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(GraphicEngineLogCategory, LogLevel::Info);
 
 	/**
      * \brief 

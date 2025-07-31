@@ -9,7 +9,7 @@
 
 namespace Ck
 {
-    CK_DECLARE_EXCEPTION_BASE(GltfParseError, "Failed to parse obj file", std::runtime_error);
+    COCKTAIL_DECLARE_EXCEPTION_BASE(GltfParseError, "Failed to parse obj file", std::runtime_error);
 
     namespace
     {

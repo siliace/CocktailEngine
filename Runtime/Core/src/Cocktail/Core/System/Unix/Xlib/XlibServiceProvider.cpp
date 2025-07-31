@@ -9,7 +9,7 @@
 
 namespace Ck::Detail::Xlib
 {
-	CK_DEFINE_LOG_CATEGORY(XlibLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(XlibLogCategory);
 
     XlibServiceProvider::XlibServiceProvider(Application* application) :
 		ServiceProvider(application)

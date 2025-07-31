@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	CK_DECLARE_LOG_CATEGORY(MipMapsLoaderLogCategory, LogLevel::Info);
+	COCKTAIL_DECLARE_LOG_CATEGORY(MipMapsLoaderLogCategory, LogLevel::Info);
 
 	class COCKTAIL_GRAPHIC_API MipMapsLoader : public AssetLoader<MipMaps, MipMapsImportParameters, MipMapsExportParameters>
 	{

@@ -12,7 +12,7 @@
 
 namespace Ck::Vulkan
 {
-	CK_DEFINE_LOG_CATEGORY(VulkanLogCategory);
+	COCKTAIL_DEFINE_LOG_CATEGORY(VulkanLogCategory);
 
 	bool IsLayerSupported(const char* layerName)
 	{
