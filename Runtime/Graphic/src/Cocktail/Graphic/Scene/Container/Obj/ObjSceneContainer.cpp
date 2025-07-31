@@ -18,7 +18,7 @@ namespace Ck
 		material.ShadingMode = Material::ShadingMode::Unlit;
 		material.Colors.Base = baseColor;
 		material.DoubleSided = true;
-		material.Opaque = true;
+		material.AlphaMode = Material::AlphaMode::Opaque;
 
 		return material;
 	}
@@ -104,7 +104,19 @@ namespace Ck
 		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(objMaterial.alpha_texname);
 		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(objMaterial.reflection_texname);
 		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(objMaterial.emissive_texname);
-		materialInfo.Opaque = objMaterial.dissolve == 1.f && objMaterial.alpha_texname.empty();
+
+		if (objMaterial.dissolve != 1.f)
+		{
+			materialInfo.AlphaMode = Material::AlphaMode::Blend;
+		}
+		else if (!objMaterial.alpha_texname.empty())
+		{
+			materialInfo.AlphaMode = Material::AlphaMode::Mask;
+		}
+		else
+		{
+			materialInfo.AlphaMode = Material::AlphaMode::Opaque;
+		}
 
 		return materialInfo;
 	}

@@ -68,7 +68,8 @@ namespace Ck
         materialInfo.Colors.Emission = GltfUtils::ConvertLinearColor(gltfMaterial.emissiveFactor);
         materialInfo.ShadingMode = Material::ShadingMode::Phong;
         materialInfo.DoubleSided = gltfMaterial.doubleSided;
-        materialInfo.Opaque = gltfMaterial.alphaMode == "OPAQUE";
+        materialInfo.AlphaMode = GltfUtils::ConvertAlphaMode(gltfMaterial.alphaMode);
+        materialInfo.AlphaCutoff = static_cast<float>(gltfMaterial.alphaCutoff);
 
         if (int textureIndex = gltfMaterial.pbrMetallicRoughness.baseColorTexture.index; textureIndex != -1)
         {

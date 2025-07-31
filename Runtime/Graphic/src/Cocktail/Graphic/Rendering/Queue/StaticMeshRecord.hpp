@@ -43,11 +43,13 @@ namespace Ck
 			Vector4<float> Normal[3]; // Alignment mess
 		};
 		
-		struct MaterialColors
+		struct MaterialInfo
 		{
-			LinearColor Base;
-			LinearColor Specular;
-			LinearColor Emissive;
+			LinearColor BaseColor;
+			float SpecularColor[3];
+			int AlphaMode;
+			float EmissiveColor[3];
+			float AlphaCutoff;
 		};
 
 		/**

@@ -129,4 +129,18 @@ namespace Ck
 
 		return color;
 	}
+
+	Material::AlphaMode GltfUtils::ConvertAlphaMode(const std::string& value)
+	{
+		if (value == "OPAQUE")
+			return Material::AlphaMode::Opaque;
+
+		if (value == "BLEND")
+			return Material::AlphaMode::Blend;
+
+		if (value == "MASK")
+			return Material::AlphaMode::Mask;
+
+		COCKTAIL_UNREACHABLE();
+	}
 }

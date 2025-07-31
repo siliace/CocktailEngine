@@ -6,6 +6,7 @@
 #include <Cocktail/Core/Math/Quaternion.hpp>
 #include <Cocktail/Core/Math/Vector/Vector3.hpp>
 
+#include <Cocktail/Graphic/Material/Material.hpp>
 #include <Cocktail/Graphic/Geometry/Vertex/VertexAttributeSemantic.hpp>
 
 #include <Cocktail/Renderer/Renderer.hpp>
@@ -27,6 +28,7 @@ namespace Ck
 	    static Vector3<float> ConvertVector3(const std::vector<double>& values);
 		static Quaternion<float> ConvertQuaternion(const std::vector<double>& values);
 		static LinearColor ConvertLinearColor(const std::vector<double>& values);
+		static Material::AlphaMode ConvertAlphaMode(const std::string& value);
 	};
 }
 

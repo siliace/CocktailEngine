@@ -118,13 +118,14 @@ namespace Ck
 				if (material->GetShadingMode() != queue.GetShadingMode())
 					continue;
 
-				if (material->IsOpaque() && queue.GetBlendingMode() == RenderQueue::BlendingMode::Transparent)
+				if (material->GetAlphaMode() == Material::AlphaMode::Opaque && queue.GetBlendingMode() == RenderQueue::BlendingMode::Transparent)
 					continue;
 
-				if (!material->IsOpaque() && queue.GetBlendingMode() == RenderQueue::BlendingMode::Opaque)
+				if (material->GetAlphaMode() != Material::AlphaMode::Opaque && queue.GetBlendingMode() == RenderQueue::BlendingMode::Opaque)
 					continue;
 
-				recordInfo.Opaque = material->IsOpaque();
+				recordInfo.AlphaMode = material->GetAlphaMode();
+				recordInfo.AlphaCutoff = material->GetAlphaCutoff();
 				recordInfo.DoubleSided = material->IsDoubleSided();
 				recordInfo.MaterialBaseColor = material->GetUniformColors().Base;
 				recordInfo.MaterialSpecularColor = material->GetUniformColors().Specular;

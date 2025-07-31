@@ -46,6 +46,13 @@ namespace Ck
 			LinearColor Emission;
 		};
 
+		enum class AlphaMode
+		{
+			Opaque,
+			Blend,
+			Mask
+		};
+
 		/**
 		 * \brief 
 		 * \param name 
@@ -116,8 +123,11 @@ namespace Ck
 		 */
 		bool IsDoubleSided() const;
 
-		bool IsOpaque() const;
-		void SetOpaque(bool opaque);
+		AlphaMode GetAlphaMode() const;
+		void SetAlphaMode(AlphaMode alphaMode);
+
+		float GetAlphaCutoff() const;
+		void SetAlphaCutoff(float alphaCutoff);
 
 	private:
 
@@ -126,7 +136,8 @@ namespace Ck
 		UniformColors mUniformColors;
 		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;
 		bool mDoubleSided;
-		bool mOpaque;
+		AlphaMode mAlphaMode;
+		float mAlphaCutoff;
 	};
 }
 

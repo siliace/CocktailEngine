@@ -102,10 +102,14 @@ namespace Ck
 		EnumMap<Material::TextureType, std::shared_ptr<Renderer::TextureView>> MaterialTextures;
 
 		/**
-		 * \brief Tell whether the geometry drawn by this record is opaque.
-		 * If record is not opaque, it will be drawn using blending to perform transparency.
+		 * \brief
 		 */
-		bool Opaque;
+		Material::AlphaMode AlphaMode = Material::AlphaMode::Opaque;
+
+		/**
+		 * \brief The ceil value of the alpha under which any fragment is discarded
+		 */
+		float AlphaCutoff = 0.f;
 	};    
 }
 

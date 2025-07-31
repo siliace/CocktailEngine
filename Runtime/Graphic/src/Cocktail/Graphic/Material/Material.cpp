@@ -6,7 +6,8 @@ namespace Ck
 		mName(std::move(name)),
 		mShadingMode(shadingMode),
 		mDoubleSided(doubleSided),
-		mOpaque(true)
+		mAlphaMode(AlphaMode::Opaque),
+		mAlphaCutoff(0.f)
 	{
 		/// Nothing
 	}
@@ -61,13 +62,23 @@ namespace Ck
 		return mDoubleSided;
 	}
 
-	bool Material::IsOpaque() const
+	Material::AlphaMode Material::GetAlphaMode() const
 	{
-		return mOpaque;
+		return mAlphaMode;
 	}
 
-	void Material::SetOpaque(bool opaque)
+	void Material::SetAlphaMode(AlphaMode alphaMode)
 	{
-		mOpaque = opaque;
+		mAlphaMode = alphaMode;
+	}
+
+	float Material::GetAlphaCutoff() const
+	{
+		return mAlphaCutoff;
+	}
+
+	void Material::SetAlphaCutoff(float alphaCutoff)
+	{
+		mAlphaCutoff = alphaCutoff;
 	}
 }

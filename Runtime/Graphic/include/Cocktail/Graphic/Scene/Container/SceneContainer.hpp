@@ -25,7 +25,8 @@ namespace Ck
 			Material::ShadingMode ShadingMode;
 			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
 			bool DoubleSided = false;
-			bool Opaque = false;
+			Material::AlphaMode AlphaMode = Material::AlphaMode::Opaque;
+			float AlphaCutoff = 0.f;
 		};
 
 		struct SubMeshInfo

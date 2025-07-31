@@ -63,13 +63,19 @@ namespace Ck
 		for (unsigned int i = 0; i < 3; i++)
 			vertexInfo.Normal[i] = Vector4<float>(normalMatrix.GetColumn(i).Normalized(), 0.f);
 
-		MaterialColors materialColors;
-		materialColors.Base = mRecordInfo.MaterialBaseColor;
-		materialColors.Specular = mRecordInfo.MaterialSpecularColor;
-		materialColors.Emissive = mRecordInfo.MaterialEmissiveColor;
+		MaterialInfo materialInfo;
+		materialInfo.BaseColor = mRecordInfo.MaterialBaseColor;
+		materialInfo.SpecularColor[0] = mRecordInfo.MaterialSpecularColor.R;
+		materialInfo.SpecularColor[1] = mRecordInfo.MaterialSpecularColor.G;
+		materialInfo.SpecularColor[2] = mRecordInfo.MaterialSpecularColor.B;
+		materialInfo.AlphaMode = static_cast<int>(mRecordInfo.AlphaMode);
+		materialInfo.EmissiveColor[0] = mRecordInfo.MaterialEmissiveColor.R;
+		materialInfo.EmissiveColor[1] = mRecordInfo.MaterialEmissiveColor.G;
+		materialInfo.EmissiveColor[2] = mRecordInfo.MaterialEmissiveColor.B;
+		materialInfo.AlphaCutoff = mRecordInfo.AlphaCutoff;
 
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
-		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialColors), &materialColors);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
 			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))
@@ -108,10 +114,10 @@ namespace Ck
 		commandList.SetFrontFace(Renderer::FrontFace::CounterClockwise);
 
 		commandList.EnableDepthTest(true);
-		commandList.EnableDepthWrite(true);
+		commandList.EnableDepthWrite(mRecordInfo.AlphaMode == Material::AlphaMode::Opaque);
 		commandList.SetDepthCompareOp(Renderer::CompareOp::Less);
 
-		commandList.EnableBlending(0, !mRecordInfo.Opaque);
+		commandList.EnableBlending(0, mRecordInfo.AlphaMode != Material::AlphaMode::Opaque);
 		commandList.SetBlendingFunction(0, Renderer::BlendFactor::SourceAlpha, Renderer::BlendFactor::OneMinusSourceAlpha, Renderer::BlendFactor::One, Renderer::BlendFactor::OneMinusSourceAlpha);
 		commandList.SetBlendingEquation(0, Renderer::BlendOp::Add, Renderer::BlendOp::Add);
 

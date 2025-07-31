@@ -4,6 +4,10 @@
 #define COCKTAIL_LIGHT_TYPE_POINT 1
 #define COCKTAIL_LIGHT_TYPE_SPOT 2
 
+#define COCKTAIL_ALPHA_MODE_OPAQUE 0
+#define COCKTAIL_ALPHA_MODE_BLEND 1
+#define COCKTAIL_ALPHA_MODE_MASK 2
+
 struct LightInstance 
 {
 	vec4 color;
@@ -58,14 +62,14 @@ layout (set = 2, binding = 1) uniform sampler2D ck_MaterialEmissive;
 layout (set = 2, binding = 2) uniform sampler2D ck_MaterialAlpha;
 #endif
 
-layout (push_constant) uniform MaterialColors {
+layout (push_constant) uniform MaterialInfo {
 	layout (offset = 112)
 	vec4 base;
 	vec3 specular;
-	float padding_1;
+	int alphaMode;
 	vec3 emissive;
-	float padding_2;
-} materialColors;
+	float alphaCutoff;
+} materialInfo;
 
 vec3 DirectionalLight_ComputeLightColor(uint index, in vec3 normal)
 {
@@ -114,8 +118,8 @@ vec3 SpotLight_ComputeLightColor(uint index, in vec3 normal, in vec3 worldPositi
 
 void main()
 {
-	vec4 baseColor = materialColors.base;
-	vec3 emissive = materialColors.emissive;
+	vec4 baseColor = materialInfo.base;
+	vec3 emissive = materialInfo.emissive;
 	
 #ifdef COCKTAIL_VERTEX_HAS_COLOR
 	baseColor *= color;
@@ -123,9 +127,12 @@ void main()
 
 #ifdef COCKTAIL_VERTEX_HAS_UV
 	#ifdef COCKTAIL_MATERIAL_HAS_ALPHA_TEXTURE
-	float alpha = texture(ck_MaterialAlpha, texCoord).r;
-	if (alpha == 0)
-		discard;
+	if (materialInfo.alphaMode == COCKTAIL_ALPHA_MODE_MASK)
+	{
+		float alpha = texture(ck_MaterialAlpha, texCoord).r;
+		if (alpha < materialInfo.alphaCutoff)
+			discard;
+	}
 	#endif
 
 	#ifdef COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE
@@ -136,6 +143,9 @@ void main()
 	emissive *= texture(ck_MaterialEmissive, texCoord);
 	#endif
 #endif
+
+	if (materialInfo.alphaMode == COCKTAIL_ALPHA_MODE_MASK && baseColor.a < materialInfo.alphaCutoff)
+		discard;
 
 	vec3 ambientColor = sceneInfo.ambientFactor * baseColor.rgb;
 	vec3 diffuseColor = vec3(0);
@@ -162,5 +172,5 @@ void main()
 
 	pixel.rgb = ambientColor + diffuseColor;
 	pixel.rgb += emissive;
-	pixel.a = baseColor.a;
+	pixel.a = materialInfo.alphaMode != COCKTAIL_ALPHA_MODE_MASK ? baseColor.a : 1.f;
 }

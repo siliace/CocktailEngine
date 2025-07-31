@@ -45,7 +45,8 @@ namespace Ck
 						material->SetTexture(textureType, sampler);
 					}
 
-					material->SetOpaque(materialInfo.Opaque);
+					material->SetAlphaMode(materialInfo.AlphaMode);
+					material->SetAlphaCutoff(materialInfo.AlphaCutoff);
 
 					materials[subMeshInfo.MaterialIndex] = std::move(material);
 				}
