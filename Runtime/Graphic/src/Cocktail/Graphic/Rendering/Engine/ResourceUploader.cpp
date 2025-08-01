@@ -69,7 +69,7 @@ namespace Ck
 			commandList.UploadTexture(textureUploadRequest.Texture->GetUnderlyingResource(), Renderer::ResourceState::CopyDestination, textureUploadRequest.UploadInfo.GetSize(), textureUploadRequest.UploadInfo.GetData());
 
 			{
-				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, mTextureUploadRequests.GetSize());
+				Renderer::GpuBarrier* barriers = COCKTAIL_STACK_ALLOC(Renderer::GpuBarrier, textureUploadRequest.UploadInfo.GetSize());
 				for (std::size_t i = 0; i < textureUploadRequest.UploadInfo.GetSize(); i++)
 				{
 					Renderer::TextureSubResource subResource;
