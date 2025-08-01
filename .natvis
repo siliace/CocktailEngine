@@ -13,4 +13,28 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+	<Type Name="Ck::Vector2&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Vector3&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}, {mComponents[2]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+			<Item Name="z" ExcludeView="simple">mComponents[2]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Vector4&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}, {mComponents[2]}, {mComponents[3]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+			<Item Name="z" ExcludeView="simple">mComponents[2]</Item>
+			<Item Name="w" ExcludeView="simple">mComponents[3]</Item>
+		</Expand>
+	</Type>
 </AutoVisualizer>
