@@ -92,7 +92,7 @@ namespace Ck
 		MaterialInfo materialInfo;
 		materialInfo.Name = objMaterial.name;
 		materialInfo.ShadingMode = Material::ShadingMode::Phong;
-		materialInfo.Colors.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], 1.f };
+		materialInfo.Colors.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
 		materialInfo.Colors.Specular = { objMaterial.specular[0], objMaterial.specular[1], objMaterial.specular[2], 1.f };
 		materialInfo.Colors.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
 		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(objMaterial.ambient_texname);
@@ -112,6 +112,7 @@ namespace Ck
 		else if (!objMaterial.alpha_texname.empty())
 		{
 			materialInfo.AlphaMode = Material::AlphaMode::Mask;
+			materialInfo.AlphaCutoff = 0.5f; /// MTL format does not provide this value
 		}
 		else
 		{
