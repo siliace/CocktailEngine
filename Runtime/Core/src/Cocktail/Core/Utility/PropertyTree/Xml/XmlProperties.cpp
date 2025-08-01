@@ -2,6 +2,7 @@
 
 #include <Cocktail/Core/Utility/FileUtils.hpp>
 #include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/Utility/PropertyTree/Xml/XmlCDataNode.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/Xml/XmlProperties.hpp>
 
 namespace Ck

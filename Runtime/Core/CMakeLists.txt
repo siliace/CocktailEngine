@@ -696,8 +696,10 @@ cocktail_source_directory(CORE_FILES
     FOLDER "Utility/PropertyTree/Xml"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/PropertyTree/Xml/XmlProperties.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/PropertyTree/Xml/XmlCDataNode.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/PropertyTree/Xml/XmlProperties.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/PropertyTree/Xml/XmlCDataNode.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
