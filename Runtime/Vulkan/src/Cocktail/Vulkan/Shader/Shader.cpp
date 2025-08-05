@@ -143,8 +143,8 @@ namespace Ck::Vulkan
 			}
 
 			vkCreateInfo.flags = 0;
-			vkCreateInfo.codeSize = createInfo.CodeLength;
-			vkCreateInfo.pCode = createInfo.Code;
+			vkCreateInfo.codeSize = createInfo.Code.GetSize();
+			vkCreateInfo.pCode = reinterpret_cast<const Uint32*>(createInfo.Code.GetData());
 		}
 		 
 		COCKTAIL_VK_CHECK(vkCreateShaderModule(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
@@ -152,7 +152,7 @@ namespace Ck::Vulkan
 		Shader::SetObjectName(createInfo.Name);
 
 		SpvReflectShaderModule module;
-		SpvReflectResult result = spvReflectCreateShaderModule(createInfo.CodeLength, createInfo.Code, &module);
+		SpvReflectResult result = spvReflectCreateShaderModule(vkCreateInfo.codeSize, vkCreateInfo.pCode, &module);
 		assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
 		// Reflect descriptor sets

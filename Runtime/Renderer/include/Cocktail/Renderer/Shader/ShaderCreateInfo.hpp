@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_SHADER_SHADERCREATEINFO_HPP
 #define COCKTAIL_RENDERER_SHADER_SHADERCREATEINFO_HPP
 
-#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Utility/ByteArrayView.hpp>
 
 #include <Cocktail/Renderer/Shader/ShaderType.hpp>
 
@@ -19,15 +19,10 @@ namespace Ck::Renderer
 		 */
         ShaderType Type = ShaderType::Vertex;
 
-        /**
-         * \brief The length of \p Code buffer
-         */
-        std::size_t CodeLength = 0;
-    	
 		/** 
 		 * \brief The code of the Shader to create
 		 */
-        const Uint32* Code = nullptr;
+        ByteArrayView Code;
 
         /**
          * \brief Specifies the name of the Shader to create

@@ -90,8 +90,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 
 			Renderer::ShaderCreateInfo shaderCreateInfo;
 			shaderCreateInfo.Type = shaderType;
-			shaderCreateInfo.Code = reinterpret_cast<Uint32*>(fileContent.GetData());
-			shaderCreateInfo.CodeLength = fileContent.GetSize();
+			shaderCreateInfo.Code = fileContent;
 
 			return renderDevice.CreateShader(shaderCreateInfo);
 		};

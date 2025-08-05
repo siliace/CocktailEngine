@@ -53,8 +53,7 @@ namespace Ck
 
 				Renderer::ShaderCreateInfo shaderCreateInfo;
 				shaderCreateInfo.Type = shaderType;
-				shaderCreateInfo.CodeLength = binary.GetSize();
-				shaderCreateInfo.Code = reinterpret_cast<const Uint32*>(binary.GetData());
+				shaderCreateInfo.Code = binary;
 				shaderProgramCreateInfo.Shaders[shaderCount] = renderDevice->CreateShader(shaderCreateInfo);
 				++shaderCount;
 			}

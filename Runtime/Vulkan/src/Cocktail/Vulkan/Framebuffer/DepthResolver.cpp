@@ -74,8 +74,7 @@ namespace Ck::Vulkan
 
 		Renderer::ShaderCreateInfo createInfo;
 		createInfo.Type = shaderType;
-		createInfo.CodeLength = shaderCode.GetSize();
-		createInfo.Code = reinterpret_cast<const Uint32*>(shaderCode.GetData());
+		createInfo.Code = shaderCode;
 
 		return std::static_pointer_cast<Shader>(renderDevice.CreateShader(createInfo));
 	}
