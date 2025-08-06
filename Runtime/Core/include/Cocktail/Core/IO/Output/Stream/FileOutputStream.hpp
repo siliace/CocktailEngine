@@ -20,7 +20,7 @@ namespace Ck
          * \brief Constructor
          * \param file The file to read from
          */
-        explicit FileOutputStream(const std::shared_ptr<File>& file);
+        explicit FileOutputStream(File& file);
 	
         /**
          * \brief
@@ -36,7 +36,7 @@ namespace Ck
 		
 	private:
 
-        std::shared_ptr<File> mFile;
+        File* mFile;
     };
 }
 

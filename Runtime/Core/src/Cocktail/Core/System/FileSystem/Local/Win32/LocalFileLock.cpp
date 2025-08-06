@@ -4,8 +4,8 @@
 
 namespace Ck::Detail::Win32
 {
-	LocalFileLock::LocalFileLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length):
-		mFile(file),
+	LocalFileLock::LocalFileLock(File& file, std::size_t offset, std::size_t length):
+		mFile(&file),
 		mOffset(offset),
 		mLength(length)
 	{

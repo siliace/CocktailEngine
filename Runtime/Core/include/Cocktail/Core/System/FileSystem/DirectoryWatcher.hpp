@@ -34,6 +34,12 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
+		virtual Signal<std::filesystem::path>& OnFileModified() = 0;
+
+		/**
+		 * \brief
+		 * \return
+		 */
 		virtual Signal<std::filesystem::path, std::filesystem::path>& OnFileRenamed() = 0;
 
 		/**

@@ -19,7 +19,7 @@ namespace Ck::Detail::Win32
 		 * \param offset
 		 * \param length 
 		 */
-		LocalFileLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length);
+		LocalFileLock(File& file, std::size_t offset, std::size_t length);
 
 		/**
 		 * \brief 
@@ -39,7 +39,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		std::shared_ptr<File> mFile;
+		File* mFile;
 		std::size_t mOffset;
 		std::size_t mLength;
 	};

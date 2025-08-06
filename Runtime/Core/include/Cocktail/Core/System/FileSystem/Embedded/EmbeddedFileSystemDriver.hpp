@@ -46,14 +46,14 @@ namespace Ck
 		 * \param flags 
 		 * \return 
 		 */
-		std::shared_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) override;
+		std::unique_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) override;
 
 		/**
 		 * \brief 
 		 * \param path 
 		 * \return 
 		 */
-		std::shared_ptr<Directory> OpenDirectory(const std::filesystem::path& path) override;
+		std::unique_ptr<Directory> OpenDirectory(const std::filesystem::path& path) override;
 
 		/**
 		 * \brief 

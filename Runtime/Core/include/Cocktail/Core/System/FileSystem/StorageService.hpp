@@ -64,14 +64,14 @@ namespace Ck
 		 * \param flags
 		 * \return
 		 */
-		std::shared_ptr<File> OpenFile(const std::filesystem::path& path, FileOpenFlags flags) const;
+		std::unique_ptr<File> OpenFile(const std::filesystem::path& path, FileOpenFlags flags) const;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		std::shared_ptr<Directory> OpenDirectory(const std::filesystem::path& path) const;
+		std::unique_ptr<Directory> OpenDirectory(const std::filesystem::path& path) const;
 
 		/**
 		 * \brief

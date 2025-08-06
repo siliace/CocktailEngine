@@ -31,9 +31,9 @@ namespace Ck
 
 	Array<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
 	{
-		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		FileInputStream inputStream(*file);
 
-		FileInputStream inputStream(file);
 		InputStreamReader inputStreamReader(inputStream);
 		BufferedReader reader(inputStreamReader);
 
