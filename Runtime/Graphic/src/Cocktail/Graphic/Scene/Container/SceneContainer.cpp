@@ -1,7 +1,14 @@
+#include <Cocktail/Graphic/Scene/Camera/OrhtographicCamera.hpp>
+#include <Cocktail/Graphic/Scene/Camera/PerspectiveCamera.hpp>
 #include <Cocktail/Graphic/Scene/Container/SceneContainer.hpp>
 
 namespace Ck
 {
+	const Array<SceneContainer::CameraInfo>& SceneContainer::GetCameras() const
+	{
+		return mCameras;
+	}
+
 	std::shared_ptr<SceneNode> SceneContainer::AddToScene(Scene& scene)
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
@@ -62,6 +69,23 @@ namespace Ck
 		return sceneNode;
 	}
 
+	SceneContainer::SceneContainer()
+	{
+		mMaterials.Add(CreateDefaultMaterial(LinearColor(0.f, 0.f, 0.f)));
+	}
+
+	SceneContainer::MaterialInfo SceneContainer::CreateDefaultMaterial(LinearColor baseColor)
+	{
+		MaterialInfo material;
+		material.Name = "Default";
+		material.ShadingMode = Material::ShadingMode::Phong;
+		material.Colors.Base = baseColor;
+		material.DoubleSided = true;
+		material.AlphaMode = Material::AlphaMode::Opaque;
+
+		return material;
+	}
+
 	std::shared_ptr<SceneNode> SceneContainer::ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials)
 	{
 		std::shared_ptr<SceneNode> sceneNode = scene.CreateSceneNode();
@@ -79,6 +103,30 @@ namespace Ck
 
 		for (NodeInfo& childNodeInfo : nodeInfo.Children)
 			ProcessNode(scene, sceneNode, childNodeInfo, meshes, materials);
+
+		if (CameraInfo* cameraInfo = nodeInfo.Camera)
+		{
+			std::unique_ptr<Camera> camera;
+			if (cameraInfo->IsPerspective)
+			{
+				camera = std::make_unique<PerspectiveCamera>(
+					sceneNode->GetTransformationNode(),
+					cameraInfo->Perspective.FieldOfView, cameraInfo->Perspective.AspectRatio, 
+					cameraInfo->DepthBounds
+				);
+			}
+			else
+			{
+				Rectangle<unsigned int> area;
+				camera = std::make_unique<OrthographicCamera>(
+					sceneNode->GetTransformationNode(),
+					area,
+					cameraInfo->DepthBounds
+				);
+			}
+
+			scene.AddCamera(std::move(camera));
+		}
 
 		return sceneNode;
 	}

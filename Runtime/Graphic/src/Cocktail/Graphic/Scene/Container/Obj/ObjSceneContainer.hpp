@@ -12,13 +12,6 @@ namespace Ck
 	{
 	public:
 
-		/**
-		 * \brief Create a material to be served a default one for shape that have none (like point or line shapes)
-		 * \param baseColor The base color of the material to create
-		 * \return The created material
-		 */
-		static MaterialInfo CreateDefaultMaterial(LinearColor baseColor);
-
 		ObjSceneContainer(const SceneImportParameters& importParameters, const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials);
 
 	private:

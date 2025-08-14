@@ -9,6 +9,32 @@ namespace Ck
 	{
 	public:
 
+		struct CameraInfo
+		{
+			struct PerspectiveInfo
+			{
+				Angle<float> FieldOfView;
+				float AspectRatio = 0.f;
+			};
+
+			struct OrthographicInfo
+			{
+				
+			};
+
+			std::string Name;
+			PerspectiveInfo Perspective;
+			OrthographicInfo Orthographic;
+			bool IsPerspective = false;
+			Vector2<float> DepthBounds;
+		};
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const Array<CameraInfo>& GetCameras() const;
+
 		/**
 		 * \brief Add the content of the SceneContainer into an existing scene
 		 * \param scene 
@@ -52,14 +78,25 @@ namespace Ck
 			Array<NodeInfo> Children;
 			Array<unsigned int> MeshIndices;
 			Transformation LocalTransformation = Transformation::Identity();
+			CameraInfo* Camera = nullptr;
 		};
 
+		SceneContainer();
+
 		NodeInfo mRoot;
+		Array<CameraInfo> mCameras;
 		Array<MeshInfo> mMeshes;
 		Array<std::shared_ptr<MipMaps>> mMipMaps;
 		Array<MaterialInfo> mMaterials;
 
 	private:
+
+		/**
+		 * \brief Create a material to be served a default one for shape that have none (like point or line shapes)
+		 * \param baseColor The base color of the material to create
+		 * \return The created material
+		 */
+		static MaterialInfo CreateDefaultMaterial(LinearColor baseColor);
 
 		/**
 		 * \brief 

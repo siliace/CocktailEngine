@@ -35,6 +35,26 @@ namespace Ck
             mMipMaps.Add(MipMaps::FromImage(*image));
         }
 
+        for (const tinygltf::Camera& gltfCamera : model.cameras)
+        {
+            CameraInfo& cameraInfo = mCameras.Emplace();
+
+            cameraInfo.Name = gltfCamera.name;
+        	cameraInfo.IsPerspective = gltfCamera.type == "perspective";
+            if (cameraInfo.IsPerspective)
+            {
+                cameraInfo.Perspective.FieldOfView = Angle<float>::Degree(gltfCamera.perspective.yfov);
+                cameraInfo.Perspective.AspectRatio = gltfCamera.perspective.aspectRatio;
+                cameraInfo.DepthBounds.X() = gltfCamera.perspective.znear;
+                cameraInfo.DepthBounds.Y() = gltfCamera.perspective.zfar;
+            }
+            else
+            {
+                cameraInfo.DepthBounds.X() = gltfCamera.orthographic.znear;
+                cameraInfo.DepthBounds.Y() = gltfCamera.orthographic.zfar;
+            }
+        }
+
         for (const tinygltf::Material& gltfMaterial : model.materials)
         {
             mMaterials.Add(
@@ -183,7 +203,7 @@ namespace Ck
             SubMeshInfo subMesh;
             subMesh.Count = static_cast<unsigned int>(indices ? indices->GetIndexCount() : vertices->GetVertexCount());
             subMesh.PrimitiveTopology = GltfUtils::ConvertPrimitiveTopology(primitive.mode);
-            subMesh.MaterialIndex = primitive.material;
+            subMesh.MaterialIndex = primitive.material == -1 ? 0 : primitive.material + 1; // material 0 is the default one (index -1 in gltf)
 
             MeshInfo* compatibleMeshInfo = nullptr;
             for (MeshInfo& meshInfo : primitiveMeshes)
@@ -267,6 +287,8 @@ namespace Ck
         nodeInfo.Children = std::move(childrenNodes);
         nodeInfo.MeshIndices = mMeshIndirections[gltfNode.mesh];
         nodeInfo.LocalTransformation = localTransformation;
+        if (int cameraIndex = gltfNode.camera; cameraIndex != -1)
+            nodeInfo.Camera = &mCameras[cameraIndex];
 
         return nodeInfo;
     }

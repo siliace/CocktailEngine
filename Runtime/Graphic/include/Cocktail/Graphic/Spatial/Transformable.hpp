@@ -89,6 +89,12 @@ namespace Ck
 		 */
 		const Transformation& GetWorldTransformation() const;
 
+		/**
+		 * \brief
+		 * \return
+		 */
+		std::shared_ptr<TransformationNode> GetTransformationNode() const;
+
 	protected:
 
 		/**
@@ -96,12 +102,6 @@ namespace Ck
 		 * \param transformationNode
 		 */
 		explicit Transformable(std::shared_ptr<TransformationNode> transformationNode);
-
-		/**
-		 * \brief
-		 * \return
-		 */
-		std::shared_ptr<TransformationNode> GetTransformationNode() const;
 
 	private:
 

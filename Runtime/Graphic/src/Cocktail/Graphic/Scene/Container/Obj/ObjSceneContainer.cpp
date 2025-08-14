@@ -11,18 +11,6 @@
 
 namespace Ck
 {
-	SceneContainer::MaterialInfo ObjSceneContainer::CreateDefaultMaterial(LinearColor baseColor)
-	{
-		MaterialInfo material;
-		material.Name = "ObjDefault";
-		material.ShadingMode = Material::ShadingMode::Unlit;
-		material.Colors.Base = baseColor;
-		material.DoubleSided = true;
-		material.AlphaMode = Material::AlphaMode::Opaque;
-
-		return material;
-	}
-
 	ObjSceneContainer::ObjSceneContainer(const SceneImportParameters& importParameters, const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials) :
 		mImportParameters(importParameters)
 	{
@@ -32,7 +20,6 @@ namespace Ck
 		vertexLayoutBuilder.AddAttribute(VertexAttributeSemantic::Normal, DataType::Float32, 3);
 		mVertexLayout = vertexLayoutBuilder.Get();
 
-		mMaterials.Add(CreateDefaultMaterial(LinearColor(0.f, 0.f, 0.f)));
 		for (const tinyobj::material_t& objMaterial : materials)
 		{
 			mMaterials.Add(
