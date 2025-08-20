@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks 
 		 */
-		RenderBuffer(std::shared_ptr<RenderDevice> renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderBuffer(RenderDevice* renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

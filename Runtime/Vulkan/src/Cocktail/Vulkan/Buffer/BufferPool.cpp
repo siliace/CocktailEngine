@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	BufferPool::BufferPool(std::shared_ptr<RenderDevice> renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	BufferPool::BufferPool(RenderDevice* renderDevice, const Renderer::BufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		Buffer(std::move(renderDevice), createInfo, allocationCallbacks),
 		mRemainingCapacity(createInfo.Size)
 	{

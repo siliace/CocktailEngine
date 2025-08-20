@@ -11,7 +11,7 @@ namespace Ck
 		SceneViewer(std::move(scene)),
 		mCurrentFramebuffer(0)
 	{
-		std::shared_ptr<Renderer::RenderDevice> renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
+		Renderer::RenderDevice* renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
 
 		for (unsigned int i = 0; i < parameters.FrameCount; i++)
 		{

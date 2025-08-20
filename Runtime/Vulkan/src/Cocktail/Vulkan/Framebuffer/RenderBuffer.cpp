@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	RenderBuffer::RenderBuffer(std::shared_ptr<RenderDevice> renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderBuffer::RenderBuffer(RenderDevice* renderDevice, const RenderBufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		AbstractTexture(renderDevice),
 		mFormat(createInfo.Format),
 		mSize(MakeExtent(createInfo.Size, 1u)),

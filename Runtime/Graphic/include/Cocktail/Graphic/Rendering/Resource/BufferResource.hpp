@@ -1,5 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_BUFFERRESOURCE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_BUFFERRESOURCE_HPP
+
+#include <memory>
  
 #include <Cocktail/Graphic/Rendering/Resource/GraphicResource.hpp>
 

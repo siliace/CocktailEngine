@@ -20,7 +20,7 @@ namespace Ck
 		 * \param renderDevice
 		 * \param createInfo
 		 */
-		MaterialProgram(const std::shared_ptr<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo);
+		MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo);
 
 		std::shared_ptr<MaterialProgramVariant> GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
 

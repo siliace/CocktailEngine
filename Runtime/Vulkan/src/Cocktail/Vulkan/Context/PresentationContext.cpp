@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	PresentationContext::PresentationContext(std::shared_ptr<RenderDevice> renderDevice, RenderSurface* surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
+	PresentationContext::PresentationContext(RenderDevice* renderDevice, RenderSurface* surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
 		mRenderDevice(std::move(renderDevice)),
 		mSurface(surface),
 		mSurfaceColorSpace(colorSpace)

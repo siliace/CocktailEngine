@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_RENDERER_RENDERDEVICEOBJECT_HPP
 #define COCKTAIL_RENDERER_RENDERDEVICEOBJECT_HPP
 
-#include <memory>
-
 namespace Ck::Renderer
 {
     class RenderDevice;
@@ -29,7 +27,7 @@ namespace Ck::Renderer
          * \brief Get the RenderDevice used to created this object
          * \return The RenderDevice
          */
-        virtual std::shared_ptr<RenderDevice> GetRenderDevice() const = 0;
+        virtual RenderDevice* GetRenderDevice() const = 0;
     };  
 }
 

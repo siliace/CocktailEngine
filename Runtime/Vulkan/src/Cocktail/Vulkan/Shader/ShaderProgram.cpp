@@ -45,7 +45,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	ShaderProgram::ShaderProgram(std::shared_ptr<RenderDevice> renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	ShaderProgram::ShaderProgram(RenderDevice* renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks)
 	{
@@ -73,7 +73,7 @@ namespace Ck::Vulkan
 	{
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> ShaderProgram::GetRenderDevice() const
+	Renderer::RenderDevice* ShaderProgram::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

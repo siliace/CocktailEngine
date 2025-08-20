@@ -8,7 +8,7 @@
 
 namespace Ck::Vulkan
 {
-	RenderContext::RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderContext::RenderContext(RenderDevice* renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mPresentationQueue(VK_NULL_HANDLE),
 		mCurrentFrameContext(0),
@@ -36,7 +36,7 @@ namespace Ck::Vulkan
 	{
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> RenderContext::GetRenderDevice() const
+	Renderer::RenderDevice* RenderContext::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

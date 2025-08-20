@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	MaterialProgramManager::MaterialProgramManager(std::shared_ptr<Renderer::RenderDevice> renderDevice) :
+	MaterialProgramManager::MaterialProgramManager(Renderer::RenderDevice* renderDevice) :
 		mRenderDevice(std::move(renderDevice))
 	{
 		for (const MaterialProgramLibrary::Entry& entry : App::Resolve<MaterialProgramLibrary>()->GetEntries())

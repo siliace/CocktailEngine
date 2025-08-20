@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit StaticSamplerManager(std::shared_ptr<RenderDevice> renderDevice);
+		explicit StaticSamplerManager(RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -32,7 +32,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		EnumMap<Renderer::StaticSampler, std::shared_ptr<Sampler>> mSamplers;
 	};
 }

@@ -26,7 +26,7 @@ namespace Ck::Vulkan
 		 * \param queueType 
 		 * \param queueIndex 
 		 */
-		QueueSubmitter(std::shared_ptr<RenderDevice> renderDevice, SubmitScheduler* scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex);
+		QueueSubmitter(RenderDevice* renderDevice, SubmitScheduler* scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex);
 
 		/**
 		 * \brief 
@@ -88,7 +88,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		SubmitScheduler* mScheduler;
 		Renderer::CommandQueueType mQueueType;
 		unsigned int mQueueIndex;

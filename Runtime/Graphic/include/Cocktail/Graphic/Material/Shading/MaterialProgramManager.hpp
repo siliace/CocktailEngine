@@ -16,7 +16,7 @@ namespace Ck
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit MaterialProgramManager(std::shared_ptr<Renderer::RenderDevice> renderDevice);
+		explicit MaterialProgramManager(Renderer::RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -46,7 +46,7 @@ namespace Ck
 
 		using MaterialProgramKey = CompositeKey<RenderableType, Material::ShadingMode>;
 
-		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
+		Renderer::RenderDevice* mRenderDevice;
 		std::unordered_map<MaterialProgramKey, std::shared_ptr<MaterialProgram>> mMaterialPrograms;
 	};
 }

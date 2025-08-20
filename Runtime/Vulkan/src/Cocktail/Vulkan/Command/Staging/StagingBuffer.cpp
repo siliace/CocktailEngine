@@ -6,7 +6,7 @@
 
 namespace Ck::Vulkan
 {
-	StagingBuffer::StagingBuffer(const std::shared_ptr<RenderDevice>& renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize) :
+	StagingBuffer::StagingBuffer(RenderDevice* renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize) :
 		mRemainingCapacity(bufferSize)
 	{
 		Renderer::BufferCreateInfo createInfo;

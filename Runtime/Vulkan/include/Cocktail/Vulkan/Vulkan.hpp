@@ -35,7 +35,7 @@ namespace Ck
 		 * \param createInfo Parameters of the RenderDevice to create
 		 * \return The RenderDevice created
 		 */
-		COCKTAIL_VULKAN_API std::shared_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo);
+		COCKTAIL_VULKAN_API std::unique_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo);
 	}
 }
 

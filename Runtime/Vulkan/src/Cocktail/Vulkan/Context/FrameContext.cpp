@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 		mRenderContext(renderContext),
 		mSubmitted(false)
 	{
-		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+		RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
 
 		CommandListPoolCreateInfo commandListPoolCreateInfo;
 		mCommandListPool = std::make_shared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
@@ -45,7 +45,7 @@ namespace Ck::Vulkan
 		auto it = mAcquiredImages.find(renderSurface);
 		if (it == mAcquiredImages.end())
 		{
-			std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+			RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
 
 			AcquiredImage acquiredImage;
 			acquiredImage.ImageAvailable = renderDevice->CreateSemaphore({});
@@ -97,7 +97,7 @@ namespace Ck::Vulkan
 				return bufferAllocator.get();
 		}
 
-		std::shared_ptr<RenderDevice> renderDevice = std::static_pointer_cast<RenderDevice>(mRenderContext->GetRenderDevice());
+		RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
 		std::shared_ptr<BufferAllocator> allocator = std::make_shared<BufferAllocator>(renderDevice, usage, 1024 * 1024, memoryType);
 		mBufferAllocators[BufferAllocatorKey(usage, memoryType)] = allocator;
 

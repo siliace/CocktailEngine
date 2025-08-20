@@ -3,8 +3,6 @@
 
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
-#include <Cocktail/Vulkan/Pipeline/ComputePipeline.hpp>
-#include <Cocktail/Vulkan/Pipeline/GraphicPipeline.hpp>
 #include <Cocktail/Vulkan/Pipeline/GraphicPipelineCreateInfo.hpp>
 #include <Cocktail/Vulkan/Pipeline/PipelineCacheCreateInfo.hpp>
 
@@ -17,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class PipelineCache
+	class PipelineCache : public Renderer::RenderDeviceObject
 	{
 	public:
 
@@ -27,38 +25,30 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		PipelineCache(std::shared_ptr<RenderDevice> renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		PipelineCache(RenderDevice* renderDevice, const PipelineCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
 		 */
-		~PipelineCache();
-		
-		/**
-		 * \brief 
-		 * \param createInfo 
-		 * \return 
-		 */
-		std::shared_ptr<ComputePipeline> CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
+		~PipelineCache() override;
 
 		/**
 		 * \brief 
-		 * \param createInfo 
-		 * \return 
+		 * \param other 
 		 */
-		std::shared_ptr<GraphicPipeline> CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo);
+		void Merge(const PipelineCache& other) const;
 
 		/**
 		 * \brief 
 		 * \param name 
 		 */
-		void SetObjectName(const char* name) const;
+		void SetObjectName(const char* name) const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<RenderDevice> GetRenderDevice() const;
+		RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -74,10 +64,9 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipelineCache mHandle;
-		std::unordered_map<PipelineStateHash, std::shared_ptr<Pipeline>> mCache;
 	};
 }
 

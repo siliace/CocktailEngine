@@ -17,11 +17,13 @@ namespace Ck::Detail
 		 * \param owner 
 		 * \param resolver 
 		 */
-		SingletonServiceBinding(ServiceContainer* owner, ServiceResolver<T> resolver) :
+		SingletonServiceBinding(ServiceContainer* owner, ServiceResolver<T> resolver, bool lazy) :
 			mOwner(owner),
-			mResolver(std::move(resolver))
+			mResolver(std::move(resolver)),
+			mLazy(lazy)
 		{
-			/// Nothing
+			if (!mLazy)
+				mInstance = CallableServiceBinding<T>::InvokeDecorators(mResolver(mOwner));
 		}
 
 		/**
@@ -30,7 +32,7 @@ namespace Ck::Detail
 		 */
 		T* Resolve() override
 		{
-			if (!mInstance)
+			if (mLazy && !mInstance)
 			{
 				std::lock_guard lg(mLock);
 				if (!mInstance)
@@ -44,6 +46,7 @@ namespace Ck::Detail
 
 		ServiceContainer* mOwner;
 		ServiceResolver<T> mResolver;
+		bool mLazy;
 		std::mutex mLock;
 		std::unique_ptr<T> mInstance;
 	};

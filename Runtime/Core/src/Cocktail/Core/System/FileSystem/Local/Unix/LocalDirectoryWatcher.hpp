@@ -18,7 +18,7 @@ namespace Ck::Detail::Unix
 		 * \param directory
 		 * \param recursive 
 		 */
-		LocalDirectoryWatcher(const std::shared_ptr<Directory>& directory, bool recursive);
+		LocalDirectoryWatcher(Directory& directory, bool recursive);
 
 		/**
 		 * \brief 
@@ -30,6 +30,12 @@ namespace Ck::Detail::Unix
 		 * \return 
 		 */
 		Signal<std::filesystem::path>& OnFileCreated() override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		Signal<std::filesystem::path>& OnFileModified() override;
 
 		/**
 		 * \brief 
@@ -45,9 +51,10 @@ namespace Ck::Detail::Unix
 
 	private:
 
-		std::shared_ptr<Directory> mDirectory;
+		Directory* mDirectory;
 		bool mRecursive;
 		Signal<std::filesystem::path> mOnFileCreated;
+		Signal<std::filesystem::path> mOnFileModified;
 		Signal<std::filesystem::path, std::filesystem::path> mOnFileRenamed;
 		Signal<std::filesystem::path> mOnFileDeleted;
 	};

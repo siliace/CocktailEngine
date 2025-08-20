@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \param allocationCallbacks 
 		 */
-		RenderContext(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderContext(RenderDevice* renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -40,7 +40,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -131,7 +131,7 @@ namespace Ck::Vulkan
 		 */
 		FrameContext* GetCurrentFrameContext() const;
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		VkQueue mPresentationQueue;
 		std::unique_ptr<SubmitScheduler> mScheduler;
 		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;

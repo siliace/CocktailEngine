@@ -20,9 +20,7 @@ namespace Ck::Vulkan
 
 	void VulkanServiceProvider::DoRegister(Application* application)
 	{
-		application->Singleton<VolkService>([]() {
-			return std::make_unique<VolkService>();
-		});
+		application->Singleton<VolkService>(false);
 	}
 
 	void VulkanServiceProvider::DoBoot(Application* application)
@@ -30,7 +28,5 @@ namespace Ck::Vulkan
 		application->Invoke([](EmbeddedFileSystemDriver* embeddedDriver) {
 			embeddedDriver->Register(cmrc::Vulkan::get_filesystem());
 		});
-
-		application->Resolve<VolkService>(); // Ensure Volk is initialized
 	}
 }

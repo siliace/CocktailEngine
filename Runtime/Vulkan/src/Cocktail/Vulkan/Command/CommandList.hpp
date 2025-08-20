@@ -24,13 +24,13 @@ namespace Ck::Vulkan
 	{
 	public:
 
-		CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		CommandList(RenderDevice* renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		~CommandList() override;
 
 		void SetObjectName(const char* name) const override;
 
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		void Begin(Renderer::CommandList* primary) override;
 		void End() override;
@@ -117,7 +117,7 @@ namespace Ck::Vulkan
 		void FlushGraphicState();
 		void FlushState(Renderer::ShaderProgramType programType);
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		std::shared_ptr<CommandListPool> mAllocator;
 		DescriptorSetAllocator* mDescriptorSetAllocator;
 		VkCommandBuffer mHandle;

@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param bufferUsage 
 		 * \param bufferSize 
 		 */
-		StagingBuffer(const std::shared_ptr<RenderDevice>& renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
+		StagingBuffer(RenderDevice* renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
 
 		/**
 		 * \brief 

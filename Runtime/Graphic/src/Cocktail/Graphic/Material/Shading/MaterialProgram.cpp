@@ -37,7 +37,7 @@ namespace Ck
 		}
 	}
 
-	MaterialProgram::MaterialProgram(const std::shared_ptr<Renderer::RenderDevice>& renderDevice, const MaterialProgramCreateInfo& createInfo) :
+	MaterialProgram::MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo) :
 		mName(createInfo.Name)
 	{
 		for (const EnumMap<Renderer::ShaderType, ByteArray>& variantBinaries : createInfo.VariantsBinaries)

@@ -33,13 +33,17 @@ namespace Ck::Detail::Win32
 			GENERIC_WRITE,
 			0,
 			nullptr,
-			CREATE_NEW,
+			OPEN_ALWAYS,
 			FILE_ATTRIBUTE_NORMAL,
 			nullptr
 		);
 
 		if (handle == INVALID_HANDLE_VALUE)
 			throw SystemError::GetLastError();
+
+		// Flush the error code
+		// With OPEN_ALWAYS, if the file already exists, this last error code is set to ERROR_ALREADY_EXISTS but we don't care here
+		::GetLastError();
 
 		CloseHandle(handle);
 	}

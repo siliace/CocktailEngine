@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	StagingAllocator::StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize) :
+	StagingAllocator::StagingAllocator(RenderDevice* renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize) :
 		mRenderDevice(std::move(renderDevice)),
 		mBufferUsage(bufferUsage),
 		mBufferSize(bufferSize)

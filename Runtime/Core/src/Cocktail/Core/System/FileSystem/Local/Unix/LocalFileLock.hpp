@@ -14,32 +14,32 @@ namespace Ck::Detail::Unix
 	public:
 
 		/**
-		 * \brief 
+		 * \brief
 		 * \param file
 		 * \param offset
-		 * \param length 
+		 * \param length
 		 */
-		LocalFileLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length);
+		LocalFileLock(File& file, std::size_t offset, std::size_t length);
 
 		/**
-		 * \brief 
+		 * \brief
 		 */
 		void Lock() override;
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		bool TryLock() override;
 
 		/**
-		 * \brief 
+		 * \brief
 		 */
 		void Unlock() override;
 
 	private:
 
-		std::shared_ptr<File> mFile;
+		File* mFile;
 		std::size_t mOffset;
 		std::size_t mLength;
 	};

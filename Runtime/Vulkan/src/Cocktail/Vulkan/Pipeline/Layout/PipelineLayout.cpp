@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	PipelineLayout::PipelineLayout(std::shared_ptr<RenderDevice> renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	PipelineLayout::PipelineLayout(RenderDevice* renderDevice, const PipelineLayoutCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -84,7 +84,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> PipelineLayout::GetRenderDevice() const
+	Renderer::RenderDevice* PipelineLayout::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

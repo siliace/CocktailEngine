@@ -31,7 +31,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		CommandListPool(RenderDevice* renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -81,7 +81,7 @@ namespace Ck::Vulkan
 		 */
 		std::shared_ptr<CommandPool> GetCommandPool(Renderer::CommandQueueType queueType) const;
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		EnumMap<Renderer::CommandQueueType, std::shared_ptr<CommandPool>> mCommandPools;
 		DescriptorSetAllocator mDescriptorSetAllocator;
 		std::unique_ptr<StagingAllocator> mStagingAllocator;

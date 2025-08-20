@@ -126,7 +126,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	Shader::Shader(std::shared_ptr<RenderDevice> renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Shader::Shader(RenderDevice* renderDevice, const ValidationCache* validationCache, const Renderer::ShaderCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -307,7 +307,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> Shader::GetRenderDevice() const
+	Renderer::RenderDevice* Shader::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

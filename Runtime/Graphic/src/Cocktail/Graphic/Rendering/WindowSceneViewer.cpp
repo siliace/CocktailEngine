@@ -49,7 +49,7 @@ namespace Ck
 	WindowSceneViewer::WindowSceneViewer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window, SceneViewerParameters parameters, bool vSync) :
 		SceneViewer(std::move(scene))
 	{
-		std::shared_ptr<Renderer::RenderDevice> renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
+		Renderer::RenderDevice* renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
 
 		Renderer::RenderSurfaceCreateInfo renderSurfaceCreateInfo;
 		renderSurfaceCreateInfo.Window = std::move(window);

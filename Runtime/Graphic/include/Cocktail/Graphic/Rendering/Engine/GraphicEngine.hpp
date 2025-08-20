@@ -93,7 +93,7 @@ namespace Ck
 	     * \brief 
 	     * \return 
 	     */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const;
+		Renderer::RenderDevice* GetRenderDevice() const;
 
 		/**
 	     * \brief 
@@ -109,7 +109,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<Renderer::RenderDevice> mRenderDevice;
+		std::unique_ptr<Renderer::RenderDevice> mRenderDevice;
 		std::shared_ptr<Renderer::RenderContext> mRenderContext;
 		std::shared_ptr<ResourceUploader> mResourceUploader;
 		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;

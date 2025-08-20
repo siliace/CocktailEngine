@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	ValidationCache::ValidationCache(std::shared_ptr<RenderDevice> renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	ValidationCache::ValidationCache(RenderDevice* renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -46,7 +46,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<RenderDevice> ValidationCache::GetRenderDevice() const
+	RenderDevice* ValidationCache::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

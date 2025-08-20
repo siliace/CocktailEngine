@@ -25,9 +25,10 @@ namespace Ck
 		{
 		public:
 
-			static std::shared_ptr<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
+			static std::unique_ptr<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
 			{
 				Vulkan::RenderDeviceCreateInfo createInfo;
+				createInfo.ApplicationName = "CocktailEngine";
 				createInfo.ApiVersion = Vulkan::GetSupportedApiVersion();
 				createInfo.EnableValidation = enableValidation;
 				return Vulkan::CreateRenderDevice(createInfo);
@@ -54,7 +55,7 @@ namespace Ck
 		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });
 
 		mResourceUploader = std::make_shared<ResourceUploader>();
-		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice);
+		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice.get());
 	}
 
     GraphicEngine::~GraphicEngine()
@@ -137,9 +138,9 @@ namespace Ck
 		FlushTransfer();
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> GraphicEngine::GetRenderDevice() const
+	Renderer::RenderDevice* GraphicEngine::GetRenderDevice() const
 	{
-		return mRenderDevice;
+		return mRenderDevice.get();
 	}
 
 	std::shared_ptr<Renderer::RenderContext> GraphicEngine::GetRenderContext() const

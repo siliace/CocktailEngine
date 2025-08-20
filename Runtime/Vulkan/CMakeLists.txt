@@ -182,6 +182,10 @@ cocktail_source_directory(VULKAN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineCache.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineCache.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineCacheCreateInfo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineCacheSaver.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineCacheSaver.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineManager.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Pipeline/PipelineManager.cpp
 )
 
 cocktail_source_directory(VULKAN_FILES    

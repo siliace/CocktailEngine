@@ -2,7 +2,7 @@
 
 namespace Ck::Vulkan
 {
-	SwapchainTexture::SwapchainTexture(std::shared_ptr<RenderDevice> renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle):
+	SwapchainTexture::SwapchainTexture(RenderDevice* renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle):
 		AbstractTexture(renderDevice),
 		mFormat(format),
 		mSize(size),

@@ -10,6 +10,12 @@ namespace Ck
 		mAliases.insert_or_assign(abstract, concrete);
 	}
 
+	void ServiceContainer::Clear()
+	{
+		mBindings.clear();
+		mAliases.clear();
+	}
+
 	void ServiceContainer::RegisterBinding(std::unique_ptr<Detail::ServiceBindingBase> binding)
 	{
 		mBindings.insert_or_assign(binding->GetResolvedType(), std::move(binding));

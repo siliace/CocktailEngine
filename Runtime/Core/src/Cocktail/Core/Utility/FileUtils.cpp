@@ -19,7 +19,10 @@ namespace Ck
 
 	ByteArray FileUtils::ReadFile(const std::filesystem::path& path)
 	{
-		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		if (!Storage::IsFile(path))
+			return {};
+
+		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
 		std::unique_ptr<std::uint8_t[]> buffer = std::make_unique<std::uint8_t[]>(size);
@@ -31,6 +34,9 @@ namespace Ck
 
 	Array<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
 	{
+		if (!Storage::IsFile(path))
+			return {};
+
 		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 		FileInputStream inputStream(*file);
 
@@ -47,17 +53,30 @@ namespace Ck
 	void FileUtils::WriteFile(const std::filesystem::path& path, ByteArrayView content)
 	{
 		if (!Storage::IsFile(path))
+		{
+			MakeDirectories(path.parent_path());
 			Storage::CreateFile(path);
+		}
 
-		std::shared_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
+		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
 		file->Write(content.GetData(), content.GetSize());
 	}
 
 	void FileUtils::WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
 	{
+		if (!Storage::IsFile(path))
+		{
+			MakeDirectories(path.parent_path());
+			Storage::CreateFile(path);
+		}
 	}
 
 	void FileUtils::AppendFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
 	{
+		if (!Storage::IsFile(path))
+		{
+			MakeDirectories(path.parent_path());
+			Storage::CreateFile(path);
+		}
 	}
 }

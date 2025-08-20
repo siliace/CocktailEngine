@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	CommandListPool::CommandListPool(std::shared_ptr<RenderDevice> renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	CommandListPool::CommandListPool(RenderDevice* renderDevice, const CommandListPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mDescriptorSetAllocator(mRenderDevice),
 		mTransient(createInfo.Transient),
