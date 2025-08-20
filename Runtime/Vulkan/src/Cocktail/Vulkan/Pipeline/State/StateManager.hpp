@@ -58,7 +58,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice 
 		 * \param descriptorSetAllocator 
 		 */
-		explicit StateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
+		explicit StateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
 
 		/**
 		 * \brief 
@@ -228,7 +228,7 @@ namespace Ck::Vulkan
 			bool Dirty = false;
 		};
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		DescriptorSetAllocator* mDescriptorSetAllocator;
 		Flags<DirtyFlagBits> mDirtyFlags;
 		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaderStages;

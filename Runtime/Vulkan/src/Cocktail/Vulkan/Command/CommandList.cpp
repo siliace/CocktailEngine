@@ -359,7 +359,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	CommandList::CommandList(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
+	CommandList::CommandList(RenderDevice* renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocator(std::move(allocator)),
 		mHandle(VK_NULL_HANDLE),
@@ -412,7 +412,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> CommandList::GetRenderDevice() const
+	Renderer::RenderDevice* CommandList::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

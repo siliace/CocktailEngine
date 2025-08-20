@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	Texture::Texture(std::shared_ptr<RenderDevice> renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Texture::Texture(RenderDevice* renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		AbstractTexture(renderDevice),
 		mType(createInfo.Type),
 		mFormat(createInfo.Format),

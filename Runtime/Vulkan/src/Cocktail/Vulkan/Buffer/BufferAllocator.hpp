@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param bufferSize
 		 * \param memoryType
 		 */
-		BufferAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType);
+		BufferAllocator(RenderDevice* renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType);
 
 		/**
 		 * \brief
@@ -67,7 +67,7 @@ namespace Ck::Vulkan
 		 */
 		BufferPool* AcquirePool(std::size_t size);
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		Renderer::BufferUsageFlags mUsage;
 		std::size_t mBufferSize;
 		Renderer::MemoryType mMemoryType;

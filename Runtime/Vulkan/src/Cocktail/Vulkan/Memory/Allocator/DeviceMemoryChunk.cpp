@@ -3,7 +3,7 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(nullptr, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(texture, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(std::shared_ptr<RenderDevice> renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),

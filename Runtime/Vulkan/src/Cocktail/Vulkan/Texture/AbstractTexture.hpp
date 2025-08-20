@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit AbstractTexture(std::shared_ptr<RenderDevice> renderDevice);
+		explicit AbstractTexture(RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -35,7 +35,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -70,7 +70,7 @@ namespace Ck::Vulkan
 		 */
 		void SetViewFormats(unsigned int viewFormatCount, const PixelFormat* viewFormats);
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 
 	private:
 

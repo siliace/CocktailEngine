@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		GraphicPipeline(std::shared_ptr<RenderDevice> renderDevice, const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		GraphicPipeline(RenderDevice* renderDevice, const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	Semaphore::Semaphore(std::shared_ptr<RenderDevice> renderDevice, const SemaphoreCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Semaphore::Semaphore(RenderDevice* renderDevice, const SemaphoreCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks)
 	{
@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> Semaphore::GetRenderDevice() const
+	Renderer::RenderDevice* Semaphore::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	BufferAllocator::BufferAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType) :
+	BufferAllocator::BufferAllocator(RenderDevice* renderDevice, Renderer::BufferUsageFlags usage, std::size_t bufferSize, Renderer::MemoryType memoryType) :
 		mRenderDevice(std::move(renderDevice)),
 		mUsage(usage),
 		mBufferSize(bufferSize),

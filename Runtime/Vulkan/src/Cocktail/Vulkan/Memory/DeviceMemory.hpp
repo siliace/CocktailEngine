@@ -16,19 +16,19 @@ namespace Ck::Vulkan
 	{
 	public:
 
-		DeviceMemory(std::shared_ptr<RenderDevice> renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DeviceMemory(RenderDevice* renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		~DeviceMemory() override;
 
 		void SetObjectName(const char* name) const override;
 
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		VkDeviceMemory GetHandle() const;
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDeviceMemory mHandle;
 		std::size_t mSize;

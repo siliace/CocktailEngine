@@ -64,7 +64,7 @@ namespace Ck::Vulkan
 		 * \param descriptorSetAllocator
 		 * \param dynamicState 
 		 */
-		GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState);
+		GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState);
 
 		void SetShaderProgram(const ShaderProgram* shaderProgram) override;
 		void SetEntryPoint(Renderer::ShaderType shaderType, const char* name) override;

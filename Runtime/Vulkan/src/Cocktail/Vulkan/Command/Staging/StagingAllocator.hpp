@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		 * \param bufferUsage The usage of buffers to create
 		 * \param bufferSize The size of buffers to create
 		 */
-		StagingAllocator(std::shared_ptr<RenderDevice> renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
+		StagingAllocator(RenderDevice* renderDevice, Renderer::BufferUsageFlags bufferUsage, std::size_t bufferSize);
 
 		/**
 		 * \brief Destructor
@@ -56,7 +56,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		Renderer::BufferUsageFlags mBufferUsage;
 		std::size_t mBufferSize;
 		Array<StagingBuffer*> mAcquiredBuffers;

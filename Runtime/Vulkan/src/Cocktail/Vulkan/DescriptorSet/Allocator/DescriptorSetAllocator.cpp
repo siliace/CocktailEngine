@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorSetAllocator::DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice) :
+	DescriptorSetAllocator::DescriptorSetAllocator(RenderDevice* renderDevice) :
 		mRenderDevice(std::move(renderDevice))
 	{
 		/// Nothing

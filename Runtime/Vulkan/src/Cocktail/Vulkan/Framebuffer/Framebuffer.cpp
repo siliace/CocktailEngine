@@ -6,7 +6,7 @@
 
 namespace Ck::Vulkan
 {
-	Framebuffer::Framebuffer(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Framebuffer::Framebuffer(RenderDevice* renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mRenderPass(renderPass),
 		mAllocationCallbacks(allocationCallbacks),
@@ -96,7 +96,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> Framebuffer::GetRenderDevice() const
+	Renderer::RenderDevice* Framebuffer::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

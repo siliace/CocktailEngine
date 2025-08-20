@@ -16,7 +16,6 @@
 #include <Cocktail/Vulkan/Context/RenderContext.hpp>
 #include <Cocktail/Vulkan/Context/RenderSurface.hpp>
 #include <Cocktail/Vulkan/Context/Swapchain.hpp>
-#include <Cocktail/Vulkan/DescriptorSet/DescriptorSet.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
 #include <Cocktail/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
@@ -25,8 +24,9 @@
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPassCreateInfo.hpp>
 #include <Cocktail/Vulkan/Memory/DeviceMemory.hpp>
-#include <Cocktail/Vulkan/Pipeline/GraphicPipelineCreateInfo.hpp>
-#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Pipeline/ComputePipeline.hpp>
+#include <Cocktail/Vulkan/Pipeline/GraphicPipeline.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCacheSaver.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 #include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
@@ -50,53 +50,58 @@ namespace Ck::Vulkan
 
 	RenderDevice::~RenderDevice()
 	{
+		if (PipelineCacheSaver* pipelineCacheSaver = Resolve<PipelineCacheSaver>())
+			pipelineCacheSaver->DumpPipelineCache();
+
+		Clear();
+
 		vkDestroyDevice(mHandle, nullptr);
 		vkDestroyInstance(mInstance, nullptr);
 	}
 
 	std::shared_ptr<Renderer::Buffer> RenderDevice::CreateBuffer(const Renderer::BufferCreateInfo& createInfo)
 	{
-		return mBufferPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mBufferPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::BufferView> RenderDevice::CreateBufferView(const Renderer::BufferViewCreateInfo& createInfo)
 	{
-		return mBufferViewPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mBufferViewPool.Allocate(this, createInfo, nullptr);
 	}
 
 	std::shared_ptr<CommandList> RenderDevice::CreateCommandList(std::shared_ptr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo)
 	{
-		return mCommandListPool.Allocate(shared_from_this(), pool, descriptorSetAllocator, createInfo);
+		return mCommandListPool.Allocate(this, pool, descriptorSetAllocator, createInfo);
 	}
 
 	std::shared_ptr<ComputePipeline> RenderDevice::CreateComputePipeline(const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo)
 	{
-		return mComputePipelinePool.Allocate(shared_from_this(), pipelineCache, createInfo, nullptr);
+		return mComputePipelinePool.Allocate(this, pipelineCache, createInfo, nullptr);
 	}
 
 	std::shared_ptr<DescriptorPool> RenderDevice::CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo)
 	{
-		return mDescriptorPoolPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mDescriptorPoolPool.Allocate(this, createInfo, nullptr);
 	}
 
 	std::shared_ptr<DescriptorSetLayout> RenderDevice::CreateDescriptorSetLayout(const DescriptorSetLayoutCreateInfo& createInfo)
 	{
-		return mDescriptorSetLayoutPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mDescriptorSetLayoutPool.Allocate(this, createInfo, nullptr);
 	}
 
 	std::shared_ptr<DescriptorUpdateTemplate> RenderDevice::CreateDescriptorUpdateTemplate(const DescriptorUpdateTemplateCreateInfo& createInfo)
 	{
-		return mDescriptorUpdateTemplatePool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mDescriptorUpdateTemplatePool.Allocate(this, createInfo, nullptr);
 	}
 
 	std::shared_ptr<DeviceMemory> RenderDevice::CreateDeviceMemory(const DeviceMemoryCreateInfo& createInfo)
 	{
-		return mDeviceMemoryPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mDeviceMemoryPool.Allocate(this, createInfo, nullptr);
 	}
 
 	std::shared_ptr<Renderer::Fence> RenderDevice::CreateFence(const Renderer::FenceCreateInfo& createInfo)
 	{
-		return mFencePool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mFencePool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::Framebuffer> RenderDevice::CreateFramebuffer(const Renderer::FramebufferCreateInfo& createInfo)
@@ -121,47 +126,47 @@ namespace Ck::Vulkan
 
 	std::shared_ptr<Renderer::Framebuffer> RenderDevice::CreateFramebuffer(std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo)
 	{
-		return mFramebufferPool.Allocate(shared_from_this(), std::move(renderPass), createInfo, nullptr);
+		return mFramebufferPool.Allocate(this, std::move(renderPass), createInfo, nullptr);
 	}
 	
 	std::shared_ptr<GraphicPipeline> RenderDevice::CreateGraphicPipeline(const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo)
 	{
-		return mGraphicPipelinePool.Allocate(shared_from_this(), pipelineCache, createInfo, nullptr);
+		return mGraphicPipelinePool.Allocate(this, pipelineCache, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<PipelineLayout> RenderDevice::CreatePipelineLayout(const PipelineLayoutCreateInfo& createInfo)
 	{
-		return mPipelineLayoutPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mPipelineLayoutPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<RenderBuffer> RenderDevice::CreateRenderBuffer(const RenderBufferCreateInfo& createInfo)
 	{
-		return mRenderBufferPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mRenderBufferPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::RenderContext> RenderDevice::CreateRenderContext(const Renderer::RenderContextCreateInfo& createInfo)
 	{
-		return mRenderContextPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mRenderContextPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::RenderSurface> RenderDevice::CreateRenderSurface(const Renderer::RenderSurfaceCreateInfo& createInfo)
 	{
-		return mRenderSurfacePool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mRenderSurfacePool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<RenderPass> RenderDevice::CreateRenderPass(const RenderPassCreateInfo& createInfo)
 	{
-		return mRenderPassPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mRenderPassPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::Sampler> RenderDevice::CreateSampler(const Renderer::SamplerCreateInfo& createInfo)
 	{
-		return mSamplerPool.Allocate(shared_from_this(), createInfo, nullptr);;
+		return mSamplerPool.Allocate(this, createInfo, nullptr);;
 	}
 
 	std::shared_ptr<Semaphore> RenderDevice::CreateSemaphore(const SemaphoreCreateInfo& createInfo)
 	{
-		return mSemaphorePool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mSemaphorePool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::Shader> RenderDevice::CreateShader(const Renderer::ShaderCreateInfo& createInfo)
@@ -170,30 +175,30 @@ namespace Ck::Vulkan
 		{
 			ValidationCache* validationCache = Resolve<ValidationCache>();
 			if (validationCache)
-				return mShaderPool.Allocate(shared_from_this(), validationCache, createInfo, nullptr);
+				return mShaderPool.Allocate(this, validationCache, createInfo, nullptr);
 		}
 
-		return mShaderPool.Allocate(shared_from_this(), nullptr, createInfo, nullptr);
+		return mShaderPool.Allocate(this, nullptr, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::ShaderProgram> RenderDevice::CreateShaderProgram(const Renderer::ShaderProgramCreateInfo& createInfo)
 	{
-		return mShaderProgramPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mShaderProgramPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Swapchain> RenderDevice::CreateSwapchain(const SwapchainCreateInfo& createInfo)
 	{
-		return mSwapchainPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mSwapchainPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::Texture> RenderDevice::CreateTexture(const Renderer::TextureCreateInfo& createInfo)
 	{
-		return mTexturePool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mTexturePool.Allocate(this, createInfo, nullptr);
 	}
 	
 	std::shared_ptr<Renderer::TextureView> RenderDevice::CreateTextureView(const Renderer::TextureViewCreateInfo& createInfo)
 	{
-		return mTextureViewPool.Allocate(shared_from_this(), createInfo, nullptr);
+		return mTextureViewPool.Allocate(this, createInfo, nullptr);
 	}
 	
 	const QueueFamilyContext& RenderDevice::GetQueueFamilyContext() const

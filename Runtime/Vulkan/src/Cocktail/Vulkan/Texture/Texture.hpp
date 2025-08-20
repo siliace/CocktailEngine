@@ -20,7 +20,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Texture(std::shared_ptr<RenderDevice> renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Texture(RenderDevice* renderDevice, const Renderer::TextureCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 

@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_RENDERER_TEXTURE_TEXTUREVIEW_HPP
 #define COCKTAIL_RENDERER_TEXTURE_TEXTUREVIEW_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/Image/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>

@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \param handle 
 		 */
-		SwapchainTexture(std::shared_ptr<RenderDevice> renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle);
+		SwapchainTexture(RenderDevice* renderDevice, PixelFormat format, const Extent2D<unsigned int>& size, VkImage handle);
 
 		/**
 		 * \brief

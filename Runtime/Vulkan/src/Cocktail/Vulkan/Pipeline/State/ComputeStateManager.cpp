@@ -1,12 +1,12 @@
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Pipeline/ComputePipelineCreateInfo.hpp>
-#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineManager.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/ComputeStateManager.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 
 namespace Ck::Vulkan
 {
-	ComputeStateManager::ComputeStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
+	ComputeStateManager::ComputeStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
 		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
 		mShaderProgram(nullptr)
 	{
@@ -42,8 +42,8 @@ namespace Ck::Vulkan
 
 		mDirtyFlags &= ~DirtyFlagBits::Pipeline;
 
-		return mRenderDevice->Invoke([&](PipelineCache* pipelineCache) {
-			return pipelineCache->CreateComputePipeline(createInfo);
+		return mRenderDevice->Invoke([&](PipelineManager* pipelineManager) {
+			return pipelineManager->CreateComputePipeline(createInfo);
 		});
 	}
 }

@@ -4,7 +4,7 @@
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
-#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineManager.hpp>
 #include <Cocktail/Vulkan/Pipeline/State/GraphicStateManager.hpp>
 #include <Cocktail/Vulkan/Shader/ShaderProgram.hpp>
 
@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	GraphicStateManager::GraphicStateManager(std::shared_ptr<RenderDevice> renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
+	GraphicStateManager::GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
 		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
 		mDynamicState(dynamicState),
 		mShaderProgram(nullptr),
@@ -329,8 +329,8 @@ namespace Ck::Vulkan
 
 		mDirtyFlags &= ~DirtyFlagBits::Pipeline;
 
-		return mRenderDevice->Invoke([&](PipelineCache* pipelineCache) -> std::shared_ptr<Pipeline> {
-			return pipelineCache->CreateGraphicPipeline(createInfo);
+		return mRenderDevice->Invoke([&](PipelineManager* pipelineManager) {
+			return pipelineManager->CreateGraphicPipeline(createInfo);
 		});
 	}
 

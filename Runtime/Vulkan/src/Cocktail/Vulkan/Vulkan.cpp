@@ -1,3 +1,8 @@
+#include <Cocktail/Core/IO/Input/Stream/FileInputStream.hpp>
+#include <Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/Utility/FileUtils.hpp>
+
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Vulkan.hpp>
@@ -5,10 +10,10 @@
 #include <Cocktail/Vulkan/Debug/DebugMessenger.hpp>
 #include <Cocktail/Vulkan/Framebuffer/DepthResolver.hpp>
 #include <Cocktail/Vulkan/Memory/Allocator/DeviceMemoryAllocator.hpp>
-#include <Cocktail/Vulkan/Pipeline/PipelineCache.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineCacheSaver.hpp>
+#include <Cocktail/Vulkan/Pipeline/PipelineManager.hpp>
 #include <Cocktail/Vulkan/Shader/ValidationCache.hpp>
-
-#include "Texture/StaticSamplerManager.hpp"
+#include <Cocktail/Vulkan/Texture/StaticSamplerManager.hpp>
 
 namespace Ck::Vulkan
 {
@@ -44,13 +49,13 @@ namespace Ck::Vulkan
 		return ApiVersion::Version_1_0;
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
+	std::unique_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
 	{
-		std::shared_ptr<RenderDevice> renderDevice = std::make_shared<RenderDevice>(createInfo);
+		std::unique_ptr<RenderDevice> renderDevice = std::make_unique<RenderDevice>(createInfo);
 
 		if (createInfo.EnableValidation && renderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
 		{
-			renderDevice->Singleton<DebugMessenger>([renderDevice = renderDevice]() {
+			renderDevice->Singleton<DebugMessenger>([renderDevice = renderDevice.get()]() {
 				return std::make_unique<DebugMessenger>(renderDevice, DebugMessengerCreateInfo{}, nullptr);
 			});
 			renderDevice->Resolve<DebugMessenger>();
@@ -58,24 +63,29 @@ namespace Ck::Vulkan
 
 		if (renderDevice->IsFeatureSupported(RenderDeviceFeature::ValidationCache))
 		{
-			renderDevice->Singleton<ValidationCache>([renderDevice = renderDevice]() {
+			renderDevice->Singleton<ValidationCache>([renderDevice = renderDevice.get()]() {
 				return std::make_unique<ValidationCache>(renderDevice, ValidationCacheCreateInfo{}, nullptr);
 			});
 		}
 
-		renderDevice->Singleton<DepthResolver>([renderDevice = renderDevice]() {
+		renderDevice->Singleton<DepthResolver>([renderDevice = renderDevice.get()]() {
 			return std::make_unique<DepthResolver>(renderDevice);
 		});
 
-		renderDevice->Singleton<DeviceMemoryAllocator>([renderDevice = renderDevice, createInfo = createInfo]() {
+		renderDevice->Singleton<DeviceMemoryAllocator>([renderDevice = renderDevice.get(), createInfo = createInfo]() {
 			return std::make_unique<DeviceMemoryAllocator>(renderDevice, createInfo.DeviceMemoryBlockSize);
 		});
 
-		renderDevice->Singleton<PipelineCache>([renderDevice = renderDevice]() {
-			return std::make_unique<PipelineCache>(renderDevice, PipelineCacheCreateInfo{}, nullptr);
+		renderDevice->Singleton<PipelineManager>([renderDevice = renderDevice.get()]() {
+			return std::make_unique<PipelineManager>(renderDevice);
 		});
 
-		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice]() {
+		std::filesystem::path pipelineCachePath = PipelineCacheSaver::ComputePipelineCachePath(createInfo.ApplicationName, createInfo.ApplicationVersion);
+		renderDevice->Singleton<PipelineCacheSaver>([pipelineCachePath = std::move(pipelineCachePath)](PipelineManager* pipelineManager) {
+			return std::make_unique<PipelineCacheSaver>(pipelineManager, std::move(pipelineCachePath));
+		}, false);
+
+		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice.get()]() {
 			return std::make_unique<StaticSamplerManager>(renderDevice);
 		});
 

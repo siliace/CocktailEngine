@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	AbstractTexture::AbstractTexture(std::shared_ptr<RenderDevice> renderDevice) :
+	AbstractTexture::AbstractTexture(RenderDevice* renderDevice) :
 		mRenderDevice(std::move(renderDevice)),
 		mHasMutableFormat(false),
 		mViewFormatCount(0)
@@ -24,7 +24,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> AbstractTexture::GetRenderDevice() const
+	Renderer::RenderDevice* AbstractTexture::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

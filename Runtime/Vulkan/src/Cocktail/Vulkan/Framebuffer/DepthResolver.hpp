@@ -27,7 +27,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit DepthResolver(std::shared_ptr<RenderDevice> renderDevice);
+		explicit DepthResolver(RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -63,7 +63,7 @@ namespace Ck::Vulkan
 		 */
 		Framebuffer* GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment);
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
 		std::shared_ptr<ShaderProgram> mShaderProgram;
 		std::unordered_map<std::shared_ptr<TextureView>, std::shared_ptr<Framebuffer>> mFramebuffers;

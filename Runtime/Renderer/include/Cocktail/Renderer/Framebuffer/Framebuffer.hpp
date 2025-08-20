@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_RENDERER_RENDERTARGET_FRAMEBUFFER_HPP
 #define COCKTAIL_RENDERER_RENDERTARGET_FRAMEBUFFER_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/Extent3D.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>

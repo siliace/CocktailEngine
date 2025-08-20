@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		RenderPass(std::shared_ptr<RenderDevice> renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		RenderPass(RenderDevice* renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -82,7 +82,7 @@ namespace Ck::Vulkan
 
 	private:
 		
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		EnumMap<Renderer::RenderPassMode, VkRenderPass> mHandle;
 		unsigned int mColorAttachmentCount;

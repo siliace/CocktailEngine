@@ -12,7 +12,7 @@
 
 namespace Ck::Vulkan
 {
-	RenderSurface::RenderSurface(std::shared_ptr<RenderDevice> renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	RenderSurface::RenderSurface(RenderDevice* renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -89,7 +89,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> RenderSurface::GetRenderDevice() const
+	Renderer::RenderDevice* RenderSurface::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

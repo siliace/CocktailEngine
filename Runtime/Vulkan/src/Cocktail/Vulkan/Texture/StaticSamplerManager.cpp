@@ -3,8 +3,8 @@
 
 namespace Ck::Vulkan
 {
-	StaticSamplerManager::StaticSamplerManager(std::shared_ptr<RenderDevice> renderDevice) :
-		mRenderDevice(std::move(renderDevice))
+	StaticSamplerManager::StaticSamplerManager(RenderDevice* renderDevice) :
+		mRenderDevice(renderDevice)
 	{
 		for (Renderer::StaticSampler staticSampler : Enum<Renderer::StaticSampler>::Values)
 		{

@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	QueueSubmitBatch::QueueSubmitBatch(std::shared_ptr<RenderDevice> renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex) :
+	QueueSubmitBatch::QueueSubmitBatch(RenderDevice* renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mQueue(queue),
 		mQueueIndex(queueIndex),

@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit Pipeline(std::shared_ptr<RenderDevice> renderDevice);
+		explicit Pipeline(RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -31,7 +31,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 
 	protected:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 	};
 }
 

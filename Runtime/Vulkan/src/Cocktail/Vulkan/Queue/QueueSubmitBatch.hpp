@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		QueueSubmitBatch(std::shared_ptr<RenderDevice> renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex);
+		QueueSubmitBatch(RenderDevice* renderDevice, Renderer::CommandQueueType queue, unsigned int queueIndex);
 
 		/**
 		 * \brief 
@@ -105,7 +105,7 @@ namespace Ck::Vulkan
 		 */
 		void PushSubmit();
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		Renderer::CommandQueueType mQueue;
 		unsigned int mQueueIndex;
 		std::shared_ptr<Fence> mFence;

@@ -4,7 +4,7 @@
 
 namespace Ck::Vulkan
 {
-	DescriptorPool::DescriptorPool(std::shared_ptr<RenderDevice> renderDevice, const DescriptorPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	DescriptorPool::DescriptorPool(RenderDevice* renderDevice, const DescriptorPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> DescriptorPool::GetRenderDevice() const
+	Renderer::RenderDevice* DescriptorPool::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

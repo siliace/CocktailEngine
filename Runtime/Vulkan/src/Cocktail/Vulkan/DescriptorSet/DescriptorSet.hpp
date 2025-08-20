@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		DescriptorSet(std::shared_ptr<RenderDevice> renderDevice, std::shared_ptr<DescriptorPool> pool, const DescriptorSetCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		DescriptorSet(RenderDevice* renderDevice, std::shared_ptr<DescriptorPool> pool, const DescriptorSetCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -36,7 +36,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderDevice> GetRenderDevice() const override;
+		Renderer::RenderDevice* GetRenderDevice() const override;
 
 		/**
 		 * \brief 
@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		std::shared_ptr<DescriptorPool> mPool;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkDescriptorSet mHandle;

@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	CommandPool::CommandPool(std::shared_ptr<RenderDevice> renderDevice, const CommandPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
+	CommandPool::CommandPool(RenderDevice* renderDevice, const CommandPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> CommandPool::GetRenderDevice() const
+	Renderer::RenderDevice* CommandPool::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

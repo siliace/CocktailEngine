@@ -61,13 +61,14 @@ namespace Ck
 		 * \brief
 		 * \tparam Abstract
 		 * \tparam Concrete
+		 * \param lazy
 		 */
 		template <typename Abstract, typename Concrete = Abstract>
-		void Singleton()
+		void Singleton(bool lazy = true)
 		{
 			Singleton<Abstract>([]() -> std::unique_ptr<Abstract> {
 				return std::make_unique<Concrete>();
-			});
+			}, lazy);
 		}
 
 		/**
@@ -75,16 +76,18 @@ namespace Ck
 		 * \tparam Abstract
 		 * \tparam Callable
 		 * \param callable
+		 * \param lazy
 		 */
 		template <typename Abstract, typename Callable>
-		void Singleton(Callable&& callable)
+		void Singleton(Callable&& callable, bool lazy = true)
 		{
 			static_assert(std::is_same_v<std::unique_ptr<Abstract>, FunctionReturnType<Callable>>);
 
 			RegisterBinding(
 				std::make_unique<Detail::SingletonServiceBinding<Abstract>>(
 					this,
-					MakeResolver<Abstract>(std::forward<Callable>(callable))
+					MakeResolver<Abstract>(std::forward<Callable>(callable)),
+					lazy
 				)
 			);
 		}
@@ -148,6 +151,13 @@ namespace Ck
 
 			return resolver(this);
 		}
+
+	protected:
+
+		/**
+		 * \brief 
+		 */
+		void Clear();
 
 	private:
 

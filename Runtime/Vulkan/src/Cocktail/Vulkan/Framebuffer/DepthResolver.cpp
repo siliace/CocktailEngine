@@ -10,7 +10,7 @@
 
 namespace Ck::Vulkan
 {
-	DepthResolver::DepthResolver(std::shared_ptr<RenderDevice> renderDevice) :
+	DepthResolver::DepthResolver(RenderDevice* renderDevice) :
 		mRenderDevice(std::move(renderDevice)),
 		mDepthSamplerSlot(nullptr)
 	{

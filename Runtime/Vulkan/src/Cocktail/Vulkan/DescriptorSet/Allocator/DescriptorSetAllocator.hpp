@@ -24,7 +24,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit DescriptorSetAllocator(std::shared_ptr<RenderDevice> renderDevice);
+		explicit DescriptorSetAllocator(RenderDevice* renderDevice);
 
 		/**
 		 * \brief 
@@ -49,7 +49,7 @@ namespace Ck::Vulkan
 		 */
 		std::shared_ptr<DescriptorPool> CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout);
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		Array<std::shared_ptr<DescriptorPool>> mDescriptorPools;
 		std::unordered_map<Uint64, std::shared_ptr<DescriptorSet>> mAcquiredSets;
 		Array<std::shared_ptr<DescriptorSet>> mVacantSets;

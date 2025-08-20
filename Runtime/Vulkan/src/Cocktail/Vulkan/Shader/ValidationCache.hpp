@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		ValidationCache(std::shared_ptr<RenderDevice> renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		ValidationCache(RenderDevice* renderDevice, const ValidationCacheCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<RenderDevice> GetRenderDevice() const;
+		RenderDevice* GetRenderDevice() const;
 
 		/**
 		 * \brief 
@@ -81,7 +81,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkValidationCacheEXT mHandle;
 	};

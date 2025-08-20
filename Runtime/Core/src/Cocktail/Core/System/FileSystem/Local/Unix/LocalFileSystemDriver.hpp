@@ -44,14 +44,14 @@ namespace Ck::Detail::Unix
 		 * \param flags
 		 * \return
 		 */
-		std::shared_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) override;
+		std::unique_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) override;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		std::shared_ptr<Directory> OpenDirectory(const std::filesystem::path& path) override;
+		std::unique_ptr<Directory> OpenDirectory(const std::filesystem::path& path) override;
 
 		/**
 		 * \brief
@@ -74,9 +74,9 @@ namespace Ck::Detail::Unix
 		 */
 		void Remove(const std::filesystem::path& path) override;
 
-		std::shared_ptr<FileLock> CreateLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length) override;
+		std::unique_ptr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
 
-		std::shared_ptr<DirectoryWatcher> CreateWatcher(const std::shared_ptr<Directory>& directory, bool recursive) override;
+		std::unique_ptr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) override;
 
 	private:
 

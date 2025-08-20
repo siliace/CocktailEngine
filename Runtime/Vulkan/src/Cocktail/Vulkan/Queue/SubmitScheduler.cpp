@@ -5,7 +5,7 @@
 
 namespace Ck::Vulkan
 {
-	SubmitScheduler::SubmitScheduler(std::shared_ptr<RenderDevice> renderDevice) :
+	SubmitScheduler::SubmitScheduler(RenderDevice* renderDevice) :
 		mRenderDevice(std::move(renderDevice)),
 		mProcessingBatch(false)
 	{

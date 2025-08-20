@@ -7,7 +7,7 @@
 
 namespace Ck::Vulkan
 {
-	Swapchain::Swapchain(std::shared_ptr<RenderDevice> renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
+	Swapchain::Swapchain(RenderDevice* renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
@@ -98,7 +98,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
 	}
 
-	std::shared_ptr<Renderer::RenderDevice> Swapchain::GetRenderDevice() const
+	Renderer::RenderDevice* Swapchain::GetRenderDevice() const
 	{
 		return mRenderDevice;
 	}

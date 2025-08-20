@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		 * \param renderDevice
 		 * \param defaultChuckSize 
 		 */
-		DeviceMemoryAllocator(std::shared_ptr<RenderDevice> renderDevice, std::size_t defaultChuckSize);
+		DeviceMemoryAllocator(RenderDevice* renderDevice, std::size_t defaultChuckSize);
 
 		/**
 		 * \brief Destructor
@@ -118,7 +118,7 @@ namespace Ck::Vulkan
 			return block;
 		}
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		std::size_t mDefaultChuckSize;
 		Array<DeviceMemoryChunk*> mChunks;
 		ObjectPool<DeviceMemoryChunk> mChunkPool;

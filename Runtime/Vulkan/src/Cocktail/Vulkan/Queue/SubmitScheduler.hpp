@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param renderDevice 
 		 */
-		explicit SubmitScheduler(std::shared_ptr<RenderDevice> renderDevice);
+		explicit SubmitScheduler(RenderDevice* renderDevice);
 
 		/**
 		 * \brief Destructor
@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<RenderDevice> mRenderDevice;
+		RenderDevice* mRenderDevice;
 		bool mProcessingBatch;
 		Array<QueueSubmitBatch*> mBatches;
 		Array<QueueSubmitBatch*> mPending;

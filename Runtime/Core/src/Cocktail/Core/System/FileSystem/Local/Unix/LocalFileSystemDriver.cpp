@@ -46,14 +46,14 @@ namespace Ck::Detail::Unix
 			throw SystemError::GetLastError();
 	}
 
-	std::shared_ptr<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
+	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
 	{
-		return std::make_shared<LocalFile>(mRootLocation / path, flags);
+		return std::make_unique<LocalFile>(mRootLocation / path, flags);
 	}
 
-	std::shared_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
+	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
 	{
-		return std::make_shared<LocalDirectory>(mRootLocation / path);
+		return std::make_unique<LocalDirectory>(mRootLocation / path);
 	}
 
 	void LocalFileSystemDriver::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists)
@@ -72,13 +72,13 @@ namespace Ck::Detail::Unix
 			throw SystemError::GetLastError();
 	}
 
-	std::shared_ptr<FileLock> LocalFileSystemDriver::CreateLock(const std::shared_ptr<File>& file, std::size_t offset, std::size_t length)
+	std::unique_ptr<FileLock> LocalFileSystemDriver::CreateLock(File& file, std::size_t offset, std::size_t length)
 	{
-		return std::make_shared<LocalFileLock>(file, offset, length);
+		return std::make_unique<LocalFileLock>(file, offset, length);
 	}
 
-	std::shared_ptr<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(const std::shared_ptr<Directory>& directory, bool recursive)
+	std::unique_ptr<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(Directory& directory, bool recursive)
 	{
-		return std::make_shared<LocalDirectoryWatcher>(directory, recursive);
+		return std::make_unique<LocalDirectoryWatcher>(directory, recursive);
 	}
 }
