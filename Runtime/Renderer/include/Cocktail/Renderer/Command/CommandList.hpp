@@ -99,6 +99,35 @@ namespace Ck::Renderer
 		virtual void ExecuteCommandLists(unsigned int commandListCount, CommandList** commandLists) = 0;
 
 		/**
+		 * \brief Clear regions of a color Texture
+		 * \param texture The Texture to be cleared
+		 * \param state The current state of the Texture
+		 * \param colorClearValue The color to use to clear the Texture
+		 * \param subResource The sub-resource to clear
+		 */
+		virtual void ClearColorTexture(const Texture* texture, ResourceState state, LinearColor colorClearValue, const TextureSubResource& subResource) = 0;
+
+		/**
+		 * \brief Clear regions of a depth stencil Texture
+		 * \param texture The Texture to be cleared
+		 * \param state The current state of the Texture
+		 * \param depthClearValue The value to use to clear the depth aspect of the depth stencil attachment
+		 * \param stencilCleanValue The value to use to clear the stencil aspect of the depth stencil attachment
+		 * \param subResource The sub-resource to clear
+		 */
+		virtual void ClearDepthStencilTexture(const Texture* texture, ResourceState state, float depthClearValue, unsigned int stencilCleanValue, const TextureSubResource& subResource) = 0;
+
+		/**
+		 * \brief Clear attachments of the bound framebuffer
+		 * \param firstColorAttachment The index of the first attachment to clear
+		 * \param colorAttachmentCount The number of color attachment to clear
+		 * \param colorClearValue The color to use to clear the color attachments
+		 * \param depthClearValue The value to use to clear the depth aspect of the depth stencil attachment
+		 * \param stencilCleanValue The value to use to clear the stencil aspect of the depth stencil attachment
+		 */
+		virtual void ClearAttachments(unsigned int firstColorAttachment, unsigned int colorAttachmentCount, LinearColor colorClearValue, float depthClearValue, unsigned int stencilCleanValue) = 0;
+
+		/**
 		 * \brief Upload data into a Buffer's memory
 		 * \param buffer The Buffer to update
 		 * \param uploadCount The number of upload to process

@@ -287,6 +287,7 @@ namespace Ck::Vulkan
 				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, PixelFormat::Undefined());
 				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, PixelFormat::Undefined());
 			}
+
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
 			{
 				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
@@ -684,6 +685,108 @@ namespace Ck::Vulkan
 		}
 
 		vkCmdExecuteCommands(mHandle, commandListCount, commandBufferHandles);
+	}
+
+	void CommandList::ClearColorTexture(const Renderer::Texture* texture, Renderer::ResourceState state, LinearColor colorClearValue, const Renderer::TextureSubResource& subResource)
+	{
+		assert(texture->GetFormat().IsColor());
+		assert(mState == Renderer::CommandListState::Recording);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(state, texture->GetFormat());
+
+		VkClearColorValue clearColorValue;
+		clearColorValue.float32[0] = colorClearValue.R;
+		clearColorValue.float32[1] = colorClearValue.G;
+		clearColorValue.float32[2] = colorClearValue.B;
+		clearColorValue.float32[3] = colorClearValue.A;
+
+		VkImageSubresourceRange subResourceRange = GetImageSubResourceRange(texture->GetFormat(), subResource);
+		vkCmdClearColorImage(mHandle, static_cast<const Texture*>(texture)->GetHandle(), imageLayout, &clearColorValue, 1, &subResourceRange);
+	}
+
+	void CommandList::ClearDepthStencilTexture(const Renderer::Texture* texture, Renderer::ResourceState state, float depthClearValue, unsigned int stencilCleanValue, const Renderer::TextureSubResource& subResource)
+	{
+		assert(!texture->GetFormat().IsColor());
+		assert(mState == Renderer::CommandListState::Recording);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(state, texture->GetFormat());
+
+		VkClearDepthStencilValue depthStencilValue;
+		depthStencilValue.depth = depthClearValue;
+		depthStencilValue.stencil = stencilCleanValue;
+
+		VkImageSubresourceRange subResourceRange = GetImageSubResourceRange(texture->GetFormat(), subResource);
+		vkCmdClearDepthStencilImage(mHandle, static_cast<const Texture*>(texture)->GetHandle(), imageLayout, &depthStencilValue, 1, &subResourceRange);
+	}
+
+	void CommandList::ClearAttachments(unsigned int firstColorAttachment, unsigned int colorAttachmentCount, LinearColor colorClearValue, float depthClearValue, unsigned int stencilCleanValue)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(firstColorAttachment + colorAttachmentCount < mCurrentFramebuffer->GetColorAttachmentCount());
+
+		unsigned int attachmentCount = colorAttachmentCount;
+
+		const bool hasDepthStencil = mCurrentFramebuffer->GetDepthStencilAttachment() != nullptr;
+		if (hasDepthStencil)
+			attachmentCount += 1;
+
+		const bool isMultisample = mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1;
+		if (isMultisample)
+			attachmentCount *= 2;
+
+		unsigned int clearAttachmentIndex = 0;
+		VkClearAttachment* clearAttachments = COCKTAIL_STACK_ALLOC(VkClearAttachment, attachmentCount);
+
+		if (colorAttachmentCount)
+		{
+			for (unsigned int i = firstColorAttachment; i < mCurrentFramebuffer->GetColorAttachmentCount(); i++)
+			{
+				clearAttachments[clearAttachmentIndex].aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				clearAttachments[clearAttachmentIndex].colorAttachment = i;
+				clearAttachments[clearAttachmentIndex].clearValue.color.float32[0] = colorClearValue.R;
+				clearAttachments[clearAttachmentIndex].clearValue.color.float32[1] = colorClearValue.G;
+				clearAttachments[clearAttachmentIndex].clearValue.color.float32[2] = colorClearValue.B;
+				clearAttachments[clearAttachmentIndex].clearValue.color.float32[3] = colorClearValue.A;
+
+				if (isMultisample)
+				{
+					clearAttachments[clearAttachmentIndex + 1] = clearAttachments[clearAttachmentIndex];
+
+					++clearAttachmentIndex;
+				}
+
+				++clearAttachmentIndex;
+			}
+		}
+
+		if (hasDepthStencil)
+		{
+			clearAttachments[clearAttachmentIndex].aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			clearAttachments[clearAttachmentIndex].colorAttachment = -1;
+			clearAttachments[clearAttachmentIndex].clearValue.depthStencil.depth = depthClearValue;
+			clearAttachments[clearAttachmentIndex].clearValue.depthStencil.stencil = stencilCleanValue;
+
+			if (isMultisample)
+			{
+				clearAttachments[clearAttachmentIndex + 1] = clearAttachments[clearAttachmentIndex];
+
+				++clearAttachmentIndex;
+			}
+
+			++clearAttachmentIndex;
+		}
+
+		VkClearRect* clearRects = COCKTAIL_STACK_ALLOC(VkClearRect, attachmentCount);
+		for (unsigned int i = 0; i < attachmentCount; i++)
+		{
+			clearRects[i].rect.offset = { 0, 0 };
+			clearRects[i].rect.extent.width = mCurrentFramebuffer->GetSize().Width;
+			clearRects[i].rect.extent.height = mCurrentFramebuffer->GetSize().Height;
+			clearRects[i].baseArrayLayer = 0;
+			clearRects[i].layerCount = 1;
+		}
+
+		vkCmdClearAttachments(mHandle, attachmentCount, clearAttachments, attachmentCount, clearRects);
 	}
 
 	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, unsigned int uploadCount, const Renderer::BufferUploadInfo* uploads)
