@@ -15,9 +15,9 @@ namespace Ck
 
         std::string message(int errorCode) const override
         {
-            char buffer[1024] = { 0 };
-            strerror_r(errorCode, buffer, 1024);
-            return std::string(buffer, std::strlen(buffer));
+            char buffer[1024];
+            char* errorMessage = strerror_r(errorCode, buffer, 1024);
+            return std::string(errorMessage, std::strlen(errorMessage));
         }
     };
 

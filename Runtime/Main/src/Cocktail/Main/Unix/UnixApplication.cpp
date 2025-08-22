@@ -1,5 +1,8 @@
 #include <cstdlib>
 
+#include <Cocktail/Core/Log/Log.hpp>
+
+#include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Unix/UnixApplication.hpp>
 
 namespace Ck::Main::Unix
@@ -15,7 +18,7 @@ namespace Ck::Main::Unix
     {
         CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.empty() ? "<>" : callSite);
 
-        _exit(exitCode);
+        exit(static_cast<int>(exitCode));
     }
 
     const Array<std::string>& UnixApplication::GetArgv() const

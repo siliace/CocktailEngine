@@ -36,4 +36,24 @@ namespace Ck
 		if (SetThreadAffinityMask(threadHandle, affinityMask) == 0)
 			throw SystemError::GetLastError();
 	}
+
+	void ThreadUtils::SleepFor(const Duration& duration)
+	{
+		std::size_t sleepTime = std::max(duration.GetCount(TimeUnit::Milliseconds()), 1llu);
+
+		// At this point, it's not useful to call successive sleep
+		assert(sleepTime < std::numeric_limits<unsigned int>::max());
+
+		Sleep(static_cast<DWORD>(sleepTime));
+	}
+
+	void ThreadUtils::SleepUntil(const Instant& instant, const Duration& duration)
+	{
+		// Assert the instant is not before now, otherwise we would wait forever
+		assert(Instant::Now().IsBefore(instant));
+
+		WaitUntil([&]() {
+			return Instant::Now().IsBefore(instant);
+		}, duration);
+	}
 }

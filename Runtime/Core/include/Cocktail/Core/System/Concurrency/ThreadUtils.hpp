@@ -4,7 +4,7 @@
 #include <string>
 #include <thread>
 
-#include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/Utility/Time/Duration.hpp>
 
 namespace Ck
 {
@@ -88,17 +88,42 @@ namespace Ck
 
 		/**
 		 * \brief Set the name of a thread
-		 * \param threadHandle 
-		 * \param name 
+		 * \param threadHandle
+		 * \param name
 		 */
 		static void SetName(std::thread::native_handle_type threadHandle, std::string_view name);
 
 		/**
 		 * \brief
-		 * \param threadHandle 
-		 * \param affinityMask 
+		 * \param threadHandle
+		 * \param affinityMask
 		 */
 		static void SetAffinity(std::thread::native_handle_type threadHandle, unsigned int affinityMask);
+
+		/**
+		 * \brief Make the calling thread to sleep for a given \p duration
+		 * \param duration
+		 */
+		static void SleepFor(const Duration& duration);
+
+		/**
+		 * \brief Make the calling thread to sleep until a \p instant has been reached
+		 * \param instant 
+		 */
+		static void SleepUntil(const Instant& instant, const Duration& duration = Duration::Milliseconds(1));
+
+		/**
+		 * \brief 
+		 * \tparam Callable 
+		 * \param callable 
+		 * \param duration 
+		 */
+		template <typename Callable>
+		static void WaitUntil(Callable callable, const Duration& duration = Duration::Milliseconds(1))
+		{
+			while (!callable())
+				SleepFor(duration);
+		}
 	};
 }
 
