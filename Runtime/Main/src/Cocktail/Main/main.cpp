@@ -3,9 +3,10 @@
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Log/LogServiceProvider.hpp>
 #include <Cocktail/Core/System/SystemServiceProvider.hpp>
+#include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
 
-#include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/ExitCode.hpp>
+#include <Cocktail/Main/main.hpp>
 
 extern Ck::Main::ExitCode ApplicationMain(Ck::Application* application);
 
@@ -15,6 +16,16 @@ namespace Ck::Main
 
 	ExitCode InvokeMain(Application* application)
 	{
+#ifndef NDEBUG
+		const bool waitedForDebugger = application->GetEnvironmentVariable("COCKTAIL_WAIT_FOR_DEBUGGER") == "1";
+		if (waitedForDebugger)
+		{
+			ThreadUtils::WaitUntil([&]() {
+				return application->IsDebuggerPresent();
+			});
+		}
+#endif
+
 		application->Instance(application);
 
 		application->RegisterServiceProvider<ImageServiceProvider>();
@@ -24,6 +35,10 @@ namespace Ck::Main
 		application->Boot();
 		  
 		CK_LOG(MainLogCategory, LogLevel::Info, "Application has been booted");
+#ifndef NDEBUG
+		if (waitedForDebugger)
+			CK_LOG(MainLogCategory, LogLevel::Info, "Debugger connected");
+#endif
 
 		ExitCode exitCode;
 
