@@ -3,6 +3,10 @@
 
 #include <Windows.h>
 
+#ifdef GetEnvironmentVariable
+	#undef GetEnvironmentVariable
+#endif
+
 #include <Cocktail/Core/Application/Application.hpp>
 
 namespace Ck::Main::Win32
@@ -23,11 +27,26 @@ namespace Ck::Main::Win32
          */
         Win32Application(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);
 
+		/**
+		 * \brief
+		 * \param exitCode
+		 * \param force
+		 * \param callSite
+		 */
+		void Exit(unsigned exitCode, bool force, std::string_view callSite) override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		const Array<std::string>& GetArgv() const override;
+
 	    /**
 	     * \brief 
+	     * \param name 
 	     * \return 
 	     */
-	    const Array<std::string>& GetArgv() const override;
+	    std::string GetEnvironmentVariable(std::string_view name) override;
 
 	    /**
 	     * \brief 

@@ -16,11 +16,26 @@ namespace Ck::Main::Unix
 	     */
 	    UnixApplication(int argc, char** argv);
 
+		/**
+		 * \brief
+		 * \param exitCode
+		 * \param force
+		 * \param callSite
+		 */
+		void Exit(unsigned exitCode, bool force, std::string_view callSite) override;
+
 	    /**
 	     * \brief 
 	     * \return 
 	     */
 	    const Array<std::string>& GetArgv() const override;
+
+		/**
+		 * \brief
+		 * \param name
+		 * \return
+		 */
+		std::string GetEnvironmentVariable(std::string_view name) override;
 
 	    bool IsDebuggerPresent() const override;
 

@@ -89,6 +89,17 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 * \param exitCode 
+		 * \param force 
+		 * \param callSite 
+		 */
+		virtual void Exit(unsigned int exitCode = 0, bool force = false, std::string_view callSite = "") = 0;
+
+		/**
+		 * \brief Gracefully terminate the application
+		 * When the application is terminated, every bound signals with be disconnected
+		 * and every registered service provider will be deleted.
+		 * Also, every ServiceFacade class will be disabled.
 		 */
 		void Terminate();
 
@@ -103,6 +114,13 @@ namespace Ck
 		 * \return 
 		 */
 		virtual const Array<std::string>& GetArgv() const = 0;
+
+		/**
+		 * \brief 
+		 * \param name 
+		 * \return 
+		 */
+		virtual std::string GetEnvironmentVariable(std::string_view name) = 0;
 
 		/**
 		 * \brief 

@@ -100,6 +100,67 @@ namespace Ck
 		 * \brief 
 		 */
 		static void Boot();
+
+		/**
+		 * \brief
+		 * \tparam T
+		 * \param callback
+		 */
+		template <typename T, typename Callable>
+		static void BeforeBooted(Callable&& callback)
+		{
+			ResolveFacadeInstance()->BeforeBooted<T>(std::forward<Callable>(callback));
+		}
+
+		/**
+		 * \brief
+		 * \tparam T
+		 * \param callback
+		 */
+		template <typename T, typename Callable>
+		static void AfterBooted(Callable&& callback)
+		{
+			ResolveFacadeInstance()->AfterBooted<T>(std::forward<Callable>(callback));
+		}
+
+		/**
+		 * \brief 
+		 * \param exitCode 
+		 * \param force 
+		 * \param callSite 
+		 */
+		static void Exit(unsigned int exitCode = 0, bool force = false, std::string_view callSite = "");
+
+		/**
+		 * \brief Get the duration since the application started
+		 * \return The uptime
+		 */
+		static Duration Uptime();
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		static const Array<std::string>& GetArgv();
+
+		/**
+		 * \brief
+		 * \param name
+		 * \return
+		 */
+		static std::string GetEnvironmentVariable(std::string_view name);
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		static bool IsDebuggerPresent();
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		static Signal<Application*>& OnTerminate();
 	};
 }
 

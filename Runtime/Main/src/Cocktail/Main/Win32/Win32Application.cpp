@@ -1,3 +1,6 @@
+#include <Cocktail/Core/Log/Log.hpp>
+
+#include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Win32/Win32Application.hpp>
 
 namespace Ck::Main::Win32
@@ -22,9 +25,35 @@ namespace Ck::Main::Win32
 		LocalFree(wideArgument);
 	}
 
+	void Win32Application::Exit(unsigned exitCode, bool force, std::string_view callSite)
+	{
+		CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.empty() ? "<>" : callSite);
+
+		if (force)
+		{
+			TerminateProcess(GetCurrentProcess(), exitCode);
+		}
+		else
+		{
+			Terminate();
+
+			PostQuitMessage(exitCode);
+		}
+	}
+
 	const Array<std::string>& Win32Application::GetArgv() const
 	{
 		return mArgv;
+	}
+
+	std::string Win32Application::GetEnvironmentVariable(std::string_view name)
+	{
+		DWORD variableLength = ::GetEnvironmentVariableA(name.data(), nullptr, 0);
+
+		char* buffer = COCKTAIL_STACK_ALLOC(char, variableLength);
+		::GetEnvironmentVariableA(name.data(), buffer, variableLength);
+
+		return std::string(buffer, std::strlen(buffer));
 	}
 
 	bool Win32Application::IsDebuggerPresent() const

@@ -1,9 +1,11 @@
 #include <algorithm>
-#include <cstring>
 
+#include <Cocktail/Core/Application/App.hpp>
+#include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Utility/StringUtils.hpp>
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
+#include <Cocktail/Vulkan/Vulkan.hpp>
 #include <Cocktail/Vulkan/WSI/WSI.hpp>
 
 namespace Ck::Vulkan
@@ -235,13 +237,10 @@ namespace Ck::Vulkan
 #ifndef NDEBUG
 	ExtensionManager::ExtensionManager()
 	{
-		const char* disableExtensionsString = std::getenv("COCKTAIL_VULKAN_DISABLED_EXTENSIONS");
-		if (disableExtensionsString)
-		{
-			Array<std::string> disabledExtensions = StringUtils::Split(std::string(disableExtensionsString), ';');
-			for (std::string& disabledExtension : disabledExtensions)
-				mDisabledExtensions.emplace(std::move(disabledExtension));
-		}
+		StringUtils::Split(App::GetEnvironmentVariable("COCKTAIL_VULKAN_DISABLED_EXTENSIONS"), ';').ForEach([&](const std::string& disabledExtension) {
+			mDisabledExtensions.emplace(disabledExtension);
+			CK_LOG(VulkanLogCategory, LogLevel::Info, "Extension {} disabled", disabledExtension);
+		});
 	}
 #else
 	ExtensionManager::ExtensionManager() = default;
