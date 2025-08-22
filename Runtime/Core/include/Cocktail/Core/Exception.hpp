@@ -20,7 +20,7 @@
 		{} \
 		template <typename... Args> \
 		explicit __Name(std::string_view format, Args&&... args) : \
-			__Base(FormatExceptionMessage(format, std::forward<Args>(args)...)) \
+			__Base(FormatExceptionMessage(format, std::forward<Args>(args)...).c_str()) \
 		{} \
 	} \
 
