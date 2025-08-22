@@ -4,10 +4,13 @@
 #include <cassert>
 #include <string>
 
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Utility/TranslatorCast.hpp>
 
 namespace Ck
 {
+	COCKTAIL_DECLARE_EXCEPTION(InvalidPropertyPathException, "PropertyTree path is invalid");
+
 	template <typename Char, typename Traits = std::char_traits<Char>, typename Alloc = std::allocator<Char>>
 	class PropertyTreePath
 	{

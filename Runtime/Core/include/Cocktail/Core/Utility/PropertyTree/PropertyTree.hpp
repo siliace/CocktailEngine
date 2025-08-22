@@ -82,7 +82,7 @@ namespace Ck
             Key key = p.Reduce();
 
             if (mRoot->GetName() != key)
-                throw std::runtime_error("");
+                throw InvalidPropertyPathException();
 
             return mRoot->GetChild(p);
         }
@@ -96,7 +96,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw std::runtime_error("Path target node is not an element");
+                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
 
         	return static_cast<Element&>(node);
         }
@@ -110,7 +110,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw std::runtime_error("Path target node is not a sequence");
+                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -124,7 +124,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw std::runtime_error("Path target node is not a value");
+                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
 
             return static_cast<Value&>(node);
         }

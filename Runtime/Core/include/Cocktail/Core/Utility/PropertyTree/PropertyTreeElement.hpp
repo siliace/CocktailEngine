@@ -259,11 +259,11 @@ namespace Ck
                     if (child->GetType() == Node::Type::Sequence)
                         return static_cast<PropertyTreeSequence<Key, Data>*>(child)->GetChild(p);
 
-                    throw std::runtime_error("");
+                    throw InvalidPropertyPathException("Child {} in node {} is terminal", key, this->mName);
 	            }
             }
 
-            throw std::runtime_error("");
+            throw InvalidPropertyPathException("Element {} does not has child {}", this->mName, key);
         }
 
         /**

@@ -84,7 +84,7 @@ namespace Ck
             Path p(path);
             std::size_t index = p.template Reduce<std::size_t>();
             if (index >= mChildren.GetSize())
-                throw std::runtime_error("");
+                throw InvalidPropertyPathException("Path target sequence {} does not contains child with index {}", this->mName, index);
 
             const Node* child = mChildren[index].get();
             if (child->GetType() == Node::Type::Element)
@@ -93,7 +93,7 @@ namespace Ck
             if (child->GetType() == Node::Type::Sequence)
                 return static_cast<const PropertyTreeSequence*>(child)->GetChild(p);
 
-            throw std::runtime_error("");
+            throw InvalidPropertyPathException("Child with index {} in node {} is terminal", index, this->mName);
         }
         /**
          * \brief
@@ -104,7 +104,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw std::runtime_error("Path target node is not an element");
+                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
 
             return static_cast<Element&>(node);
         }
@@ -118,7 +118,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw std::runtime_error("Path target node is not a sequence");
+                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -132,7 +132,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw std::runtime_error("Path target node is not a value");
+                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
 
             return static_cast<Value&>(node);
         }
@@ -184,7 +184,7 @@ namespace Ck
         {
             Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
-                throw std::runtime_error("");
+                throw InvalidPropertyPathException("Sequence {} child node at index {} is not an Element", this->mName, index);
 
             return static_cast<Element&>(child);
         }
@@ -198,7 +198,7 @@ namespace Ck
         {
             const Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
-                throw std::runtime_error("");
+                throw InvalidPropertyPathException("Sequence {} child node at index {} is not an Element", this->mName, index);
 
             return static_cast<const Element&>(child);
         }
@@ -242,7 +242,7 @@ namespace Ck
 
     private:
 
-        Array<std::unique_ptr<Node>> mChildren;
+        Array64<std::unique_ptr<Node>> mChildren;
     };
 }
 
