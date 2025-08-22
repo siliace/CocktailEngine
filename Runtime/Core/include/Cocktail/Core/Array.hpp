@@ -1089,15 +1089,27 @@ namespace Ck
         /**
          * \brief Resizes the array to the given size
          * New elements are default constructed.
+         * If the new size is lower than the current size, right most elements will be destroyed.
          * \param size New size of the array
          */
         void Resize(SizeType size)
         {
-            E* availableElements = Allocate(size);
-            for (SizeType i = 0; i < size; ++i)
-                ConstructRange(size, availableElements);
+            if (size > mSize)
+            {
+                SizeType allocateCount = size - mSize;
+                E* availableElements = Allocate(allocateCount);
+                for (SizeType i = 0; i < size; ++i)
+                    ConstructRange(size, availableElements);
 
-            mSize += size;
+                mSize += allocateCount;
+            }
+            else if (size < mSize)
+            {
+                SizeType destroyCount = mSize - size;
+                DestroyRange(destroyCount, GetData() + size);
+
+                mSize -= destroyCount;
+            }
         }
 
         /**

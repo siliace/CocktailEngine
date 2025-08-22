@@ -291,10 +291,26 @@ TEST_CASE("Slice an array with range", "[Array]")
 TEST_CASE("Resize an array", "[Array]")
 {
     Ck::Array<int> arr;
+
     arr.Resize(10);
 
     REQUIRE(arr.GetSize() == 10);
     REQUIRE(arr.GetCapacity() == Ck::NextPowerOfTwo(10));
+
+    SECTION("to a bigger capacity")
+    {
+        arr.Resize(15);
+
+        REQUIRE(arr.GetSize() == 15);
+        REQUIRE(arr.GetCapacity() == Ck::NextPowerOfTwo(15));
+    }
+
+    SECTION("to a smaller capacity")
+    {
+        arr.Resize(5);
+
+        REQUIRE(arr.GetSize() == 5);
+    }
 }
 
 TEST_CASE("Reserve an array", "[Array]")
