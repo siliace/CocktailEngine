@@ -19,17 +19,20 @@ namespace Ck
 
 	ByteArray FileUtils::ReadFile(const std::filesystem::path& path)
 	{
+		ByteArray content;
 		if (!Storage::IsFile(path))
-			return {};
+			return content;
 
 		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
-		std::unique_ptr<std::uint8_t[]> buffer = std::make_unique<std::uint8_t[]>(size);
+		if (!size)
+			return content;
 
-		const std::size_t read = file->Read(buffer.get(), size);
+		content.Resize(size);
+		file->Read(content.GetData(), content.GetSize());
 
-		return ByteArray(reinterpret_cast<char*>(buffer.get()), read);
+		return content;
 	}
 
 	Array<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
@@ -50,7 +53,7 @@ namespace Ck
 		return lines;
 	}
 
-	void FileUtils::WriteFile(const std::filesystem::path& path, ByteArrayView content)
+	void FileUtils::WriteFile(const std::filesystem::path& path, ByteArrayView content, bool append)
 	{
 		if (!Storage::IsFile(path))
 		{
@@ -58,25 +61,31 @@ namespace Ck
 			Storage::CreateFile(path);
 		}
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
+		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
+		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
+
+		std::unique_ptr<File> file = Storage::OpenFile(path, openFlags);
 		file->Write(content.GetData(), content.GetSize());
 	}
 
-	void FileUtils::WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
+	void FileUtils::WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines, bool append)
 	{
 		if (!Storage::IsFile(path))
 		{
 			MakeDirectories(path.parent_path());
 			Storage::CreateFile(path);
 		}
-	}
 
-	void FileUtils::AppendFileLines(const std::filesystem::path& path, const Array<std::string>& lines)
-	{
-		if (!Storage::IsFile(path))
-		{
-			MakeDirectories(path.parent_path());
-			Storage::CreateFile(path);
-		}
+		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
+		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
+
+		std::unique_ptr<File> file = Storage::OpenFile(path, openFlags);
+		FileOutputStream outputStream(*file);
+
+		lines.ForEach([&](const std::string& line) {
+			outputStream.Write(line.data(), line.length());
+		});
+
+		outputStream.Flush();
 	}
 }

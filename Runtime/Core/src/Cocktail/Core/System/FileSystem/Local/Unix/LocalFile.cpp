@@ -27,7 +27,7 @@ namespace Ck::Detail::Unix
 		if (flags & FileOpenFlagBits::Write && flags & FileOpenFlagBits::Truncate)
 			sysFlags |= O_TRUNC;
 
-		mHandle = ::open64(path.c_str(), 0, S_IRWXU);
+		mHandle = ::open64(path.c_str(), sysFlags, S_IRWXU);
 		if (mHandle == -1)
 			throw SystemError::GetLastError();
 	}

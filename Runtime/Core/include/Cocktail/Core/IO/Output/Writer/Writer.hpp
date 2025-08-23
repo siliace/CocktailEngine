@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_IO_TEXTWRITER_HPP
 #define COCKTAIL_CORE_IO_TEXTWRITER_HPP
 
+#include <utility>
+
 namespace Ck
 {
 	/**

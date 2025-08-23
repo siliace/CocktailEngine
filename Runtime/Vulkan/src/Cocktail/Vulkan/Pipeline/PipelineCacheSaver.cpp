@@ -61,6 +61,6 @@ namespace Ck::Vulkan
 
 	void PipelineCacheSaver::DumpPipelineCache() const
 	{
-		FileUtils::WriteFile(mPipelineCachePath, mPipelineManager->GetCache()->GetCacheData());
+		FileUtils::WriteFile(mPipelineCachePath, mPipelineManager->GetCache()->GetCacheData(), false);
 	}
 }

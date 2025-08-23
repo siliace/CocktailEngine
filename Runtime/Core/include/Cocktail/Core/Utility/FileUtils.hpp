@@ -38,23 +38,18 @@ namespace Ck
 		/**
 		 * \brief 
 		 * \param path 
-		 * \param content 
+		 * \param content
+		 * \param append Flag indicating whether append or truncate the file to write before opening it
 		 */
-		static void WriteFile(const std::filesystem::path& path, ByteArrayView content);
+		static void WriteFile(const std::filesystem::path& path, ByteArrayView content, bool append);
 
 		/**
-		 * \brief
-		 * \param path
-		 * \param lines
+		 * \brief Write an array of string into a file
+		 * \param path The path of the file to write
+		 * \param lines Strings to write to the file
+		 * \param append Flag indicating whether append or truncate the file to write before opening it
 		 */
-		static void WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines);
-
-		/**
-		 * \brief 
-		 * \param path 
-		 * \param lines 
-		 */
-		static void AppendFileLines(const std::filesystem::path& path, const Array<std::string>& lines);
+		static void WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines, bool append);
 	};
 }
 
