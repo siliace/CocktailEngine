@@ -75,8 +75,8 @@ namespace Ck
 		assert(positionAttribute->GetType() == DataType::Float32);
 		assert(positionAttribute->GetElementCount() == 2 || positionAttribute->GetElementCount() == 3);
 
-		Vector3<float> maxBounds = Vector3<float>::Zero();
-		Vector3<float> minBounds = Vector3<float>::Infinite();
+		Vector3<float> maxBounds = Vector3<float>(std::numeric_limits<float>::lowest());
+		Vector3<float> minBounds = Vector3<float>(std::numeric_limits<float>::max());
 
 		const bool isFlat = positionAttribute->GetElementCount() == 2;
 		for (std::size_t i = 0; i < mVertices->GetVertexCount(); i++)
