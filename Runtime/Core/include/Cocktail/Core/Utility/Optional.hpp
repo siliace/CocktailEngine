@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(EmptyOptionalException, "Optional has been empty", std::runtime_error);
+	COCKTAIL_DECLARE_EXCEPTION(EmptyOptionalException, "Optional has been empty");
 
 	/**
 	 * \brief 

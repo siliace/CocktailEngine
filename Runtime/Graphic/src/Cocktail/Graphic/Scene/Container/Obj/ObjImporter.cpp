@@ -11,7 +11,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION_BASE(ObjParseError, "Failed to parse obj file", std::runtime_error);
+	COCKTAIL_DECLARE_EXCEPTION(ObjParseError, "Failed to parse obj file");
 
 	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
 	{

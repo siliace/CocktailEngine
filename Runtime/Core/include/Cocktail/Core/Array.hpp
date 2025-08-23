@@ -8,8 +8,8 @@
 
 namespace Ck
 {
-    COCKTAIL_DECLARE_EXCEPTION_BASE(ArrayEmpty, "Array is empty", std::runtime_error);
-    COCKTAIL_DECLARE_EXCEPTION_BASE(ArrayOutOfRange, "Array subscript has been out of range", std::runtime_error);
+    COCKTAIL_DECLARE_EXCEPTION(ArrayEmpty, "Array is empty");
+    COCKTAIL_DECLARE_EXCEPTION(ArrayOutOfRange, "Array subscript has been out of range");
 
     /**
      * \brief Template class implementing a dynamic array similar to std::vector.
