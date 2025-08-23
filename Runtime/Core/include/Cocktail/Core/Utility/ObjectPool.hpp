@@ -96,6 +96,7 @@ namespace Ck
 			 */
 			~ObjectPoolBase()
 			{
+				assert(mAllocatedObjectCount == 0);
 				Clear();
 			}
 

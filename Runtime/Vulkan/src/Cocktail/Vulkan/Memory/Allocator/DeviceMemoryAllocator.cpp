@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	DeviceMemoryAllocator::DeviceMemoryAllocator(RenderDevice* renderDevice, std::size_t defaultChuckSize) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mDefaultChuckSize(defaultChuckSize)
 	{
 		/// Nothing
@@ -13,9 +13,10 @@ namespace Ck::Vulkan
 
 	DeviceMemoryAllocator::~DeviceMemoryAllocator()
 	{
-		mChunks.ForEach([&](DeviceMemoryChunk* chunk) {
-			mChunkPool.Recycle(chunk);
-		});
+		mChunks.Clear();
+
+		mChunkPool.Clear();
+		mBlockPool.Clear();
 	}
 
 	DeviceMemoryBlock* DeviceMemoryAllocator::Allocate(const AbstractTexture& texture)
@@ -49,13 +50,13 @@ namespace Ck::Vulkan
 
 	void DeviceMemoryAllocator::GarbageCollect(bool compact)
 	{
-		mChunks.FilterInPlace([](const DeviceMemoryChunk* chunk) {
+		mChunks.FilterInPlace([&](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
 			return chunk->IsFree();
 		});
 
 		if (compact)
 		{
-			mChunks.ForEach([](DeviceMemoryChunk* chunk) {
+			mChunks.ForEach([](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
 				chunk->Compact();
 			});
 		}

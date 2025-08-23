@@ -73,7 +73,7 @@ namespace Ck::Vulkan
 			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
 				mStagingBufferPool.Recycle(stagingBuffer);
 
-			for (StagingBuffer* stagingBuffer : mAcquiredBuffers)
+			for (StagingBuffer* stagingBuffer : mAvailableBuffers)
 				mStagingBufferPool.Recycle(stagingBuffer);
 
 			mAvailableBuffers.Clear();
