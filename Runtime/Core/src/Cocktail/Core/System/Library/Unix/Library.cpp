@@ -6,7 +6,7 @@
 
 namespace Ck::Detail::Unix
 {
-	COCKTAIL_DECLARE_EXCEPTION(LibraryOpenException, "Failed to open library");
+	COCKTAIL_DECLARE_EXCEPTION(LibraryOpenException);
 
 	Library::Library(std::string_view name)
 	{

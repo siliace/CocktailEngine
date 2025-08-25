@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION(StbImportError, "Failed to import image");
+	COCKTAIL_DECLARE_EXCEPTION_FROM(StbImportError, RuntimeException);
 
 	StbImageImporter::StbImageImporter() :
 		mCallbacks()
@@ -84,7 +84,7 @@ namespace Ck
 		}
 
 		if (!pixels)
-			throw StbImportError(stbi_failure_reason());
+			throw StbImportError("Failed to import image: {}", stbi_failure_reason());
 		
 		Extent2D<unsigned int> size = MakeExtent<unsigned int>(width, height);
 		unsigned int channels = desiredChannels == STBI_default ? fileChannels : desiredChannels;

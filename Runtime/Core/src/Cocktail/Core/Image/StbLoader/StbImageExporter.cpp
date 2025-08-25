@@ -8,7 +8,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION(StbExportError, "Failed to export image");
+	COCKTAIL_DECLARE_EXCEPTION_FROM(StbExportError, RuntimeException);
 
 	namespace
 	{
@@ -54,7 +54,7 @@ namespace Ck
 		}
 
 		if (err == 0)
-			throw StbExportError();
+			throw StbExportError("Failed to export image");
 	}
 
 	ByteArray StbImageExporter::SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const

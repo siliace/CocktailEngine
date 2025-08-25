@@ -46,6 +46,11 @@ namespace Ck::Main
 		{
 			exitCode = ApplicationMain(application);
 		}
+		catch (const Exception& e)
+		{
+			CK_LOG(MainLogCategory, LogLevel::Critical, "Process terminated with exception {} of type {} with message {}", e.GetName(), e.GetTypeName(), e.GetMessage());
+			exitCode = ExitCode::GeneralError;
+		}
 		catch (const std::exception& e)
 		{
 			CK_LOG(MainLogCategory, LogLevel::Critical, "Process terminated with exception {}: {}", typeid(e).name(), e.what());

@@ -9,7 +9,7 @@
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION(InvalidPropertyPathException, "PropertyTree path is invalid");
+	COCKTAIL_DECLARE_EXCEPTION_FROM(InvalidPropertyPathException, RuntimeException);
 
 	template <typename Char, typename Traits = std::char_traits<Char>, typename Alloc = std::allocator<Char>>
 	class PropertyTreePath
