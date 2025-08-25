@@ -48,12 +48,17 @@ namespace Ck::Main::Win32
 
 	std::string Win32Application::GetEnvironmentVariable(std::string_view name)
 	{
+		std::string value;
 		DWORD variableLength = ::GetEnvironmentVariableA(name.data(), nullptr, 0);
+		if (variableLength)
+		{
+			char* buffer = COCKTAIL_STACK_ALLOC(char, variableLength);
+			::GetEnvironmentVariableA(name.data(), buffer, variableLength);
 
-		char* buffer = COCKTAIL_STACK_ALLOC(char, variableLength);
-		::GetEnvironmentVariableA(name.data(), buffer, variableLength);
+			value.assign(buffer, variableLength - 1);
+		}
 
-		return std::string(buffer, std::strlen(buffer));
+		return value;
 	}
 
 	bool Win32Application::IsDebuggerPresent() const
