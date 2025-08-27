@@ -50,7 +50,7 @@ namespace Ck::Vulkan
 
 	void DeviceMemoryAllocator::GarbageCollect(bool compact)
 	{
-		mChunks.FilterInPlace([&](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
+		mChunks.Filter(InPlace, [&](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
 			return chunk->IsFree();
 		});
 

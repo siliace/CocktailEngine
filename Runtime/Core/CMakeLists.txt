@@ -12,9 +12,11 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent2D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent3D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/String.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/String.cpp
 )
 
 cocktail_source_directory(CORE_FILES    

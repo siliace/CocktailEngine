@@ -45,7 +45,7 @@ namespace Ck::Vulkan
 					mTerminated.Add(mPending[i]);
 				}
 
-				mPending.SliceInPlace(0, index + 1);
+				mPending.Splice(InPlace, 0, index + 1);
 			});
 
 			mProcessingBatch = false;

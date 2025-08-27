@@ -88,6 +88,14 @@
 	#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr __Name##Tag __Name;
 #endif // COCKTAIL_DECLARE_TAG
 
+#ifndef CK_TEXT
+	#ifdef COCKTAIL_OS_WINDOWS
+		#define CK_TEXT(__Text) L ## __Text
+	#else
+		#define CK_TEXT(__Text) __Text
+	#endif
+#endif
+
 namespace Ck
 {
 	using Uint8 = std::uint8_t;
@@ -98,6 +106,12 @@ namespace Ck
 	using Int16 = std::int16_t;
 	using Int32 = std::int32_t;
 	using Int64 = std::int64_t;
+
+#ifdef COCKTAIL_OS_WINDOWS
+	using TextChar = wchar_t;
+#else
+	using TextChar = char;
+#endif
 
 	COCKTAIL_DECLARE_TAG(InPlace);
 	COCKTAIL_DECLARE_TAG(InOptional);

@@ -78,7 +78,7 @@ namespace Ck
 
 	void Scene::RemoveCamera(const Camera* camera)
 	{
-		mCameras.FilterInPlace([&](const std::unique_ptr<Camera>& sceneCamera) {
+		mCameras.Filter(InPlace, [&](const std::unique_ptr<Camera>& sceneCamera) {
 			return sceneCamera.get() == camera;
 		});
 	}
@@ -92,7 +92,7 @@ namespace Ck
 
 	void Scene::RemoveLight(const Light* light)
 	{
-		mLights.FilterInPlace([&](const std::unique_ptr<Light>&sceneLight) {
+		mLights.Filter(InPlace, [&](const std::unique_ptr<Light>&sceneLight) {
 			return sceneLight.get() == light;
 		});
 	}

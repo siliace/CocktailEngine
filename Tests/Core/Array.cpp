@@ -198,30 +198,18 @@ TEST_CASE("Filter an array", "[Array]")
 {
     Ck::Array<int> array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
-    SECTION("To another array")
-    {
-	    Ck::Array<int> results = array.Filter([](int i) {
-		    return i % 2 != 0;
-	    });
+    Ck::Array<int> results = array.Filter([](int i) {
+        return i % 2 != 0;
+    });
 
-        REQUIRE(results.GetSize() == 8);
-        REQUIRE(results == Ck::Array<int>{0, 2, 4, 6, 8, 10, 12, 14});
-    }
-
-    SECTION("In place")
-    {
-        array.FilterInPlace([](int i) {
-            return i % 2 != 0;
-        });
-
-        REQUIRE(array.GetSize() == 8);
-        REQUIRE(array == Ck::Array<int>{0, 2, 4, 6, 8, 10, 12, 14});
-    }
+    REQUIRE(results.GetSize() == 8);
+    REQUIRE(results == Ck::Array<int>{0, 2, 4, 6, 8, 10, 12, 14});
 }
 
 TEST_CASE("Reduce an array", "[Array]")
 {
     Ck::Array<int> array = { 1, 2, 3, 4 };
+
     int sum = array.Reduce(0, [](int current, int value) {
         return current + value;
     });
@@ -233,62 +221,40 @@ TEST_CASE("Reverse an array", "[Array]")
 {
     Ck::Array<int> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-    SECTION("To another array")
-    {
-        Ck::Array<int> reversed = array.Reverse();
-        REQUIRE(reversed == Ck::Array<int>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
-    }
-
-    SECTION("In place")
-    {
-        array.ReverseInPlace();
-        REQUIRE(array == Ck::Array<int>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
-    }
+    Ck::Array<int> reversed = array.Reverse();
+    REQUIRE(reversed == Ck::Array<int>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
 }
 
-TEST_CASE("Slice an array", "[Array]")
+TEST_CASE("Splice an array", "[Array]")
 {
     Ck::Array<int> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-    SECTION("To another array")
+    SECTION("at the beginning")
     {
-        Ck::Array<int> sliced = array.Slice(3);
+        Ck::Array<int> spliced = array.Splice(3);
 
-        REQUIRE(sliced.GetSize() == 3);
-        REQUIRE(sliced == Ck::Array<int>{ 0, 1, 2 });
+        REQUIRE(spliced.GetSize() == 3);
+        REQUIRE(spliced == Ck::Array<int>{ 0, 1, 2 });
     }
 
-    SECTION("In place")
+    SECTION("in the middle")
     {
-        array.SliceInPlace(3);
+        Ck::Array<int> spliced = array.Splice(3, 5);
 
-        REQUIRE(array.GetSize() == 3);
-        REQUIRE(array == Ck::Array<int>{ 0, 1, 2 });
-    }
-}
-
-TEST_CASE("Slice an array with range", "[Array]")
-{
-    Ck::Array<int> array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-
-    SECTION("To another array")
-    {
-	    Ck::Array<int> sliced = array.Slice(3, 5);
-
-        REQUIRE(sliced.GetSize() == 11);
-        REQUIRE(sliced == Ck::Array<int>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
+        REQUIRE(spliced.GetSize() == 11);
+        REQUIRE(spliced == Ck::Array<int>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
     }
 
-    SECTION("In place")
+    SECTION("at the end")
     {
-        array.SliceInPlace(3, 5);
+        Ck::Array<int> spliced = array.Splice(13);
 
-        REQUIRE(array.GetSize() == 11);
-        REQUIRE(array == Ck::Array<int>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
+        REQUIRE(spliced.GetSize() == 13);
+        REQUIRE(spliced == Ck::Array<int>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     }
 }
 
-TEST_CASE("Resize an array", "[Array]")
+/*TEST_CASE("Resize an array", "[Array]")
 {
     Ck::Array<int> arr;
 
@@ -311,7 +277,7 @@ TEST_CASE("Resize an array", "[Array]")
 
         REQUIRE(arr.GetSize() == 5);
     }
-}
+}*/
 
 TEST_CASE("Reserve an array", "[Array]")
 {

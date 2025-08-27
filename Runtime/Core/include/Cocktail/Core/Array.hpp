@@ -594,13 +594,16 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the first occurrence of the element.
-         * \param element Element to find.
-         * \return Optional index if found, empty otherwise.
+         * \brief Finds the index of the first occurrence of the element
+         * \param element Element to find
+         * \param start The first index to start to search
+         * \return Optional index if found, empty otherwise
          */
-        Optional<SizeType> FindIndex(const E& element) const
+        Optional<SizeType> FindIndex(const E& element, SizeType start = 0) const
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start < mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 if (At(i) == element)
                     return Optional<SizeType>::Of(i);
@@ -626,15 +629,18 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the first occurrence of the element.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Optional index if found, empty otherwise.
+         * \brief Finds the index of the first occurrence of the element
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         * \param start The first index to start to search
+         * \return Optional index if found, empty otherwise
          */
         template <typename TPredicate>
-        Optional<SizeType> FindIndexIf(TPredicate predicate) const
+        Optional<SizeType> FindIndexIf(TPredicate predicate, SizeType start = 0) const
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start < mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 const E& element = At(i);
                 if (predicate(element))
@@ -664,15 +670,18 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the pointer to the first element satisfying a predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Pointer to element if found, nullptr otherwise.
+         * \brief Finds the pointer to the first element satisfying a predicate
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         * \param start The first index to start to search
+         * \return Pointer to element if found, nullptr otherwise
          */
         template <typename TPredicate>
-    	Optional<E&> FindIf(TPredicate predicate)
+    	Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start < mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 E& element = At(i);
                 if (predicate(element))
@@ -804,7 +813,7 @@ namespace Ck
         SizeType Remove(const E& toRemove)
         {
             SizeType removed = 0;
-            FilterInPlace([&](const E& element) {
+            Filter(InPlace, [&](const E& element) {
                 const bool remove = element == toRemove;
                 if (remove)
                     ++removed;
@@ -825,7 +834,7 @@ namespace Ck
     	Array<E> Filter(TPredicate predicate) const
         {
             Array<E> results(*this);
-            results.FilterInPlace(predicate);
+            results.Filter(InPlace, predicate);
 
             return results;
         }
@@ -837,7 +846,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TPredicate>
-    	Array<E>& FilterInPlace(TPredicate predicate)
+    	Array<E>& Filter(InPlaceTag, TPredicate predicate)
         {
             SizeType writeIndex = 0;
             ElementType* data = GetData();
@@ -912,7 +921,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TFunction>
-    	Array<E>& TransformInPlace(TFunction transformer)
+    	Array<E>& Transform(InPlaceTag, TFunction transformer)
         {
             for (SizeType i = 0; i < mSize; ++i)
             {
@@ -1003,7 +1012,7 @@ namespace Ck
         Array<E> Reverse() const
         {
             Array<E> copy = *this;
-            copy.ReverseInPlace();
+            copy.Reverse(InPlace);
             return copy;
         }
 
@@ -1011,7 +1020,7 @@ namespace Ck
          * \brief Reverses the array in place.
          * \return Reference to *this.
          */
-        Array<E>& ReverseInPlace()
+        Array<E>& Reverse(InPlaceTag)
         {
             const SizeType size = GetSize();
             if (size > 1)
@@ -1025,14 +1034,73 @@ namespace Ck
         }
 
         /**
+         * \brief Creates a sub-array containing a slice of the current array
+         *
+         * This method extracts a contiguous range of elements starting from
+         * the specified index \p first to the end of the array
+         * The resulting slice is stored in a new Array instance.
+         *
+         * \tparam E Type of elements stored in the array.
+         * \param first The starting index of the slice. Must be within the bounds of the array
+         *
+         * \return A new Array<E> containing the selected subrange of elements
+         *
+         * \pre `first < mSize`
+         *
+         * \note The slice is a copy of the selected elements, not a view into the original array
+         *       Modifying the returned Array will not affect the original
+         *
+         * \warning Asserts if the requested range exceeds the array size
+         */
+        Array<E> Slice(SizeType first) const
+        {
+            assert(first < mSize);
+            return Slice(first, mSize - first);
+        }
+
+        /**
+         * \brief Creates a sub-array containing a slice of the current array
+         *
+         * This method extracts a contiguous range of elements starting from
+         * the specified index \p first and spanning \p count elements.
+         * The resulting slice is stored in a new Array instance.
+         *
+         * \tparam E Type of elements stored in the array.
+         * \param first The starting index of the slice. Must be within the bounds of the array
+         * \param count The number of elements to include in the slice
+         *              The range [first, first + count) must be valid and not exceed the array size
+         *
+         * \return A new Array<E> containing the selected subrange of elements
+         *
+         * \pre `first + count <= mSize`
+         *
+         * \note The slice is a copy of the selected elements, not a view into the original array
+         *       Modifying the returned Array will not affect the original
+         *
+         * \warning Asserts if the requested range exceeds the array size
+         */
+        Array<E> Slice(SizeType first, SizeType count) const
+        {
+            assert(first + count <= mSize);
+
+            Array<E> slice;
+            slice.Reserve(count);
+
+            for (SizeType i = 0; i < count; ++i)
+                slice.Add(UncheckedAt(first + i));
+
+            return slice;
+        }
+
+        /**
          * \brief Returns a new array which is a slice from the first index to the end.
          * \param first Start index of the slice.
          * \return Sliced array.
          */
-        Array<E> Slice(SizeType first) const
+        Array<E> Splice(SizeType first) const
         {
             Array<E> sliced(*this);
-            sliced.SliceInPlace(first);
+            sliced.Splice(InPlace, first);
 
             return sliced;
         }
@@ -1042,9 +1110,9 @@ namespace Ck
          * \param first Start index of the slice.
          * \return Reference to *this.
          */
-        Array<E>& SliceInPlace(SizeType first)
+        Array<E>& Splice(InPlaceTag, SizeType first)
         {
-            return SliceInPlace(first, mSize - first);
+            return Splice(InPlace, first, mSize - first);
         }
 
         /**
@@ -1053,10 +1121,10 @@ namespace Ck
          * \param count Number of elements in the slice.
          * \return Sliced array.
          */
-        Array<E> Slice(SizeType first, SizeType count) const
+        Array<E> Splice(SizeType first, SizeType count) const
         {
             Array<E> sliced(*this);
-            sliced.SliceInPlace(first, count);
+            sliced.Splice(InPlace, first, count);
 
             return sliced;
         }
@@ -1067,7 +1135,7 @@ namespace Ck
          * \param count Number of elements in the slice.
          * \return Reference to *this.
          */
-        Array<E>& SliceInPlace(SizeType first, SizeType count)
+        Array<E>& Splice(InPlaceTag, SizeType first, SizeType count)
         {
             CheckIndex(first + count - 1);
             
@@ -1264,8 +1332,7 @@ namespace Ck
          */
         E& operator[](SizeType index)
         {
-            E* element = GetData() + index;
-            return *element;
+            return UncheckedAt(index);
         }
 
         /**
@@ -1274,6 +1341,19 @@ namespace Ck
          * \return
          */
         const E& operator[](SizeType index) const
+        {
+            return UncheckedAt(index);
+        }
+
+    protected:
+
+        ElementType& UncheckedAt(SizeType index)
+        {
+            E* element = GetData() + index;
+            return *element;
+        }
+
+        const ElementType& UncheckedAt(SizeType index) const
         {
             const E* element = GetData() + index;
             return *element;
