@@ -69,10 +69,10 @@ namespace Ck
 		 * \param point The reference point on the plane
 		 * \param normal The normal of the plane
 		 */
-		Plane(const Vector3<T>& point, const Vector3<float>& normal) :
+		Plane(const Vector3<T>& point, const Vector3<T>& normal) :
 			mNormal(Vector3<T>::Normalize(normal))
 		{
-			mDistance = -Vector3<float>::DotProduct(mNormal, point);
+			mDistance = -Vector3<T>::DotProduct(mNormal, point);
 		}
 
 		/**
@@ -100,9 +100,9 @@ namespace Ck
 		 * \param point The point to test
 		 * \return The distance between the \p point and the plane
 		 */
-		T DistanceTo(const Vector3<float>& point) const
+		T DistanceTo(const Vector3<T>& point) const
 		{
-			return Vector3<float>::DotProduct(mNormal, point) + mDistance;
+			return Vector3<T>::DotProduct(mNormal, point) + mDistance;
 		}
 		
 		/**

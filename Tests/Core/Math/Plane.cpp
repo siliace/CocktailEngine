@@ -2,60 +2,60 @@
 
 #include <Cocktail/Core/Math/Plane.hpp>
 
-TEST_CASE("Create a Plane from a point and a normal", "[Plane]")
+TEMPLATE_TEST_CASE("Create a Plane from a point and a normal", "[Plane]", float, double)
 {
-    Ck::Vector3<float> point(0.f, 3.f, 0.f);
-    Ck::Plane<float> plane(point, Ck::Vector3<float>::Up());
+    Ck::Vector3<TestType> point(0, 3, 0);
+    Ck::Plane<TestType> plane(point, Ck::Vector3<TestType>::Up());
 
     SECTION("Its normal is normalized")
     {
-        REQUIRE(plane.GetNormal().GetLength() == 1.f);
+        REQUIRE(plane.GetNormal().GetLength() == 1);
     }
 
     SECTION("Compute distance to the origin")
     {
-        REQUIRE(plane.DistanceTo(Ck::Vector3<float>::Zero()) == -3.f);
+        REQUIRE(plane.DistanceTo(Ck::Vector3<TestType>::Zero()) == -3);
     }
 }
 
-TEST_CASE("Create a Plane from three points", "[Plane]")
+TEMPLATE_TEST_CASE("Create a Plane from three points", "[Plane]", float, double)
 {
-    Ck::Plane<float> plane(
-        Ck::Vector3<float>(1.f, 3.f, 0.f),
-        Ck::Vector3<float>(0.f, 3.f, 1.f),
-        Ck::Vector3<float>(1.f, 3.f, 3.f)
+    Ck::Plane<TestType> plane(
+        Ck::Vector3<TestType>(1, 3, 0),
+        Ck::Vector3<TestType>(0, 3, 1),
+        Ck::Vector3<TestType>(1, 3, 3)
     );
 
     SECTION("Its distance should be 3")
     {
-        REQUIRE(plane.GetDistance() == -3.f);
+        REQUIRE(plane.GetDistance() == -3);
     }
 
     SECTION("Its normal should be up up")
     {
-        REQUIRE(plane.GetNormal() == Ck::Vector3<float>::Up());
+        REQUIRE(plane.GetNormal() == Ck::Vector3<TestType>::Up());
     }
 }
 
-TEST_CASE("Compute distance between a plane and a point", "[Plane]")
+TEMPLATE_TEST_CASE("Compute distance between a plane and a point", "[Plane]", float, double)
 {
     SECTION("Horizontal plane")
     {
-        Ck::Plane<float> plane(-3.f, Ck::Vector3<float>::Up());
+        Ck::Plane<TestType> plane(-3, Ck::Vector3<TestType>::Up());
         
         SECTION("Distance to a point in front of the plane")
         {
-            REQUIRE(plane.DistanceTo(Ck::Vector3<float>(1.f, 5.f, 3.f)) == 2.f);
+            REQUIRE(plane.DistanceTo(Ck::Vector3<TestType>(1, 5, 3)) == 2);
         }
         
         SECTION("Distance to a point in behind of the plane")
         {
-            REQUIRE(plane.DistanceTo(Ck::Vector3<float>(1.f, -5.f, 3.f)) == -8.f);
+            REQUIRE(plane.DistanceTo(Ck::Vector3<TestType>(1, -5, 3)) == -8);
         }
         
         SECTION("Distance to a point in the plane")
         {
-            REQUIRE(plane.DistanceTo(Ck::Vector3<float>(1.f, 3.f, 3.f)) == 0.f);
+            REQUIRE(plane.DistanceTo(Ck::Vector3<TestType>(1, 3, 3)) == 0);
         }
     }
 }

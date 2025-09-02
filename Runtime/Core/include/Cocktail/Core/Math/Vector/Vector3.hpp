@@ -21,7 +21,7 @@ namespace Ck
 		 */
 		static Vector3 Right()
 		{
-			return { 1.f, 0.f, 0.f };
+			return { 1, 0, 0 };
 		}
 
 		/**
@@ -30,7 +30,7 @@ namespace Ck
 		 */
 		static Vector3 Left()
 		{
-			return { -1.f, 0.f, 0.f };
+			return { -1, 0, 0 };
 		}
 
 		/**
@@ -39,7 +39,7 @@ namespace Ck
 		 */
 		static Vector3 Up()
 		{
-			return { 0.f, 1.f, 0.f };
+			return { 0, 1, 0 };
 		}
 
 		/**
@@ -48,7 +48,7 @@ namespace Ck
 		 */
 		static Vector3 Down()
 		{
-			return { 0.f, -1.f, 0.f };
+			return { 0, -1, 0 };
 		}
 
 		/**
@@ -57,7 +57,7 @@ namespace Ck
 		 */
 		static Vector3 Backward()
 		{
-			return { 0.f, 0.f, 1.f };
+			return { 0, 0, 1 };
 		}
 
 		/**
@@ -66,7 +66,7 @@ namespace Ck
 		 */
 		static Vector3 Forward()
 		{
-			return { 0.f, 0.f, -1.f };
+			return { 0, 0, -1 };
 		}
 
 		/**

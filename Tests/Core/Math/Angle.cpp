@@ -2,65 +2,65 @@
 
 #include <Cocktail/Core/Math/Angle.hpp>
 
-TEST_CASE("Angle conversion between degrees and radians", "[Angle]")
+TEMPLATE_TEST_CASE("Angle conversion between degrees and radians", "[Angle]", float, double)
 {
-	float degrees = 180.f;
-	float radians = Ck::Constants<float>::Pi;
+	TestType degrees = 180;
+	TestType radians = Ck::Constants<TestType>::Pi;
 
 	SECTION("Radian to degree")
 	{
-		Ck::Angle<float> angle = Ck::Angle<float>::Degree(degrees);
+		Ck::Angle<TestType> angle = Ck::Angle<TestType>::Degree(degrees);
 		REQUIRE(Ck::NearlyEqual(angle.AsRadian(), radians));
 	}
 
 	SECTION("Degree to radian")
 	{
-		Ck::Angle<float> angle = Ck::Angle<float>::Radian(radians);
+		Ck::Angle<TestType> angle = Ck::Angle<TestType>::Radian(radians);
 		REQUIRE(Ck::NearlyEqual(angle.AsDegree(), degrees));
 	}
 }
 
-TEST_CASE("Angle equality", "[Angle]")
+TEMPLATE_TEST_CASE("Angle equality", "[Angle]", float, double)
 {
 	SECTION("Equality")
 	{
-		REQUIRE(Ck::Angle<float>::Degree(180.f) == Ck::Angle<float>::Degree(180.f));
+		REQUIRE(Ck::Angle<TestType>::Degree(180) == Ck::Angle<TestType>::Degree(180));
 	}
 
 	SECTION("Inequality")
 	{
-		REQUIRE(Ck::Angle<float>::Degree(180.f) != Ck::Angle<float>::Degree(360.f));
+		REQUIRE(Ck::Angle<TestType>::Degree(180) != Ck::Angle<TestType>::Degree(360));
 	}
 }
 
-TEST_CASE("Angle addition", "[Angle]")
+TEMPLATE_TEST_CASE("Angle addition", "[Angle]", float, double)
 {
 	SECTION("With the same unit")
 	{
-		Ck::Angle<float> lhs = Ck::Angle<float>::Degree(180.f);
-		Ck::Angle<float> rhs = Ck::Angle<float>::Degree(180.f);
+		Ck::Angle<TestType> lhs = Ck::Angle<TestType>::Degree(180);
+		Ck::Angle<TestType> rhs = Ck::Angle<TestType>::Degree(180);
 
-		Ck::Angle<float> sum = lhs + rhs;
-		REQUIRE(Ck::NearlyEqual(sum.AsDegree(), 360.f));
+		Ck::Angle<TestType> sum = lhs + rhs;
+		REQUIRE(Ck::NearlyEqual(sum.AsDegree(), static_cast<TestType>(360)));
 	}
 
 	SECTION("Not with the same unit")
 	{
-		Ck::Angle<float> lhs = Ck::Angle<float>::Radian(Ck::Constants<float>::Pi);
-		Ck::Angle<float> rhs = Ck::Angle<float>::Degree(180.f);
+		Ck::Angle<TestType> lhs = Ck::Angle<TestType>::Radian(Ck::Constants<TestType>::Pi);
+		Ck::Angle<TestType> rhs = Ck::Angle<TestType>::Degree(180);
 
-		Ck::Angle<float> sum = lhs + rhs;
-		REQUIRE(Ck::NearlyEqual(sum.AsDegree(), 360.f));
+		Ck::Angle<TestType> sum = lhs + rhs;
+		REQUIRE(Ck::NearlyEqual(sum.AsDegree(), static_cast<TestType>(360)));
 	}
 }
 
-TEST_CASE("Angle normalization", "[Angle]")
+TEMPLATE_TEST_CASE("Angle normalization", "[Angle]", float, double)
 {
-	Ck::Angle<float> angle = Ck::Angle<float>::Degree(
-		3 * 180.f
+	Ck::Angle<TestType> angle = Ck::Angle<TestType>::Degree(
+		3 * 180
 	);
-	Ck::Angle<float> normalized = Ck::Angle<float>::Radian(
-		Ck::Constants<float>::Pi
+	Ck::Angle<TestType> normalized = Ck::Angle<TestType>::Radian(
+		Ck::Constants<TestType>::Pi
 	);
 
 	REQUIRE(angle.Normalized() == normalized);
