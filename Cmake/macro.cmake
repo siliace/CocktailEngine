@@ -153,6 +153,7 @@ function(cocktail_add_sample)
     endif ()
 
     if (THIS_DEBUG_DIRECTORY AND CMAKE_GENERATOR MATCHES "Visual Studio")
+        target_sources(${THIS_TARGET} PRIVATE "${CMAKE_SOURCE_DIR}/.natvis")
         set_target_properties(${THIS_TARGET} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${THIS_DEBUG_DIRECTORY})
     endif ()
 

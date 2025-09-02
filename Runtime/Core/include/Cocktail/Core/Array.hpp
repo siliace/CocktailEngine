@@ -212,7 +212,7 @@ namespace Ck
     	E& Emplace(TArgs&&... args)
         {
             E* availableElements = Allocate(1);
-            Construct(availableElements, std::forward<TArgs>(args)...);
+            AllocatorUtils::Construct(availableElements, std::forward<TArgs>(args)...);
             ++mSize;
 
             return availableElements[0];
@@ -241,12 +241,12 @@ namespace Ck
                 ElementType& current = data[i];
                 ElementType& previous = data[i - 1];
 
-                Construct(&current, std::move(previous));
-                Destroy(&previous);
+                AllocatorUtils::Construct(&current, std::move(previous));
+                AllocatorUtils::Destroy(&previous);
             }
 
             ElementType& element = data[index];
-            Construct(&element, std::forward<TArgs>(args)...);
+            AllocatorUtils::Construct(&element, std::forward<TArgs>(args)...);
             ++mSize;
 
             return element;
@@ -280,14 +280,14 @@ namespace Ck
             ElementType* data = GetData();
 
             for (SizeType i = 0; i < elementCount; ++i)
-                Construct(&data[mSize + i], std::move(data[index + i]));
+                AllocatorUtils::Construct(&data[mSize + i], std::move(data[index + i]));
 
-            DestroyRange(elementCount, data + index);
+            AllocatorUtils::DestroyRange(elementCount, data + index);
 
             SizeType i = 0;
             for (auto it = values.begin(); it != values.end(); ++it)
             {
-                Construct(&data[index + i], std::move(*it));
+                AllocatorUtils::Construct(&data[index + i], std::move(*it));
                 ++i;
             }
 
@@ -309,12 +309,12 @@ namespace Ck
             ElementType* data = GetData();
 
             for (SizeType i = 0; i < elementCount; ++i)
-                Construct(&data[mSize + i], std::move(data[index + i]));
+                AllocatorUtils::Construct(&data[mSize + i], std::move(data[index + i]));
 
-            DestroyRange(elementCount, data + index);
+            AllocatorUtils::DestroyRange(elementCount, data + index);
 
         	for (SizeType i = 0; i < elementCount; ++i)
-                Construct(&data[index + i], std::move(elements[i]));
+                AllocatorUtils::Construct(&data[index + i], std::move(elements[i]));
 
             mSize += elementCount;
         }
@@ -337,12 +337,12 @@ namespace Ck
          */
         void Append(std::initializer_list<E> values)
         {
-            SizeType count = values.size();
+            SizeType count = static_cast<SizeType>(values.size());
 
             E* availableElements = Allocate(count);
             for (auto it = values.begin(); it != values.end(); ++it)
             {
-                Construct(availableElements, *it);
+                AllocatorUtils::Construct(availableElements, *it);
                 ++availableElements;
             }
 
@@ -359,7 +359,7 @@ namespace Ck
             E* availableElements = Allocate(elementCount);
             for (SizeType i = 0; i < elementCount; ++i)
             {
-                Construct(availableElements, elements[i]);
+                AllocatorUtils::Construct(availableElements, elements[i]);
                 ++availableElements;
             }
 
@@ -741,7 +741,7 @@ namespace Ck
                 data[i - 1] = std::move(data[i]);
 
             ElementType& last = data[mSize - 1];
-            Destroy(&last);
+            AllocatorUtils::Destroy(&last);
 
             --mSize;
 
@@ -760,7 +760,7 @@ namespace Ck
             ElementType& last = data[mSize - 1];
 
             ElementType lastElement = std::move(last);
-            Destroy(&last);
+            AllocatorUtils::Destroy(&last);
 
             --mSize;
 
@@ -822,9 +822,9 @@ namespace Ck
          * \return Filtered array.
          */
         template <typename TPredicate>
-    	Array<E> Filter(TPredicate predicate) const
+    	Array<E, AllocatorType> Filter(TPredicate predicate) const
         {
-            Array<E> results(*this);
+            Array<E, AllocatorType> results(*this);
             results.FilterInPlace(predicate);
 
             return results;
@@ -837,7 +837,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TPredicate>
-    	Array<E>& FilterInPlace(TPredicate predicate)
+    	Array<E, AllocatorType>& FilterInPlace(TPredicate predicate)
         {
             SizeType writeIndex = 0;
             ElementType* data = GetData();
@@ -851,14 +851,14 @@ namespace Ck
                 {
                     if (writeIndex != readIndex) 
                     {
-                        Construct(&writeElement, std::move(readElement));
-                        Destroy(&readElement);
+                        AllocatorUtils::Construct(&writeElement, std::move(readElement));
+                        AllocatorUtils::Destroy(&readElement);
                     }
                     ++writeIndex;
                 }
                 else
                 {
-                    Destroy(&readElement);
+                    AllocatorUtils::Destroy(&readElement);
                 }
             }
 
@@ -912,7 +912,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TFunction>
-    	Array<E>& TransformInPlace(TFunction transformer)
+    	Array<E, AllocatorType>& TransformInPlace(TFunction transformer)
         {
             for (SizeType i = 0; i < mSize; ++i)
             {
@@ -1000,9 +1000,9 @@ namespace Ck
          * \brief Returns a reversed copy of the array.
          * \return New reversed array.
          */
-        Array<E> Reverse() const
+        Array<E, AllocatorType> Reverse() const
         {
-            Array<E> copy = *this;
+            Array<E, AllocatorType> copy = *this;
             copy.ReverseInPlace();
             return copy;
         }
@@ -1011,7 +1011,7 @@ namespace Ck
          * \brief Reverses the array in place.
          * \return Reference to *this.
          */
-        Array<E>& ReverseInPlace()
+        Array<E, AllocatorType>& ReverseInPlace()
         {
             const SizeType size = GetSize();
             if (size > 1)
@@ -1029,9 +1029,9 @@ namespace Ck
          * \param first Start index of the slice.
          * \return Sliced array.
          */
-        Array<E> Slice(SizeType first) const
+        Array<E, AllocatorType> Slice(SizeType first) const
         {
-            Array<E> sliced(*this);
+            Array<E, AllocatorType> sliced(*this);
             sliced.SliceInPlace(first);
 
             return sliced;
@@ -1042,7 +1042,7 @@ namespace Ck
          * \param first Start index of the slice.
          * \return Reference to *this.
          */
-        Array<E>& SliceInPlace(SizeType first)
+        Array<E, AllocatorType>& SliceInPlace(SizeType first)
         {
             return SliceInPlace(first, mSize - first);
         }
@@ -1053,9 +1053,9 @@ namespace Ck
          * \param count Number of elements in the slice.
          * \return Sliced array.
          */
-        Array<E> Slice(SizeType first, SizeType count) const
+        Array<E, AllocatorType> Slice(SizeType first, SizeType count) const
         {
-            Array<E> sliced(*this);
+            Array<E, AllocatorType> sliced(*this);
             sliced.SliceInPlace(first, count);
 
             return sliced;
@@ -1067,18 +1067,18 @@ namespace Ck
          * \param count Number of elements in the slice.
          * \return Reference to *this.
          */
-        Array<E>& SliceInPlace(SizeType first, SizeType count)
+        Array<E, AllocatorType>& SliceInPlace(SizeType first, SizeType count)
         {
             CheckIndex(first + count - 1);
             
             const SizeType firstKept = first + count;
 
-            DestroyRange(count, GetData() + first);
+            AllocatorUtils::DestroyRange(count, GetData() + first);
             for (SizeType i = 0; i < mSize - first; ++i)
             {
                 E* element = GetData() + firstKept + i;
-                Construct(GetData() + first + i, std::move(*element));
-                Destroy(element);
+                AllocatorUtils::Construct(GetData() + first + i, std::move(*element));
+                AllocatorUtils::Destroy(element);
             }
 
             mSize -= count;
@@ -1099,14 +1099,14 @@ namespace Ck
                 SizeType allocateCount = size - mSize;
                 E* availableElements = Allocate(allocateCount);
                 for (SizeType i = 0; i < size; ++i)
-                    ConstructRange(size, availableElements);
+                    AllocatorUtils::ConstructRange(allocateCount, availableElements);
 
                 mSize += allocateCount;
             }
             else if (size < mSize)
             {
                 SizeType destroyCount = mSize - size;
-                DestroyRange(destroyCount, GetData() + size);
+                AllocatorUtils::DestroyRange(destroyCount, GetData() + size);
 
                 mSize -= destroyCount;
             }
@@ -1121,11 +1121,22 @@ namespace Ck
         template <typename U, typename = std::enable_if_t<std::is_constructible_v<E, U>>>
         void Resize(SizeType size, const U& element)
         {
-            E* availableElements = Allocate(size);
-            for (SizeType i = 0; i < size; ++i)
-                ConstructRange(size, availableElements, element);
+            if (size > mSize)
+            {
+                SizeType allocateCount = size - mSize;
+                E* availableElements = Allocate(allocateCount);
+                for (SizeType i = 0; i < size; ++i)
+                    ConstructRange(allocateCount, availableElements, element);
 
-            mSize += size;
+                mSize += allocateCount;
+            }
+            else if (size < mSize)
+            {
+                SizeType destroyCount = mSize - size;
+                DestroyRange(destroyCount, GetData() + size);
+
+                mSize -= destroyCount;
+            }
         }
 
         /**
@@ -1146,7 +1157,7 @@ namespace Ck
         void Clear()
         {
             if (mSize > 0)
-                DestroyRange(mSize, mAllocator.GetAllocation());
+                AllocatorUtils::DestroyRange(mSize, mAllocator.GetAllocation());
                 
             mSize = 0;
         }

@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_MEMORY_ALLOCATOR_SIZEDHEAPALLOCATOR_HPP
 
 #include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
 
 namespace Ck
 {
@@ -93,6 +94,10 @@ namespace Ck
 					mData = std::realloc(mData, nextSize * elementSize);
 			}
 
+			/**
+			 * \brief 
+			 * \return 
+			 */
 			SizeType GetInitialCapacity() const
 			{
 				return 0;
@@ -128,12 +133,17 @@ namespace Ck
 			void ResizeAllocation(SizeType currentSize, SizeType nextSize, std::size_t elementSize)
 			{
 				T* block = static_cast<T*>(std::malloc(nextSize * elementSize));
-				MoveRange(currentSize, block, GetAllocation());
+				if (T* currentBlock = GetAllocation(); currentBlock && currentSize > 0)
+					AllocatorUtils::MoveRange(currentSize, block, currentBlock);
 
 				std::free(Raw::mData);
 				Raw::mData = block;
 			}
 
+			/**
+			 * \brief 
+			 * \return 
+			 */
 			T* GetAllocation() const
 			{
 				return static_cast<T*>(Raw::GetAllocation());

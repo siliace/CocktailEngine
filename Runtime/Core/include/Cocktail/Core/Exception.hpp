@@ -204,6 +204,7 @@ namespace Ck
 	COCKTAIL_DECLARE_EXCEPTION_FROM(NotImplementedException, LogicException);
 
 	COCKTAIL_DECLARE_EXCEPTION(RuntimeException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(OutOfMemory, RuntimeException);
 }
 
 #endif // COCKTAIL_CORE_EXCEPTION_HPP
