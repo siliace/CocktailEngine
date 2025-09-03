@@ -183,18 +183,60 @@ namespace Ck
 		using Common = std::common_type_t<T1, T2>;
 		return AbsoluteDifference<Common>(lhs, rhs) < epsilon;
 	}
-
-	constexpr std::size_t HashMerge(std::size_t lhs, std::size_t rhs)
+	/**
+	 * \brief Merges two 64-bit hash values into a single hash value
+	 *
+	 * This function combines two 64-bit hash values using the golden ratio constant
+	 * to improve bit diffusion and reduce collisions.
+	 *
+	 * \param lhs The left-hand side hash value
+	 * \param rhs The right-hand side hash value
+	 * \return The merged 64-bit hash value
+	 */
+	constexpr Uint64 HashMerge(Uint64 lhs, Uint64 rhs)
 	{
-		std::size_t merge = lhs;
-		merge ^= rhs + 0x9e3779b9 + (merge << 6) + (merge >> 2);
+		constexpr Uint64 GoldenRatio = 0x9e3779b97f4a7c15ULL;
+
+		Uint64 merge = lhs;
+		merge ^= rhs + GoldenRatio + (merge << 6) + (merge >> 2);
 		return merge;
 	}
-
+	/**
+	 * \brief Combines a hash with the hash of a given value
+	 *
+	 * This function updates the given hash by merging it with the hash of a new value.
+	 *
+	 * \tparam T The type of the value to hash. Requires std::hash<T> to be defined
+	 * \param hash Reference to the current hash value to update
+	 * \param value The value to hash and combine
+	 */
 	template <typename T>
-	constexpr void HashCombine(std::size_t& hash, const T& value)
+	constexpr void HashCombine(Uint64& hash, const T& value)
 	{
-		hash = HashMerge(hash, std::hash<T>()(value));
+		hash = HashMerge(hash, 
+			static_cast<Uint64>(std::hash<T>()(value))
+		);
+	}
+
+	/**
+	 * \brief Computes a combined hash value from multiple values
+	 *
+	 * This function takes any number of arguments and combines their hashes into a single 64-bit hash value.
+	 *
+	 * \tparam Ts Variadic template parameter pack of value types
+	 * \param values The values to hash and combine
+	 * \return A 64-bit hash value representing the combination of all input values
+	 *
+	 * Example usage:
+	 * \code{.cpp}
+	 * Uint64 h = HashValues(42, std::string("Hello"), 3.14);
+	 * \endcode
+	 */
+	template <typename... Ts>
+	constexpr Uint64 HashValues(const Ts&... values) {
+		Uint64 hash = 0;
+		(HashCombine(hash, values), ...);
+		return hash;
 	}
 
 	template <typename T>

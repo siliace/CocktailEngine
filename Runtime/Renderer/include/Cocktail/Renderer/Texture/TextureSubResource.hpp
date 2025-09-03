@@ -101,13 +101,7 @@ namespace std
 	{
 		size_t operator()(const Ck::Renderer::TextureSubResource& textureSubResource) const noexcept
 		{
-			size_t hash = 0;
-			Ck::HashCombine(hash, textureSubResource.BaseArrayLayer);
-			Ck::HashCombine(hash, textureSubResource.BaseMipMapLevel);
-			Ck::HashCombine(hash, textureSubResource.ArrayLayerCount);
-			Ck::HashCombine(hash, textureSubResource.MipMapLevelCount);
-
-			return hash;
+			return Ck::HashValues(textureSubResource.BaseArrayLayer, textureSubResource.BaseMipMapLevel, textureSubResource.ArrayLayerCount, textureSubResource.MipMapLevelCount);
 		}
 	};
 }
