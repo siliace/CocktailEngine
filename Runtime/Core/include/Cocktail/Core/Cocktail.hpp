@@ -132,16 +132,56 @@ namespace Ck
 		return true;
 	}
 
-	template <typename T>
-	constexpr T AbsoluteDifference(const T& lhs, const T& rhs)
+	/**
+	 * \brief Computes the absolute difference between two values of possibly different types
+	 *
+	 * This function promotes both operands to their common and returns the absolute difference between them. 
+	 *
+	 * \tparam T1 Type of the left-hand side operand
+	 * \tparam T2 Type of the right-hand side operand
+	 * \param lhs The left-hand side operand
+	 * \param rhs The right-hand side operand
+	 * \return The absolute difference between @p lhs and @p rhs, promoted to the common type
+	 *
+	 * \note Both values are converted to the common type before comparison
+	 *
+	 * \code
+	 * AbsoluteDifference(5, 2.5);   // returns 2.5 (as double)
+	 * AbsoluteDifference(3.0f, 7);  // returns 4.0f (as float)
+	 * \endcode
+	 */
+	template <typename T1, typename T2>
+	constexpr std::common_type_t<T1, T2> AbsoluteDifference(const T1& lhs, const T2& rhs)
 	{
-		return std::max(lhs, rhs) - std::min(lhs, rhs);
+		using Common = std::common_type_t<T1, T2>;
+		return std::max<Common>(lhs, rhs) - std::min<Common>(lhs, rhs);
 	}
 
-	template <typename T>
-	constexpr bool NearlyEqual(T lhs, T rhs, T epsilon = std::numeric_limits<T>::epsilon())
+	/**
+	 * \brief Checks whether two values are nearly equal within a tolerance (epsilon)
+	 *
+	 * This function compares two values of possibly different types for approximate equality.
+	 * Both values are promoted to their common type, and the comparison is performed using an absolute
+	 * difference check with a given epsilon tolerance.
+	 *
+	 * \tparam T1 Type of the left-hand side operand
+	 * \tparam T2 Type of the right-hand side operand
+	 * \param lhs The left-hand side operand
+	 * \param rhs The right-hand side operand
+	 * \param epsilon The maximum allowed difference between @p lhs and @p rhs for them to be considered equal
+	 * \return true if the absolute difference between @p lhs and @p rhs is less than @p epsilon, false otherwise
+	 *
+	 * \code
+	 * NearlyEqual(1.0f, 1.00001f, 1e-4f); // true
+	 * NearlyEqual(1.0, 2.0);              // false
+	 * NearlyEqual(1.0, 1);                // true (common type is double)
+	 * \endcode
+	 */
+	template <typename T1, typename T2>
+	constexpr bool NearlyEqual(T1 lhs, T2 rhs, std::common_type_t<T1, T2> epsilon = std::numeric_limits<std::common_type_t<T1, T2>>::epsilon())
 	{
-		return AbsoluteDifference(lhs, rhs) < epsilon;
+		using Common = std::common_type_t<T1, T2>;
+		return AbsoluteDifference<Common>(lhs, rhs) < epsilon;
 	}
 
 	constexpr std::size_t HashMerge(std::size_t lhs, std::size_t rhs)

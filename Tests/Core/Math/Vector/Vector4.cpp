@@ -2,64 +2,65 @@
 
 #include <Cocktail/Core/Math/Vector/Vector4.hpp>
 
-TEST_CASE("Normalize a vector", "[Vector4]")
+TEMPLATE_TEST_CASE("Normalize a vector", "[Vector4]", float, double)
 {
-	Ck::Vector4<float> vector(2.f, 0.f, 0.f, 0.f);
-	Ck::Vector4<float> normalized = Ck::Vector4<float>::Normalize(vector);
+	Ck::Vector4<TestType> vector(2, 0, 0, 0);
+	Ck::Vector4<TestType> normalized = Ck::Vector4<TestType>::Normalize(vector);
 
 	SECTION("Its length should be one")
 	{
-		REQUIRE(normalized.GetLength() == 1.f);
+		REQUIRE(Ck::NearlyEqual(normalized.GetLength(), 1));
 	}
 
 	SECTION("Its components should all be clamped between 0 and 1")
 	{
-		REQUIRE(normalized.X() == 1.f);
-		REQUIRE(normalized.Y() == 0.f);
-		REQUIRE(normalized.Z() == 0.f);
-		REQUIRE(normalized.Z() == 0.f);
+		REQUIRE(Ck::NearlyEqual(normalized.X(), 1));
+		REQUIRE(Ck::NearlyEqual(normalized.Y(), 0));
+		REQUIRE(Ck::NearlyEqual(normalized.Z(), 0));
+		REQUIRE(Ck::NearlyEqual(normalized.Z(), 0));
 	}
 }
 
-TEST_CASE("Compute the dot product of two vectors", "[Vector4]")
+TEMPLATE_TEST_CASE("Compute the dot product of two vectors", "[Vector4]", float, double)
 {
-	Ck::Vector4<float> lhs(1.f, 0.f, 1.f, 0.f);
-	Ck::Vector4<float> rhs(0.f, 1.f, 1.f, 0.f);
+	Ck::Vector4<TestType> lhs(1, 0, 1, 0);
+	Ck::Vector4<TestType> rhs(0, 1, 1, 0);
 
-	REQUIRE(Ck::Vector4<float>::DotProduct(lhs, rhs) == 1.f);
+	REQUIRE(Ck::NearlyEqual(Ck::Vector4<TestType>::DotProduct(lhs, rhs), 1));
 }
 
-TEST_CASE("Create a default Vector4", "[Vector4]")
+TEMPLATE_TEST_CASE("Create a default Vector4", "[Vector4]", float, double)
 {
-	Ck::Vector4<float> vector;
+	Ck::Vector4<TestType> vector;
 
-	REQUIRE(vector.X() == 0.f);
-	REQUIRE(vector.Y() == 0.f);
-	REQUIRE(vector.Z() == 0.f);
+	REQUIRE(Ck::NearlyEqual(vector.X(), 0));
+	REQUIRE(Ck::NearlyEqual(vector.Y(), 0));
+	REQUIRE(Ck::NearlyEqual(vector.Z(), 0));
+	REQUIRE(Ck::NearlyEqual(vector.W(), 0));
 }
 
-TEST_CASE("Create a Vector4 by specifying its components", "[Vector4]")
+TEMPLATE_TEST_CASE("Create a Vector4 by specifying its components", "[Vector4]", float, double)
 {
-	Ck::Vector4<float> vector(2.f, -7.f, 0.5f, 0.f);
+	Ck::Vector4<TestType> vector(2, -7, 0.5f, 0);
 
-	REQUIRE(vector.X() == 2.f);
-	REQUIRE(vector.Y() == -7.f);
-	REQUIRE(vector.Z() == 0.5f);
-	REQUIRE(vector.W() == 0.f);
+	REQUIRE(Ck::NearlyEqual(vector.X(), 2));
+	REQUIRE(Ck::NearlyEqual(vector.Y(), -7));
+	REQUIRE(Ck::NearlyEqual(vector.Z(), 0.5));
+	REQUIRE(Ck::NearlyEqual(vector.W(), 0));
 }
 
-TEST_CASE("The length of an unit vector is 1", "[Vector4]")
+TEMPLATE_TEST_CASE("The length of an unit vector is 1", "[Vector4]", float, double)
 {
-	Ck::Vector4<float> vector(1.f, 0.f, 0.f, 0.f);
+	Ck::Vector4<TestType> vector(1, 0, 0, 0);
 
 	SECTION("Its length should be 1")
 	{
-		REQUIRE(vector.GetLength() == 1.f);
+		REQUIRE(Ck::NearlyEqual(vector.GetLength(), 1));
 	}
 
 	SECTION("It should not change when normalized")
 	{
-		Ck::Vector4<float> normalized = Ck::Vector4<float>::Normalize(vector);
+		Ck::Vector4<TestType> normalized = Ck::Vector4<TestType>::Normalize(vector);
 		REQUIRE(vector == normalized);
 	}
 }
