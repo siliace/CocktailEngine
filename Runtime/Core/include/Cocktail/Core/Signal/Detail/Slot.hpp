@@ -19,10 +19,10 @@ namespace Ck::Detail
 		 * \brief 
 		 * \param args 
 		 */
-		void Invoke(Args&&... args)
+		void Invoke(std::tuple<Args...> args)
 		{
 			if (SlotState::IsConnected() && !SlotState::IsDisabled())
-				DoInvoke(std::forward<Args>(args)...);
+				DoInvoke(std::move(args));
 		}
 		
 	protected:
@@ -42,7 +42,7 @@ namespace Ck::Detail
 		 * \brief 
 		 * \param args 
 		 */
-		virtual void DoInvoke(Args&&... args) = 0;
+		virtual void DoInvoke(std::tuple<Args...>&& args) = 0;
 	};
 
 	/**
@@ -72,14 +72,100 @@ namespace Ck::Detail
 		 * \brief 
 		 * \param args 
 		 */
-		void DoInvoke(Args&&... args) override
+		void DoInvoke(std::tuple<Args...>&& args) override
 		{
-			std::invoke(mCallable, std::forward<Args>(args)...);
+			std::apply(mCallable, std::forward<std::tuple<Args...>>(args));
 		}
 
 	private:
 
 		Callable mCallable;
+	};
+
+	template <typename T, typename... Args>
+	class ObjectSlot : public Slot<Args...>
+	{
+	public:
+
+		using ObjectType = T;
+		using ReferenceType = T&;
+		using FunctionType = void(T::*)(Args...);
+
+		/**
+		 * \brief
+		 * \param object
+		 * \param function
+		 * \param container
+		 * \param groupId
+		 */
+		ObjectSlot(ReferenceType object, FunctionType function, SlotContainer* container, unsigned int groupId) :
+			Slot<Args...>(container, groupId),
+			mObject(object),
+			mFunction(function)
+		{
+			/// Nothing
+		}
+
+	protected:
+
+		/**
+		 * \brief 
+		 * \param args 
+		 */
+		void DoInvoke(std::tuple<Args...>&& args) override
+		{
+			std::apply([&](Args&&... innerArgs) {
+				std::invoke(mFunction, mObject, std::forward<Args>(innerArgs)...);
+			}, std::forward<std::tuple<Args...>>(args));
+		}
+
+	private:
+
+		ReferenceType mObject;
+		FunctionType mFunction;
+	};
+
+	template <typename T, typename... Args>
+	class ConstantObjectSlot : public Slot<Args...>
+	{
+	public:
+
+		using ObjectType = T;
+		using ReferenceType = const T&;
+		using FunctionType = void(T::*)(Args...) const;
+
+		/**
+		 * \brief
+		 * \param object
+		 * \param function
+		 * \param container
+		 * \param groupId
+		 */
+		ConstantObjectSlot(ReferenceType object, FunctionType function, SlotContainer* container, unsigned int groupId) :
+			Slot<Args...>(container, groupId),
+			mObject(object),
+			mFunction(function)
+		{
+			/// Nothing
+		}
+
+	protected:
+
+		/**
+		 * \brief
+		 * \param args
+		 */
+		void DoInvoke(std::tuple<Args...>&& args) override
+		{
+			std::apply([&](Args&&... innerArgs) {
+				std::invoke(mFunction, mObject, std::forward<Args>(innerArgs)...);
+			}, std::forward<std::tuple<Args...>>(args));
+		}
+
+	private:
+
+		ReferenceType mObject;
+		FunctionType mFunction;
 	};
 }
 

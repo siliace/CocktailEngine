@@ -3,6 +3,32 @@
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
+class TestClass
+{
+public:
+
+	static bool StaitcMethodCalled;
+	bool MemberMethodCalled = false;
+	mutable bool ConstMemberMethodCalled = false;
+
+	static void StaticCall(bool called)
+	{
+		StaitcMethodCalled = called;
+	}
+
+	void MethodCall(bool called)
+	{
+		MemberMethodCalled = called;
+	}
+
+	void ConstMethodCall() const
+	{
+		ConstMemberMethodCalled = true;
+	}
+};
+
+bool TestClass::StaitcMethodCalled = false;
+
 TEST_CASE("Emit a signal to a free function", "[Signal]")
 {
 	Ck::Signal<int> signal;
@@ -14,6 +40,38 @@ TEST_CASE("Emit a signal to a free function", "[Signal]")
 
 	signal.Emit(1);
 	REQUIRE(value == 1);
+}
+
+TEST_CASE("Emit a signal to a member method", "[Signal]")
+{
+	Ck::Signal<bool> signal;
+
+	TestClass testObject;
+	auto connection = signal.Connect(testObject, &TestClass::MethodCall);
+	signal.Emit(true);
+
+	REQUIRE(testObject.MemberMethodCalled);
+}
+
+TEST_CASE("Emit a signal to a constant member method", "[Signal]")
+{
+	Ck::Signal<> signal;
+
+	TestClass testObject;
+	auto connection = signal.Connect(testObject, &TestClass::ConstMethodCall);
+	signal.Emit();
+
+	REQUIRE(testObject.ConstMemberMethodCalled);
+}
+
+TEST_CASE("Emit a signal to a static method", "[Signal]")
+{
+	Ck::Signal<bool> signal;
+
+	auto connection = signal.Connect(&TestClass::StaticCall);
+	signal.Emit(true);
+
+	REQUIRE(TestClass::StaitcMethodCalled);
 }
 
 TEST_CASE("Emit a signal to free functions with group ids", "[Signal]")

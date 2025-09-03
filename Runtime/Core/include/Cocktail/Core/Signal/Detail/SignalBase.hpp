@@ -83,15 +83,59 @@ namespace Ck::Detail
 
 	    /**
          * \brief 
+         * \tparam T 
+         * \param object 
+         * \param function
+         * \param groupId 
+         * \return 
+         */
+        template <typename T>
+        Connection Connect(T& object, void (T::* function)(Args...), unsigned int groupId = 0)
+        {
+            using SlotType = ObjectSlot<T, Args...>;
+
+            // Create the slot into the signal
+            std::shared_ptr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
+
+            // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+	    /**
+         * \brief 
+         * \tparam T 
+         * \param object 
+         * \param function
+         * \param groupId 
+         * \return 
+         */
+        template <typename T>
+        Connection Connect(const T& object, void (T::* function)(Args...) const, unsigned int groupId = 0)
+        {
+            using SlotType = ConstantObjectSlot<T, Args...>;
+
+            // Create the slot into the signal
+            std::shared_ptr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
+
+            // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+	    /**
+         * \brief 
          * \param args 
          */
         void Emit(Args... args)
         {
             std::lock_guard<Lockable> lg(mSlotLock);
-            for (const auto& pair : mSlots)
-				pair.second->Invoke(std::forward<Args>(args)...);
+            for (const auto& [groupIndex, slot] : mSlots)
+				slot->Invoke(std::tie<Args...>(args...));
         }
 
+	    /**
+         * \brief Tell whether the signal has active connections bound
+         * \return True if the signal has active connections, false otherwise
+         */
         bool IsBound() const
         {
             return !mSlots.empty();
