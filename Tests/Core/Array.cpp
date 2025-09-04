@@ -36,19 +36,53 @@ TEMPLATE_TEST_CASE("Add elements in the middle of an array", "[Array]", Ck::Size
     REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 4, 5, 6, 7 });
 }
 
+TEMPLATE_TEST_CASE("Prepend elements at the begining of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+{
+    Ck::Array<int, TestType> array = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("Insert another array")
+    {
+        array.Prepend(Ck::Array<float, TestType>{ 0.f, 1.f, 2, 3, 4 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+
+    SECTION("Insert a initialize list")
+    {
+        array.Prepend({ 0, 1, 2, 3, 4 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
 TEMPLATE_TEST_CASE("Insert elements in the middle of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 10, 11, 12, 13, 14, 15 };
 
     SECTION("Insert another array")
     {
-        array.Insert(4, Ck::Array<int, TestType>{ 4, 5, 6, 7, 8, 9 });
+        array.Insert(4, Ck::Array<float, TestType>{ 4.f, 5.f, 6.f, 7.f, 8.f, 9.f });
         REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
     }
 
     SECTION("Insert a initialize list")
     {
         array.Insert(4, { 4, 5, 6, 7, 8, 9 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Append elements at the end of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    SECTION("Insert another array")
+    {
+        array.Append(Ck::Array<float, TestType>{ 11.f, 12.f, 13.f, 14.f, 15.f });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+
+    SECTION("Insert a initialize list")
+    {
+        array.Append({ 11, 12, 13, 14, 15 });
         REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
     }
 }

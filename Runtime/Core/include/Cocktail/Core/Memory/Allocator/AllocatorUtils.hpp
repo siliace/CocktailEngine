@@ -53,6 +53,29 @@ namespace Ck
 		}
 
 		/**
+		 * \brief Copies a range of object from source memory to destination memory
+		 * \tparam TDestination Type of objects to copy to
+		 * \tparam TSource Type of objects to copy from
+		 * \tparam TSizeType Integral type used for the size/count
+		 * \param size Number of objects to copy
+		 * \param destination Pointer to the destination memory block
+		 * \param destination Pointer to the source memory block
+		 * \note Source and destination should not overlap. Memory must be aligned properly.
+		 */
+		template <typename TDestination, typename TSource, typename TSizeType,
+			typename = std::enable_if_t<std::is_constructible_v<TDestination, TSource>>
+		>
+		static void CopyRange(TSizeType size, TDestination* destination, const TSource* source)
+		{
+			static_assert(std::is_integral_v<TSizeType>, "TSizeType must be an integral type");
+
+			assert(source != nullptr && destination != nullptr);
+
+			for (TSizeType i = 0; i < size; ++i)
+				new (&destination[i]) TDestination(source[i]);
+		}
+
+		/**
 		 * \brief Moves a range of objects from source to destination memory
 		 * \tparam T Type of objects to move (must be nothrow move constructible)
 		 * \tparam TSizeType Integral type used for the size/count
