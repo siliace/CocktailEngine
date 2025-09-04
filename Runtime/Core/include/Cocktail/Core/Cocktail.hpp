@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_COCKTAIL_HPP
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -130,6 +131,46 @@ namespace Ck
 
 		lhs = rhs;
 		return true;
+	}
+
+	/**
+	 * \brief
+	 * \param first
+	 * \param second
+	 * \param third
+	 * \param fourth
+	 * \return
+	 */
+	constexpr Uint32 Pack(Uint8 first, Uint8 second, Uint8 third, Uint8 fourth)
+	{
+		return static_cast<Uint32>(first << 24 | second << 16 | third << 8 | fourth);
+	}
+
+	/**
+	 * \brief 
+	 * \param bytes 
+	 * \return 
+	 */
+	constexpr Uint32 Pack(const std::array<Uint8, 4>& bytes)
+	{
+		return Pack(bytes[0], bytes[1], bytes[2], bytes[3]);
+	}
+
+	/**
+	 * \brief 
+	 * \param packed 
+	 * \return 
+	 */
+	constexpr std::array<Uint8, 4> Unpack(Uint32 packed)
+	{
+		std::array<Uint8, 4> bytes{
+			static_cast<Uint8>((packed & 0xff000000) >> 24),
+			static_cast<Uint8>((packed & 0x00ff0000) >> 16),
+			static_cast<Uint8>((packed & 0x0000ff00) >> 8),
+			static_cast<Uint8>((packed & 0x000000ff) >> 0)
+		};
+
+		return bytes;
 	}
 
 	/**
