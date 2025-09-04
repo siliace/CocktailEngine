@@ -236,14 +236,7 @@ namespace Ck
             Allocate(1);
 
             ElementType* data = GetData();
-            for (SizeType i = mSize; i > index; --i)
-            {
-                ElementType& current = data[i];
-                ElementType& previous = data[i - 1];
-
-                AllocatorUtils::Construct(&current, std::move(previous));
-                AllocatorUtils::Destroy(&previous);
-            }
+            AllocatorUtils::MoveRange(mSize - index, data + index + 1, data + index);
 
             ElementType& element = data[index];
             AllocatorUtils::Construct(&element, std::forward<TArgs>(args)...);
@@ -253,16 +246,69 @@ namespace Ck
         }
 
         /**
-         * \brief Inserts elements from another array at the specified index (copy).
-         * \param index Position to insert at.
-         * \param other Array to insert.
+         * \brief Prepends elements from another array (copy).
+         * \param other Array to Prepend.
          */
-        void Insert(SizeType index, const Array& other)
+        template <typename TOtherElement, typename TOtherAllocator,
+            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+        >
+        void Prepend(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
                 return;
 
-            Insert(index, other.GetData(), other.GetSize());
+            Prepend<TOtherElement, typename TOtherAllocator::SizeType>(other.GetData(), other.GetSize());
+        }
+
+        /**
+         * \brief Prepends elements from an initializer list.
+         * \param values Initializer list of elements to Prepend.
+         */
+        void Prepend(std::initializer_list<E> values)
+        {
+            SizeType elementCount = static_cast<SizeType>(values.size());
+            Reserve(elementCount);
+
+            for (auto it = std::rbegin(values); it != std::rend(values); ++it)
+                AddAt(0, *it);
+        }
+
+        /**
+         * \brief Prepends elements from a raw pointer.
+         * \param elements Pointer to elements to Prepend.
+         * \param elementCount Number of elements to Prepend.
+         */
+        template <typename TOtherElement, typename TOtherSizeType,
+            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+        >
+        void Prepend(const TOtherElement* elements, TOtherSizeType elementCount)
+        {
+            /// TODO: add static assert on size type conversion
+
+            Reserve(elementCount);
+
+            ElementType* data = GetData();
+
+            AllocatorUtils::MoveRange(mSize, data + elementCount, data);
+            AllocatorUtils::CopyRange(elementCount, data, elements);
+
+            mSize += elementCount;
+        }
+
+        /**
+         * \brief Inserts elements from another array at the specified index (copy).
+         * \param index Position to insert at.
+         * \param other Array to insert.
+         */
+        template <typename TOtherElement, typename TOtherAllocator,
+			typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+    	>
+        void Insert(SizeType index, const Array<TOtherElement, TOtherAllocator>& other)
+        {
+            if (other.IsEmpty())
+                return;
+
+            Insert<TOtherElement, typename TOtherAllocator::SizeType>(index, other.GetData(), other.GetSize());
         }
 
         /**
@@ -300,13 +346,20 @@ namespace Ck
          * \param elements Pointer to elements to insert
          * \param elementCount Number of elements to insert
          */
-        void Insert(SizeType index, const E* elements, SizeType elementCount)
+        template <typename TOtherElement, typename TOtherSizeType,
+            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+        >
+        void Insert(SizeType index, const TOtherElement* elements, TOtherSizeType elementCount)
         {
+            /// TODO: add static assert on size type conversion
+
             CheckIndex(index);
 
             Reserve(elementCount);
 
             ElementType* data = GetData();
+
+            /// TODO: refactor here with AllocatorUtils::MoveRange and CopyRange
 
             for (SizeType i = 0; i < elementCount; ++i)
                 AllocatorUtils::Construct(&data[mSize + i], std::move(data[index + i]));
@@ -323,12 +376,15 @@ namespace Ck
          * \brief Appends elements from another array (copy).
          * \param other Array to append.
          */
-        void Append(const Array& other)
+        template <typename TOtherElement, typename TOtherAllocator,
+            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+        >
+        void Append(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
                 return;
 
-            Append(other.GetData(), other.GetSize());
+            Append<TOtherElement, typename TOtherAllocator::SizeType>(other.GetData(), other.GetSize());
         }
 
         /**
@@ -338,15 +394,10 @@ namespace Ck
         void Append(std::initializer_list<E> values)
         {
             SizeType count = static_cast<SizeType>(values.size());
+            Reserve(count);
 
-            E* availableElements = Allocate(count);
             for (auto it = values.begin(); it != values.end(); ++it)
-            {
-                AllocatorUtils::Construct(availableElements, *it);
-                ++availableElements;
-            }
-
-            mSize += count;
+                Add(*it);
         }
 
         /**
@@ -354,8 +405,13 @@ namespace Ck
          * \param elements Pointer to elements to append.
          * \param elementCount Number of elements to append.
          */
-        void Append(const E* elements, SizeType elementCount)
+        template <typename TOtherElement, typename TOtherSizeType,
+            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
+        >
+        void Append(const TOtherElement* elements, TOtherSizeType elementCount)
         {
+            /// TODO: add static assert on size type conversion
+
             E* availableElements = Allocate(elementCount);
             for (SizeType i = 0; i < elementCount; ++i)
             {
@@ -375,9 +431,7 @@ namespace Ck
         E& At(SizeType index)
         {
             CheckIndex(index);
-
-            E* element = GetData() + index;
-            return *element;
+            return UncheckAt(index);
         }
 
         /**
@@ -389,9 +443,7 @@ namespace Ck
         const E& At(SizeType index) const
         {
             CheckIndex(index);
-
-            const E* element = GetData() + index;
-            return *element;
+            return UncheckAt(index);
         }
 
         /**
@@ -404,8 +456,7 @@ namespace Ck
             if (index >= mSize)
                 return Optional<E&>::Empty();
 
-            E* element = GetData() + index;
-            return Optional<E&>::Of(*element);
+            return Optional<E&>::Of(UncheckAt(index));
         }
 
         /**
@@ -418,8 +469,7 @@ namespace Ck
             if (index >= mSize)
                 return Optional<const E&>::Empty();
 
-            const E* element = GetData() + index;
-            return Optional<const E&>::Of(*element);
+            return Optional<const E&>::Of(UncheckAt(index));
         }
 
         /**
@@ -1275,8 +1325,7 @@ namespace Ck
          */
         E& operator[](SizeType index)
         {
-            E* element = GetData() + index;
-            return *element;
+            return UncheckAt(index);
         }
 
         /**
@@ -1285,6 +1334,19 @@ namespace Ck
          * \return
          */
         const E& operator[](SizeType index) const
+        {
+            return UncheckAt(index);
+        }
+
+    protected:
+
+        E& UncheckAt(SizeType index)
+        {
+            E* element = GetData() + index;
+            return *element;
+        }
+
+        const E& UncheckAt(SizeType index) const
         {
             const E* element = GetData() + index;
             return *element;
