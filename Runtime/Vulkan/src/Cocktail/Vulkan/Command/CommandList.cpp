@@ -361,13 +361,15 @@ namespace Ck::Vulkan
 	}
 
 	CommandList::CommandList(RenderDevice* renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocator(std::move(allocator)),
 		mHandle(VK_NULL_HANDLE),
 		mSecondary(createInfo.Secondary),
 		mState(Renderer::CommandListState::Initial),
 		mUsage(createInfo.Usage),
-		mDynamicState(createInfo.DynamicState)
+		mDynamicState(createInfo.DynamicState),
+		mCurrentFramebuffer(nullptr),
+		mDescriptorSetAllocator(nullptr)
 	{
 		Renderer::CommandQueueType queueType = SelectQueueForUsage(mUsage);
 
