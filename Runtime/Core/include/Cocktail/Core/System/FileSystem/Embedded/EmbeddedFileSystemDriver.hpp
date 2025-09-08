@@ -3,6 +3,7 @@
 
 #include <cmrc/cmrc.hpp>
 
+#include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/System/FileSystem/FileSystemDriver.hpp>
 
 namespace Ck

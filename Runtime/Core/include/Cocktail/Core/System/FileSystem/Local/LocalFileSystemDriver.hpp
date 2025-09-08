@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMDRIVER_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMDRIVER_HPP
 
+#include <Cocktail/Core/System/FileSystem/DirectoryWatcher.hpp>
+#include <Cocktail/Core/System/FileSystem/FileLock.hpp>
 #include <Cocktail/Core/System/FileSystem/FileSystemDriver.hpp>
 
 namespace Ck
