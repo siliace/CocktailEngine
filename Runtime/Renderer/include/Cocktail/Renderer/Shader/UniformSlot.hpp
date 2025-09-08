@@ -3,6 +3,7 @@
 
 #include <Cocktail/Core/DataType.hpp>
 #include <Cocktail/Core/Flags.hpp>
+#include <Cocktail/Core/String.hpp>
 
 #include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramType.hpp>
@@ -28,7 +29,7 @@ namespace Ck::Renderer
 		 * \brief 
 		 * \return 
 		 */
-		virtual const std::string& GetName() const = 0;
+		virtual const String& GetName() const = 0;
 
 		/**
 		 * \brief 
@@ -138,7 +139,7 @@ namespace Ck::Renderer
 		 * \brief Get the name of the descriptor in the shader code
 		 * \return The name of the uniform if found in the stage
 		 */
-		virtual const std::string& GetName() const = 0;
+		virtual const String& GetName() const = 0;
 	};
 }
 

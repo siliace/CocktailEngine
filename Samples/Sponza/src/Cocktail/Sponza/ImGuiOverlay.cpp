@@ -85,8 +85,8 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 	}
 
 	{
-		auto loadShader = [&](Renderer::ShaderType shaderType, const std::filesystem::path& path) {
-			ByteArray fileContent = FileUtils::ReadFile(path);
+		auto loadShader = [&](Renderer::ShaderType shaderType, const URI& uri) {
+			ByteArray fileContent = FileUtils::ReadFile(uri);
 
 			Renderer::ShaderCreateInfo shaderCreateInfo;
 			shaderCreateInfo.Type = shaderType;
@@ -98,11 +98,11 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		Renderer::ShaderProgramCreateInfo shaderProgramCreateInfo;
 		shaderProgramCreateInfo.Type = Renderer::ShaderProgramType::Graphic;
 		shaderProgramCreateInfo.ShaderCount = 2;
-		shaderProgramCreateInfo.Shaders[0] = loadShader(Renderer::ShaderType::Vertex, "builtin://sponza/resources/Shaders/ImGui/default.vert.spv");
-		shaderProgramCreateInfo.Shaders[1] = loadShader(Renderer::ShaderType::Fragment, "builtin://sponza/resources/Shaders/ImGui/default.frag.spv");
+		shaderProgramCreateInfo.Shaders[0] = loadShader(Renderer::ShaderType::Vertex, CK_TEXT("builtin://sponza/resources/Shaders/ImGui/default.vert.spv"));
+		shaderProgramCreateInfo.Shaders[1] = loadShader(Renderer::ShaderType::Fragment, CK_TEXT("builtin://sponza/resources/Shaders/ImGui/default.frag.spv"));
 		mShaderProgram = renderDevice.CreateShaderProgram(shaderProgramCreateInfo);
 
-		mTextureUniformSlot = mShaderProgram->FindUniformSlot("inTexture");
+		mTextureUniformSlot = mShaderProgram->FindUniformSlot(CK_TEXT("inTexture"));
 		assert(mTextureUniformSlot);
 	}
 

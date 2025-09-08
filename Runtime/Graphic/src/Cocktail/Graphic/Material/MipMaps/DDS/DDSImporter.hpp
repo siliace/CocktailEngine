@@ -20,7 +20,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<MipMaps> LoadFromPath(const std::filesystem::path& path, const MipMapsImportParameters& parameters) override;
+		std::shared_ptr<MipMaps> LoadFromPath(const Path& path, const MipMapsImportParameters& parameters) override;
 
 		/**
 		 * \brief 
@@ -35,7 +35,7 @@ namespace Ck
     	 * \param extension 
     	 * \return 
     	 */
-    	bool SupportExtension(std::string_view extension) const override;
+    	bool SupportExtension(StringView extension) const override;
 
 		/**
     	 * \brief 

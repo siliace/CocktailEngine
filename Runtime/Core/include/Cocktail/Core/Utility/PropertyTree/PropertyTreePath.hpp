@@ -2,7 +2,6 @@
 #define COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREEPATH_HPP
 
 #include <cassert>
-#include <string>
 
 #include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Utility/TranslatorCast.hpp>
@@ -11,18 +10,23 @@ namespace Ck
 {
 	COCKTAIL_DECLARE_EXCEPTION_FROM(InvalidPropertyPathException, RuntimeException);
 
-	template <typename Char, typename Traits = std::char_traits<Char>, typename Alloc = std::allocator<Char>>
-	class PropertyTreePath
+	class PropertyTreePath;
+
+	template <>
+	struct TranslatorBetween<PropertyTreePath, String>
+	{
+		using Type = ToStringTranslator<PropertyTreePath>;
+	};
+
+	class COCKTAIL_CORE_API PropertyTreePath
 	{
 	public:
-
-		using String = std::basic_string<Char, Traits, Alloc>;
 
 		/**
 		 * \brief Default constructor
 		 * Create an empty path
 		 */
-		PropertyTreePath() = default;
+		PropertyTreePath();
 
 		/**
 		 * \brief 
@@ -32,8 +36,8 @@ namespace Ck
 		 * \param separator 
 		 * \param translator 
 		 */
-		template <typename T, typename Tr = typename TranslatorBetween<String, T>::Type>
-		PropertyTreePath(const T& value, Char separator = '.', const Tr& translator = Tr()) :
+		template <typename T, typename Tr = typename TranslatorBetween<T, String>::Type>
+		explicit PropertyTreePath(const T& value, TextChar separator = CK_TEXT('.'), const Tr& translator = Tr()) :
 			mSeparator(separator)
 		{
 			mPath = translator(value).Get();
@@ -45,12 +49,7 @@ namespace Ck
 		 * \param path The string to parse, possibly with separators
 		 * \param separator The separator used to parse the \p path
 		 */
-		PropertyTreePath(const String& path, Char separator = '.') :
-			mSeparator(separator),
-			mPath(path)
-		{
-			/// Nothing
-		}
+		PropertyTreePath(String path, TextChar separator = CK_TEXT('.'));
 
 		/**
 		 * \brief Constructor
@@ -58,49 +57,26 @@ namespace Ck
 		 * \param path The string to parse, possibly with separators
 		 * \param separator The separator used to parse the \p path
 		 */
-		PropertyTreePath(const Char* path, Char separator = '.') :
-			mSeparator(separator),
-			mPath(path)
-		{
-			/// Nothing
-		}
+		PropertyTreePath(const TextChar* path, TextChar separator = CK_TEXT('.'));
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		bool IsEmpty() const
-		{
-			return mPath.empty();
-		}
+		bool IsEmpty() const;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		bool IsSingle() const
-		{
-			return mPath.find(mSeparator) == String::npos;
-		}
+		bool IsSingle() const;
 
 		/**
 		 * \brief
 		 * \param other
 		 * \return
 		 */
-		PropertyTreePath& Append(const PropertyTreePath<Char, Traits, Alloc>& other)
-		{
-			assert(mSeparator == other.mSeparator || other.IsEmpty() || other.IsSingle());
-			if (!other.IsEmpty())
-			{
-				if (!IsEmpty())
-					mPath.push_back(mSeparator);
-
-				mPath.append(other.mPath);
-			}
-
-			return *this;
-		}
+		PropertyTreePath& Append(const PropertyTreePath& other);
 
 		/**
 		 * \brief 
@@ -110,7 +86,7 @@ namespace Ck
 		 * \param translator 
 		 * \return 
 		 */
-		template <typename T, typename Tr = typename TranslatorBetween<String, T>::Type>
+		template <typename T, typename Tr = typename TranslatorBetween<T, String>::Type>
 		PropertyTreePath& Append(const T& other, const Tr& translator = Tr())
 		{
 			return Append(PropertyTreePath(other, mSeparator, translator));
@@ -127,9 +103,9 @@ namespace Ck
 		{
 			assert(!IsEmpty() && "Cannot reduce an empty path");
 
-			std::size_t separatorIndex = mPath.find_first_of(mSeparator);
-			String frontSplit = mPath.substr(0, separatorIndex);
-			mPath = mPath.substr(separatorIndex + 1);
+			unsigned int separatorIndex = mPath.FindFirst(mSeparator).Get();
+			String frontSplit = mPath.SubString(0, separatorIndex);
+			mPath = mPath.SubString(separatorIndex + 1);
 
 			return translator(frontSplit).Get();
 		}
@@ -138,38 +114,19 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Char GetSeparator() const
-		{
-			return mSeparator;
-		}
+		TextChar GetSeparator() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const String& ToString() const
-		{
-			return mPath;
-		}
+		const String& ToString() const;
 
 	private:
 
-		Char mSeparator;
+		TextChar mSeparator;
 		String mPath;
 	};
-
-	template <typename T>
-	struct PropertyTreePathOf
-	{
-	};
-
-	template <typename Char, typename Traits, typename Alloc>
-	struct PropertyTreePathOf<std::basic_string<Char, Traits, Alloc>>
-	{
-		using Type = PropertyTreePath<Char, Traits, Alloc>;
-	};
-
-	using PropertyPath = PropertyTreePath<char>;
 }
 
 #endif // COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREEPATH_HPP

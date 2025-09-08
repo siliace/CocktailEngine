@@ -19,7 +19,7 @@ namespace Ck
 		commandList.BindShaderProgram(mCurrentMaterialProgram->GetShaderProgram().get());
 		for (const auto& [key, area] : mPersistentBuffers)
 		{
-			std::string name = std::get<0>(key);
+			String  name = std::get<0>(key);
 			unsigned int arrayIndex = std::get<1>(key);
 
 			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
@@ -50,7 +50,7 @@ namespace Ck
 		commandList.BindIndexBuffer(area.Buffer, area.BaseOffset, indexType);
 	}
 
-	void RecordDrawContext::BindData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
+	void RecordDrawContext::BindData(Renderer::CommandList& commandList, StringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
 	{
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
@@ -61,13 +61,13 @@ namespace Ck
 		commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
 	}
 
-	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
+	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, StringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
 	{
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
-		std::string n(name.data(), name.length());
-		mPersistentBuffers[CompositeKey<std::string, unsigned int>(n, arrayIndex)] = area;
+		String n(name.GetData(), name.GetLength());
+		mPersistentBuffers[CompositeKey<String , unsigned int>(n, arrayIndex)] = area;
 
 		if (mCurrentMaterialProgram)
 		{

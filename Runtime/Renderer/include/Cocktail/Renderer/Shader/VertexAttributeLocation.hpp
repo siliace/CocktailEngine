@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_RENDERER_SHADER_VERTEXATTRIBUTELOCATION_HPP
 #define COCKTAIL_RENDERER_SHADER_VERTEXATTRIBUTELOCATION_HPP
 
-#include <string>
-
 #include <Cocktail/Core/DataType.hpp>
+#include <Cocktail/Core/String.hpp>
 
 namespace Ck::Renderer
 {
@@ -41,7 +40,7 @@ namespace Ck::Renderer
          * \brief
          * \return
          */
-        virtual const std::string& GetName() const = 0;
+        virtual const String& GetName() const = 0;
     };
 }
 

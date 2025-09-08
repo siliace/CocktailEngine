@@ -8,7 +8,7 @@ namespace Ck
 			mEntryPool.Recycle(logEntry);
 	}
 
-	void LogManager::RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel)
+	void LogManager::RegisterChannel(const String& name, std::unique_ptr<LogChannel> logChannel)
 	{
 		mChannels.insert_or_assign(name, std::move(logChannel));
 	}

@@ -6,7 +6,7 @@ namespace Ck::Detail::Win32
 {
 	namespace
 	{
-		const char* ToWin32SystemCursorType(SystemCursorType type)
+		const TextChar* ToWin32SystemCursorType(SystemCursorType type)
 		{
 			switch (type)
 			{

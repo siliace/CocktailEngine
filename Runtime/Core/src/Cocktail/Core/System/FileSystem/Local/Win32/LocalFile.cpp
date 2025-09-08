@@ -3,7 +3,7 @@
 
 namespace Ck::Detail::Win32
 {
-	LocalFile::LocalFile(const std::filesystem::path& path, const FileOpenFlags& flags) :
+	LocalFile::LocalFile(const Path& path, const FileOpenFlags& flags) :
 		mPath(path)
 	{
 		DWORD desiredAccess = 0;
@@ -39,7 +39,7 @@ namespace Ck::Detail::Win32
 			shareMode |= FILE_SHARE_WRITE;
 		
 		mHandle = CreateFileW(
-			mPath.c_str(),
+			mPath.ToString().GetData(),
 			desiredAccess,
 			shareMode,
 			nullptr,
@@ -124,7 +124,7 @@ namespace Ck::Detail::Win32
 		return fileSize.QuadPart;
 	}
 
-	const std::filesystem::path& LocalFile::GetPath() const
+	const Path& LocalFile::GetPath() const
 	{
 		return mPath;
 	}

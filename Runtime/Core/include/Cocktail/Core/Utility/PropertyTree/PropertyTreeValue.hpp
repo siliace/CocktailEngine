@@ -9,8 +9,8 @@ namespace Ck
     /** 
      * \brief
      */
-    template <typename Key, typename Data>
-    class PropertyTreeValue : public PropertyTreeNode<Key, Data>
+    template <typename Data>
+    class PropertyTreeValue : public PropertyTreeNode<Data>
     {
     public:
 
@@ -31,7 +31,7 @@ namespace Ck
          * \param value The initial value to hold
          * \param translator The translator
          */
-        template <typename T, typename Tr = typename TranslatorBetween<Data, T>::Type>
+        template <typename T, typename Tr = typename TranslatorBetween<T, Data>::Type>
         explicit PropertyTreeValue(const T& value, const Tr& translator = Tr()) :
 			mValue(translator(value).Get())
         {
@@ -55,9 +55,9 @@ namespace Ck
          * \brief
          * \return
          */
-        typename PropertyTreeNode<Key, Data>::Type GetType() const override
+        typename PropertyTreeNode<Data>::Type GetType() const override
         {
-            return PropertyTreeNode<Key, Data>::Type::Value;
+            return PropertyTreeNode<Data>::Type::Value;
         }
 
     protected:
@@ -68,8 +68,8 @@ namespace Ck
          * \param name The name of the node into the tree
          * \param value The initial value to hold
          */
-        PropertyTreeValue(PropertyTreeNode<Key, Data>* parent, const Key& name, const Data& value) :
-            PropertyTreeNode<Key, Data>(parent, name),
+        PropertyTreeValue(PropertyTreeNode<Data>* parent, const String& name, const Data& value) :
+            PropertyTreeNode<Data>(parent, name),
             mValue(value)
         {
             /// Nothing
@@ -81,9 +81,9 @@ namespace Ck
          * \param name
          * \return
          */
-        std::unique_ptr<PropertyTreeNode<Key, Data>> Clone(PropertyTreeNode<Key, Data>* parent, const Key& name) const override
+        std::unique_ptr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const override
         {
-            return std::unique_ptr<PropertyTreeNode<Key, Data>>(
+            return std::unique_ptr<PropertyTreeNode<Data>>(
                 new PropertyTreeValue(parent, name, mValue)
             );
         }

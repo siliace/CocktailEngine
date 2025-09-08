@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_DIRECTORYWATCHER_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_DIRECTORYWATCHER_HPP
 
-#include <filesystem>
-
 #include <Cocktail/Core/Signal/Signal.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
 {
@@ -28,25 +27,25 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual Signal<std::filesystem::path>& OnFileCreated() = 0;
+		virtual Signal<Path>& OnFileCreated() = 0;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		virtual Signal<std::filesystem::path>& OnFileModified() = 0;
+		virtual Signal<Path>& OnFileModified() = 0;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		virtual Signal<std::filesystem::path, std::filesystem::path>& OnFileRenamed() = 0;
+		virtual Signal<Path, Path>& OnFileRenamed() = 0;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		virtual Signal<std::filesystem::path>& OnFileDeleted() = 0;
+		virtual Signal<Path>& OnFileDeleted() = 0;
 	};
 }
 

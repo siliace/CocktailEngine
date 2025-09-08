@@ -22,7 +22,7 @@ namespace Ck
 				
 			};
 
-			std::string Name;
+			String Name;
 			PerspectiveInfo Perspective;
 			OrthographicInfo Orthographic;
 			bool IsPerspective = false;
@@ -46,7 +46,7 @@ namespace Ck
 
 		struct MaterialInfo
 		{
-			std::string Name;
+			String Name;
 			Material::UniformColors Colors;
 			Material::ShadingMode ShadingMode;
 			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
@@ -57,7 +57,7 @@ namespace Ck
 
 		struct SubMeshInfo
 		{
-			std::string Name;
+			String Name;
 			unsigned int Count;
 			unsigned int FirstVertex;
 			unsigned int FirstIndex;
@@ -67,7 +67,7 @@ namespace Ck
 
 		struct MeshInfo
 		{
-			std::string Name;
+			String Name;
 			std::shared_ptr<VertexArray> Vertices;
 			std::shared_ptr<IndexArray> Indices;
 			Array<SubMeshInfo> SubMeshes;

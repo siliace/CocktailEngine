@@ -17,7 +17,7 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		std::string Name;
+		String Name;
 
 		/**
 		 * \brief 

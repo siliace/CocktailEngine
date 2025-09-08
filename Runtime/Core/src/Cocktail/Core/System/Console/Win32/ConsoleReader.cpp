@@ -4,12 +4,12 @@
 
 namespace Ck::Detail::Win32
 {
-	bool ConsoleReader::Read(char& c)
+	bool ConsoleReader::Read(TextChar& c)
 	{
 		return Read(&c, 1) == 1;
 	}
 
-	std::size_t ConsoleReader::Read(char* buffer, std::size_t length)
+	std::size_t ConsoleReader::Read(TextChar* buffer, std::size_t length)
 	{
 		DWORD read;
 		HANDLE handle = GetStdHandle(STD_INPUT_HANDLE);
@@ -51,5 +51,10 @@ namespace Ck::Detail::Win32
 	bool ConsoleReader::IsEof() const
 	{
 		return false;
+	}
+
+	EncodingMode ConsoleReader::GetEncodingMode() const
+	{
+		return EncodingMode::Utf16LittleEndian;
 	}
 }

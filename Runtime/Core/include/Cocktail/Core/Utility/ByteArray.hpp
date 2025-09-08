@@ -3,8 +3,8 @@
 
 #include <cstring>
 #include <memory>
-#include <string>
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Utility/ByteArrayView.hpp>
 
 namespace Ck
@@ -21,24 +21,14 @@ namespace Ck
          * \param string The string to copy
          * \return The created ByteArray
          */
-        template <typename Char, typename Traits, typename Alloc>
-        static ByteArray FromString(std::basic_string<Char, Traits, Alloc> string)
-        {
-            assert(!string.empty());
-            return ByteArray(string.data(), string.length());
-        }
+        static ByteArray FromString(const String& string);
 
-	    /**
+        /**
          * \brief Create a ByteArray by copying an existing string view
          * \param string The string to copy
          * \return The created ByteArray
          */
-        template <typename Char, typename Traits>
-        static ByteArray FromString(std::basic_string_view<Char, Traits> string)
-        {
-            assert(!string.empty());
-            return ByteArray(string.data(), string.length());
-        }
+        static ByteArray FromString(StringView string);
 
         /**
          * \brief Create a ByteArray by copying an existing string view
@@ -54,7 +44,7 @@ namespace Ck
             while (string[size] != 0)
                 ++size;
 
-            return ByteArray(string, size);
+            return ByteArray(string, size * sizeof(Char));
         }
 
 	    /**
@@ -205,14 +195,7 @@ namespace Ck
          * \tparam Char 
          * \return 
          */
-        template <typename Char = char>
-		std::basic_string<Char> ToString() const
-        {
-            return std::basic_string<Char>(
-                reinterpret_cast<const Char*>(mData.get()),
-                mSize / sizeof(Char)
-            );
-        }
+        String ToString() const;
 
         std::size_t GetSize() const;
         Uint8* GetData();

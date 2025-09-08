@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_JOYSTICK_WIN32_JOYSTICK_HPP
 #define COCKTAIL_CORE_SYSTEM_JOYSTICK_WIN32_JOYSTICK_HPP
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
 #include <Cocktail/Core/System/Joystick/Joystick.hpp>
 
@@ -31,7 +32,7 @@ namespace Ck::Detail::Win32
 		Signal<JoystickButtonEvent>& OnButtonEvent(unsigned int button) override;
 		Signal<JoystickButtonEvent>& OnButtonEvent(unsigned int button, bool pressed) override;
 
-		const std::string& GetName() const override;
+		const String& GetName() const override;
 
 		const JoystickCapabilities& GetCapabilities() const override;
 
@@ -43,7 +44,7 @@ namespace Ck::Detail::Win32
 		 * \param capabilities 
 		 * \param name 
 		 */
-		static void GetCapabilitiesAndName(UINT index, JoystickCapabilities& capabilities, std::string& name);
+		static void GetCapabilitiesAndName(UINT index, JoystickCapabilities& capabilities, String& name);
 
 		/**
 		 * \brief 
@@ -53,7 +54,7 @@ namespace Ck::Detail::Win32
 		JOYINFOEX GetInternalState(DWORD flags) const;
 
 		unsigned int mIndex;
-		std::string mName;
+		String mName;
 		JoystickCapabilities mCapabilities;
 		HWND mCaptureHandle;
 		Signal<JoystickAxisEvent> mOnAxesEvent;

@@ -17,12 +17,12 @@ namespace Ck
 			if (errorCode == 0)
 				return "";
 
-			DWORD size = FormatMessage(
+			DWORD size = FormatMessageA(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 				nullptr,
 				errorCode,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				reinterpret_cast<LPTSTR>(&messageBuffer), // Send a pointer of string so WinAPI can allocate it accordingly to the message length
+				reinterpret_cast<LPSTR>(&messageBuffer), // Send a pointer of string so WinAPI can allocate it accordingly to the message length
 				0,
 				nullptr
 			);

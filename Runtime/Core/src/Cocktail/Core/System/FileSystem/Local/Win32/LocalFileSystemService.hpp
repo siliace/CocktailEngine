@@ -16,13 +16,15 @@ namespace Ck::Detail::Win32
 		 * \brief Get the path of the process current working directory
 		 * \return The path of the working directory
 		 */
-		std::filesystem::path GetWorkingDirectory() const override;
+		Path GetWorkingDirectory() const override;
 
 		/**
 		 * \brief Set the path of the process current working directory
 		 * \param workingDirectory 
 		 */
-		void SetWorkingDirectory(const std::filesystem::path& workingDirectory) override;
+		void SetWorkingDirectory(const Path& workingDirectory) override;
+
+		Path GetTempDirectoryPath() const override;
 	};
 }
 

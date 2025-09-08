@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_IMAGE_IMAGE_HPP
 #define COCKTAIL_CORE_IMAGE_IMAGE_HPP
 
+#include <string>
+
 #include <Cocktail/Core/Image/PixelFormat.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
@@ -53,7 +55,7 @@ namespace Ck
 	 */
 	struct ImageExportParameters
 	{
-		std::string Format;
+		String Format;
 	};
 
 	/**

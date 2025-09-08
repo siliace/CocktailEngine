@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_LIBRARY_LIBRARYSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_LIBRARY_LIBRARYSERVICE_HPP
 
-#include <filesystem>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
 {
@@ -24,19 +24,19 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		virtual std::unique_ptr<Library> LoadLibrary(std::string_view name) = 0;
+		virtual std::unique_ptr<Library> LoadLibrary(StringView name) = 0;
 
 		/**
 		 * \brief 
 		 * \param path 
 		 */
-		virtual void AddLibraryDirectory(const std::filesystem::path& path) = 0;
+		virtual void AddLibraryDirectory(const Path& path) = 0;
 
 		/**
 		 * \brief 
 		 * \param path 
 		 */
-		virtual void RemoveLibraryDirectory(const std::filesystem::path& path) = 0;
+		virtual void RemoveLibraryDirectory(const Path& path) = 0;
 	};
 }
 

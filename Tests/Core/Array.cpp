@@ -1,6 +1,7 @@
 #include <catch2/catch_all.hpp>
 
 #include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Memory/Allocator/BumpAllocator.hpp>
 
 TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
@@ -197,7 +198,7 @@ TEMPLATE_TEST_CASE("Pop the first element of the array", "[Array]", Ck::SizedHea
 
     SECTION("from an empty array")
     {
-	    REQUIRE_THROWS_AS(array.PopFirst(), Ck::ArrayEmpty);
+	    REQUIRE_THROWS_AS(array.PopFirst(), Ck::ContainerEmpty);
     }
 
     SECTION("from a filled array")
@@ -216,7 +217,7 @@ TEMPLATE_TEST_CASE("Pop the last element of the array", "[Array]", Ck::SizedHeap
 
     SECTION("from an empty array")
     {
-        REQUIRE_THROWS_AS(array.PopLast(), Ck::ArrayEmpty);
+        REQUIRE_THROWS_AS(array.PopLast(), Ck::ContainerEmpty);
     }
 
     SECTION("from a filled array")
@@ -287,7 +288,7 @@ TEMPLATE_TEST_CASE("Slice an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::
 
     SECTION("To another array")
     {
-        Ck::Array<int, TestType> sliced = array.Slice(3);
+        Ck::Array<int, TestType> sliced = array.Splice(3);
 
         REQUIRE(sliced.GetSize() == 3);
         REQUIRE(sliced == Ck::Array<int, TestType>{ 0, 1, 2 });
@@ -295,7 +296,7 @@ TEMPLATE_TEST_CASE("Slice an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::
 
     SECTION("In place")
     {
-        array.SliceInPlace(3);
+        array.SpliceInPlace(3);
 
         REQUIRE(array.GetSize() == 3);
         REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2 });
@@ -308,7 +309,7 @@ TEMPLATE_TEST_CASE("Slice an array with range", "[Array]", Ck::SizedHeapAllocato
 
     SECTION("To another array")
     {
-	    Ck::Array<int, TestType> sliced = array.Slice(3, 5);
+	    Ck::Array<int, TestType> sliced = array.Splice(3, 5);
 
         REQUIRE(sliced.GetSize() == 11);
         REQUIRE(sliced == Ck::Array<int, TestType>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
@@ -316,7 +317,7 @@ TEMPLATE_TEST_CASE("Slice an array with range", "[Array]", Ck::SizedHeapAllocato
 
     SECTION("In place")
     {
-        array.SliceInPlace(3, 5);
+        array.SpliceInPlace(3, 5);
 
         REQUIRE(array.GetSize() == 11);
         REQUIRE(array == Ck::Array<int, TestType>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});

@@ -1,12 +1,13 @@
 #ifndef COCKTAIL_CORE_UTILITY_PROPERTYTREE_XML_XMLPROPERTIES_HPP
 #define COCKTAIL_CORE_UTILITY_PROPERTYTREE_XML_XMLPROPERTIES_HPP
 
-#include <filesystem>
-
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/PropertyTree.hpp>
 
 namespace Ck
 {
+	COCKTAIL_DECLARE_EXCEPTION_FROM(XmlParseException, RuntimeException);
+
 	/**
 	 * \brief 
 	 */
@@ -17,7 +18,7 @@ namespace Ck
 		 * \brief 
 		 * \param path 
 		 */
-		explicit XmlProperties(const std::filesystem::path& path);
+		explicit XmlProperties(const Path& path);
 	};
 }
 

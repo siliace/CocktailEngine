@@ -8,8 +8,8 @@ namespace Ck
     /**
      * \brief Specialization of PropertyTreeNode implementing custom node type
      */
-    template <typename Key, typename Data>
-    class PropertyTreeCustomNode : public PropertyTreeNode<Key, Data>
+    template <typename Data>
+    class PropertyTreeCustomNode : public PropertyTreeNode<Data>
     {
     public:
 
@@ -24,7 +24,7 @@ namespace Ck
          */
         typename PropertyTreeCustomNode::Type GetType() const override
         {
-            return PropertyTreeNode<Key, Data>::Type::Custom;
+            return PropertyTreeNode<Data>::Type::Custom;
         }
 
     protected:
@@ -34,8 +34,8 @@ namespace Ck
          * \param parent The parent node
          * \param name The name of this node into \p parent node
          */
-        PropertyTreeCustomNode(PropertyTreeNode<Key, Data>* parent, const Key& name) :
-            PropertyTreeNode<Key, Data>(parent, name)
+        PropertyTreeCustomNode(PropertyTreeNode<Data>* parent, const String& name) :
+            PropertyTreeNode<Data>(parent, name)
         {
             /// Nothing
         }

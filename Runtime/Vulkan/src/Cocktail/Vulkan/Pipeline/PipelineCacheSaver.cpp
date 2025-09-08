@@ -13,17 +13,15 @@
 
 namespace Ck::Vulkan
 {
-	std::filesystem::path PipelineCacheSaver::ComputePipelineCachePath(std::string_view applicationName, const VersionDescriptor& applicationVersion)
+	Path PipelineCacheSaver::ComputePipelineCachePath(StringView applicationName, const VersionDescriptor& applicationVersion)
 	{
-		std::filesystem::path path = std::filesystem::temp_directory_path();
-		path = path / applicationName;
-		path = path / std::to_string(applicationVersion.ToInteger());
-		path = path / "pipelinecache.bin";
-
-		return path;
+		return LocalFileSystem::GetTempDirectoryPath()
+				.Join(applicationName)
+				.Join(TranslatorCast<String>(applicationVersion.ToInteger()))
+				.Join(CK_TEXT("pipelinecache.bin"));
 	}
 
-	PipelineCacheSaver::PipelineCacheSaver(PipelineManager* pipelineManager, std::filesystem::path pipelineCachePath) :
+	PipelineCacheSaver::PipelineCacheSaver(PipelineManager* pipelineManager, Path pipelineCachePath) :
 		mPipelineManager(pipelineManager),
 		mPipelineCachePath(std::move(pipelineCachePath))
 	{
@@ -53,7 +51,7 @@ namespace Ck::Vulkan
 					PipelineCache pipelineCache(renderDevice, pipelineCacheCreateInfo, nullptr);
 					pipelineManager->GetCache()->Merge(pipelineCache);
 
-					CK_LOG(VulkanLogCategory, LogLevel::Info, "Pipeline cache loaded from {}", mPipelineCachePath.string());
+					CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Pipeline cache loaded from %s"), mPipelineCachePath.ToString());
 				}
 			}
 		}

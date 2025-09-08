@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <fmt/core.h>
+#include <Cocktail/Core/String.hpp>
 
 #define COCKTAIL_DECLARE_EXCEPTION_FROM(__Name, __Base)                                               \
 	class __Name : public __Base                                                                      \
@@ -15,28 +15,40 @@
 		static_assert(std::is_base_of_v<::Ck::Exception, __Base>);                                    \
                                                                                                       \
 		template <typename... Args>                                                                   \
-		static std::string FormatExceptionMessage(std::string_view format, Args&&... args)            \
+		static ::Ck::String FormatExceptionMessage(::Ck::StringView format, Args&&... args)           \
 		{                                                                                             \
-			return fmt::format("{} : {}", #__Name, fmt::format(format, std::forward<Args>(args)...)); \
+			return ::Ck::String::Format(                                                              \
+						CK_TEXT("%s : %s"),                                                           \
+						CK_TEXT(#__Name),                                                             \
+						::Ck::String::Format(format, std::forward<Args>(args))...                     \
+			);                                                                                        \
+		}                                                                                             \
+		                                                                                              \
+		__Name() = default;                                                                           \
+		                                                                                              \
+		explicit __Name(::Ck::String message) :                                                       \
+			__Base(std::move(message))                                                                \
+		{                                                                                             \
+		}                                                                                             \
+		                                                                                              \
+		 __Name(const ::Ck::Exception& nested, ::Ck::String message) :                                \
+			__Base(nested, std::move(message))                                                        \
+		{                                                                                             \
 		}                                                                                             \
                                                                                                       \
-		__Name() = default;                                                                           \
-                                                                                                      \
 		template <typename... Args>                                                                   \
-		explicit __Name(std::string_view format, Args&&... args) :                                    \
+		explicit __Name(::Ck::StringView format, Args&&... args) :                                    \
 			__Base(FormatExceptionMessage(format, std::forward<Args>(args)...))                       \
 		{		                                                                                      \
 		}                                                                                             \
                                                                                                       \
 		template <typename... Args>                                                                   \
-		explicit __Name(const ::Ck::Exception& nested, std::string_view format, Args&&... args) :     \
+		explicit __Name(const ::Ck::Exception& nested, ::Ck::StringView format, Args&&... args) :     \
 			__Base(nested, FormatExceptionMessage(format, std::forward<Args>(args)...))               \
 		{		                                                                                      \
 		}                                                                                             \
                                                                                                       \
-		const char* GetName() const override { return #__Name; }                                      \
-                                                                                                      \
-		const char* GetTypeName() const override { return typeid(*this).name(); }                     \
+		::Ck::StringView GetName() const override { return CK_TEXT(#__Name); }                        \
                                                                                                       \
 	protected:                                                                                        \
 		__Name* Clone() const override { return new __Name(*this); }                                  \
@@ -49,138 +61,73 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class Exception : public std::exception
+	class COCKTAIL_CORE_API Exception : public std::exception
 	{
 	public:
 
-		Exception() :
-			mNested(nullptr)
-		{
-			/// Nothing
-		}
+		Exception();
 
 		/**
 		 * \brief 
 		 * \param message 
 		 */
-		explicit Exception(std::string message) :
-			mMessage(std::move(message)),
-			mNested(nullptr)
-		{
-			/// Nothing
-		}
+		explicit Exception(String message);
 
 		/**
 		 * \brief 
 		 * \param message 
 		 * \param nested 
 		 */
-		Exception(const Exception& nested, std::string message) :
-			mMessage(std::move(message))
-		{
-			mNested = nested.Clone();
-		}
+		Exception(const Exception& nested, String message);
 
 		/**
 		 * \brief 
 		 * \param other 
 		 */
-		Exception(const Exception& other) :
-			std::exception(other),
-			mMessage(other.mMessage)
-		{
-			mNested = other.mNested ? other.mNested->Clone() : nullptr;
-		}
+		Exception(const Exception& other);
 
 		/**
 		 * \brief 
 		 * \param other 
 		 */
-		Exception(Exception&& other) noexcept :
-			std::exception(other),
-			mMessage(std::move(other.mMessage)),
-			mNested(std::exchange(other.mNested, nullptr))
-		{
-			/// Nothing
-		}
+		Exception(Exception&& other) noexcept;
 
 		/**
 		 * \brief
 		 */
-		~Exception() override
-		{
-			delete mNested;
-		}
+		~Exception() override;
 
 		/**
 		 * \brief 
 		 * \param other 
 		 * \return 
 		 */
-		Exception& operator=(const Exception& other)
-		{
-			if (this == &other)
-				return *this;
-
-			std::exception::operator=(other);
-			mMessage = other.mMessage;
-			mNested = other.mNested;
-
-			return *this;
-		}
+		Exception& operator=(const Exception& other);
 
 		/**
 		 * \brief 
 		 * \param other 
 		 * \return 
 		 */
-		Exception& operator=(Exception&& other) noexcept
-		{
-			if (this == &other)
-				return *this;
-
-			std::exception::operator=(other);
-			mMessage = std::move(other.mMessage);
-			mNested = std::exchange(other.mNested, nullptr);
-
-			return *this;
-		}
+		Exception& operator=(Exception&& other) noexcept;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		char const* what() const noexcept override
-		{
-			return GetName();
-		}
+		char const* what() const noexcept override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual const char* GetName() const
-		{
-			return "Exception";
-		}
+		virtual StringView GetName() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual const char* GetTypeName() const
-		{
-			return typeid(*this).name();
-		}
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		const std::string& GetMessage() const
-		{
-			return mMessage;
-		}
+		const String& GetMessage() const;
 
 	protected:
 
@@ -188,23 +135,23 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual Exception* Clone() const
-		{
-			return new Exception(*this);
-		}
+		virtual Exception* Clone() const;
 
 	private:
 
-		std::string mMessage;
+		String mMessage;
 		Exception* mNested;
 	};
 
 	COCKTAIL_DECLARE_EXCEPTION(LogicException);
 	COCKTAIL_DECLARE_EXCEPTION_FROM(InvalidParameterException, LogicException);
 	COCKTAIL_DECLARE_EXCEPTION_FROM(NotImplementedException, LogicException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(ContainerEmpty, LogicException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(ContainerOutOfRange, LogicException);
 
 	COCKTAIL_DECLARE_EXCEPTION(RuntimeException);
 	COCKTAIL_DECLARE_EXCEPTION_FROM(OutOfMemory, RuntimeException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(EmptyOptionalException, RuntimeException);
 }
 
 #endif // COCKTAIL_CORE_EXCEPTION_HPP

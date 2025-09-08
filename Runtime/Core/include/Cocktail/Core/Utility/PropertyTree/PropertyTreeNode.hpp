@@ -3,12 +3,14 @@
 
 #include <memory>
 
+#include <Cocktail/Core/String.hpp>
+
 namespace Ck
 {
     /**
      * \brief
      */
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTreeNode
     {
     public:
@@ -84,7 +86,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        std::unique_ptr<PropertyTreeNode<Key, Data>> DropNextSibling()
+        std::unique_ptr<PropertyTreeNode<Data>> DropNextSibling()
         {
             // Disconnect ourselves form the next sibling
             if (mNextSibling)
@@ -97,7 +99,7 @@ namespace Ck
          * \brief
          * \return
          */
-        const Key& GetName() const
+        const String& GetName() const
         {
             return mName;
         }
@@ -106,7 +108,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual PropertyTreeNode<Key, Data>* GetPreviousSibling()
+        virtual PropertyTreeNode<Data>* GetPreviousSibling()
         {
             return mPreviousSibling;
         }
@@ -115,7 +117,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual const PropertyTreeNode<Key, Data>* GetPreviousSibling() const
+        virtual const PropertyTreeNode<Data>* GetPreviousSibling() const
         {
             return mPreviousSibling;
         }
@@ -124,7 +126,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual PropertyTreeNode<Key, Data>* GetNextSibling()
+        virtual PropertyTreeNode<Data>* GetNextSibling()
         {
             return mNextSibling.get();
         }
@@ -133,7 +135,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual const PropertyTreeNode<Key, Data>* GetNextSibling() const
+        virtual const PropertyTreeNode<Data>* GetNextSibling() const
         {
             return mNextSibling.get();
         }
@@ -144,7 +146,7 @@ namespace Ck
 		 * \param node
 		 * \return
 		 */
-        PropertyTreeNode<Key, Data>* SetNextSibling(const Key& name, const PropertyTreeNode<Key, Data>& node)
+        PropertyTreeNode<Data>* SetNextSibling(const String& name, const PropertyTreeNode<Data>& node)
         {
             return SetNextSibling(node.Clone(mParent, name));
         }
@@ -154,7 +156,7 @@ namespace Ck
          * \param node
          * \return
          */
-        PropertyTreeNode<Key, Data>* SetNextSibling(std::unique_ptr<PropertyTreeNode<Key, Data>> node)
+        PropertyTreeNode<Data>* SetNextSibling(std::unique_ptr<PropertyTreeNode<Data>> node)
         {
             if (mNextSibling)
             {
@@ -175,7 +177,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual PropertyTreeNode<Key, Data>* GetParent()
+        virtual PropertyTreeNode<Data>* GetParent()
         {
             return mParent;
         }
@@ -184,7 +186,7 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual const PropertyTreeNode<Key, Data>* GetParent() const
+        virtual const PropertyTreeNode<Data>* GetParent() const
         {
             return mParent;
         }
@@ -197,13 +199,13 @@ namespace Ck
 
     protected:
 
-        template <typename, typename>
+        template <typename>
         friend class PropertyTreeElement;
 
-        template <typename, typename>
+        template <typename>
         friend class PropertyTreeSequence;
 
-        template <typename, typename>
+        template <typename>
         friend class PropertyTreeValue;
 
         /**
@@ -211,7 +213,7 @@ namespace Ck
          * \param parent The parent node
          * \param name The name of this node into \p parent node
          */
-        PropertyTreeNode(PropertyTreeNode<Key, Data>* parent, const Key& name) :
+        PropertyTreeNode(PropertyTreeNode<Data>* parent, const String& name) :
             mParent(parent),
             mName(name),
             mPreviousSibling(nullptr)
@@ -225,14 +227,14 @@ namespace Ck
          * \param name
          * \return
          */
-        virtual std::unique_ptr<PropertyTreeNode<Key, Data>> Clone(PropertyTreeNode<Key, Data>* parent, const Key& name) const = 0;
+        virtual std::unique_ptr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const = 0;
 
     private:
 
-        PropertyTreeNode<Key, Data>* mParent;
-        Key mName;
-        PropertyTreeNode<Key, Data>* mPreviousSibling;
-        std::unique_ptr<PropertyTreeNode<Key, Data>> mNextSibling;
+        PropertyTreeNode<Data>* mParent;
+        String mName;
+        PropertyTreeNode<Data>* mPreviousSibling;
+        std::unique_ptr<PropertyTreeNode<Data>> mNextSibling;
     };
 }
 

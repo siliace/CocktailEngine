@@ -3,10 +3,10 @@
 
 namespace Ck::Detail::Win32
 {
-	WindowClass::WindowClass(HINSTANCE instanceHandle, WNDPROC windowProc, const char* className) :
+	WindowClass::WindowClass(HINSTANCE instanceHandle, WNDPROC windowProc, const TextChar* className) :
 		mInstanceHandle(instanceHandle)
 	{
-		WNDCLASS windowClass;
+		WNDCLASSW windowClass;
 		windowClass.style = 0;
 		windowClass.lpfnWndProc = windowProc;
 		windowClass.cbClsExtra = 0;

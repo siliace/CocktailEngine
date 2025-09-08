@@ -1,6 +1,7 @@
 #include <catch2/catch_all.hpp>
 
 #include <Cocktail/Core/Utility/ByteArray.hpp>
+#include <Cocktail/Core/Utility/StringUtils.hpp>
 
 TEST_CASE("Create a ByteArray", "[ByteArray]")
 {
@@ -54,7 +55,7 @@ TEST_CASE("Append data to a ByteArray", "[ByteArray]")
 
 		lhs.Append(rhs);
 
-		REQUIRE(lhs.ToString() == "Hello World");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello World"));
 	}
 
 	SECTION("initially not empty")
@@ -64,7 +65,7 @@ TEST_CASE("Append data to a ByteArray", "[ByteArray]")
 
 		lhs.Append(rhs);
 
-		REQUIRE(lhs.ToString() == "Hello World");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello World"));
 	}
 }
 
@@ -77,7 +78,7 @@ TEST_CASE("Prepend data to a ByteArray", "[ByteArray]")
 
 		lhs.Prepend(rhs);
 
-		REQUIRE(lhs.ToString() == "Hello World");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello World"));
 	}
 
 	SECTION("initially not empty")
@@ -87,7 +88,7 @@ TEST_CASE("Prepend data to a ByteArray", "[ByteArray]")
 
 		lhs.Prepend(rhs);
 
-		REQUIRE(lhs.ToString() == "Hello World");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello World"));
 	}
 }
 
@@ -100,7 +101,7 @@ TEST_CASE("Insert data to a ByteArray", "[ByteArray]")
 
 		lhs.Insert(3, rhs);
 
-		REQUIRE(lhs.ToString() == "Hello World");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello World"));
 	}
 }
 
@@ -118,7 +119,7 @@ TEST_CASE("Remove data to a ByteArray", "[ByteArray]")
 
 		lhs.Remove(0, 5);
 
-		REQUIRE(lhs.ToString() == " World");
+		REQUIRE(lhs.ToString() == CK_TEXT(" World"));
 	}
 
 	SECTION("in the middle")
@@ -127,7 +128,7 @@ TEST_CASE("Remove data to a ByteArray", "[ByteArray]")
 
 		lhs.Remove(3, 5);
 
-		REQUIRE(lhs.ToString() == "Helrld");
+		REQUIRE(lhs.ToString() == CK_TEXT("Helrld"));
 	}
 
 	SECTION("at the end")
@@ -136,29 +137,19 @@ TEST_CASE("Remove data to a ByteArray", "[ByteArray]")
 
 		lhs.Remove(4, 6);
 
-		REQUIRE(lhs.ToString() == "Hello");
+		REQUIRE(lhs.ToString() == CK_TEXT("Hello"));
 	}
 }
 
 TEST_CASE("Convert a ByteArray to a string", "[ByteArray]")
 {
-	SECTION("To a char string")
+	SECTION("To a string")
 	{
-		const char* data = "Hello World";
-		const std::size_t length = std::strlen(data);
+		const Ck::TextChar* data = CK_TEXT("Hello World");
+		const std::size_t length = Ck::Characters<Ck::TextChar, unsigned int>::GetLength(data);
 
 		Ck::ByteArray byteArray(data, length);
 
 		REQUIRE(byteArray.ToString() == data);
-	}
-
-	SECTION("To a wchar_t string")
-	{
-		const wchar_t* data = L"Hello World";
-		const std::size_t length = std::wcslen(data);
-
-		Ck::ByteArray byteArray(data, length);
-
-		REQUIRE(byteArray.ToString<wchar_t>() == data);
 	}
 }

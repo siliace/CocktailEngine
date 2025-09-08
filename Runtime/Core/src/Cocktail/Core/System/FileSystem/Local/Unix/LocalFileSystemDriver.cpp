@@ -8,67 +8,67 @@
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFile.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileLock.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp>
-#include <Cocktail/Core/Utility/FileUtils.hpp>
+#include <Cocktail/Core/Utility/StringUtils.hpp>
 
 namespace Ck::Detail::Unix
 {
-	bool LocalFileSystemDriver::IsFile(const std::filesystem::path& path) const
+	bool LocalFileSystemDriver::IsFile(const Path& path) const
 	{
 		struct stat64 filestats;
-		if (stat64(path.c_str(), &filestats) == -1)
+		if (stat64(CK_TEXT_TO_ANSI(path.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISREG(filestats.st_mode);
 	}
 
-	bool LocalFileSystemDriver::IsDirectory(const std::filesystem::path& path) const
+	bool LocalFileSystemDriver::IsDirectory(const Path& path) const
 	{
 		struct stat64 filestats;
-		if (stat64(path.c_str(), &filestats) == -1)
+		if (stat64(CK_TEXT_TO_ANSI(path.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISDIR(filestats.st_mode);
 	}
 
-	void LocalFileSystemDriver::CreateFile(const std::filesystem::path& path)
+	void LocalFileSystemDriver::CreateFile(const Path& path)
 	{
-        int handle = ::open64(path.c_str(), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
-		if (handle != -1)
+        int handle = ::open64(CK_TEXT_TO_ANSI(path.ToString().GetData()), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
+		if (handle == -1)
 			throw SystemError::GetLastError();
 		
 		close(handle);
 	}
 	
-	void LocalFileSystemDriver::CreateDirectory(const std::filesystem::path& path)
+	void LocalFileSystemDriver::CreateDirectory(const Path& path)
 	{
-		int error = mkdir(path.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+		int error = mkdir(CK_TEXT_TO_ANSI(path.ToString().GetData()), S_IRWXU | S_IRGRP | S_IROTH);
 		if (error == -1)
 			throw SystemError::GetLastError();
 	}
 
-	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
+	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
-		return std::make_unique<LocalFile>(mRootLocation / path, flags);
+		return std::make_unique<LocalFile>(path, flags);
 	}
 
-	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
+	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
 	{
-		return std::make_unique<LocalDirectory>(mRootLocation / path);
+		return std::make_unique<LocalDirectory>(path);
 	}
 
-	void LocalFileSystemDriver::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists)
+	void LocalFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
 	{
 	}
 
-	void LocalFileSystemDriver::Move(const std::filesystem::path& source, const std::filesystem::path& destination)
+	void LocalFileSystemDriver::Move(const Path& source, const Path& destination)
 	{
-		if (::rename(source.c_str(), destination.c_str()) == -1)
+		if (::rename(CK_TEXT_TO_ANSI(source.ToString().GetData()), CK_TEXT_TO_ANSI(destination.ToString().GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 
-	void LocalFileSystemDriver::Remove(const std::filesystem::path& path)
+	void LocalFileSystemDriver::Remove(const Path& path)
 	{
-		if (::unlink(path.c_str()) == -1)
+		if (::unlink(CK_TEXT_TO_ANSI(path.ToString().GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 

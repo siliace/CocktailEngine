@@ -1,5 +1,7 @@
 #include <tiny_gltf.h>
 
+#include <Cocktail/Core/Utility/StringUtils.hpp>
+
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfUtils.hpp>
 
 namespace Ck
@@ -36,18 +38,18 @@ namespace Ck
         COCKTAIL_UNREACHABLE();
 	}
 
-	VertexAttributeSemantic GltfUtils::ConvertAttributeName(std::string_view name)
+	VertexAttributeSemantic GltfUtils::ConvertAttributeName(const AnsiChar* name)
 	{
-        if (name == "POSITION")
+        if (StringUtils<AnsiChar>::Equal(name, "POSITION"))
             return VertexAttributeSemantic::Position;
 
-		if (name == "NORMAL")
+		if (StringUtils<AnsiChar>::Equal(name, "NORMAL"))
             return VertexAttributeSemantic::Normal;
         
-        if (name == "TEXCOORD_0")
+        if (StringUtils<AnsiChar>::Equal(name, "TEXCOORD_0"))
             return VertexAttributeSemantic::TexCoord;
         
-        if (name == "TANGENT")
+        if (StringUtils<AnsiChar>::Equal(name, "TANGENT"))
             return VertexAttributeSemantic::Tangent;
 
         COCKTAIL_UNREACHABLE();
@@ -130,15 +132,15 @@ namespace Ck
 		return color;
 	}
 
-	Material::AlphaMode GltfUtils::ConvertAlphaMode(const std::string& value)
+	Material::AlphaMode GltfUtils::ConvertAlphaMode(const AnsiChar* value)
 	{
-		if (value == "OPAQUE")
+        if (StringUtils<AnsiChar>::Equal(value, "OPAQUE"))
 			return Material::AlphaMode::Opaque;
 
-		if (value == "BLEND")
+		if (StringUtils<AnsiChar>::Equal(value, "BLEND"))
 			return Material::AlphaMode::Blend;
 
-		if (value == "MASK")
+		if (StringUtils<AnsiChar>::Equal(value, "MASK"))
 			return Material::AlphaMode::Mask;
 
 		COCKTAIL_UNREACHABLE();

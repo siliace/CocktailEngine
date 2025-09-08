@@ -23,19 +23,19 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		static std::unique_ptr<Library> LoadLibrary(std::string_view name);
+		static std::unique_ptr<Library> LoadLibrary(StringView name);
 
 		/**
 		 * \brief 
 		 * \param path 
 		 */
-		static void AddLibraryDirectory(const std::filesystem::path& path);
+		static void AddLibraryDirectory(const Path& path);
 
 		/**
 		 * \brief 
 		 * \param path 
 		 */
-		static void RemoveLibraryDirectory(const std::filesystem::path& path);
+		static void RemoveLibraryDirectory(const Path& path);
 
 		/**
 		 * \brief Destructor
@@ -47,7 +47,7 @@ namespace Ck
 		 * \param functionName 
 		 * \return 
 		 */
-		virtual FunctionPtr LoadFunction(std::string_view functionName) = 0;
+		virtual FunctionPtr LoadFunction(const AnsiChar* functionName) = 0;
 
 		/**
 		 * \brief 

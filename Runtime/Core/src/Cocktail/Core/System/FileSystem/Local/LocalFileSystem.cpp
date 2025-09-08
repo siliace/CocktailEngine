@@ -2,13 +2,18 @@
 
 namespace Ck
 {
-	std::filesystem::path LocalFileSystem::GetWorkingDirectory()
+	Path LocalFileSystem::GetWorkingDirectory()
 	{
 		return ResolveFacadeInstance()->GetWorkingDirectory();
 	}
 
-    void LocalFileSystem::SetWorkingDirectory(const std::filesystem::path& workingDirectory)
+    void LocalFileSystem::SetWorkingDirectory(const Path& workingDirectory)
     {
 		return ResolveFacadeInstance()->SetWorkingDirectory(workingDirectory);
+    }
+
+    Path LocalFileSystem::GetTempDirectoryPath()
+    {
+		return ResolveFacadeInstance()->GetTempDirectoryPath();
     }
 }

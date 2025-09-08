@@ -1,18 +1,17 @@
 #include <dlfcn.h>
 
 #include <Cocktail/Core/Exception.hpp>
-#include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Library/Unix/Library.hpp>
 
 namespace Ck::Detail::Unix
 {
-	COCKTAIL_DECLARE_EXCEPTION(LibraryOpenException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(LibraryOpenException, RuntimeException);
 
-	Library::Library(std::string_view name)
+	Library::Library(StringView name)
 	{
-		mHandle = dlopen(name.data(), RTLD_LOCAL | RTLD_LAZY);
+		mHandle = dlopen(CK_TEXT_TO_ANSI(name.GetData()), RTLD_LOCAL | RTLD_LAZY);
 		if (!mHandle)
-			throw LibraryOpenException(dlerror());
+			throw LibraryOpenException(CK_ANSI_TO_TEXT(dlerror()));
 	}
 
 	Library::~Library()
@@ -20,9 +19,9 @@ namespace Ck::Detail::Unix
 		dlclose(mHandle);
 	}
 
-	Library::FunctionPtr Library::LoadFunction(std::string_view functionName)
+	Library::FunctionPtr Library::LoadFunction(const AnsiChar* functionName)
 	{
-		return reinterpret_cast<FunctionPtr>(dlsym(mHandle, functionName.data()));
+		return reinterpret_cast<FunctionPtr>(dlsym(mHandle, functionName));
 	}
 
 	void* Library::GetSystemHandle() const

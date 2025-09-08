@@ -6,21 +6,26 @@
 
 namespace Ck::Detail::Unix
 {
-	std::filesystem::path LocalFileSystemService::GetWorkingDirectory() const
+	Path LocalFileSystemService::GetWorkingDirectory() const
 	{
 		char* buffer = getcwd(nullptr, 0);
 		if (!buffer)
 			throw SystemError::GetLastError();
 
-		std::filesystem::path workingDirectory(buffer);
+		Path workingDirectory(buffer);
 		free(buffer);
 
 		return workingDirectory;
 	}
 
-    void LocalFileSystemService::SetWorkingDirectory(const std::filesystem::path& workingDirectory)
+    void LocalFileSystemService::SetWorkingDirectory(const Path& workingDirectory)
     {
-		if (chdir(workingDirectory.c_str()) != 0)
+		if (chdir(workingDirectory.ToString().GetData()) != 0)
 			throw SystemError::GetLastError();
+    }
+
+    Path LocalFileSystemService::GetTempDirectoryPath() const
+    {
+		return CK_TEXT("/var/tmp");
     }
 }

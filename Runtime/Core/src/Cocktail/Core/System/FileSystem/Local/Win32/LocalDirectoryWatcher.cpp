@@ -4,21 +4,6 @@
 
 namespace Ck::Detail::Win32
 {
-	std::string FromUtf16(WCHAR* wString, DWORD length)
-	{
-		if (!wString || length == 0)
-			return "";
-
-		int utf8Length = WideCharToMultiByte(CP_UTF8, 0, wString, length, nullptr, 0, nullptr, nullptr);
-		if (utf8Length == 0)
-			return "";
-
-		std::string utf8(utf8Length, 0);
-		WideCharToMultiByte(CP_UTF8, 0, wString, length, utf8.data(), utf8Length, nullptr, nullptr);
-
-		return utf8;
-	}
-
 	LocalDirectoryWatcher::LocalDirectoryWatcher(Directory& directory, bool recursive):
 		mDirectory(&directory),
 		mRecursive(recursive)
@@ -45,7 +30,7 @@ namespace Ck::Detail::Win32
 		if (success == FALSE)
 			throw SystemError::GetLastError();
 
-		std::pair<std::filesystem::path, std::filesystem::path> renamePair;
+		std::pair<Path, Path> renamePair;
 
 		DWORD offset = 0;
 		PFILE_NOTIFY_INFORMATION notify;
@@ -54,56 +39,56 @@ namespace Ck::Detail::Win32
 			notify = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(&buffer[offset]);
 			offset += notify->NextEntryOffset;
 
-			std::filesystem::path filename = mDirectory->GetPath() / FromUtf16(notify->FileName, notify->FileNameLength);
+			Path changeFullPath = mDirectory->GetPath().Join(notify->FileName, notify->FileNameLength);
 			switch (notify->Action)
 			{
 			case FILE_ACTION_ADDED:
-				mOnFileCreated.Emit(filename);
+				mOnFileCreated.Emit(changeFullPath);
 				break;
 
 			case FILE_ACTION_MODIFIED:
-				mOnFileModified.Emit(filename);
+				mOnFileModified.Emit(changeFullPath);
 				break;
 
 			case FILE_ACTION_RENAMED_OLD_NAME:
-				renamePair.first = std::move(filename);
+				renamePair.first = std::move(changeFullPath);
 				break;
 
 			case FILE_ACTION_RENAMED_NEW_NAME:
-				renamePair.second = std::move(filename);
+				renamePair.second = std::move(changeFullPath);
 				break;
 
 			case FILE_ACTION_REMOVED:
-				mOnFileDeleted.Emit(filename);
+				mOnFileDeleted.Emit(changeFullPath);
 				break;
 			}
 
-			if (!renamePair.first.empty() && !renamePair.second.empty())
+			if (!renamePair.first.IsEmpty() && !renamePair.second.IsEmpty())
 			{
 				mOnFileRenamed.Emit(renamePair.first, renamePair.second);
 
-				renamePair.first = "";
-				renamePair.second = "";
+				renamePair.first = String::Empty;
+				renamePair.second = String::Empty;
 			}
 		} while (notify->NextEntryOffset != 0);
 	}
 
-	Signal<std::filesystem::path>& LocalDirectoryWatcher::OnFileCreated()
+	Signal<Path>& LocalDirectoryWatcher::OnFileCreated()
 	{
 		return mOnFileCreated;
 	}
 
-	Signal<std::filesystem::path>& LocalDirectoryWatcher::OnFileModified()
+	Signal<Path>& LocalDirectoryWatcher::OnFileModified()
 	{
 		return mOnFileModified;
 	}
 
-	Signal<std::filesystem::path, std::filesystem::path>& LocalDirectoryWatcher::OnFileRenamed()
+	Signal<Path, Path>& LocalDirectoryWatcher::OnFileRenamed()
 	{
 		return mOnFileRenamed;
 	}
 
-	Signal<std::filesystem::path>& LocalDirectoryWatcher::OnFileDeleted()
+	Signal<Path>& LocalDirectoryWatcher::OnFileDeleted()
 	{
 		return mOnFileDeleted;
 	}

@@ -22,13 +22,13 @@ namespace Ck
 	public:
 
 		static DataType ConvertComponentType(int componentType);
-		static VertexAttributeSemantic ConvertAttributeName(std::string_view name);
+		static VertexAttributeSemantic ConvertAttributeName(const AnsiChar* name);
 		static Renderer::PrimitiveTopology ConvertPrimitiveTopology(int primitiveMode);
 		static Renderer::IndexType ConvertIndexType(int componentType);
 	    static Vector3<float> ConvertVector3(const std::vector<double>& values);
 		static Quaternion<float> ConvertQuaternion(const std::vector<double>& values);
 		static LinearColor ConvertLinearColor(const std::vector<double>& values);
-		static Material::AlphaMode ConvertAlphaMode(const std::string& value);
+		static Material::AlphaMode ConvertAlphaMode(const AnsiChar* value);
 	};
 }
 

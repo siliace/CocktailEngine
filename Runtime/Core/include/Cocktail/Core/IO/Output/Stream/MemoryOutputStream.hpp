@@ -11,8 +11,10 @@ namespace Ck
     public:
 
         /**
-         * \brief Construct
+         * \brief Constructor
+         *
          * Create a new instance of MemoryOutputStream
+         *
          * \param output The ByteArray to write
          */
         explicit MemoryOutputStream(ByteArray& output);

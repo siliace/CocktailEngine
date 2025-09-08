@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 #define COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 
-#include <string_view>
+#include <Cocktail/Core/StringView.hpp>
 
 #include <Cocktail/Vulkan/ApiVersion.hpp>
 #include <Cocktail/Vulkan/VersionDescriptor.hpp>
@@ -16,7 +16,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		std::string_view ApplicationName;
+		StringView ApplicationName;
 
 		/**
 		 * \brief 
@@ -29,12 +29,16 @@ namespace Ck::Vulkan
 		ApiVersion ApiVersion = ApiVersion::Version_1_0;
 
 		/**
-		 * \brief 
+		 * \brief Size of device memory allocation block
+		 * Vulkan based render device will allocate video memory by block of this size
+		 * and will perform sub allocation in these block to bind memory to a resource.
 		 */
 		unsigned int DeviceMemoryBlockSize = 1024 * 1024 * 64;
 
 		/**
-		 * \brief
+		 * \brief Flag enabling the activation of a validation layer
+		 * Even if this flag is set to true, if the system has no validation layer installed,
+		 * ths application will still run without it.
 		 */
 		bool EnableValidation = false;
 	};

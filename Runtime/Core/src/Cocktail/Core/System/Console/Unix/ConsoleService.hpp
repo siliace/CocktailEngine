@@ -18,7 +18,13 @@ namespace Ck::Detail::Unix
 		 * \brief 
 		 */
 		ConsoleService();
-		
+
+		void Write(const String& text) override;
+		void WriteLine(const String& text) override;
+		void Write(StringView text) override;
+		void WriteLine(StringView text) override;
+
+
 		/**
 		 * \brief 
 		 * \return 
@@ -60,6 +66,7 @@ namespace Ck::Detail::Unix
 		 * \param duration 
 		 */
 		void Beep(unsigned int frequency, const Duration& duration) const override;
+
 
 	private:
 

@@ -13,7 +13,7 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		const char* GetSurfaceExtensionName();
+		const AnsiChar* GetSurfaceExtensionName();
 
 		/**
 		 * \brief

@@ -1,6 +1,5 @@
 add_subdirectory(Catch2)
 add_subdirectory(cmrc)
-add_subdirectory(fmt)
 add_subdirectory(SPIRV-Headers)
 
 set(ENABLE_OPT OFF)

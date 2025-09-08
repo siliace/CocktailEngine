@@ -7,7 +7,7 @@
 
 namespace Ck::Vulkan::WSI
 {
-	const char* GetSurfaceExtensionName()
+	const AnsiChar* GetSurfaceExtensionName()
 	{
 		return VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 	}

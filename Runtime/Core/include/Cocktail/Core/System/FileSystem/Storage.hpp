@@ -15,44 +15,44 @@ namespace Ck
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 * \return
 		 */
-		static bool IsFile(const std::filesystem::path& path);
+		static bool IsFile(const URI& uri);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 * \return
 		 */
-		static bool IsDirectory(const std::filesystem::path& path);
+		static bool IsDirectory(const URI& uri);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 */
-		static void CreateFile(const std::filesystem::path& path);
+		static void CreateFile(const URI& uri);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 */
-		static void CreateDirectory(const std::filesystem::path& path);
+		static void CreateDirectory(const URI& uri);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 * \param flags
 		 * \return
 		 */
-		static std::unique_ptr<File> OpenFile(const std::filesystem::path& path, FileOpenFlags flags);
+		static std::unique_ptr<File> OpenFile(const URI& uri, FileOpenFlags flags);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 * \return
 		 */
-		static std::unique_ptr<Directory> OpenDirectory(const std::filesystem::path& path);
+		static std::unique_ptr<Directory> OpenDirectory(const URI& uri);
 
 		/**
 		 * \brief
@@ -60,33 +60,33 @@ namespace Ck
 		 * \param destination
 		 * \param failIfExists
 		 */
-		static void Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists = false);
+		static void Copy(const URI& source, const URI& destination, bool failIfExists = false);
 
 		/**
 		 * \brief
 		 * \param source
 		 * \param destination
 		 */
-		static void Move(const std::filesystem::path& source, const std::filesystem::path& destination);
+		static void Move(const URI& source, const URI& destination);
 
 		/**
 		 * \brief
-		 * \param path
+		 * \param uri
 		 */
-		static void Remove(const std::filesystem::path& path);
+		static void Remove(const URI& uri);
 
 		/**
 		 * \brief
 		 * \param protocol
 		 * \param fileSystemDriver
 		 */
-		static void Mount(std::string protocol, FileSystemDriver* fileSystemDriver);
+		static void Mount(String protocol, FileSystemDriver* fileSystemDriver);
 
 		/**
 		 * \brief
 		 * \param protocol
 		 */
-		static void UnMount(const std::string& protocol);
+		static void UnMount(const String& protocol);
 	};
 }
 

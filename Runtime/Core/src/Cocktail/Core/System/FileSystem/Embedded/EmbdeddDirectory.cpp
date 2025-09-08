@@ -1,29 +1,28 @@
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectory.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
-	EmbeddedDirectory::EmbeddedDirectory(cmrc::embedded_filesystem fileSystem, std::filesystem::path path):
+	EmbeddedDirectory::EmbeddedDirectory(cmrc::embedded_filesystem fileSystem, Path path):
 		mFileSystem(fileSystem),
 		mPath(std::move(path))
 	{
 		/// Nothing
 	}
 
-	Array<std::filesystem::path> EmbeddedDirectory::GetContent() const
+	Array<Path> EmbeddedDirectory::GetContent() const
 	{
-		Array<std::filesystem::path> childrens;
-		cmrc::directory_iterator iterable = mFileSystem.iterate_directory(mPath.string());
+		Array<Path> children;
+		cmrc::directory_iterator iterable = mFileSystem.iterate_directory(CK_TEXT_TO_ANSI(mPath.ToString().GetData()));
 
-		std::filesystem::path basePath = "builtin://" / mPath;
-
-		childrens.Reserve(std::distance(iterable.begin(), iterable.end()));
+		children.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
-			childrens.Emplace(basePath.string() + '/' + (*it).filename());
+			children.Add(mPath.Join(CK_ANSI_TO_TEXT((*it).filename().c_str())));
 
-		return childrens;
+		return children;
 	}
 
-	const std::filesystem::path& EmbeddedDirectory::GetPath() const
+	const Path& EmbeddedDirectory::GetPath() const
 	{
 		return mPath;
 	}

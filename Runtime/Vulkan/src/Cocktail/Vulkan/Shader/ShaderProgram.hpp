@@ -59,7 +59,7 @@ namespace Ck::Vulkan
 		 * \param name 
 		 * \return 
 		 */
-		Renderer::UniformSlot* FindUniformSlot(std::string_view name) const override;
+		Renderer::UniformSlot* FindUniformSlot(StringView name) const override;
 
 		/**
 		 * \brief 

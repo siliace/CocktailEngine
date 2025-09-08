@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_UTILITY_FINDER_HPP
 #define COCKTAIL_CORE_UTILITY_FINDER_HPP
 
-#include <filesystem>
-
-#include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
 {
@@ -19,14 +17,14 @@ namespace Ck
 		 * \param path 
 		 * \return 
 		 */
-		Finder& From(const std::filesystem::path& path);
+		Finder& From(const Path& path);
 
 		/**
 		 * \brief 
 		 * \param fileExtension 
 		 * \return 
 		 */
-		Finder& WithExtension(const std::string& fileExtension);
+		Finder& WithExtension(String fileExtension);
 
 		/**
 		 * \brief 
@@ -54,7 +52,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Array<std::filesystem::path> Get() const;
+		Array<Path> Get() const;
 
 	private:
 
@@ -64,13 +62,13 @@ namespace Ck
 		 * \param depth 
 		 * \return 
 		 */
-		Array<std::filesystem::path> Get(const std::filesystem::path& source, unsigned int depth) const;
+		Array<Path> Get(const Path& source, unsigned int depth) const;
 
 		bool mIgnoreFiles = false;
 		bool mIgnoreDirectories = false;
 		unsigned int mDepth = 0;
-		std::string mFileExtension;
-		Array<std::filesystem::path> mSource;
+		String mFileExtension;
+		Array<Path> mSource;
 	};
 
 }

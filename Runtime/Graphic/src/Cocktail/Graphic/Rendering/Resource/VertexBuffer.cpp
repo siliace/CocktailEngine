@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	VertexBuffer::VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, std::string_view name) :
+	VertexBuffer::VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, const AnsiChar* name) :
 		BufferResource(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Vertex, vertices->GetVertices().GetSize(), name),
 		mVertices(std::move(vertices))
 	{

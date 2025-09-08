@@ -78,7 +78,7 @@ namespace Ck
 		 * \param name 
 		 * \return 
 		 */
-		static T FromString(std::string_view name)
+		static T FromString(const AnsiChar* name)
 		{
 			auto enumValue = magic_enum::enum_cast<T>(name);
 			if (!enumValue.has_value())
@@ -92,9 +92,9 @@ namespace Ck
 		 * \param value 
 		 * \return 
 		 */
-		static std::string_view ToString(T value)
+		static const AnsiChar* ToString(T value)
 		{
-			return magic_enum::enum_name(value);
+			return magic_enum::enum_name(value).data();
 		}
 
 		/**

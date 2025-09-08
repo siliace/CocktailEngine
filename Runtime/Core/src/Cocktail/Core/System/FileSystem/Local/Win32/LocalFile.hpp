@@ -19,7 +19,7 @@ namespace Ck::Detail::Win32
 		 * \param path 
 		 * \param flags 
 		 */
-		LocalFile(const std::filesystem::path& path, const FileOpenFlags& flags);
+		LocalFile(const Path& path, const FileOpenFlags& flags);
 
 		/**
 		 * \brief 
@@ -66,7 +66,7 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		const std::filesystem::path& GetPath() const override;
+		const Path& GetPath() const override;
 
 		/**
 		 * \brief 
@@ -81,7 +81,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		std::filesystem::path mPath;
+		Path mPath;
 		HANDLE mHandle;
 	};
 }

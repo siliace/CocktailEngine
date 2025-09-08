@@ -18,10 +18,10 @@ namespace Ck
 		}
 	}
 
-	void StbImageExporter::SaveToPath(const Image& asset, const std::filesystem::path& path, const ImageExportParameters& parameters) const
+	void StbImageExporter::SaveToPath(const Image& asset, const Path& path, const ImageExportParameters& parameters) const
 	{
 		ImageExportParameters streamExportParameters = parameters;
-		streamExportParameters.Format = path.extension().string();
+		streamExportParameters.Format = path.GetExtension();
 
 		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
 		FileOutputStream outputStream(*file);
@@ -36,25 +36,25 @@ namespace Ck
 		const void* pixels = asset.GetPixels().GetData();
 
 		int err = 0;
-		if (parameters.Format == "png")
+		if (parameters.Format == CK_TEXT("png"))
 		{
 			err = stbi_write_png_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 0);
 		}
-		else if (parameters.Format == "bmp")
+		else if (parameters.Format == CK_TEXT("bmp"))
 		{
 			err = stbi_write_bmp_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
 		}
-		else if (parameters.Format == "tga")
+		else if (parameters.Format == CK_TEXT("tga"))
 		{
 			err = stbi_write_tga_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
 		}
-		else if (parameters.Format == "jpg" || parameters.Format == "jpeg")
+		else if (parameters.Format == CK_TEXT("jpg") || parameters.Format == CK_TEXT("jpeg"))
 		{
 			err = stbi_write_jpg_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 90);
 		}
 
 		if (err == 0)
-			throw StbExportError("Failed to export image");
+			throw StbExportError(CK_TEXT("Failed to export image"));
 	}
 
 	ByteArray StbImageExporter::SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const
@@ -66,9 +66,9 @@ namespace Ck
 		return byteArray;
 	}
 
-	bool StbImageExporter::SupportExtension(std::string_view extension) const
+	bool StbImageExporter::SupportExtension(StringView extension) const
 	{
-		for (const std::string_view supportedExtension : {".jpg", ".jpeg", ".png", ".tga", ".bmp"})
+		for (StringView supportedExtension : { CK_TEXT(".jpg"), CK_TEXT(".jpeg"), CK_TEXT(".png"), CK_TEXT(".tga"), CK_TEXT(".bmp") })
 		{
 			if (supportedExtension == extension)
 				return true;

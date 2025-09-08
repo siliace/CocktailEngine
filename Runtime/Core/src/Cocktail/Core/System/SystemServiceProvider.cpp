@@ -22,11 +22,11 @@ namespace Ck
 	void SystemServiceProvider::DoBoot(Application* application)
 	{
 		application->Invoke([](StorageService* storage, EmbeddedFileSystemDriver* embeddedFileSystemDriver) {
-			storage->Mount("builtin", embeddedFileSystemDriver);
+			storage->Mount(CK_TEXT("builtin"), embeddedFileSystemDriver);
 		});
 
 		application->Invoke([](StorageService* storage, LocalFileSystemDriver* localFileSystemDriver) {
-			storage->Mount(storage->GetDefaultProtocol(), localFileSystemDriver);
+			storage->Mount(storage->GetDefaultScheme(), localFileSystemDriver);
 		});
 	}
 }

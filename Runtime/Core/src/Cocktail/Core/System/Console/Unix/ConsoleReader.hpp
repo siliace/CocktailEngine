@@ -17,7 +17,7 @@ namespace Ck::Detail::Unix
 		 * \param c
 		 * \return
 		 */
-		bool Read(char& c) override;
+		bool Read(TextChar& c) override;
 
 		/**
 		 * \brief 
@@ -25,7 +25,7 @@ namespace Ck::Detail::Unix
 		 * \param length 
 		 * \return 
 		 */
-		std::size_t Read(char* buffer, std::size_t length) override;
+		std::size_t Read(TextChar* buffer, std::size_t length) override;
 
 		/**
 		 * \brief 
@@ -62,6 +62,8 @@ namespace Ck::Detail::Unix
 		 * \return 
 		 */
 		bool IsEof() const override;
+
+		EncodingMode GetEncodingMode() const override;
 	};
 }
 

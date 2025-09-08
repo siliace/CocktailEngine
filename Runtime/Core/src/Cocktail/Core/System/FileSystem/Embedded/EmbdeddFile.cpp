@@ -1,16 +1,17 @@
 #include <cstring>
 
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
-	EmbeddedFile::EmbeddedFile(const cmrc::embedded_filesystem& fileSystem, const std::filesystem::path& path, const FileOpenFlags& flags):
+	EmbeddedFile::EmbeddedFile(const cmrc::embedded_filesystem& fileSystem, const Path& path, const FileOpenFlags& flags):
 		mPath(path)
 	{
 		if (flags & FileOpenFlagBits::Truncate | flags & FileOpenFlagBits::Write)
 			throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
 
-		mHandle = fileSystem.open(path.string());
+		mHandle = fileSystem.open(CK_TEXT_TO_ANSI(path.ToString().GetData()));
 		mCursor = flags & FileOpenFlagBits::Append ? mHandle.cend() : mHandle.cbegin();
 	}
 
@@ -58,7 +59,7 @@ namespace Ck
 		return mHandle.size();
 	}
 
-	const std::filesystem::path& EmbeddedFile::GetPath() const
+	const Path& EmbeddedFile::GetPath() const
 	{
 		return mPath;
 	}

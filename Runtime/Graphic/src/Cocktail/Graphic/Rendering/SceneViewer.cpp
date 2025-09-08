@@ -48,7 +48,7 @@ namespace Ck
 
 		SceneInfo sceneInfo;
 		sceneInfo.AmbientFactor = 0.1f;
-		drawContext.BindPersistentData(*commandList, "sceneInfo", Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(SceneInfo), &sceneInfo);
+		drawContext.BindPersistentData(*commandList, CK_TEXT("sceneInfo"), Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(SceneInfo), &sceneInfo);
 		
 		for (const ViewportEntry& viewportEntry : mViewports)
 		{
@@ -109,7 +109,7 @@ namespace Ck
 				}
 			}
 
-			drawContext.BindPersistentData(*commandList, "lightsInfo", Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
+			drawContext.BindPersistentData(*commandList, CK_TEXT("lightsInfo"), Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
 
 			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
 			{

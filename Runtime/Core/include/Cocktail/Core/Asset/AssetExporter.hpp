@@ -1,9 +1,9 @@
 #ifndef COCKTAIL_CORE_ASSET_ASSETEXPORTER_HPP
 #define COCKTAIL_CORE_ASSET_ASSETEXPORTER_HPP
 
-#include <filesystem>
-
+#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/IO/Output/Stream/OutputStream.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 namespace Ck
@@ -29,7 +29,7 @@ namespace Ck
 		 * \param path
 		 * \param parameters
 		 */
-		virtual void SaveToPath(const T& asset, const std::filesystem::path& path, const P& parameters = {}) const = 0;
+		virtual void SaveToPath(const T& asset, const Path& path, const P& parameters = {}) const = 0;
 
 		/**
 		 * \brief
@@ -52,7 +52,7 @@ namespace Ck
 		 * \param extension
 		 * \return
 		 */
-		virtual bool SupportExtension(std::string_view extension) const = 0;
+		virtual bool SupportExtension(StringView extension) const = 0;
 
 		/**
 		 * \brief 

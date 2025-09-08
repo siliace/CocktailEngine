@@ -69,7 +69,7 @@ namespace Ck
 		 * \param size
 		 * \param data
 		 */
-		void BindData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const;
+		void BindData(Renderer::CommandList& commandList, StringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const;
 
 		/**
 		 * \brief
@@ -78,7 +78,7 @@ namespace Ck
 		 * \param size
 		 * \param data
 		 */
-		void BindPersistentData(Renderer::CommandList& commandList, std::string_view name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data);
+		void BindPersistentData(Renderer::CommandList& commandList, StringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data);
 
 		/**
 		 * \brief 
@@ -106,7 +106,7 @@ namespace Ck
 		Renderer::RenderContext* mRenderContext;
 		RenderingModifiers mModifiers;
 		const MaterialProgramVariant* mCurrentMaterialProgram;
-		std::unordered_map<CompositeKey<std::string, unsigned int>, Renderer::BufferArea> mPersistentBuffers;
+		std::unordered_map<CompositeKey<String , unsigned int>, Renderer::BufferArea> mPersistentBuffers;
 	};
 }
 

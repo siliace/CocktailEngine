@@ -35,4 +35,8 @@
 	#undef IsMaximized
 #endif
 
+#ifdef Yield
+	#undef Yield
+#endif
+
 #endif // COCKTAIL_CORE_SYSTEM_WIN32_WINDOWS_HPP

@@ -4,32 +4,31 @@
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFile.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileLock.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileSystemDriver.hpp>
-#include <Cocktail/Core/Utility/FileUtils.hpp>
 
 namespace Ck::Detail::Win32
 {
-	bool LocalFileSystemDriver::IsFile(const std::filesystem::path& path) const
+	bool LocalFileSystemDriver::IsFile(const Path& path) const
 	{
-		DWORD attribtutes = GetFileAttributesW(path.c_str());
+		DWORD attribtutes = GetFileAttributes(path.ToString().GetData());
 		if (attribtutes == INVALID_FILE_ATTRIBUTES)
 			return false;
 
 		return (attribtutes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 	}
 
-	bool LocalFileSystemDriver::IsDirectory(const std::filesystem::path& path) const
+	bool LocalFileSystemDriver::IsDirectory(const Path& path) const
 	{
-		DWORD attribtutes = GetFileAttributesW(path.c_str());
+		DWORD attribtutes = GetFileAttributes(path.ToString().GetData());
 		if (attribtutes == INVALID_FILE_ATTRIBUTES)
 			return false;
 
 		return attribtutes == FILE_ATTRIBUTE_DIRECTORY;
 	}
 
-	void LocalFileSystemDriver::CreateFile(const std::filesystem::path& path)
+	void LocalFileSystemDriver::CreateFile(const Path& path)
 	{
-		HANDLE handle = CreateFileW(
-			path.c_str(),
+		HANDLE handle = ::CreateFileW(
+			path.ToString().GetData(),
 			GENERIC_WRITE,
 			0,
 			nullptr,
@@ -48,46 +47,44 @@ namespace Ck::Detail::Win32
 		CloseHandle(handle);
 	}
 
-	void LocalFileSystemDriver::CreateDirectory(const std::filesystem::path& path)
+	void LocalFileSystemDriver::CreateDirectory(const Path& path)
 	{
-		if (CreateDirectoryW(path.c_str(), nullptr) == FALSE)
+		if (::CreateDirectoryW(path.ToString().GetData(), nullptr) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
-	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags)
+	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
 		return std::make_unique<LocalFile>(path, flags);
 	}
 
-	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const std::filesystem::path& path)
+	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
 	{
 		return std::make_unique<LocalDirectory>(path);
 	}
 
-	void LocalFileSystemDriver::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists)
+	void LocalFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
 	{
-		if (CopyFileW(source.c_str(), destination.c_str(), failIfExists) == FALSE)
+		if (CopyFile(source.ToString().GetData(), destination.ToString().GetData(), failIfExists) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
-	void LocalFileSystemDriver::Move(const std::filesystem::path& source, const std::filesystem::path& destination)
+	void LocalFileSystemDriver::Move(const Path& source, const Path& destination)
 	{
-		if (MoveFileW(source.c_str(), destination.c_str()) == FALSE)
+		if (MoveFile(source.ToString().GetData(), destination.ToString().GetData()) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
-	void LocalFileSystemDriver::Remove(const std::filesystem::path& path)
+	void LocalFileSystemDriver::Remove(const Path& path)
 	{
-		std::filesystem::path fullPath = path;
-
-		if (IsFile(fullPath))
+		if (IsFile(path))
 		{
-			if (DeleteFileW(fullPath.c_str()) == FALSE)
+			if (DeleteFile(path.ToString().GetData()) == FALSE)
 				throw SystemError::GetLastError();
 		}
-		else if (IsDirectory(fullPath))
+		else if (IsDirectory(path))
 		{
-			if (RemoveDirectoryW(fullPath.c_str()) == FALSE)
+			if (RemoveDirectory(path.ToString().GetData()) == FALSE)
 				throw SystemError::GetLastError();
 		}
 	}

@@ -33,7 +33,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
-		windowCreateInfo.Title = "Hello Sponza";
+		windowCreateInfo.Title = CK_TEXT("Hello Sponza");
 		windowCreateInfo.Style = Flags<WindowStyle>::All(); 
 		windowCreateInfo.Position = MakeExtent(100, 100);
 
@@ -44,7 +44,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
 	std::shared_ptr<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
-		return sceneLoader->LoadFromPath("./resources/Models/Sponza/Sponza.gltf", {})->AddToScene(*scene);
+		return sceneLoader->LoadFromPath(CK_TEXT("./resources/Models/Sponza/Sponza.gltf"), {})->AddToScene(*scene);
 	});
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());

@@ -18,7 +18,7 @@ namespace Ck::Detail::Unix
 		 * \param path 
 		 * \param flags 
 		 */
-		LocalFile(const std::filesystem::path& path, const FileOpenFlags& flags);
+		LocalFile(const Path& path, const FileOpenFlags& flags);
 
 		/**
 		 * \brief 
@@ -65,7 +65,7 @@ namespace Ck::Detail::Unix
 		 * \brief 
 		 * \return 
 		 */
-		const std::filesystem::path& GetPath() const override;
+		const Path& GetPath() const override;
 
 		/**
 		 * \brief 
@@ -80,7 +80,7 @@ namespace Ck::Detail::Unix
 
 	private:
 
-		std::filesystem::path mPath;
+		Path mPath;
 		int mHandle;
 	};
 }

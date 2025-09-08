@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	Material::Material(std::string name, ShadingMode shadingMode, bool doubleSided) :
+	Material::Material(String name, ShadingMode shadingMode, bool doubleSided) :
 		mName(std::move(name)),
 		mShadingMode(shadingMode),
 		mDoubleSided(doubleSided),
@@ -10,16 +10,6 @@ namespace Ck
 		mAlphaCutoff(0.f)
 	{
 		/// Nothing
-	}
-
-	const std::string& Material::GetName() const
-	{
-		return mName;
-	}
-
-	Material::ShadingMode Material::GetShadingMode() const
-	{
-		return mShadingMode;
 	}
 
 	void Material::SetBaseColor(const LinearColor& color)
@@ -50,6 +40,16 @@ namespace Ck
 	bool Material::IsEmissive() const
 	{
 		return mUniformColors.Base != LinearColor{ 0.f, 0.f, 0.f, 1.f } || mTextures[TextureType::Emission] != nullptr;
+	}
+
+	const String& Material::GetName() const
+	{
+		return mName;
+	}
+
+	Material::ShadingMode Material::GetShadingMode() const
+	{
+		return mShadingMode;
 	}
 
 	const Material::UniformColors& Material::GetUniformColors() const

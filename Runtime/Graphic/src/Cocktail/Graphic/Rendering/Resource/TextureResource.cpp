@@ -33,7 +33,7 @@ namespace Ck
         }
     }
 
-    TextureResource::TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube, std::string_view name) :
+    TextureResource::TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube, const AnsiChar* name) :
         mGraphicEngine(std::move(graphicEngine))
     {
         Renderer::TextureCreateInfo createInfo;
@@ -46,7 +46,7 @@ namespace Ck
         createInfo.Usage = Renderer::TextureUsageFlagBits::Sampled;
         createInfo.ArrayLayerCount = layerCount;
         createInfo.MipMapsCount = levelCount;
-        createInfo.Name = name.data();
+        createInfo.Name = name;
         mTexture = mGraphicEngine->GetRenderDevice()->CreateTexture(createInfo);
 
 		Renderer::TextureViewCreateInfo viewCreateInfo;

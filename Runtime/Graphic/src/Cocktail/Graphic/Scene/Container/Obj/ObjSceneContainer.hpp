@@ -16,16 +16,16 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<MipMaps> LoadMipMaps(const std::filesystem::path& path);
+		std::shared_ptr<MipMaps> LoadMipMaps(const Path& path);
 		MaterialInfo ProcessMaterial(const tinyobj::material_t& objMaterial);
 
 		void ProcessIndices(ObjVertexCache& vertexCache, const tinyobj::attrib_t& attributes, const tinyobj::index_t* indices, std::size_t indicesCount) const;
-		bool ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape);
+		bool ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape) const;
 		MeshInfo ProcessMesh(const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes);
 
 		std::shared_ptr<VertexLayout> mVertexLayout;
 		SceneImportParameters mImportParameters;
-		std::unordered_map<std::filesystem::path, std::shared_ptr<MipMaps>> mMipMaps;
+		std::unordered_map<Path, std::shared_ptr<MipMaps>> mMipMaps;
 	};
 }
 

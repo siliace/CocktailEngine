@@ -2,57 +2,57 @@
 
 namespace Ck
 {
-	bool Storage::IsFile(const std::filesystem::path& path)
+	bool Storage::IsFile(const URI& uri)
 	{
-		return ResolveFacadeInstance()->IsFile(path);
+		return ResolveFacadeInstance()->IsFile(uri);
 	}
 
-	bool Storage::IsDirectory(const std::filesystem::path& path)
+	bool Storage::IsDirectory(const URI& uri)
 	{
-		return ResolveFacadeInstance()->IsDirectory(path);
+		return ResolveFacadeInstance()->IsDirectory(uri);
 	}
 
-	void Storage::CreateFile(const std::filesystem::path& path)
+	void Storage::CreateFile(const URI& uri)
 	{
-		return ResolveFacadeInstance()->CreateFile(path);
+		return ResolveFacadeInstance()->CreateFile(uri);
 	}
 
-	void Storage::CreateDirectory(const std::filesystem::path& path)
+	void Storage::CreateDirectory(const URI& uri)
 	{
-		return ResolveFacadeInstance()->CreateDirectory(path);
+		return ResolveFacadeInstance()->CreateDirectory(uri);
 	}
 
-	std::unique_ptr<File> Storage::OpenFile(const std::filesystem::path& path, FileOpenFlags flags)
+	std::unique_ptr<File> Storage::OpenFile(const URI& uri, FileOpenFlags flags)
 	{
-		return ResolveFacadeInstance()->OpenFile(path, flags);
+		return ResolveFacadeInstance()->OpenFile(uri, flags);
 	}
 
-	std::unique_ptr<Directory> Storage::OpenDirectory(const std::filesystem::path& path)
+	std::unique_ptr<Directory> Storage::OpenDirectory(const URI& uri)
 	{
-		return ResolveFacadeInstance()->OpenDirectory(path);
+		return ResolveFacadeInstance()->OpenDirectory(uri);
 	}
 
-	void Storage::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists)
+	void Storage::Copy(const URI& source, const URI& destination, bool failIfExists)
 	{
 		return ResolveFacadeInstance()->Copy(source, destination, failIfExists);
 	}
 
-	void Storage::Move(const std::filesystem::path& source, const std::filesystem::path& destination)
+	void Storage::Move(const URI& source, const URI& destination)
 	{
 		return ResolveFacadeInstance()->Move(source, destination);
 	}
 
-	void Storage::Remove(const std::filesystem::path& path)
+	void Storage::Remove(const URI& uri)
 	{
-		return ResolveFacadeInstance()->Remove(path);
+		return ResolveFacadeInstance()->Remove(uri);
 	}
 
-	void Storage::Mount(std::string protocol, FileSystemDriver* fileSystemDriver)
+	void Storage::Mount(String protocol, FileSystemDriver* fileSystemDriver)
 	{
-		ResolveFacadeInstance()->Mount(std::move(protocol), std::move(fileSystemDriver));
+		ResolveFacadeInstance()->Mount(std::move(protocol), fileSystemDriver);
 	}
 
-	void Storage::UnMount(const std::string& protocol)
+	void Storage::UnMount(const String& protocol)
 	{
 		ResolveFacadeInstance()->UnMount(protocol);
 	}

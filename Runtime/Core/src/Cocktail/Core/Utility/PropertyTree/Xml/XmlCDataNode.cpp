@@ -13,16 +13,16 @@ namespace Ck
 		return mData;
 	}
 
-	XmlCDataNode::XmlCDataNode(XmlProperties::Node* parent, const std::string& name, ByteArray data) :
-		XmlProperties::CustomNode(parent, name),
+	XmlCDataNode::XmlCDataNode(XmlProperties::NodeType* parent, const String& name, ByteArray data) :
+		XmlProperties::CustomNodeType(parent, name),
 		mData(std::move(data))
 	{
 		/// Nothing
 	}
 
-	std::unique_ptr<XmlProperties::Node> XmlCDataNode::Clone(XmlProperties::Node* parent, const std::string& name) const
+	std::unique_ptr<XmlProperties::NodeType> XmlCDataNode::Clone(XmlProperties::NodeType* parent, const String& name) const
 	{
-		return std::unique_ptr<XmlProperties::Node>(
+		return std::unique_ptr<XmlProperties::NodeType>(
 			new XmlCDataNode(parent, name, mData)
 		);
 	}

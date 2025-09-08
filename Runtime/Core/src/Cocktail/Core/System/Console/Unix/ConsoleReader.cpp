@@ -3,12 +3,12 @@
 
 namespace Ck::Detail::Unix
 {
-	bool ConsoleReader::Read(char& c)
+	bool ConsoleReader::Read(TextChar& c)
 	{
 		return Read(&c, 1) == 1;
 	}
 
-	std::size_t ConsoleReader::Read(char* buffer, std::size_t length)
+	std::size_t ConsoleReader::Read(TextChar* buffer, std::size_t length)
 	{
 		return 0;
 	}
@@ -45,4 +45,10 @@ namespace Ck::Detail::Unix
 	{
 		return false;
 	}
+
+	EncodingMode ConsoleReader::GetEncodingMode() const
+	{
+		return EncodingMode::Utf8;
+	}
+
 }

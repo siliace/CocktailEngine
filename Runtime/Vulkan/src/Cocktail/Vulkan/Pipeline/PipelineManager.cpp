@@ -1,4 +1,5 @@
 #include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/Utility/StringUtils.hpp>
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Vulkan.hpp>
@@ -10,15 +11,16 @@ namespace Ck::Vulkan
 {
 	namespace
 	{
-		std::size_t HashShaderStageState(const ShaderStageState& state)
+		Uint64 HashShaderStageState(const ShaderStageState& state)
 		{
-			std::size_t hash = 0;
-			HashCombine(hash, static_cast<void*>(state.Shader->GetHandle()));
+			Uint64 handleHash = 0;
+			HashCombine(handleHash, static_cast<void*>(state.Shader->GetHandle()));
 
-			std::string_view entryPoint(state.EntryPoint);
-			HashCombine(hash, entryPoint);
+			Uint64 entryPointHash = 0;
+			for (unsigned int i = 0; i < StringUtils<AnsiChar, unsigned int>::GetLength(state.EntryPoint); i++)
+				HashCombine(entryPointHash, state.EntryPoint[i]);
 
-			return hash;
+			return HashMerge(handleHash, entryPointHash);
 		}
 
 		PipelineStateHash HashComputeState(const ComputeState& computeState)
@@ -36,7 +38,7 @@ namespace Ck::Vulkan
 					if (graphicState.ShaderStages[shaderType].Shader == nullptr)
 						continue;
 
-					HashMerge(hash, HashShaderStageState(graphicState.ShaderStages[shaderType]));
+					hash = HashMerge(hash, HashShaderStageState(graphicState.ShaderStages[shaderType]));
 				}
 			}
 
@@ -168,7 +170,7 @@ namespace Ck::Vulkan
 		std::shared_ptr<ComputePipeline> pipeline = mRenderDevice->CreateComputePipeline(mCache.get(), createInfo);
 		mComputePipelines[stateHash] = pipeline;
 
-		CK_LOG(VulkanLogCategory, LogLevel::Info, "Created ComputePipeline with hash {}", stateHash);
+		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created ComputePipeline with hash %llu"), stateHash);
 
 		return pipeline;
 	}
@@ -182,7 +184,7 @@ namespace Ck::Vulkan
 		std::shared_ptr<GraphicPipeline> pipeline = mRenderDevice->CreateGraphicPipeline(mCache.get(), createInfo);
 		mGraphicPipelines[stateHash] = pipeline;
 
-		CK_LOG(VulkanLogCategory, LogLevel::Info, "Created GraphicPipeline with hash {}", stateHash);
+		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created GraphicPipeline with hash %llu"), stateHash);
 
 		return pipeline;
 	}

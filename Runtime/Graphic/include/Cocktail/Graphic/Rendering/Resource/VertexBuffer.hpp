@@ -19,7 +19,7 @@ namespace Ck
          * \param vertices
          * \param name
          */
-        VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, std::string_view name = "");
+        VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, const AnsiChar* name = "");
 
         /**
          * \brief

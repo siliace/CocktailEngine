@@ -2,7 +2,7 @@
 
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
-#include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/Vulkan.hpp>
@@ -14,23 +14,23 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions = nullptr;
+		inline static const AnsiChar** InstanceExtensions = nullptr;
 
 		inline static unsigned int DeviceExtensionCount = 0;
-		inline static const char** DeviceExtensions = nullptr;
+		inline static const AnsiChar** DeviceExtensions = nullptr;
 	};
 
 	template <>
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::RenderSurface>
 	{
 		inline static unsigned int InstanceExtensionCount = 2;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_SURFACE_EXTENSION_NAME,
 			WSI::GetSurfaceExtensionName()
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 		};
 	};
@@ -39,12 +39,12 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::RenderSurfaceColorSpace>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_SURFACE_EXTENSION_NAME,
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME
 		};
 	};
@@ -53,24 +53,24 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::Debug>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_EXT_DEBUG_UTILS_EXTENSION_NAME
 		};
 
 		inline static unsigned int DeviceExtensionCount = 0;
-		inline static const char** DeviceExtensions = nullptr;
+		inline static const AnsiChar** DeviceExtensions = nullptr;
 	};
 
 	template <>
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::InstanceDivisor>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_EXT_VERTEX_ATTRIBUTE_DIVISOR_EXTENSION_NAME
 		};
 	};
@@ -79,10 +79,10 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::MutableTextureFormat>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions = nullptr;
+		inline static const AnsiChar** InstanceExtensions = nullptr;
 
 		inline static unsigned int DeviceExtensionCount = 4;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 			VK_KHR_MAINTENANCE2_EXTENSION_NAME,
 			VK_KHR_IMAGE_FORMAT_LIST_EXTENSION_NAME,
@@ -94,10 +94,10 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::ByteIndexType>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions = nullptr;
+		inline static const AnsiChar** InstanceExtensions = nullptr;
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_EXT_INDEX_TYPE_UINT8_EXTENSION_NAME,
 		};
 	};
@@ -106,12 +106,12 @@ namespace Ck::Vulkan
 	struct ExtensionRequirement<Renderer::RenderDeviceExtension::TimelineSynchronization>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
 		};
 	};
@@ -120,20 +120,20 @@ namespace Ck::Vulkan
 	struct FeatureRequirement
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions = nullptr;
+		inline static const AnsiChar** InstanceExtensions = nullptr;
 
 		inline static unsigned int DeviceExtensionCount = 0;
-		inline static const char** DeviceExtensions = nullptr;
+		inline static const AnsiChar** DeviceExtensions = nullptr;
 	};
 
 	template <>
 	struct FeatureRequirement<RenderDeviceFeature::DedicatedAllocation>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions = nullptr;
+		inline static const AnsiChar** InstanceExtensions = nullptr;
 
 		inline static unsigned int DeviceExtensionCount = 2;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
 			VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME,
 		};
@@ -143,10 +143,10 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::DescriptorUpdateTemplate>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions;
+		inline static const AnsiChar** InstanceExtensions;
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_DESCRIPTOR_UPDATE_TEMPLATE_EXTENSION_NAME,
 		};
 	};
@@ -155,12 +155,12 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::PushDescriptors>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
 		};
 	};
@@ -169,12 +169,12 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::Synchronization2>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
-		inline static const char* InstanceExtensions[] = {
+		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 		};
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME,
 		};
 	};
@@ -183,10 +183,10 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::RenderPass2>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions;
+		inline static const AnsiChar** InstanceExtensions;
 
 		inline static unsigned int DeviceExtensionCount = 3;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_MULTIVIEW_EXTENSION_NAME,
 			VK_KHR_MAINTENANCE2_EXTENSION_NAME,
 			VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
@@ -197,10 +197,10 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::RenderPassDepthStencilResolve>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions;
+		inline static const AnsiChar** InstanceExtensions;
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_KHR_DEPTH_STENCIL_RESOLVE_EXTENSION_NAME,
 		};
 	};
@@ -209,15 +209,15 @@ namespace Ck::Vulkan
 	struct FeatureRequirement<RenderDeviceFeature::ValidationCache>
 	{
 		inline static unsigned int InstanceExtensionCount = 0;
-		inline static const char** InstanceExtensions;
+		inline static const AnsiChar** InstanceExtensions;
 
 		inline static unsigned int DeviceExtensionCount = 1;
-		inline static const char* DeviceExtensions[] = {
+		inline static const AnsiChar* DeviceExtensions[] = {
 			VK_EXT_VALIDATION_CACHE_EXTENSION_NAME,
 		};
 	};
 
-	bool ExtensionManager::IsLayerSupported(const char* layerName)
+	bool ExtensionManager::IsLayerSupported(const AnsiChar* layerName)
 	{
 		unsigned int propertyCount;
 		vkEnumerateInstanceLayerProperties(&propertyCount, nullptr);
@@ -225,21 +225,20 @@ namespace Ck::Vulkan
 		Array<VkLayerProperties> properties(propertyCount);
 		vkEnumerateInstanceLayerProperties(&propertyCount, properties.GetData());
 
-		for (const VkLayerProperties& property : properties)
-		{
-			if (std::strcmp(layerName, property.layerName) == 0)
-				return true;
-		}
-
-		return false;
+		return properties.ContainsIf([&](const VkLayerProperties& layerProperty) {
+			return StringUtils<AnsiChar, unsigned int>::Equal(layerName, layerProperty.layerName);
+		});
 	}
 
 #ifndef NDEBUG
 	ExtensionManager::ExtensionManager()
 	{
-		StringUtils::Split(App::GetEnvironmentVariable("COCKTAIL_VULKAN_DISABLED_EXTENSIONS"), ';').ForEach([&](const std::string& disabledExtension) {
-			mDisabledExtensions.emplace(disabledExtension);
-			CK_LOG(VulkanLogCategory, LogLevel::Info, "Extension {} disabled", disabledExtension);
+		mDisabledExtensions = App::GetEnvironmentVariable(CK_TEXT("COCKTAIL_VULKAN_DISABLED_EXTENSIONS")).Map([&](const String& variable) {
+			return variable.Split(';');
+		}).GetOr(Array<String>());
+
+		mDisabledExtensions.ForEach([&](const String& disabledExtension) {
+			CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Extension %s disabled"), disabledExtension);
 		});
 	}
 #else
@@ -249,7 +248,7 @@ namespace Ck::Vulkan
 	bool ExtensionManager::EnableInstanceExtension(RenderDeviceFeature feature)
 	{
 		unsigned int extensionCount = 0;
-		const char* const* extensionNames = nullptr;
+		const AnsiChar* const* extensionNames = nullptr;
 #define CASE_FEATURE(__Feature)                                                      \
 		case __Feature:                                                              \
 			{                                                                        \
@@ -274,7 +273,12 @@ namespace Ck::Vulkan
 			return false;
 
 		for (unsigned int i = 0; i < extensionCount; i++)
-			mInstanceExtensions.insert(extensionNames[i]);
+		{
+			if (mInstanceExtensions.Contains(extensionNames[i]))
+				continue;
+
+			mInstanceExtensions.Add(extensionNames[i]);
+		}
 
 		return true;
 	}
@@ -282,7 +286,7 @@ namespace Ck::Vulkan
 	bool ExtensionManager::EnableInstanceExtension(Renderer::RenderDeviceExtension extension)
 	{
 		unsigned int extensionCount = 0;
-		const char* const* extensionNames = nullptr;
+		const AnsiChar* const* extensionNames = nullptr;
 #define CASE_EXTENSION(__Extension)                                                      \
 		case __Extension:                                                                \
 			{                                                                            \
@@ -308,7 +312,12 @@ namespace Ck::Vulkan
 			return false;
 
 		for (unsigned int i = 0; i < extensionCount; i++)
-			mInstanceExtensions.insert(extensionNames[i]);
+		{
+			if (mInstanceExtensions.Contains(extensionNames[i]))
+				continue;
+
+			mInstanceExtensions.Add(extensionNames[i]);
+		}
 
 		return true;
 	}
@@ -316,7 +325,7 @@ namespace Ck::Vulkan
 	bool ExtensionManager::EnableDeviceExtension(RenderDeviceFeature feature, VkPhysicalDevice physicalDevice)
 	{
 		unsigned int extensionCount = 0;
-		const char* const* extensionNames = nullptr;
+		const AnsiChar* const* extensionNames = nullptr;
 #define CASE_FEATURE(__Feature)                                                    \
 		case __Feature:                                                            \
 			{                                                                      \
@@ -341,7 +350,12 @@ namespace Ck::Vulkan
 			return false;
 
 		for (unsigned int i = 0; i < extensionCount; i++)
-			mDeviceExtensions.insert(extensionNames[i]);
+		{
+			if (mDeviceExtensions.Contains(extensionNames[i]))
+				continue;
+
+			mDeviceExtensions.Add(extensionNames[i]);
+		}
 
 		return true;
 	}
@@ -349,7 +363,7 @@ namespace Ck::Vulkan
 	bool ExtensionManager::EnableDeviceExtension(Renderer::RenderDeviceExtension extension, VkPhysicalDevice physicalDevice)
 	{
 		unsigned int extensionCount = 0;
-		const char* const* extensionNames = nullptr;
+		const AnsiChar* const* extensionNames = nullptr;
 #define CASE_EXTENSION(__Extension)                                                    \
 		case __Extension:                                                              \
 			{                                                                          \
@@ -375,40 +389,41 @@ namespace Ck::Vulkan
 			return false;
 
 		for (unsigned int i = 0; i < extensionCount; i++)
-			mDeviceExtensions.insert(extensionNames[i]);
+		{
+			if (mDeviceExtensions.Contains(extensionNames[i]))
+				continue;
+
+			mDeviceExtensions.Add(extensionNames[i]);
+		}
 
 		return true;
 	}
 
-	bool ExtensionManager::IsSupportedInstanceExtension(std::string_view extensionName) const
+	bool ExtensionManager::IsSupportedInstanceExtension(const AnsiChar* extensionName) const
 	{
-		return std::find(mInstanceExtensions.begin(), mInstanceExtensions.end(), extensionName) != mInstanceExtensions.end();
+		return mInstanceExtensions.ContainsIf([&](const AnsiChar* instanceExtensionName) {
+			return StringUtils<AnsiChar, unsigned int>::Equal(extensionName, instanceExtensionName);
+		});
 	}
 
-	bool ExtensionManager::IsSupportedDeviceExtension(std::string_view extensionName) const
+	bool ExtensionManager::IsSupportedDeviceExtension(const AnsiChar* extensionName) const
 	{
-		return std::find(mDeviceExtensions.begin(), mDeviceExtensions.end(), extensionName) != mDeviceExtensions.end();
+		return mDeviceExtensions.ContainsIf([&](const AnsiChar* deviceExtensionName) {
+			return StringUtils<AnsiChar, unsigned int>::Equal(extensionName, deviceExtensionName);
+		});
 	}
 
-	Array<const char*> ExtensionManager::GetInstanceExtensions() const
+	const Array<const AnsiChar*>& ExtensionManager::GetInstanceExtensions() const
 	{
-		Array<const char*> extensions;
-		for (auto it = mInstanceExtensions.begin(); it != mInstanceExtensions.end(); ++it)
-			extensions.Add(*it);
-
-		return extensions;
+		return mInstanceExtensions;
 	}
 
-	Array<const char*> ExtensionManager::GetDeviceExtensions() const
+	const Array<const AnsiChar*>& ExtensionManager::GetDeviceExtensions() const
 	{
-		Array<const char*> extensions;
-		for (auto it = mDeviceExtensions.begin(); it != mDeviceExtensions.end(); ++it)
-			extensions.Add(*it);
-
-		return extensions;
+		return mDeviceExtensions;
 	}
 
-	bool ExtensionManager::CheckExtensionsInstanceSupport(unsigned int extensionCount, const char* const* extensionNames) const
+	bool ExtensionManager::CheckExtensionsInstanceSupport(unsigned int extensionCount, const AnsiChar* const* extensionNames) const
 	{
 		unsigned int propertyCount;
 		vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
@@ -419,7 +434,7 @@ namespace Ck::Vulkan
 		return CheckExtensionSupport(properties, extensionCount, extensionNames);
 	}
 
-	bool ExtensionManager::CheckExtensionPhysicalDeviceSupport(VkPhysicalDevice physicalDevice, unsigned int extensionCount, const char* const* extensionNames) const
+	bool ExtensionManager::CheckExtensionPhysicalDeviceSupport(VkPhysicalDevice physicalDevice, unsigned int extensionCount, const AnsiChar* const* extensionNames) const
 	{
 		unsigned int propertyCount;
 		vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &propertyCount, nullptr);
@@ -430,15 +445,15 @@ namespace Ck::Vulkan
 		return CheckExtensionSupport(properties, extensionCount, extensionNames);
 	}
 
-	bool ExtensionManager::CheckExtensionSupport(const Array<VkExtensionProperties>& properties, unsigned int extensionCount, const char* const* extensionNames) const
+	bool ExtensionManager::CheckExtensionSupport(const Array<VkExtensionProperties>& properties, unsigned int extensionCount, const AnsiChar* const* extensionNames) const
 	{
 		bool extensionsSupported = true;
 		for (unsigned int i = 0; i < extensionCount && extensionsSupported; i++)
 		{
 			bool extensionSupported = false;
-			const char* extensionName = extensionNames[i];
+			const AnsiChar* extensionName = extensionNames[i];
 #ifndef NDEBUG
-			if (IsExtensionDisabled(extensionName))
+			if (IsExtensionDisabled(CK_ANSI_TO_TEXT(extensionName)))
 				return false;
 #endif
 
@@ -454,9 +469,9 @@ namespace Ck::Vulkan
 		return extensionsSupported;
 	}
 
-	bool ExtensionManager::IsExtensionDisabled(std::string_view extensionName) const
+	bool ExtensionManager::IsExtensionDisabled(const TextChar* extensionName) const
 	{
-		for (const std::string& disabledExtension : mDisabledExtensions)
+		for (const String& disabledExtension : mDisabledExtensions)
 		{
 			if (disabledExtension == extensionName)
 				return true;

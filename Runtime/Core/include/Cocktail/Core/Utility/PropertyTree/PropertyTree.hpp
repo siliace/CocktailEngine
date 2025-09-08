@@ -11,20 +11,18 @@ namespace Ck
 {
 	/**
      * \brief 
-     * \tparam Key 
-     * \tparam Data 
+     * \tparam Data
      */
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTree
     {
     public:
 
-        using CustomNode = PropertyTreeCustomNode<Key, Data>;
-        using Element = PropertyTreeElement<Key, Data>;
-        using Node = PropertyTreeNode<Key, Data>;
-        using Path = typename PropertyTreePathOf<Key>::Type;
-    	using Sequence = PropertyTreeSequence<Key, Data>;
-        using Value = PropertyTreeValue<Key, Data>;
+        using CustomNodeType = PropertyTreeCustomNode<Data>;
+        using ElementType = PropertyTreeElement<Data>;
+        using NodeType = PropertyTreeNode<Data>;
+    	using SequenceType = PropertyTreeSequence<Data>;
+        using ValueType = PropertyTreeValue<Data>;
 
         /**
          * \brief 
@@ -66,7 +64,7 @@ namespace Ck
          * \return 
          */
         template <typename T, typename Tr = typename TranslatorBetween<Data, T>::Type>
-    	T Get(const Path& path, const Tr& translator = Tr()) const
+    	T Get(const PropertyTreePath& path, const Tr& translator = Tr()) const
         {
             return GetValue(path).template As<T, Tr>(translator);
         }
@@ -76,10 +74,10 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Node& GetChild(const Path& path) const
+        NodeType& GetChild(const PropertyTreePath& path) const
         {
-            Path p(path);
-            Key key = p.Reduce();
+            PropertyTreePath p(path);
+            String key = p.Reduce();
 
             if (mRoot->GetName() != key)
                 throw InvalidPropertyPathException();
@@ -92,13 +90,13 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Element& GetElement(const Path& path) const
+        ElementType& GetElement(const PropertyTreePath& path) const
         {
-            Node& node = GetChild(path);
-            if (node.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
+            NodeType& node = GetChild(path);
+            if (node.GetType() != NodeType::Type::Element)
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not an element"), path.ToString());
 
-        	return static_cast<Element&>(node);
+        	return static_cast<ElementType&>(node);
         }
 
         /**
@@ -106,13 +104,13 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Sequence& GetSequence(const Path& path) const
+        SequenceType& GetSequence(const PropertyTreePath& path) const
         {
-            Node& node = GetChild(path);
-            if (node.GetType() != Node::Type::Sequence)
-                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
+            NodeType& node = GetChild(path);
+            if (node.GetType() != NodeType::Type::Sequence)
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a sequence"), path.ToString());
 
-            return static_cast<Sequence&>(node);
+            return static_cast<SequenceType&>(node);
         }
 
         /**
@@ -120,20 +118,20 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Value& GetValue(const Path& path) const
+        ValueType& GetValue(const PropertyTreePath& path) const
         {
-            Node& node = GetChild(path);
-            if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
+            NodeType& node = GetChild(path);
+            if (node.GetType() != NodeType::Type::Value)
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a value"), path.ToString());
 
-            return static_cast<Value&>(node);
+            return static_cast<ValueType&>(node);
         }
 
         /**
          * \brief Get the root element of the tree property
          * \return The root element
          */
-        Element* GetRoot()
+        ElementType* GetRoot()
         {
             return mRoot.get();
         }
@@ -142,7 +140,7 @@ namespace Ck
          * \brief Get the root element of the tree property
          * \return The root element
          */
-        const Element* GetRoot() const
+        const ElementType* GetRoot() const
         {
             return mRoot.get();
         }
@@ -152,10 +150,10 @@ namespace Ck
         /**
          * \brief
          */
-        void ResetRoot(const Key& name, const Element& rootElement)
+        void ResetRoot(const String& name, const ElementType& rootElement)
         {
-            mRoot = std::unique_ptr<Element>(
-                static_cast<Element*>(
+            mRoot = std::unique_ptr<ElementType>(
+                static_cast<ElementType*>(
                     rootElement.Clone(nullptr, name).release()
                 )
             );
@@ -163,10 +161,10 @@ namespace Ck
 
     private:
 
-        std::unique_ptr<Element> mRoot;
+        std::unique_ptr<ElementType> mRoot;
     };
 
-    using Properties = PropertyTree<std::string, std::string>;
+    using Properties = PropertyTree<String>;
 }
 
 #endif // COCKTAIL_CORE_UTILITY_PROPERTYTREE_HPP

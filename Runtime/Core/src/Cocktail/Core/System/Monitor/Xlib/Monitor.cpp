@@ -3,6 +3,8 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/Monitor.hpp>
 
+#include "Cocktail/Core/Utility/StringConvertion.hpp"
+
 namespace Ck::Detail::Xlib
 {
 	namespace
@@ -94,9 +96,9 @@ namespace Ck::Detail::Xlib
         return RotationToOrientation(mCrtcInfo->rotation);
     }
 
-    std::string Monitor::GetName() const
+    String Monitor::GetName() const
     {
-		return std::string(mOutputInfo->name, mOutputInfo->nameLen);;
+		return CK_ANSI_TO_TEXT(mOutputInfo->name);
 	}
 
     VideoMode Monitor::GetCurrentVideoMode() const

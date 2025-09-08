@@ -8,6 +8,9 @@
 
 namespace Ck
 {
+	class String;
+	class StringView;
+
 	/**
 	 * \brief 
 	 */
@@ -19,6 +22,12 @@ namespace Ck
 		 * \brief Destructor
 		 */
 		virtual ~ConsoleService() = default;
+
+		virtual void Write(const String& text) = 0;
+		virtual void WriteLine(const String& text) = 0;
+
+		virtual void Write(StringView text) = 0;
+		virtual void WriteLine(StringView text) = 0;
 
 		/**
 		 * \brief

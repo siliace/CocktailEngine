@@ -43,7 +43,7 @@ namespace Ck::Detail::Xlib
 		}	
 		else
 		{
-			CK_LOG(XlibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
+			CK_LOG(XlibLogCategory, LogLevel::Warning, CK_TEXT("X11 extension RANDR is not supported, MonitorService will be disabled"));
 		}
 
 		application->Singleton<Ck::MouseService>([display = mDisplay](Application* app) -> std::unique_ptr<Ck::MouseService> {

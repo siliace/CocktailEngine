@@ -29,34 +29,34 @@ namespace Ck::Detail::Unix
 		 * \brief 
 		 * \return 
 		 */
-		Signal<std::filesystem::path>& OnFileCreated() override;
+		Signal<Path>& OnFileCreated() override;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Signal<std::filesystem::path>& OnFileModified() override;
+		Signal<Path>& OnFileModified() override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Signal<std::filesystem::path, std::filesystem::path>& OnFileRenamed() override;
+		Signal<Path, Path>& OnFileRenamed() override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Signal<std::filesystem::path>& OnFileDeleted() override;
+		Signal<Path>& OnFileDeleted() override;
 
 	private:
 
 		Directory* mDirectory;
 		bool mRecursive;
-		Signal<std::filesystem::path> mOnFileCreated;
-		Signal<std::filesystem::path> mOnFileModified;
-		Signal<std::filesystem::path, std::filesystem::path> mOnFileRenamed;
-		Signal<std::filesystem::path> mOnFileDeleted;
+		Signal<Path> mOnFileCreated;
+		Signal<Path> mOnFileModified;
+		Signal<Path, Path> mOnFileRenamed;
+		Signal<Path> mOnFileDeleted;
 	};
 }
 

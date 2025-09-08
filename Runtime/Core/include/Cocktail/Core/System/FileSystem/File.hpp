@@ -1,10 +1,8 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILE_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILE_HPP
 
-#include <filesystem>
-
-#include <Cocktail/Core/Cocktail.hpp>
 #include <Cocktail/Core/System/FileSystem/FileCursorMode.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
 {
@@ -60,7 +58,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual const std::filesystem::path& GetPath() const = 0;
+		virtual const Path& GetPath() const = 0;
 
 		/**
 		 * \brief 

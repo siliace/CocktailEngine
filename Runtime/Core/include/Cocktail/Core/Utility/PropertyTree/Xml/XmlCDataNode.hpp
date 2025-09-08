@@ -6,7 +6,7 @@
 
 namespace Ck
 {
-	class XmlCDataNode : public XmlProperties::CustomNode
+	class XmlCDataNode : public XmlProperties::CustomNodeType
 	{
 	public:
 
@@ -16,9 +16,9 @@ namespace Ck
 
 	protected:
 
-		XmlCDataNode(XmlProperties::Node* parent, const std::string& name, ByteArray data);
+		XmlCDataNode(XmlProperties::NodeType* parent, const String& name, ByteArray data);
 
-		std::unique_ptr<XmlProperties::Node> Clone(XmlProperties::Node* parent, const std::string& name) const override;
+		std::unique_ptr<XmlProperties::NodeType> Clone(XmlProperties::NodeType* parent, const String& name) const override;
 
 	private:
 

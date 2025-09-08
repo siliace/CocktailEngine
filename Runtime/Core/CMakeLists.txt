@@ -12,9 +12,14 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent2D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent3D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/String.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/StringView.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/String.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/StringView.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -76,6 +81,12 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/StbLoader/StbImageImporter.cpp
 )
 
+cocktail_source_directory(CORE_FILES
+    FOLDER "IO"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/EncodingMode.hpp
+)
+
 cocktail_source_directory(CORE_FILES    
     FOLDER "IO/Input/Reader"
     INCLUDE
@@ -113,6 +124,9 @@ cocktail_source_directory(CORE_FILES
     FOLDER "IO/Output/Writer"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/Writer.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/FileWriter.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Output/Writer/FileWriter.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -350,11 +364,15 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileLock.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileOpenFlags.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileSystemDriver.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/Path.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/Storage.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/StorageService.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/URI.hpp
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Path.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Storage.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/StorageService.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/URI.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -663,23 +681,29 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/AcyclicGraph.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ByteArray.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ByteArrayView.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/CharUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/CompositeKey.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/EnumMap.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ExceptionUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/FileUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Finder.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/FixedArray.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/FunctionTraits.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/LazyValue.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/TranslatorCast.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ObjectPool.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Optional.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ParameterPack.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringConvertion.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringFormater.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringUtils.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/TranslatorCast.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArray.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArrayView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ExceptionUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/StringConvertion.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -692,6 +716,8 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/PropertyTree/PropertyTreePath.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/PropertyTree/PropertyTreeSequence.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/PropertyTree/PropertyTreeValue.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/PropertyTree/PropertyTreePath.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -742,7 +768,7 @@ endif ()
 
 cocktail_add_runtime_library(
     NAME Core 
-    DEPENDS fmt::fmt magic_enum
+    DEPENDS magic_enum
     LINK ${CORE_LINK_LIBRARIES}
     SOURCES ${CORE_FILES}
 )

@@ -1,4 +1,5 @@
-#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/String.hpp>
+#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Win32/ConsoleService.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -112,6 +113,48 @@ namespace Ck::Detail::Win32
 	{
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(handle, mIntialAttributes);
+	}
+
+	void ConsoleService::Write(const String& text)
+	{
+		GetOutput().Write(text.GetData(), text.GetLength());
+	}
+
+	void ConsoleService::WriteLine(const String& text)
+	{
+		static const StringView EndLine = CK_TEXT("\r\n");
+		if (text.EndsWith(EndLine))
+		{
+			Write(text);
+		}
+		else
+		{
+			String line = text;
+			line.Append(EndLine);
+
+			return Write(line);
+		}
+	}
+
+	void ConsoleService::Write(StringView text)
+	{
+		GetOutput().Write(text.GetData(), text.GetLength());
+	}
+
+	void ConsoleService::WriteLine(StringView text)
+	{
+		static const StringView EndLine = CK_TEXT("\r\n");
+		if (text.EndsWith(EndLine))
+		{
+			Write(text);
+		}
+		else
+		{
+			String line(text);
+			line.Append(EndLine);
+
+			return Write(line);
+		}
 	}
 
 	Writer& ConsoleService::GetOutput()

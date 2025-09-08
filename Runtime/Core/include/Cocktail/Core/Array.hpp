@@ -1,16 +1,12 @@
 #ifndef COCKTAIL_CORE_ARRAY_HPP
 #define COCKTAIL_CORE_ARRAY_HPP
 
-#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
 
 namespace Ck
 {
-    COCKTAIL_DECLARE_EXCEPTION_FROM(ArrayEmpty, LogicException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(ArrayOutOfRange, LogicException);
-
     /**
      * \brief Template class implementing a dynamic array similar to std::vector.
      * \tparam E The element type stored in the array.
@@ -479,7 +475,10 @@ namespace Ck
          */
         E& First()
         {
-            return TryFirst().template GetOrThrow<ArrayEmpty>();
+            if (Optional<E&> first = TryFirst(); !first.IsEmpty())
+                return first.Get();
+
+            ExceptionUtils::ThrowEmptyContainer();
         }
 
         /**
@@ -489,7 +488,10 @@ namespace Ck
          */
         const E& First() const
         {
-            return TryFirst().template GetOrThrow<ArrayEmpty>();
+            if (Optional<const E&> first = TryFirst(); !first.IsEmpty())
+                return first.Get();
+
+            ExceptionUtils::ThrowEmptyContainer();
         }
 
         /**
@@ -523,7 +525,10 @@ namespace Ck
          */
         E& Last()
         {
-            return TryLast().template GetOrThrow<ArrayEmpty>();
+            if (Optional<E&> last = TryLast(); !last.IsEmpty())
+                return last.Get();
+
+            ExceptionUtils::ThrowEmptyContainer();
         }
 
         /**
@@ -533,7 +538,10 @@ namespace Ck
          */
         const E& Last() const
         {
-            return TryLast().template GetOrThrow<ArrayEmpty>();
+            if (Optional<const E&> last = TryLast(); !last.IsEmpty())
+                return last.Get();
+
+            ExceptionUtils::ThrowEmptyContainer();
         }
 
         /**
@@ -644,13 +652,16 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the first occurrence of the element.
-         * \param element Element to find.
-         * \return Optional index if found, empty otherwise.
+         * \brief Finds the index of the first occurrence of the element
+         * \param element Element to find
+         * \param start The first index to start to search
+         * \return Optional index if found, empty otherwise
          */
-        Optional<SizeType> FindIndex(const E& element) const
+        Optional<SizeType> FindIndex(const E& element, SizeType start = 0) const
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start <= mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 if (At(i) == element)
                     return Optional<SizeType>::Of(i);
@@ -676,15 +687,18 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the first occurrence of the element.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Optional index if found, empty otherwise.
+         * \brief Finds the index of the first occurrence of the element
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         * \param start The first index to start to search
+         * \return Optional index if found, empty otherwise
          */
         template <typename TPredicate>
-        Optional<SizeType> FindIndexIf(TPredicate predicate) const
+        Optional<SizeType> FindIndexIf(TPredicate predicate, SizeType start = 0) const
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start <= mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 const E& element = At(i);
                 if (predicate(element))
@@ -714,15 +728,18 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the pointer to the first element satisfying a predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Pointer to element if found, nullptr otherwise.
+         * \brief Finds the pointer to the first element satisfying a predicate
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         * \param start The first index to start to search
+         * \return Pointer to element if found, nullptr otherwise
          */
         template <typename TPredicate>
-    	Optional<E&> FindIf(TPredicate predicate)
+    	Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
         {
-            for (SizeType i = 0; i < mSize; ++i)
+            assert(start <= mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
             {
                 E& element = At(i);
                 if (predicate(element))
@@ -733,15 +750,16 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the pointer to the first element satisfying a predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Pointer to element if found, nullptr otherwise.
+         * \brief Finds the pointer to the first element satisfying a predicate
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         * \param start The first index to start to search
+         * \return Pointer to element if found, nullptr otherwise
          */
         template <typename TPredicate>
-    	Optional<const E&> FindIf(TPredicate predicate) const
+    	Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
         {
-            return const_cast<Array<E, TAllocator>*>(this)->FindIf(predicate);
+            return const_cast<Array<E, TAllocator>*>(this)->FindIf(predicate, start);
         }
 
         /**
@@ -1075,49 +1093,108 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a new array which is a slice from the first index to the end.
-         * \param first Start index of the slice.
-         * \return Sliced array.
+         * \brief Creates a sub-array containing a slice of the current array
+         *
+         * This method extracts a contiguous range of elements starting from
+         * the specified index \p first to the end of the array
+         * The resulting slice is stored in a new Array instance.
+         *
+         * \tparam E Type of elements stored in the array.
+         * \param first The starting index of the slice. Must be within the bounds of the array
+         *
+         * \return A new Array<E> containing the selected subrange of elements
+         *
+         * \pre `first < mSize`
+         *
+         * \note The slice is a copy of the selected elements, not a view into the original array
+         *       Modifying the returned Array will not affect the original
+         *
+         * \warning Asserts if the requested range exceeds the array size
          */
-        Array<E, AllocatorType> Slice(SizeType first) const
+        Array<E> Slice(SizeType first) const
+        {
+            assert(first < mSize);
+            return Slice(first, mSize - first);
+        }
+
+        /**
+         * \brief Creates a sub-array containing a slice of the current array
+         *
+         * This method extracts a contiguous range of elements starting from
+         * the specified index \p first and spanning \p count elements.
+         * The resulting slice is stored in a new Array instance.
+         *
+         * \tparam E Type of elements stored in the array.
+         * \param first The starting index of the slice. Must be within the bounds of the array
+         * \param count The number of elements to include in the slice
+         *              The range [first, first + count) must be valid and not exceed the array size
+         *
+         * \return A new Array<E> containing the selected subrange of elements
+         *
+         * \pre `first + count <= mSize`
+         *
+         * \note The slice is a copy of the selected elements, not a view into the original array
+         *       Modifying the returned Array will not affect the original
+         *
+         * \warning Asserts if the requested range exceeds the array size
+         */
+        Array<E> Slice(SizeType first, SizeType count) const
+        {
+            assert(first + count <= mSize);
+
+            Array<E> slice;
+            slice.Reserve(count);
+
+            for (SizeType i = 0; i < count; ++i)
+                slice.Add(UncheckAt(first + i));
+
+            return slice;
+        }
+
+        /**
+         * \brief 
+         * \param first 
+         * \return 
+         */
+        Array<E, AllocatorType> Splice(SizeType first) const
         {
             Array<E, AllocatorType> sliced(*this);
-            sliced.SliceInPlace(first);
+            sliced.SpliceInPlace(first);
 
             return sliced;
         }
 
         /**
-         * \brief Removes elements before the first index in place.
-         * \param first Start index of the slice.
-         * \return Reference to *this.
+         * \brief 
+         * \param first 
+         * \return 
          */
-        Array<E, AllocatorType>& SliceInPlace(SizeType first)
+        Array<E, AllocatorType>& SpliceInPlace(SizeType first)
         {
-            return SliceInPlace(first, mSize - first);
+            return SpliceInPlace(first, mSize - first);
         }
 
         /**
-         * \brief Returns a new array which is a slice of specified count starting at first index.
-         * \param first Start index of the slice.
-         * \param count Number of elements in the slice.
-         * \return Sliced array.
+         * \brief 
+         * \param first 
+         * \param count 
+         * \return 
          */
-        Array<E, AllocatorType> Slice(SizeType first, SizeType count) const
+        Array<E, AllocatorType> Splice(SizeType first, SizeType count) const
         {
             Array<E, AllocatorType> sliced(*this);
-            sliced.SliceInPlace(first, count);
+            sliced.SpliceInPlace(first, count);
 
             return sliced;
         }
 
         /**
-         * \brief Removes elements outside the slice in place.
-         * \param first Start index of the slice.
-         * \param count Number of elements in the slice.
-         * \return Reference to *this.
+         * \brief 
+         * \param first 
+         * \param count 
+         * \return 
          */
-        Array<E, AllocatorType>& SliceInPlace(SizeType first, SizeType count)
+        Array<E, AllocatorType>& SpliceInPlace(SizeType first, SizeType count)
         {
             CheckIndex(first + count - 1);
             
@@ -1357,7 +1434,7 @@ namespace Ck
         void CheckSize() const
         {
             if (mSize == 0)
-                throw ArrayEmpty();
+                ExceptionUtils::ThrowEmptyContainer();
         }
 
         /**
@@ -1369,7 +1446,7 @@ namespace Ck
             CheckSize();
 
             if (index >= mSize)
-                throw ArrayOutOfRange("Index {} is out of array size {}", index, mSize);
+                ExceptionUtils::ThrowOutOfRange(index, mSize);
         }
 
         /**

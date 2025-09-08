@@ -3,9 +3,9 @@
 
 namespace Ck::Detail::Win32
 {
-	Library::Library(std::string_view name)
+	Library::Library(StringView name)
 	{
-		mHandle = LoadLibraryA(name.data());
+		mHandle = ::LoadLibraryW(name.GetData());
 		if (!mHandle)
 			throw SystemError::GetLastError();
 	}
@@ -15,9 +15,9 @@ namespace Ck::Detail::Win32
 		FreeLibrary(mHandle);
 	}
 
-	Library::FunctionPtr Library::LoadFunction(std::string_view functionName)
+	Library::FunctionPtr Library::LoadFunction(const AnsiChar* functionName)
 	{
-		return reinterpret_cast<FunctionPtr>(GetProcAddress(mHandle, functionName.data()));
+		return reinterpret_cast<FunctionPtr>(GetProcAddress(mHandle, functionName));
 	}
 
 	void* Library::GetSystemHandle() const

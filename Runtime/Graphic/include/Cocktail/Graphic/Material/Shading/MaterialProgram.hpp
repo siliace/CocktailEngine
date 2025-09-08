@@ -24,13 +24,13 @@ namespace Ck
 
 		std::shared_ptr<MaterialProgramVariant> GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
 
-		const std::string& GetName() const;
+		const String& GetName() const;
 
 	private:
 
 		using VariantKey = CompositeKey<Flags<VertexAttributeSemantic>, Flags<Material::TextureType>>;
 
-		std::string mName;
+		String mName;
 		std::unordered_map<VariantKey, std::shared_ptr<MaterialProgramVariant>> mVariants;
 	};
 }

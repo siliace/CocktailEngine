@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMINTERFACE_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMINTERFACE_HPP
 
-#include <string>
-
 #include <Cocktail/Graphic/Geometry/Vertex/VertexAttributeSemantic.hpp>
 #include <Cocktail/Graphic/Material/Material.hpp>
 
@@ -18,14 +16,14 @@ namespace Ck
 		/**
 		 * \brief Names of vertex attributes in the vertex shader
 		 */
-		EnumMap<VertexAttributeSemantic, std::string> VertexAttributes;
+		EnumMap<VertexAttributeSemantic, String> VertexAttributes;
 
 		struct TextureInterface
 		{
 			/**
 			 * \brief 
 			 */
-			std::string Name;
+			String Name;
 
 			/**
 			 * \brief 

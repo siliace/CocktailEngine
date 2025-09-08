@@ -4,6 +4,18 @@
 
 namespace Ck
 {
+	ByteArray ByteArray::FromString(const String& string)
+	{
+		assert(!string.IsEmpty());
+		return ByteArray(string.GetData(), string.GetLength());
+	}
+
+	ByteArray ByteArray::FromString(StringView string)
+	{
+		assert(!string.IsEmpty());
+		return ByteArray(string.GetData(), string.GetLength());
+	}
+
 	ByteArray::ByteArray() :
 		mSize(0),
 		mData(nullptr)
@@ -214,6 +226,14 @@ namespace Ck
 	bool ByteArray::IsEmpty() const
 	{
 		return mSize == 0;
+	}
+
+	String ByteArray::ToString() const
+	{
+		return String(
+			reinterpret_cast<const TextChar*>(mData.get()),
+			mSize / sizeof(TextChar)
+		);
 	}
 
 	std::size_t ByteArray::GetSize() const

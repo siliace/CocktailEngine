@@ -2,18 +2,19 @@
 
 namespace Ck
 {
-	InputStreamReader::InputStreamReader(InputStream& inputStream):
-		mInputStream(inputStream)
+	InputStreamReader::InputStreamReader(InputStream& inputStream, EncodingMode encodingMode) :
+		mInputStream(inputStream),
+		mEncodingMode(encodingMode)
 	{
 		/// Nothing
 	}
 
-	bool InputStreamReader::Read(char& c)
+	bool InputStreamReader::Read(TextChar& c)
 	{
-		return mInputStream.Read(&c, sizeof(char)) == sizeof(char);
+		return mInputStream.Read(&c, sizeof(TextChar)) == sizeof(TextChar);
 	}
 
-	std::size_t InputStreamReader::Read(char* buffer, std::size_t length)
+	std::size_t InputStreamReader::Read(TextChar* buffer, std::size_t length)
 	{
 		return mInputStream.Read(buffer, length);
 	}

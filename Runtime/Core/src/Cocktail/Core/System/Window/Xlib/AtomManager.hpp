@@ -1,9 +1,9 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_XLIB_ATOMMANAGER_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_XLIB_ATOMMANAGER_HPP
 
-#include <string>
 #include <unordered_map>
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Unix/Xlib/Xlib.hpp>
 
 namespace Ck::Detail::Xlib
@@ -14,12 +14,12 @@ namespace Ck::Detail::Xlib
 
         explicit AtomManager(::Display* display);
 
-        Atom GetAtom(const std::string& name, bool mustExists = true);
+        Atom GetAtom(const String& name, bool mustExists = true);
 
     private:
 
         ::Display* mDisplay;
-        std::unordered_map<std::string, Atom> mAtoms;
+        std::unordered_map<String, Atom> mAtoms;
     };    
 }
 

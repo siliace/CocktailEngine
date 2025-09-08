@@ -9,6 +9,8 @@
 #include <Cocktail/Graphic/Scene/SceneLoader.hpp>
 #include <Cocktail/Graphic/Scene/Container/Obj/ObjSceneContainer.hpp>
 
+#include "Cocktail/Core/Utility/StringConvertion.hpp"
+
 namespace Ck
 {
 	ObjSceneContainer::ObjSceneContainer(const SceneImportParameters& importParameters, const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials) :
@@ -34,9 +36,9 @@ namespace Ck
 		mRoot.MeshIndices = { 0 }; /// Obj format support only one mesh with many sub mesh
 	}
 
-	std::shared_ptr<MipMaps> ObjSceneContainer::LoadMipMaps(const std::filesystem::path& path)
+	std::shared_ptr<MipMaps> ObjSceneContainer::LoadMipMaps(const Path& path)
 	{
-        if (path.empty())
+        if (path.IsEmpty())
             return nullptr;
 
 		if (auto it = mMipMaps.find(path); it != mMipMaps.end())
@@ -45,11 +47,11 @@ namespace Ck
         ImageLoader* imageLoader = App::Resolve<ImageLoader>();
         MipMapsLoader* mipMapLoader = App::Resolve<MipMapsLoader>();
 
-        std::string extension = path.extension().string();
-        std::filesystem::path fullpath = mImportParameters.BaseDirectory / path;
+        String extension(path.GetExtension());
+        Path fullpath = mImportParameters.BaseDirectory.Join(path);
         if (!Storage::IsFile(fullpath))
         {
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "File {} not found", path.string());
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("File %s not found"), path.ToString());
             return nullptr;
         }
 
@@ -65,7 +67,7 @@ namespace Ck
         }
 		else
 		{
-			CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "No loader found for file {}", path.string());
+			CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("No loader found for file %s"), path.ToString());
 			return nullptr;
 		}
 
@@ -77,20 +79,21 @@ namespace Ck
 	ObjSceneContainer::MaterialInfo ObjSceneContainer::ProcessMaterial(const tinyobj::material_t& objMaterial)
 	{
 		MaterialInfo materialInfo;
-		materialInfo.Name = objMaterial.name;
+		materialInfo.Name = CK_ANSI_TO_TEXT(objMaterial.name.c_str());
 		materialInfo.ShadingMode = Material::ShadingMode::Phong;
 		materialInfo.Colors.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
 		materialInfo.Colors.Specular = { objMaterial.specular[0], objMaterial.specular[1], objMaterial.specular[2], 1.f };
 		materialInfo.Colors.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
-		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(objMaterial.ambient_texname);
-		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(objMaterial.diffuse_texname);
-		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(objMaterial.specular_texname);
-		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(objMaterial.specular_highlight_texname);
-		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(objMaterial.bump_texname);
-		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(objMaterial.displacement_texname);
-		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(objMaterial.alpha_texname);
-		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(objMaterial.reflection_texname);
-		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(objMaterial.emissive_texname);
+
+		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.ambient_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.diffuse_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.specular_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.specular_highlight_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.bump_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.displacement_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.alpha_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.reflection_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.emissive_texname.c_str()));
 
 		if (objMaterial.dissolve != 1.f)
 		{
@@ -145,10 +148,10 @@ namespace Ck
 		}
 	}
 
-	bool ObjSceneContainer::ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape)
+	bool ObjSceneContainer::ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape) const
 	{
 		SubMeshInfo subMesh;
-		subMesh.Name = shape.name;
+		subMesh.Name = CK_ANSI_TO_TEXT(shape.name.c_str());
 
 		if (!shape.mesh.indices.empty())
 		{
@@ -224,7 +227,7 @@ namespace Ck
 		{
 			bool processed = ProcessSubMesh(vertexCache, subMeshes, attributes, shape);
 			if (!processed)
-				CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Shape {} is invalid and will be ignored", shape.name);
+				CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Shape %s is invalid and will be ignored"), shape.name.c_str());
 		}
 
 		MeshInfo meshInfo;

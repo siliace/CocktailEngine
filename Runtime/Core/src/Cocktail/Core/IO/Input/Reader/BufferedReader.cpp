@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
@@ -11,11 +12,11 @@ namespace Ck
 		mLimit(0),
 		mBufferSize(bufferSize)
 	{
-		mLineBuffer.reserve(1024);
-		mBuffer = std::make_unique<char[]>(mBufferSize);
+		mLineBuffer.Reserve(1024);
+		mBuffer = std::make_unique<TextChar[]>(mBufferSize);
 	}
 
-	bool BufferedReader::Read(char& c)
+	bool BufferedReader::Read(TextChar& c)
 	{
 		if (mPos == mLimit && Advance() == 0)
 			return false;
@@ -24,7 +25,7 @@ namespace Ck
 		return true;
 	}
 
-	std::size_t BufferedReader::Read(char* buffer, std::size_t length)
+	std::size_t BufferedReader::Read(TextChar* text, std::size_t length)
 	{
 		std::size_t accumulated = 0;
 		while (accumulated < length)
@@ -38,7 +39,7 @@ namespace Ck
 			}
 
 			std::size_t copyLength = std::min(validLength, length - accumulated);
-			std::memcpy(buffer + accumulated, mBuffer.get() + mPos, copyLength);
+			std::memcpy(text + accumulated, mBuffer.get() + mPos, copyLength);
 			accumulated += copyLength;
 			mPos += copyLength;
 		}
@@ -46,17 +47,18 @@ namespace Ck
 		return accumulated;
 	}
 
-	std::string BufferedReader::ReadLine()
+	String BufferedReader::ReadLine()
 	{
-		if (const std::size_t i = FindLineEnd(mLimit); i != std::string::npos)
+		if (Optional<std::size_t> index = FindLineEnd(mLimit); !index.IsEmpty())
 		{
-			std::string string(mBuffer.get() + mPos, i - mPos);
-			mPos = i + 1;
+			String string(mBuffer.get() + mPos, index.Get() - mPos);
+			mPos = index.Get() + 1;
 
 			return string;
 		}
 
-		mLineBuffer.clear();
+		mLineBuffer.Clear();
+		mLineBuffer = String::Empty;
 
 		bool eof = false;
 		while (true)
@@ -72,30 +74,30 @@ namespace Ck
 			}
 			else
 			{
-				std::size_t i = FindLineEnd(mLimit);
-				if (i != std::string::npos)
+				Optional<std::size_t> index = FindLineEnd(mLimit);
+				if (!index.IsEmpty())
 				{
-					mLineBuffer.append(mBuffer.get() + mPos, i);
-					mPos += i;
+					mLineBuffer.Append(mBuffer.get() + mPos, index.Get());
+					mPos += index.Get();
 					break;
 				}
 
 				const std::size_t validLength = mLimit - mPos;
-				mLineBuffer.append(mBuffer.get() + mPos, validLength);
+				mLineBuffer.Append(mBuffer.get() + mPos, validLength);
 				mPos += validLength;
 			}
 		}
 
-		return mLineBuffer.length() == 0 && eof ? "" : mLineBuffer;
+		return mLineBuffer.IsEmpty() && eof ? String::Empty : mLineBuffer;
 	}
 
-	std::string BufferedReader::ReadAll()
+	String BufferedReader::ReadAll()
 	{
-		std::string content;
-		content.reserve(mIn.GetSize() - mIn.Tell());
+		String content;
+		content.Reserve(mIn.GetSize() - mIn.Tell());
 
 		while (!IsEof())
-			content.append(ReadLine());
+			content.Append(ReadLine());
 
 		return content;
 	}
@@ -132,6 +134,11 @@ namespace Ck
 		return mIn.IsEof();
 	}
 
+	EncodingMode BufferedReader::GetEncodingMode() const
+	{
+		return mIn.GetEncodingMode();
+	}
+
 	std::size_t BufferedReader::Advance()
 	{
 		assert(mPos == mLimit);
@@ -144,15 +151,15 @@ namespace Ck
 		return count;
 	}
 
-	std::size_t BufferedReader::FindLineEnd(std::size_t limit) const
+	Optional<std::size_t> BufferedReader::FindLineEnd(std::size_t limit) const
 	{
 		for (std::size_t i = mPos; i < limit; i++)
 		{
-			const char c = mBuffer[i];
-			if (c == '\n')
-				return i;
+			const TextChar c = mBuffer[i];
+			if (c == CK_TEXT('\n'))
+				return Optional<std::size_t>::Of(i);
 		}
 
-		return std::string::npos;
+		return Optional<std::size_t>::Empty();
 	}
 }

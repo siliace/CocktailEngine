@@ -1,7 +1,4 @@
-#include <cstring>
-
-#include <Cocktail/Core/Cocktail.hpp>
-#include <Cocktail/Core/System/SystemError.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleService.hpp>
 
 namespace Ck::Detail::Unix
@@ -100,7 +97,49 @@ namespace Ck::Detail::Unix
         /// Nothing
 	}
 
-	Writer& ConsoleService::GetOutput()
+    void ConsoleService::Write(const String& text)
+	{
+	    GetOutput().Write(text.GetData(), text.GetLength());
+	}
+
+    void ConsoleService::WriteLine(const String& text)
+	{
+	    static const StringView EndLine = CK_TEXT("\n");
+	    if (text.EndsWith(EndLine))
+	    {
+	        Write(text);
+	    }
+	    else
+	    {
+	        String line = text;
+	        line.Append(EndLine);
+
+	        return Write(line);
+	    }
+	}
+
+    void ConsoleService::Write(StringView text)
+	{
+	    GetOutput().Write(text.GetData(), text.GetLength());
+	}
+
+    void ConsoleService::WriteLine(StringView text)
+	{
+	    static const StringView EndLine = CK_TEXT("\n");
+	    if (text.EndsWith(EndLine))
+	    {
+	        Write(text);
+	    }
+	    else
+	    {
+	        String line(text);
+	        line.Append(EndLine);
+
+	        return Write(line);
+	    }
+	}
+
+    Writer& ConsoleService::GetOutput()
 	{
 		return mOutput;
 	}
@@ -117,18 +156,14 @@ namespace Ck::Detail::Unix
 
 	void ConsoleService::Clear()
 	{
-		static const std::string ClearString("\e[1;1H\e[2J");
-		GetOutput().Write(ClearString.c_str(), ClearString.length());
+		static const StringView ClearString = CK_TEXT("\e[1;1H\e[2J");
+		Write(ClearString);
 	}
 
 	void ConsoleService::SetColors(ConsoleColor background, ConsoleColor foreground)
 	{
-		char buffer[1024];
-		std::sprintf(buffer, "\033[%dm", ConsoleColorToBackgroundAttribute(background));
-        GetOutput().Write(buffer, std::strlen(buffer));
-
-		std::sprintf(buffer, "\033[%dm", ConsoleColorToTextAttribute(foreground));
-        GetOutput().Write(buffer, std::strlen(buffer));
+		Write(String::Format(CK_TEXT("\033[%dm"), ConsoleColorToTextAttribute(background)));
+		Write(String::Format(CK_TEXT("\033[%dm"), ConsoleColorToBackgroundAttribute(background)));
 	}
 
 	void ConsoleService::Beep() const

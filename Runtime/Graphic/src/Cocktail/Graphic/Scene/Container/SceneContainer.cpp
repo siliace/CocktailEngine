@@ -77,7 +77,7 @@ namespace Ck
 	SceneContainer::MaterialInfo SceneContainer::CreateDefaultMaterial(LinearColor baseColor)
 	{
 		MaterialInfo material;
-		material.Name = "Default";
+		material.Name = CK_TEXT("Default");
 		material.ShadingMode = Material::ShadingMode::Phong;
 		material.Colors.Base = baseColor;
 		material.DoubleSided = true;

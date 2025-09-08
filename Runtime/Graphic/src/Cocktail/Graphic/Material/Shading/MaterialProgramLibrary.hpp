@@ -24,7 +24,7 @@ namespace Ck
 			/**
 			 * \brief Specifies the name of the program
 			 */
-			std::string Name;
+			String Name;
 
 			/**
 			 * \brief Specifies the type of object renderable with this program

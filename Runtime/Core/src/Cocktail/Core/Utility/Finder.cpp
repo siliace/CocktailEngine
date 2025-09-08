@@ -3,20 +3,19 @@
 
 namespace Ck
 {
-	Finder& Finder::From(const std::filesystem::path& path)
+	Finder& Finder::From(const Path& path)
 	{
 		mSource.Add(path);
 
 		return *this;
 	}
 
-	Finder& Finder::WithExtension(const std::string& fileExtension)
+	Finder& Finder::WithExtension(String fileExtension)
 	{
-		mFileExtension.clear();
-		if (fileExtension[0] != '.')
-			mFileExtension.append(".");
+		if (fileExtension[0] != CK_TEXT('.'))
+			fileExtension.Append(CK_TEXT('.'));
 
-		mFileExtension.append(fileExtension);
+		mFileExtension = std::move(fileExtension);
 
 		return *this;
 	}
@@ -42,28 +41,28 @@ namespace Ck
 		return *this;
 	}
 
-	Array<std::filesystem::path> Finder::Get() const
+	Array<Path> Finder::Get() const
 	{
-		Array<std::filesystem::path> content;
-		for (const std::filesystem::path& source : mSource)
+		Array<Path> content;
+		for (const Path& source : mSource)
 			content.Append(Get(source, mDepth));
 
 		return content;
 	}
 
-	Array<std::filesystem::path> Finder::Get(const std::filesystem::path& source, unsigned int depth) const
+	Array<Path> Finder::Get(const Path& source, unsigned int depth) const
 	{
-		Array<std::filesystem::path> content;
+		Array<Path> content;
 		std::shared_ptr<Directory> directory = Storage::OpenDirectory(source);
 
-		for (const std::filesystem::path& child : directory->GetContent())
+		for (const Path& child : directory->GetContent())
 		{
-			if (child == "." || child == "..")
+			if (child == CK_TEXT(".") || child == CK_TEXT(".."))
 				continue;
 
 			if (Storage::IsFile(child) && !mIgnoreFiles)
 			{
-				if (!mFileExtension.empty() && child.extension() != mFileExtension)
+				if (!mFileExtension.IsEmpty() && child.GetExtension() != mFileExtension)
 					continue;
 
 				content.Add(child);

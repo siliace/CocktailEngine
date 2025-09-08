@@ -1,32 +1,29 @@
 #ifndef COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREEELEMENT_HPP
 #define COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREEELEMENT_HPP
 
-#include <stdexcept>
-
 #include <Cocktail/Core/Utility/PropertyTree/PropertyTreeNode.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/PropertyTreePath.hpp>
 
 namespace Ck
 {
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTreeSequence;
 
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTreeValue;
 
     /**
      * \brief Specialization of PropertyTreeNode implementing recursive tree node
      */
-    template <typename Key, typename Data>
-    class PropertyTreeElement : public PropertyTreeNode<Key, Data>
+    template <typename Data>
+    class PropertyTreeElement : public PropertyTreeNode<Data>
     {
     public:
 
         using Element = PropertyTreeElement;
-        using Node = PropertyTreeNode<Key, Data>;
-        using Path = typename PropertyTreePathOf<Key>::Type;
-        using Sequence = PropertyTreeSequence<Key, Data>;
-        using Value = PropertyTreeValue<Key, Data>;
+        using Node = PropertyTreeNode<Data>;
+        using Sequence = PropertyTreeSequence<Data>;
+        using Value = PropertyTreeValue<Data>;
 
         /**
          * \brief Default constructor
@@ -69,8 +66,8 @@ namespace Ck
          * \param node The node to be inserted
          * \return A pointer to the inserted node�
          */
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* Insert(const Key& name, const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* Insert(const String& name, const NodeType<Data>& node)
         {
             Remove(name);
             
@@ -86,8 +83,8 @@ namespace Ck
          * \param node The node to be inserted
          * \return A pointer to the inserted node�
          */
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* FrontInsert(const Key& name, const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* FrontInsert(const String& name, const NodeType<Data>& node)
         {
             Remove(name);
 
@@ -104,8 +101,8 @@ namespace Ck
          * \param node
          * \return
          */
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* InsertBefore(Node* where, const Key& name, const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* InsertBefore(Node* where, const String& name, const NodeType<Data>& node)
         {
             if (this != where->GetParent())
                 throw std::invalid_argument("Cannot insert property node after a node that does not belongs to the same element");
@@ -126,7 +123,7 @@ namespace Ck
                 inserted = mFirstChild.get();
             }
 
-            return static_cast<NodeType<Key, Data>*>(inserted);
+            return static_cast<NodeType<Data>*>(inserted);
         }
 
         /**
@@ -136,8 +133,8 @@ namespace Ck
          * \param node
          * \return
          */
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* InsertAfter(Node* where, const Key& name, const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* InsertAfter(Node* where, const String& name, const NodeType<Data>& node)
         {
             if (this != where->GetParent())
                 throw std::invalid_argument("Cannot insert property node after a node that does not belongs to the same element");
@@ -149,14 +146,14 @@ namespace Ck
             if (where == mLastChild)
                 mLastChild = inserted;
 
-			return static_cast<NodeType<Key, Data>*>(inserted);
+			return static_cast<NodeType<Data>*>(inserted);
         }
 
         /**
          * \brief 
          * \param key 
          */
-        void Remove(const Key& key)
+        void Remove(const String& key)
         {
             for (Node* current = mFirstChild.get(); current; current = current->GetNextSibling())
             {
@@ -175,7 +172,7 @@ namespace Ck
         void Remove(const Node* node)
         {
             if (this != node->GetParent())
-                throw std::invalid_argument("Cannot insert property node after a node that does not belongs to the same element");
+                throw RuntimeException(CK_TEXT("Cannot insert property node after a node that does not belongs to the same element"));
 
             if (mFirstChild.get() == node)
             {
@@ -214,7 +211,7 @@ namespace Ck
          * \return
          */
         template <typename T, typename Tr = typename TranslatorBetween<Data, T>::Type>
-        T Get(const Path& path, const Tr& translator = Tr()) const
+        T Get(const PropertyTreePath& path, const Tr& translator = Tr()) const
         {
             return GetValue(path).template As<T, Tr>(translator);
         }
@@ -224,7 +221,7 @@ namespace Ck
          * \param childName 
          * \return 
          */
-        bool HasChild(const Key& childName) const
+        bool HasChild(const String& childName) const
         {
 	        for (auto child = mFirstChild.get(); child; child = child->GetNextSibling())
 	        {
@@ -240,11 +237,11 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Node& GetChild(const Path& path) const
+        Node& GetChild(const PropertyTreePath& path) const
         {
-            Path p(path);
+            PropertyTreePath p(path);
             const bool isTerminal = p.IsSingle();
-            Key key = p.Reduce();
+            String key = p.Reduce();
 
             for (Node* child = GetFirstChild(); child; child = child->GetNextSibling())
             {
@@ -257,13 +254,13 @@ namespace Ck
                         return static_cast<Element*>(child)->GetChild(p);
 
                     if (child->GetType() == Node::Type::Sequence)
-                        return static_cast<PropertyTreeSequence<Key, Data>*>(child)->GetChild(p);
+                        return static_cast<PropertyTreeSequence<Data>*>(child)->GetChild(p);
 
-                    throw InvalidPropertyPathException("Child {} in node {} is terminal", key, this->mName);
+                    throw InvalidPropertyPathException(CK_TEXT("Child %s in node %s is terminal"), key, this->mName);
 	            }
             }
 
-            throw InvalidPropertyPathException("Element {} does not has child {}", this->mName, key);
+            throw InvalidPropertyPathException(CK_TEXT("Element %s does not has child %s"), this->mName, key);
         }
 
         /**
@@ -271,11 +268,11 @@ namespace Ck
          * \param path
          * \return
          */
-        Element& GetElement(const Path& path) const
+        Element& GetElement(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw std::runtime_error("Path target node is not an element");
+                throw std::runtime_error("PropertyTreePath target node is not an element");
 
             return static_cast<Element&>(node);
         }
@@ -285,11 +282,11 @@ namespace Ck
          * \param path
          * \return
          */
-        Sequence& GetSequence(const Path& path) const
+        Sequence& GetSequence(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw std::runtime_error("Path target node is not a sequence");
+                throw std::runtime_error("PropertyTreePath target node is not a sequence");
 
             return static_cast<Sequence&>(node);
         }
@@ -299,11 +296,11 @@ namespace Ck
          * \param path
          * \return
          */
-        Value& GetValue(const Path& path) const
+        Value& GetValue(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw std::runtime_error("Path target node is not a value");
+                throw InvalidPropertyPathException("PropertyTreePath target node is not a value");
 
             return static_cast<Value&>(node);
         }
@@ -332,12 +329,12 @@ namespace Ck
          */
         typename Node::Type GetType() const override
         {
-            return PropertyTreeNode<Key, Data>::Type::Element;
+            return PropertyTreeNode<Data>::Type::Element;
         }
 
     protected:
 
-        template <typename,typename>
+        template <typename>
         friend class PropertyTree;
 
         /**
@@ -345,7 +342,7 @@ namespace Ck
          * \param parent
          * \param name
          */
-        PropertyTreeElement(Node* parent, const Key& name) :
+        PropertyTreeElement(Node* parent, const String& name) :
             Node(parent, name),
             mLastChild(nullptr)
         {
@@ -358,9 +355,9 @@ namespace Ck
          * \param name
          * \return
          */
-        std::unique_ptr<Node> Clone(Node* parent, const Key& name) const override
+        std::unique_ptr<Node> Clone(Node* parent, const String& name) const override
         {
-            std::unique_ptr<PropertyTreeElement<Key, Data>> clone(new PropertyTreeElement<Key, Data>(parent, name)); /// TODO: find a way to use std::make_unique
+            std::unique_ptr<PropertyTreeElement<Data>> clone(new PropertyTreeElement<Data>(parent, name)); /// TODO: find a way to use std::make_unique
             for (auto* child = mFirstChild.get(); child != nullptr; child = child->GetNextSibling())
                 clone->Insert(child->GetName(), *child);
 
@@ -369,13 +366,13 @@ namespace Ck
         
     private:
 
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* SetFirstChild(const Key& name, const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* SetFirstChild(const String& name, const NodeType<Data>& node)
         {
             mFirstChild = static_cast<const Node&>(node).Clone(this, name);
             mLastChild = mFirstChild.get();
 
-            return static_cast<NodeType<Key, Data>*>(mLastChild);
+            return static_cast<NodeType<Data>*>(mLastChild);
         }
 
         std::unique_ptr<Node> mFirstChild;

@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	MipMapsTextureResource::MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, std::string_view name) :
+	MipMapsTextureResource::MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name) :
 		TextureResource(std::move(graphicEngine), mipMaps->GetBaseSize(), mipMaps->GetPixelFormat(), mipMaps->GetArrayLayerCount(), mipMaps->GetMipMapCount(), mipMaps->IsCube(), name),
 		mMipMaps(std::move(mipMaps))
 	{

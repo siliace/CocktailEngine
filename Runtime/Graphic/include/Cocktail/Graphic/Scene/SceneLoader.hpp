@@ -18,7 +18,7 @@ namespace Ck
 		 * \brief The base directory of the scene
 		 * Used to resolve paths relatives to the scene (like textures files)
 		 */
-		std::filesystem::path BaseDirectory;
+		Path BaseDirectory;
 
 		/**
 		 * \brief Flag indicating whether to flip Y component of UV vertex component
@@ -31,7 +31,7 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		std::filesystem::path BaseDirectory;
+		Path BaseDirectory;
 	};
 
 	class SceneLoader : public AssetLoader<SceneContainer, SceneImportParameters, SceneExportParameters>

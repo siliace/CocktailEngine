@@ -13,6 +13,30 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+	<Type Name="Ck::String">
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity == 0">Empty</DisplayString>
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity &gt; 0">Empty, Capacity={mCharacters.mCapacity - 1}</DisplayString>
+		<DisplayString Condition="mCharacters.mSize &gt; 0">{{ Length={mData.mSize - 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[length]" ExcludeView="simple">mCharacters.mSize - 1</Item>
+			<Item Name="[capacity]" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>(wchar_t*)mCharacters.mAllocator.mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::StringView">
+		<DisplayString Condition="mLength == 0">Empty</DisplayString>
+		<DisplayString Condition="mLength &gt; 0">{{ Length={mLength} }}</DisplayString>
+		<Expand>
+			<Item Name="[length]" ExcludeView="simple">mLength</Item>
+			<ArrayItems>
+				<Size>mLength</Size>
+				<ValuePointer>(wchar_t*)mString</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
 	<Type Name="Ck::Vector2&lt;*&gt;">
 		<DisplayString>{mComponents[0]}, {mComponents[1]}</DisplayString>
 		<Expand>

@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
@@ -36,9 +37,9 @@ namespace Ck
 		return pthread_self();
 	}
 
-	void ThreadUtils::SetName(std::thread::native_handle_type threadHandle, std::string_view name)
+	void ThreadUtils::SetName(std::thread::native_handle_type threadHandle, StringView name)
 	{
-		int error = pthread_setname_np((pthread_t)threadHandle, name.data());
+		int error = pthread_setname_np((pthread_t)threadHandle, name.GetData());
 		if (error)
 			throw SystemError::GetLastError();
 	}
@@ -46,12 +47,12 @@ namespace Ck
 	void ThreadUtils::SetAffinity(std::thread::native_handle_type threadHandle, unsigned int affinityMask)
 	{
 		if (affinityMask == 0)
-			throw std::runtime_error("Cannot assign a null affinity mask to a thread");
+			throw RuntimeException(CK_TEXT("Cannot assign a null affinity mask to a thread"));
 
 		unsigned int processAffinityMask = GetProcessAffinityMask();
 		if ((affinityMask | processAffinityMask) != processAffinityMask)
 		{
-			CK_LOG(Detail::Unix::UnixLogCategory, LogLevel::Warning, "Thread affinity mask {} must be a subset of process affinity mask {}", affinityMask, processAffinityMask);
+			CK_LOG(Detail::Unix::UnixLogCategory, LogLevel::Warning, CK_TEXT("Thread affinity mask {} must be a subset of process affinity mask {}"), affinityMask, processAffinityMask);
 			affinityMask = processAffinityMask;
 		}
 

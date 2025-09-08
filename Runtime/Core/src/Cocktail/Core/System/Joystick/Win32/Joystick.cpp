@@ -194,7 +194,7 @@ namespace Ck::Detail::Win32
 		return mOnButtonReleasedEvent[button];
 	}
 
-	const std::string& Joystick::GetName() const
+	const String& Joystick::GetName() const
 	{
 		return mName;
 	}
@@ -204,7 +204,7 @@ namespace Ck::Detail::Win32
 		return mCapabilities;
 	}
 
-	void Joystick::GetCapabilitiesAndName(UINT index, JoystickCapabilities& capabilities, std::string& name)
+	void Joystick::GetCapabilitiesAndName(UINT index, JoystickCapabilities& capabilities, String& name)
 	{
 		JOYCAPS2 infoCaps;
 		ZeroMemory(&infoCaps, sizeof(JOYCAPS2));

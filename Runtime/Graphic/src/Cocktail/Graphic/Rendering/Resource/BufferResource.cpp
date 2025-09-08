@@ -5,13 +5,13 @@
 
 namespace Ck
 {
-	BufferResource::BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, std::string_view name) :
+	BufferResource::BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
 		Renderer::BufferCreateInfo createInfo;
 		createInfo.Usage = usage;
 		createInfo.Size = size;
-		createInfo.Name = name.data();
+		createInfo.Name = name;
 		mBuffer = mGraphicEngine->GetRenderDevice()->CreateBuffer(createInfo);
 	}
 

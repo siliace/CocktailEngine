@@ -3,6 +3,8 @@
 
 int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "");
+
     std::unique_ptr<Ck::Application> application = std::make_unique<Ck::Main::Unix::UnixApplication>(
 		argc, argv
 	);

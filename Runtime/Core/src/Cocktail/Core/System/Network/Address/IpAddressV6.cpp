@@ -1,5 +1,5 @@
 #include <Cocktail/Core/System/Network/Address/IpAddressV6.hpp>
-#include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/Utility/TranslatorCast.hpp>
 
 namespace Ck
 {
@@ -53,8 +53,17 @@ namespace Ck
 		return Protocol::Ipv6;
 	}
 
-	std::string IpAddressV6::ToString() const
+	String IpAddressV6::ToString() const
 	{
-		return StringUtils::Join(Bytes.begin(), Bytes.end(), ":");
+		String result;
+		for (String::SizeType i = 0; i < Bytes.size(); i++)
+		{
+			if (i > 0)
+				result.Append(CK_TEXT(':'));
+
+			result.Append(TranslatorCast<String>(Bytes[i]));
+		}
+
+		return result;
 	}
 }

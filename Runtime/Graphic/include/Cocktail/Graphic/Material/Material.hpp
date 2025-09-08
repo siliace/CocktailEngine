@@ -2,9 +2,9 @@
 #define COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP
 
 #include <memory>
-#include <string>
 
 #include <Cocktail/Core/Color.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
@@ -59,7 +59,7 @@ namespace Ck
 		 * \param shadingMode
 		 * \param doubleSided 
 		 */
-		Material(std::string name, ShadingMode shadingMode, bool doubleSided = false);
+		Material(String name, ShadingMode shadingMode, bool doubleSided = false);
 
 		/**
 		 * \brief
@@ -103,7 +103,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::string& GetName() const;
+		const String& GetName() const;
 
 		/**
 		 * \brief 
@@ -131,7 +131,7 @@ namespace Ck
 
 	private:
 
-		std::string mName;
+		String mName;
 		ShadingMode mShadingMode;
 		UniformColors mUniformColors;
 		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;
@@ -141,4 +141,4 @@ namespace Ck
 	};
 }
 
-#endif // COCKTAIL_GRAPHIC_MATERIAL_M ATERIAL_HPP
+#endif // COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP

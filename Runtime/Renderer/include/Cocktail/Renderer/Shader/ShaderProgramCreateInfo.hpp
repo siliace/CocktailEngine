@@ -15,7 +15,7 @@ namespace Ck::Renderer
 	    /**
          * \brief 
          */
-        std::string_view Member;
+        StringView Member;
 
 	    /**
          * \brief 

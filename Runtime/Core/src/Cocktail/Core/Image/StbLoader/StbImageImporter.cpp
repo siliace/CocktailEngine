@@ -18,9 +18,9 @@ namespace Ck
 		mCallbacks.eof = &StbImageImporter::EofCallback;
 	}
 
-	std::shared_ptr<Image> StbImageImporter::LoadFromPath(const std::filesystem::path& path, const ImageImportParameters& parameters)
+	std::shared_ptr<Image> StbImageImporter::LoadFromPath(const Path& path, const ImageImportParameters& parameters)
 	{
-		CK_LOG(ImageLoaderLogCategory, LogLevel::Info, "Loading image from {}", path.string());
+		CK_LOG(ImageLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading image from %s"), path.ToString());
 		return AssetImporter<Image, ImageImportParameters>::LoadFromPath(path, parameters);
 	}
 
@@ -34,25 +34,25 @@ namespace Ck
 
 		switch (parameters.ImportFormat)
 		{
-			case ImageImportParameters::Format::Default:
-				desiredChannels = STBI_default;
-				break;
+		case ImageImportParameters::Format::Default:
+			desiredChannels = STBI_default;
+			break;
 
-			case ImageImportParameters::Format::Grey:
-				desiredChannels = STBI_grey;
-				break;
+		case ImageImportParameters::Format::Grey:
+			desiredChannels = STBI_grey;
+			break;
 
-			case ImageImportParameters::Format::GreyAlpha:
-				desiredChannels = STBI_grey_alpha;
-				break;
+		case ImageImportParameters::Format::GreyAlpha:
+			desiredChannels = STBI_grey_alpha;
+			break;
 
-			case ImageImportParameters::Format::RedGreenBlue:
-				desiredChannels = STBI_rgb;
-				break;
+		case ImageImportParameters::Format::RedGreenBlue:
+			desiredChannels = STBI_rgb;
+			break;
 
-			case ImageImportParameters::Format::RedGreenBlueAlpha:
-				desiredChannels = STBI_rgb_alpha;
-				break;
+		case ImageImportParameters::Format::RedGreenBlueAlpha:
+			desiredChannels = STBI_rgb_alpha;
+			break;
 		}
 
 		bool isHdr = stbi_is_hdr_from_callbacks(&mCallbacks, &inputStream) == 1;
@@ -84,8 +84,8 @@ namespace Ck
 		}
 
 		if (!pixels)
-			throw StbImportError("Failed to import image: {}", stbi_failure_reason());
-		
+			throw StbImportError(CK_TEXT("Failed to import image: {}"), stbi_failure_reason());
+
 		Extent2D<unsigned int> size = MakeExtent<unsigned int>(width, height);
 		unsigned int channels = desiredChannels == STBI_default ? fileChannels : desiredChannels;
 
@@ -116,9 +116,9 @@ namespace Ck
 		return image;
 	}
 
-	bool StbImageImporter::SupportExtension(std::string_view extension) const
+	bool StbImageImporter::SupportExtension(StringView extension) const
 	{
-		for (const std::string_view supportedExtension : {".jpg", ".jpeg", ".png", ".tga"})
+		for (StringView supportedExtension : { CK_TEXT(".jpg"), CK_TEXT(".jpeg"), CK_TEXT(".png"), CK_TEXT(".tga") })
 		{
 			if (supportedExtension == extension)
 				return true;

@@ -26,9 +26,9 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<T> LoadFromPath(const std::filesystem::path& path, const ImportParam& parameters) const
+		std::shared_ptr<T> LoadFromPath(const Path& path, const ImportParam& parameters) const
 		{
-			std::string extension = path.extension().string();
+			String extension = path.GetExtension();
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
 			{
 				if (!importer->SupportExtension(extension))
@@ -53,9 +53,9 @@ namespace Ck
 		 * \param path 
 		 * \param parameters 
 		 */
-		void SaveToPath(const T& asset, const std::filesystem::path& path, const ExportParam& parameters) const
+		void SaveToPath(const T& asset, const Path& path, const ExportParam& parameters) const
 		{
-			std::string extension = path.extension().string();
+			String extension = path.GetExtension();
 			for (AssetExporter<T, ExportParam>* exporter : mExporters)
 			{
 				if (!exporter->SupportExtension(extension))
@@ -162,7 +162,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtension(std::string_view extension)
+		bool SupportExtension(StringView extension)
 		{
 			return SupportExtensionImport(extension) && SupportExtensionExport(extension);
 		}
@@ -172,7 +172,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtensionImport(std::string_view extension)
+		bool SupportExtensionImport(StringView extension)
 		{
 			return mImporters.AnyOf([&](AssetImporter<T, ImportParam>* importer) {
 				return importer->SupportExtension(extension);
@@ -184,7 +184,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtensionExport(std::string_view extension)
+		bool SupportExtensionExport(StringView extension)
 		{
 			return mExporters.AnyOf([&](AssetExporter<T, ExportParam>* exporter) {
 				return exporter->SupportExtension(extension);

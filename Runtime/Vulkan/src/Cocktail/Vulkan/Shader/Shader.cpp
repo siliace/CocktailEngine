@@ -1,5 +1,7 @@
 #include <spirv_reflect.h>
 
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
+
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
@@ -107,7 +109,7 @@ namespace Ck::Vulkan
 		std::unique_ptr<VertexAttributeLocation> ReflectInterfaceVariable(const SpvReflectInterfaceVariable* reflectInterfaceVariable)
 		{
 			unsigned int location = reflectInterfaceVariable->location;
-			std::string name = reflectInterfaceVariable->name;
+			String name = CK_ANSI_TO_TEXT(reflectInterfaceVariable->name);
 			unsigned int elementCount = ReflectElementCount(reflectInterfaceVariable->numeric);
 
 			return std::make_unique<VertexAttributeLocation>(location, GetReflectFormatDataType(reflectInterfaceVariable->format), elementCount, std::move(name));
@@ -119,7 +121,7 @@ namespace Ck::Vulkan
 			member.Offset = blockVariable.offset;
 			member.DataType = ReflectDataType(blockVariable.type_description->type_flags, blockVariable.numeric);
 			member.ElementCount = ReflectElementCount(blockVariable.numeric);
-			member.Name = blockVariable.name;
+			member.Name = CK_ANSI_TO_TEXT(blockVariable.name);
 			member.ArrayLength = 1;
 
 			return member;
@@ -201,7 +203,7 @@ namespace Ck::Vulkan
 							descriptorSetInfo.Bindings[j].ArrayLength = 1;
 						}
 
-						descriptorSetInfo.Bindings[j].Name = reflectBinding->name;
+						descriptorSetInfo.Bindings[j].Name = CK_ANSI_TO_TEXT(reflectBinding->name);
 					}
 
 					mDescriptorSetInfo[i] = descriptorSetInfo;
@@ -231,7 +233,7 @@ namespace Ck::Vulkan
 					for (unsigned int j = 0; j < members.GetSize(); j++)
 						members[j] = ReflectBlockMember(reflectPushConstantBlock->members[j]);
 
-					pushConstantBlockInfo.Name = reflectPushConstantBlock->name;
+					pushConstantBlockInfo.Name = CK_ANSI_TO_TEXT(reflectPushConstantBlock->name);
 					pushConstantBlockInfo.Members = std::move(members);
 					pushConstantBlockInfo.BaseOffset = pushConstantBlockInfo.Members[0].Offset;
 					pushConstantBlockInfo.Size = reflectPushConstantBlock->size - reflectPushConstantBlock->offset;
@@ -317,7 +319,7 @@ namespace Ck::Vulkan
 		return mType;
 	}
 
-	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(std::string_view name) const
+	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(StringView name) const
 	{
 		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mInputAttributeLocations)
 		{
@@ -328,7 +330,7 @@ namespace Ck::Vulkan
 		return nullptr;
 	}
 
-	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(std::string_view name) const
+	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(StringView name) const
 	{
 		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mOutputAttributeLocations)
 		{

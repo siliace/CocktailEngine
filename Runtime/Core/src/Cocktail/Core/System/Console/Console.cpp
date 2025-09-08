@@ -2,6 +2,26 @@
 
 namespace Ck
 {
+	void Console::Write(const String& text)
+	{
+		ResolveFacadeInstance()->Write(text);
+	}
+
+	void Console::WriteLine(const String& text)
+	{ 
+		ResolveFacadeInstance()->Write(text);
+	}
+
+	void Console::Write(StringView text)
+	{ 
+		ResolveFacadeInstance()->Write(text);
+	}
+
+	void Console::WriteLine(StringView text)
+	{
+		ResolveFacadeInstance()->Write(text);
+	}
+
 	Writer& Console::GetOutput()
 	{
 		return ResolveFacadeInstance()->GetOutput();

@@ -8,22 +8,21 @@
 
 namespace Ck
 {
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTreeElement;
 
-    template <typename Key, typename Data>
+    template <typename Data>
     class PropertyTreeValue;
 
-    template <typename Key, typename Data>
-    class PropertyTreeSequence : public PropertyTreeNode<Key, Data>
+    template <typename Data>
+    class PropertyTreeSequence : public PropertyTreeNode<Data>
     {
     public:
 
-        using Element = PropertyTreeElement<Key, Data>;
-        using Node = PropertyTreeNode<Key, Data>;
-        using Path = typename PropertyTreePathOf<Key>::Type;
+        using Element = PropertyTreeElement<Data>;
+        using Node = PropertyTreeNode<Data>;
         using Sequence = PropertyTreeSequence;
-        using Value = PropertyTreeValue<Key, Data>;
+        using Value = PropertyTreeValue<Data>;
 
 	    /**
          * \brief 
@@ -36,14 +35,14 @@ namespace Ck
          * \param node 
          * \return 
          */
-        template <template<class, class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Key, Data>>>>
-        NodeType<Key, Data>* Add(const NodeType<Key, Data>& node)
+        template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
+        NodeType<Data>* Add(const NodeType<Data>& node)
         {
-            std::size_t index = GetSize();
-            Key keyIndex = TranslatorCast<Key>(index);
+            unsigned int index = GetSize();
+            String keyIndex = TranslatorCast<String>(index);
             std::unique_ptr<Node> clone = static_cast<const Node&>(node).Clone(this, keyIndex);
             Node* inserted = mChildren.Emplace(std::move(clone)).get();
-            return static_cast<NodeType<Key, Data>*>(inserted);
+            return static_cast<NodeType<Data>*>(inserted);
         }
 
         /**
@@ -55,7 +54,7 @@ namespace Ck
          * \return
          */
         template <typename T, typename Tr = typename TranslatorBetween<Data, T>::Type>
-        T Get(const Path& path, const Tr& translator = Tr()) const
+        T Get(const PropertyTreePath& path, const Tr& translator = Tr()) const
         {
             return GetValue(path).template As<T, Tr>(translator);
         }
@@ -69,7 +68,7 @@ namespace Ck
          * \return
          */
         template <typename T, typename Tr = typename TranslatorBetween<Data, T>::Type>
-        T Get(std::size_t index, const Path& path, const Tr& translator = Tr()) const
+        T Get(unsigned int index, const PropertyTreePath& path, const Tr& translator = Tr()) const
         {
             return At(index)->template GetValue<T, Tr>(path, translator);
         }
@@ -79,32 +78,32 @@ namespace Ck
          * \param path 
          * \return 
          */
-        Node& GetChild(const Path& path) const
+        Node& GetChild(const PropertyTreePath& path) const
         {
-            Path p(path);
-            std::size_t index = p.template Reduce<std::size_t>();
+            PropertyTreePath p(path);
+            unsigned int index = p.Reduce<unsigned int>();
             if (index >= mChildren.GetSize())
-                throw InvalidPropertyPathException("Path target sequence {} does not contains child with index {}", this->mName, index);
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target sequence %s does not contains child with index %u"), this->mName, index);
 
             const Node* child = mChildren[index].get();
             if (child->GetType() == Node::Type::Element)
-                return static_cast<const PropertyTreeElement<Key, Data>*>(child)->GetChild(p);
+                return static_cast<const PropertyTreeElement<Data>*>(child)->GetChild(p);
 
             if (child->GetType() == Node::Type::Sequence)
                 return static_cast<const PropertyTreeSequence*>(child)->GetChild(p);
 
-            throw InvalidPropertyPathException("Child with index {} in node {} is terminal", index, this->mName);
+            throw InvalidPropertyPathException(CK_TEXT("Child with index %u in node %s is terminal"), index, this->mName);
         }
         /**
          * \brief
          * \param path
          * \return
          */
-        Element& GetElement(const Path& path) const
+        Element& GetElement(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not an element"), path.ToString());
 
             return static_cast<Element&>(node);
         }
@@ -114,11 +113,11 @@ namespace Ck
          * \param path
          * \return
          */
-        Sequence& GetSequence(const Path& path) const
+        Sequence& GetSequence(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a sequence"), path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -128,11 +127,11 @@ namespace Ck
          * \param path
          * \return
          */
-        Value& GetValue(const Path& path) const
+        Value& GetValue(const PropertyTreePath& path) const
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a value"), path.ToString());
 
             return static_cast<Value&>(node);
         }
@@ -150,7 +149,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        std::size_t GetSize() const
+        unsigned int GetSize() const
         {
             return mChildren.GetSize();
         }
@@ -160,7 +159,7 @@ namespace Ck
          * \param index
          * \return
          */
-        Node& At(std::size_t index)
+        Node& At(unsigned int index)
         {
             return *mChildren.At(index);
         }
@@ -170,7 +169,7 @@ namespace Ck
          * \param index
          * \return
          */
-        const Node& At(std::size_t index) const
+        const Node& At(unsigned int index) const
         {
             return *mChildren.At(index);
         }
@@ -180,7 +179,7 @@ namespace Ck
          * \param index
          * \return
          */
-        Element& ElementAt(std::size_t index)
+        Element& ElementAt(unsigned int index)
         {
             Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
@@ -194,7 +193,7 @@ namespace Ck
          * \param index 
          * \return 
          */
-        const Element& ElementAt(std::size_t index) const
+        const Element& ElementAt(unsigned int index) const
         {
             const Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
@@ -219,7 +218,7 @@ namespace Ck
          * \param parent The parent node
          * \param name The name of this node into \p parent node
          */
-        PropertyTreeSequence(Node* parent, const Key& name) :
+        PropertyTreeSequence(Node* parent, const String& name) :
             Node(parent, name)
         {
             /// Nothing
@@ -231,9 +230,9 @@ namespace Ck
          * \param name 
          * \return 
          */
-        std::unique_ptr<Node> Clone(Node* parent, const Key& name) const override
+        std::unique_ptr<Node> Clone(Node* parent, const String& name) const override
         {
-            std::unique_ptr<PropertyTreeSequence<Key, Data>> clone(new PropertyTreeSequence<Key, Data>(parent, name)); /// TODO: find a way to use std::make_unique
+            std::unique_ptr<PropertyTreeSequence<Data>> clone(new PropertyTreeSequence<Data>(parent, name)); /// TODO: find a way to use std::make_unique
             for (const std::unique_ptr<Node>& child : mChildren)
                 clone->Add(*child);
 

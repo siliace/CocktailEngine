@@ -183,7 +183,7 @@ namespace Ck::Vulkan
 			}
 			else
 			{
-				CK_LOG(VulkanLogCategory, LogLevel::Warning, "RenderSurface does not support present mode immediate, vsync cannot be disabled");
+				CK_LOG(VulkanLogCategory, LogLevel::Warning, CK_TEXT("RenderSurface does not support present mode immediate, vsync cannot be disabled"));
 
 				mVSyncEnable = true;
 				presentMode = VK_PRESENT_MODE_FIFO_KHR;

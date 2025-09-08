@@ -17,26 +17,26 @@ namespace Ck::Detail::Win32
 		 * \param path
 		 * \return
 		 */
-		bool IsFile(const std::filesystem::path& path) const override;
+		bool IsFile(const Path& path) const override;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		bool IsDirectory(const std::filesystem::path& path) const override;
+		bool IsDirectory(const Path& path) const override;
 
 		/**
 		 * \brief
 		 * \param path
 		 */
-		void CreateFile(const std::filesystem::path& path) override;
+		void CreateFile(const Path& path) override;
 
 		/**
 		 * \brief
 		 * \param path
 		 */
-		void CreateDirectory(const std::filesystem::path& path) override;
+		void CreateDirectory(const Path& path) override;
 
 		/**
 		 * \brief
@@ -44,14 +44,14 @@ namespace Ck::Detail::Win32
 		 * \param flags
 		 * \return
 		 */
-		std::unique_ptr<File> OpenFile(const std::filesystem::path& path, const FileOpenFlags& flags) override;
+		std::unique_ptr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		std::unique_ptr<Directory> OpenDirectory(const std::filesystem::path& path) override;
+		std::unique_ptr<Directory> OpenDirectory(const Path& path) override;
 
 		/**
 		 * \brief
@@ -59,20 +59,20 @@ namespace Ck::Detail::Win32
 		 * \param destination
 		 * \param failIfExists
 		 */
-		void Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists) override;
+		void Copy(const Path& source, const Path& destination, bool failIfExists) override;
 
 		/**
 		 * \brief
 		 * \param source
 		 * \param destination
 		 */
-		void Move(const std::filesystem::path& source, const std::filesystem::path& destination) override;
+		void Move(const Path& source, const Path& destination) override;
 
 		/**
 		 * \brief
 		 * \param path
 		 */
-		void Remove(const std::filesystem::path& path) override;
+		void Remove(const Path& path) override;
 
 		/**
 		 * \brief 

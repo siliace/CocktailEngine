@@ -87,7 +87,16 @@
 
 #ifndef COCKTAIL_DECLARE_TAG
 	#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr __Name##Tag __Name;
-#endif // COCKTAIL_DECLARE_TAG
+#endif
+
+#ifndef COCKTAIL_TEXT
+	#ifdef COCKTAIL_OS_WINDOWS
+		#define COCKTAIL_TEXT(__Text) L ## __Text
+	#else
+		#define COCKTAIL_TEXT(__Text) u ## __Text
+	#endif
+	#define CK_TEXT(__Text) COCKTAIL_TEXT(__Text)
+#endif
 
 namespace Ck
 {
@@ -99,6 +108,19 @@ namespace Ck
 	using Int16 = std::int16_t;
 	using Int32 = std::int32_t;
 	using Int64 = std::int64_t;
+
+	using AnsiChar = char;
+	using Utf8Char = Uint8;
+	using Utf16Char = Uint16;
+	using Utf32Char = Uint32;
+
+#ifdef COCKTAIL_OS_WINDOWS
+	using WildChar = wchar_t;
+#else
+	using WildChar = char16_t;
+#endif
+
+	using TextChar = WildChar;
 
 	COCKTAIL_DECLARE_TAG(InPlace);
 	COCKTAIL_DECLARE_TAG(InOptional);
@@ -270,7 +292,7 @@ namespace Ck
 	 *
 	 * Example usage:
 	 * \code{.cpp}
-	 * Uint64 h = HashValues(42, std::string("Hello"), 3.14);
+	 * Uint64 h = HashValues(42, String("Hello"), 3.14);
 	 * \endcode
 	 */
 	template <typename... Ts>

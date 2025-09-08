@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
 #include <Cocktail/Core/Application/ServiceProvider.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
@@ -93,7 +93,7 @@ namespace Ck
 		 * \param force 
 		 * \param callSite 
 		 */
-		virtual void Exit(unsigned int exitCode = 0, bool force = false, std::string_view callSite = "") = 0;
+		virtual void Exit(unsigned int exitCode = 0, bool force = false, StringView callSite = CK_TEXT("")) = 0;
 
 		/**
 		 * \brief Gracefully terminate the application
@@ -113,14 +113,14 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual const Array<std::string>& GetArgv() const = 0;
+		virtual const Array<String>& GetArgv() const = 0;
 
 		/**
 		 * \brief 
 		 * \param name 
 		 * \return 
 		 */
-		virtual std::string GetEnvironmentVariable(std::string_view name) = 0;
+		virtual Optional<String> GetEnvironmentVariable(StringView name) = 0;
 
 		/**
 		 * \brief 

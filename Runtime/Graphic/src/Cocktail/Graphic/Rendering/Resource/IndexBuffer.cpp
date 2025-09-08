@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	IndexBuffer::IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, std::string_view name) :
+	IndexBuffer::IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, const AnsiChar* name) :
 		BufferResource(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Index, indices->GetIndices().GetSize(), name),
 		mIndices(std::move(indices))
 	{

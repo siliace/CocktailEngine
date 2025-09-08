@@ -2,10 +2,8 @@
 #define COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESS_HPP
 
 #include <memory>
-#include <string>
 
-#include <Cocktail/Core/Array.hpp>
-#include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/String.hpp>
 
 namespace Ck
 {
@@ -37,7 +35,7 @@ namespace Ck
          * \param hostname 
          * \return 
          */
-        static Array<std::unique_ptr<IpAddress>> Resolve(const std::string& hostname);
+        static Array<std::unique_ptr<IpAddress>> Resolve(StringView hostname);
 
         /**
          * \brief Destructor
@@ -74,7 +72,7 @@ namespace Ck
          * \brief Convert the ip address to a string representation
          * \return
          */
-        virtual std::string ToString() const = 0;   
+        virtual String ToString() const = 0;   
     };
 }
 

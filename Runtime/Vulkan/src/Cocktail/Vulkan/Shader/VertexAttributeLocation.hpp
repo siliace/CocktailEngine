@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_VULKAN_SHADER_VERTEXATTRIBUTELOCATION_HPP
 #define COCKTAIL_VULKAN_SHADER_VERTEXATTRIBUTELOCATION_HPP
 
+#include <Cocktail/Core/String.hpp>
+
 #include <Cocktail/Renderer/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck::Vulkan
@@ -19,7 +21,7 @@ namespace Ck::Vulkan
 		 * \param elementCount 
 		 * \param name 
 		 */	
-		VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, std::string name);
+		VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, String name);
 
 		/**
 		 * \brief 
@@ -43,14 +45,14 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		const std::string& GetName() const override;
+		const String& GetName() const override;
 
 	private:
 
 		unsigned int mLocation;
 		DataType mDataType;
 		unsigned int mElementCount;
-		std::string mName;
+		String mName;
 	};
 }
 

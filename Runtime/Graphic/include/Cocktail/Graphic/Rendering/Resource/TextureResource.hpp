@@ -19,7 +19,7 @@ namespace Ck
 		/**
 		 * \brief Constructor
 		 */
-		TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube = false, std::string_view name = "");
+		TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube = false, const AnsiChar* name = "");
 
 		/**
 		 * \brief 

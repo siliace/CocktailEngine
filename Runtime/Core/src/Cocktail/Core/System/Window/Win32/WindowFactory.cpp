@@ -51,7 +51,7 @@ namespace Ck::Detail::Win32
 
 	WindowFactory::WindowFactory(HINSTANCE instanceHandle) :
 		mInstanceHandle(instanceHandle),
-		mWindowClass(mInstanceHandle, MainWindowProc, "cocktail-window-class")
+		mWindowClass(mInstanceHandle, MainWindowProc, CK_TEXT("cocktail-window-class"))
 	{
 		for (SystemCursorType cursorType : Enum<SystemCursorType>::Values)
 		{

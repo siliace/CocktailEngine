@@ -276,7 +276,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		Signal<LogLevel, Renderer::MessageType, std::string_view>& OnDebugMessage() override;
+		Signal<LogLevel, Renderer::MessageType, const AnsiChar*>& OnDebugMessage() override;
 
 		/**
 		 * \brief 
@@ -305,7 +305,7 @@ namespace Ck::Vulkan
 		 * \param apiVersion 
 		 * \param enableValidationLayer 
 		 */
-		void CreateInstance(std::string_view applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer);
+		void CreateInstance(StringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer);
 
 		/**
 		 * \brief 
@@ -347,7 +347,7 @@ namespace Ck::Vulkan
 		ObjectPool<TextureView> mTextureViewPool;
 		EnumMap<RenderDeviceFeature, bool> mSupportedFeatures;
 		EnumMap<Renderer::RenderDeviceExtension, bool> mSupportedExtensions;
-		Signal<LogLevel, Renderer::MessageType, std::string_view> mOnDebugMessage;
+		Signal<LogLevel, Renderer::MessageType, const AnsiChar*> mOnDebugMessage;
 	};
 }
 

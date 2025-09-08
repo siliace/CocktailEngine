@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_SHADER_REFLECTION_BLOCKMEMBER_HPP
 #define COCKTAIL_VULKAN_SHADER_REFLECTION_BLOCKMEMBER_HPP
 
-#include <string>
-
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/DataType.hpp>
 
@@ -50,7 +48,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		std::string Name;
+		String Name;
 
 		/**
 		 * \brief

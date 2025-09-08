@@ -16,7 +16,7 @@ namespace Ck
          * \param mipMaps 
          * \param name 
          */
-        MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, std::string_view name = "");
+        MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name = "");
 
 	    /**
          * \brief

@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
 
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
 
 TEST_CASE("Default optional is empty", "[Optional]")

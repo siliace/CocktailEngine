@@ -28,7 +28,7 @@ namespace Ck
 			static std::unique_ptr<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
 			{
 				Vulkan::RenderDeviceCreateInfo createInfo;
-				createInfo.ApplicationName = "CocktailEngine";
+				createInfo.ApplicationName = CK_TEXT("CocktailEngine");
 				createInfo.ApiVersion = Vulkan::GetSupportedApiVersion();
 				createInfo.EnableValidation = enableValidation;
 				return Vulkan::CreateRenderDevice(createInfo);
@@ -48,8 +48,8 @@ namespace Ck
 			assert(false);
 		}
 
-		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, std::string_view message) {
-			CK_LOG(GraphicEngineLogCategory, logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
+		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, const AnsiChar* message) {
+			CK_LOG(GraphicEngineLogCategory, logLevel, CK_TEXT("Debug message of type %hs from RenderDevice : %hs"), messageType, message);
 		});
 
 		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });
@@ -64,7 +64,7 @@ namespace Ck
 		mRenderContext->Synchronize();
     }
 
-    std::shared_ptr<VertexBuffer> GraphicEngine::CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable, std::string_view name)
+    std::shared_ptr<VertexBuffer> GraphicEngine::CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable, const AnsiChar* name)
     {
 		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>(shared_from_this(), std::move(vertices), name);
 		vertexBuffer->Upload();
@@ -72,7 +72,7 @@ namespace Ck
 		return vertexBuffer;
 	}
 
-	std::shared_ptr<IndexBuffer> GraphicEngine::CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable, std::string_view name)
+	std::shared_ptr<IndexBuffer> GraphicEngine::CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable, const AnsiChar* name)
 	{
 		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(shared_from_this(), std::move(indices), name);
 		indexBuffer->Upload();
@@ -80,7 +80,7 @@ namespace Ck
 		return indexBuffer;
 	}
 
-	std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, std::string_view name)
+	std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name)
 	{
 		std::shared_ptr<MipMapsTextureResource> textureResource = std::make_shared<MipMapsTextureResource>(shared_from_this(), mipMaps, name);
 		for (unsigned int layer = 0; layer < mipMaps->GetArrayLayerCount(); layer++)

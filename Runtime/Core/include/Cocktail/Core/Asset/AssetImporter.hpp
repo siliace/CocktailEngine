@@ -29,7 +29,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		virtual std::shared_ptr<T> LoadFromPath(const std::filesystem::path& path, const P& parameters = {})
+		virtual std::shared_ptr<T> LoadFromPath(const Path& path, const P& parameters = {})
 		{
 			std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read);
 			FileInputStream inputStream(*file);
@@ -63,7 +63,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		virtual bool SupportExtension(std::string_view extension) const = 0;
+		virtual bool SupportExtension(StringView extension) const = 0;
 
 		/**
 		 * \brief

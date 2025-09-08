@@ -19,7 +19,7 @@ namespace Ck
 		 * \param path 
 		 * \param parameters 
 		 */
-		void SaveToPath(const Image& asset, const std::filesystem::path& path, const ImageExportParameters& parameters) const override;
+		void SaveToPath(const Image& asset, const Path& path, const ImageExportParameters& parameters) const override;
 
 		/**
 		 * \brief 
@@ -42,7 +42,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtension(std::string_view extension) const override;
+		bool SupportExtension(StringView extension) const override;
 
 		/**
 		 * \brief 

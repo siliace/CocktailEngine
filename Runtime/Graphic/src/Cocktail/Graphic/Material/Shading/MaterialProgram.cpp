@@ -65,7 +65,7 @@ namespace Ck
 			Renderer::StaticSamplerInfo* staticSamplers = COCKTAIL_STACK_ALLOC(Renderer::StaticSamplerInfo, Enum<Material::TextureType>::ValueCount);
 			for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 			{
-				if (createInfo.Interface.Textures[textureType].Name.empty())
+				if (createInfo.Interface.Textures[textureType].Name.IsEmpty())
 					continue;
 
 				staticSamplers[staticSamplerCount].Member = createInfo.Interface.Textures[textureType].Name;
@@ -134,7 +134,7 @@ namespace Ck
 		return bestVariant;
 	}
 
-	const std::string& MaterialProgram::GetName() const
+	const String& MaterialProgram::GetName() const
 	{
 		return mName;
 	}

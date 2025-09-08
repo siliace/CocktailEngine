@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_WINDOW_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_WINDOW_HPP
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
@@ -98,13 +99,13 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual std::string GetTitle() const = 0;
+        virtual String GetTitle() const = 0;
 
         /**
          * \brief
          * \param title
          */
-        virtual void SetTitle(const std::string& title) = 0;
+        virtual void SetTitle(const String& title) = 0;
 
         /**
          * \brief

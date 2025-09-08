@@ -1,450 +1,508 @@
-#ifndef COCKTAIL_CORE_UTILITY_STRINGUTILS_HPP
-#define COCKTAIL_CORE_UTILITY_STRINGUTILS_HPP
+#ifndef COCKTAIL_CORE_UTILITY_CHARACTERS_HPP
+#define COCKTAIL_CORE_UTILITY_CHARACTERS_HPP
 
-#include <sstream>
 #include <string>
 
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
+#include <Cocktail/Core/Utility/CharUtils.hpp>
+#include <Cocktail/Core/Utility/Optional.hpp>
 
 namespace Ck
 {
-	/**
-	 * \brief 
-	 */
-	class StringUtils
-	{
-	public:
+    /**
+     * \class StringUtils
+     * \brief Utility class for character and character-sequence operations
+     *
+     * This templated class provides static helper functions for comparing,
+     * searching and inspecting character sequences. It supports both
+     * case-sensitive and case-insensitive operations.
+     *
+     * \tparam TChar Character type (e.g. AnsiChar, WildChar and likely most of the time TextChar)
+     * \tparam TSize Unsigned integer type used for sizes and indexing
+     */
+    template <typename TChar, typename TSize = IndexSizeToSizeType<32>::Type>
+    class StringUtils
+    {
+    public:
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \param begin
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool StartsWith(const std::basic_string<Char, Traits, Alloc>& string, const std::basic_string<Char, Traits, Alloc>& begin)
-		{
-			return string.find(begin) == 0;
-		}
+        static_assert(std::is_unsigned_v<TSize>, "TSize should be an unsigned integer");
 
-		/**
-		 * \brief 
-		 * \tparam Char 
-		 * \tparam Traits 
-		 * \tparam Alloc 
-		 * \param string 
-		 * \param begin 
-		 * \return 
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool StartsWith(const std::basic_string<Char, Traits, Alloc>& string, std::basic_string_view<Char, Traits> begin)
-		{
-			return string.find(begin) == 0;
-		}
+        using CharType = TChar; /*!< Alias for character type */
+        using SizeType = TSize; /*!< Alias for size/index type */
 
-		/**
-		 * \brief 
-		 * \tparam Char 
-		 * \tparam Traits 
-		 * \tparam Alloc 
-		 * \param string 
-		 * \param begin 
-		 * \return 
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool StartsWith(const std::basic_string<Char, Traits, Alloc>& string, const Char* begin)
-		{
-			return StartsWith(string, std::basic_string_view<Char, Traits>(begin));
-		}
+        /**
+         * \brief Compares two characters for equality
+         *
+         * \param lhs Left-hand side character
+         * \param rhs Right-hand side character
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if characters are equal under chosen comparison mode
+         */
+        static bool Equal(CharType lhs, CharType rhs, bool caseSensitive)
+        {
+            return caseSensitive ? lhs == rhs : CharUtils<TextChar>::ToLower(lhs) == CharUtils<TextChar>::ToLower(rhs);
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param string
-		 * \param begin
-		 * \return
-		 */
-		template <typename Char, typename Traits>
-		static bool StartsWith(const std::basic_string_view<Char, Traits>& string, const std::basic_string_view<Char, Traits>& begin)
-		{
-			return string.find(begin) == 0;
-		}
+        /**
+         * \brief Compares two character buffers for equality
+         *
+         * \param lhs Pointer to the first buffer=
+         * \param rhs Pointer to the second buffer=
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if both sequences are exactly equal
+         */
+        static bool Equal(const CharType* lhs, const CharType* rhs, bool caseSensitive = true)
+        {
+            return Equal(lhs, GetLength(lhs), rhs, GetLength(rhs), caseSensitive);
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param string
-		 * \param begin
-		 * \return
-		 */
-		template <typename Char, typename Traits>
-		static bool StartsWith(const std::basic_string_view<Char, Traits>& string, const Char* begin)
-		{
-			return StartsWith(string, std::basic_string_view<Char, Traits>(begin));
-		}
+        /**
+         * \brief Compares two character buffers for equality
+         *
+         * \param lhs Pointer to the first buffer
+         * \param lhsLength Number of characters in the first buffer
+         * \param rhs Pointer to the second buffer
+         * \param rhsLength Number of characters in the second buffer
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if both sequences are exactly equal
+         */
+        static bool Equal(const CharType* lhs, SizeType lhsLength, const CharType* rhs, SizeType rhsLength, bool caseSensitive = true)
+        {
+            return Compare(lhs, lhsLength, rhs, rhsLength, caseSensitive) == 0;
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param string
-		 * \param begin
-		 * \return
-		 */
-		template <typename Char>
-		static bool StartsWith(const Char* string, const Char* begin)
-		{
-			return StartsWith(std::basic_string_view<Char>(string), std::basic_string_view<Char>(begin));
-		}
+        /**
+         * \brief Compares two character sequences lexicographically
+         *
+         * \param lhs Pointer to the first buffer
+         * \param rhs Pointer to the second buffer
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return 0 if equal, negative if lhs < rhs, positive if lhs > rhs.
+         */
+        static int Compare(const CharType* lhs, const CharType* rhs, bool caseSensitive = true)
+        {
+            return Compare(lhs, GetLength(lhs), rhs, GetLength(rhs), caseSensitive);
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool EndsWith(const std::basic_string<Char, Traits, Alloc>& string, const std::basic_string<Char, Traits, Alloc>& end)
-		{
-			return string.substr(end.length() + 1) == end;
-		}
+        /**
+         * \brief Compares two character sequences lexicographically
+         *
+         * \param lhs Pointer to the first buffer
+         * \param lhsLength Length of the first buffer
+         * \param rhs Pointer to the second buffer
+         * \param rhsLength Length of the second buffer
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return 0 if equal, negative if lhs < rhs, positive if lhs > rhs.
+         */
+        static int Compare(const CharType* lhs, SizeType lhsLength, const CharType* rhs, SizeType rhsLength, bool caseSensitive = true)
+        {
+            SizeType minLen = std::min(lhsLength, rhsLength);
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool EndsWith(const std::basic_string<Char, Traits, Alloc>& string, std::basic_string_view<Char, Traits> end)
-		{
-			return string.substr(end.length() + 1) == end;
-		}
+            for (SizeType i = 0; i < minLen; ++i)
+            {
+                if (!Equal(lhs[i], rhs[i], caseSensitive))
+                    return lhs[i] < rhs[i] ? -1 : 1;
+            }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static bool EndsWith(const std::basic_string<Char, Traits, Alloc>& string, const Char* end)
-		{
-			return EndsWith(string, std::basic_string_view<Char, Traits>(end));
-		}
+            if (lhsLength < rhsLength)
+                return -1;
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char, typename Traits>
-		static bool EndsWith(const std::basic_string_view<Char, Traits>& string, const std::basic_string_view<Char, Traits>& end)
-		{
-			return string.substr(end.length() + 1) == end;
-		}
+            if (lhsLength > rhsLength)
+                return 1;
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char, typename Traits>
-		static bool EndsWith(const std::basic_string_view<Char, Traits>& string, const Char* end)
-		{
-			return EndsWith(string, std::basic_string_view<Char, Traits>(end));
-		}
+            return 0;
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param string
-		 * \param end
-		 * \return
-		 */
-		template <typename Char>
-		static bool EndsWith(const Char* string, const Char* end)
-		{
-			return EndsWith(std::basic_string_view<Char>(string), std::basic_string_view<Char>(end));
-		}
+        /**
+         * \brief Computes the length of a null-terminated character string
+         *
+         * \param string Pointer to the sequence terminated by '\\0'
+         *
+         * \return The number of characters before the null terminator
+         */
+        static SizeType GetLength(const CharType* string)
+        {
+            assert(string != nullptr);
 
-		/**
-		 * \brief 
-		 * \tparam Char 
-		 * \tparam Traits 
-		 * \tparam Alloc 
-		 * \param string 
-		 * \param delimiter 
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static Array<std::basic_string<Char, Traits, Alloc>> Split(const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
-		{
-			Array<std::basic_string<Char, Traits, Alloc>> tokens;
-			Split(tokens, string, delimiter);
+            SizeType length = 0;
+            while (string[length] != '\0')
+                ++length;
 
-			return tokens;
-		}
+            return length;
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param string
-		 * \param delimiter
-		 */
-		template <typename Char, typename Traits>
-		static Array<std::basic_string<Char, Traits>> Split(const std::basic_string_view<Char, Traits>& string, Char delimiter)
-		{
-			Array<std::basic_string<Char, Traits>> tokens;
-			Split(tokens, string, delimiter);
+        /**
+         * \brief Finds the first occurrence of a character
+         *
+         * \param haystack Pointer to the character buffer
+         * \param length Length of the buffer
+         * \param needle The character to find
+         * \param startIndex Index to begin searching from
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindFirst(const CharType* haystack, SizeType length, CharType needle, SizeType startIndex = 0, bool caseSensitive = true)
+        {
+            assert(haystack && needle);
 
-			return tokens;
-		}
+            for (SizeType i = startIndex; i < length; i++)
+            {
+                if (Equal(haystack[i], needle, caseSensitive))
+                    return Optional<SizeType>::Of(i);
+            }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param string
-		 * \param delimiter
-		 */
-		template <typename Char>
-		static Array<std::basic_string<Char>> Split(const Char* string, Char delimiter)
-		{
-			Array<std::basic_string<Char>> tokens;
-			Split(tokens, string, delimiter);
+            return Optional<SizeType>::Empty();
+        }
 
-			return tokens;
-		}
+        /**
+         * \brief Finds the first occurrence of a substring
+         *
+         * \param haystack Pointer to the character buffer
+         * \param needle Pointer to the substring buffer
+         * \param startIndex Index to begin searching from
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindFirst(const CharType* haystack, const CharType* needle, SizeType startIndex = 0, bool caseSensitive = true)
+        {
+            return FindFirst(haystack, GetLength(haystack), needle, GetLength(needle), startIndex, caseSensitive);
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param tokens
-		 * \param string
-		 * \param delimiter
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static void Split(Array<std::basic_string<Char, Traits, Alloc>>& tokens, const std::basic_string<Char, Traits, Alloc>& string, Char delimiter)
-		{
-			tokens.Clear();
+        /**
+         * \brief Finds the first occurrence of a substring
+         *
+         * \param haystack Pointer to the character buffer
+         * \param haystackLength Length of the buffer
+         * \param needle Pointer to the substring buffer
+         * \param needleLength Length of the substring
+         * \param startIndex Index to begin searching from
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindFirst(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, SizeType startIndex = 0, bool caseSensitive = true)
+        {
+            assert(haystack && needle);
 
-			std::basic_string<Char, Traits, Alloc> token;
-			std::basic_istringstream<Char, Traits, Alloc> iss(string);
-			while (std::getline(iss, token, delimiter))
-			{
-				if (!token.empty())
-					tokens.Add(token);
-			}
-		}
+            if (needleLength == 0 || needleLength > haystackLength + startIndex)
+                return Optional<SizeType>::Empty();
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param tokens
-		 * \param string
-		 * \param delimiter
-		 */
-		template <typename Char, typename Traits>
-		static void Split(Array<std::basic_string<Char, Traits>>& tokens, const std::basic_string_view<Char, Traits>& string, Char delimiter)
-		{
-			Split(tokens, std::basic_string<Char, Traits>(string), delimiter);
-		}
+            for (SizeType i = startIndex; i <= haystackLength - needleLength; ++i)
+            {
+                SizeType j = 0;
+                while (j < needleLength && Equal(haystack[i + j], needle[j], caseSensitive))
+                    ++j;
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param tokens
-		 * \param string
-		 * \param delimiter
-		 */
-		template <typename Char>
-		static void Split(Array<std::basic_string<Char>>& tokens, const char* string, Char delimiter)
-		{
-			Split(tokens, std::basic_string_view<Char>(string), delimiter);
-		}
+                if (j != needleLength)
+                    continue;
 
-		/**
-		 * \brief 
-		 * \tparam It 
-		 * \tparam Char 
-		 * \tparam Traits 
-		 * \tparam Alloc 
-		 * \param begin 
-		 * \param end 
-		 * \param glue 
-		 * \return 
-		 */
-		template <typename It, typename Char, typename Traits, typename Alloc>
-		static std::basic_string<Char, Traits, Alloc> Join(It begin, It end, const std::basic_string<Char, Traits, Alloc>& glue)
-		{
-			std::basic_ostringstream<Char, Traits, Alloc> oss;
-			while (begin != end)
-			{
-				if constexpr (std::is_arithmetic_v<typename std::iterator_traits<It>::value_type>)
-				{
-					oss << std::to_string(*begin);
-				}
-				else
-				{
-					oss << *begin;
-				}
+                return Optional<SizeType>::Of(i);
+            }
 
-				if (std::next(begin) != end)
-					oss << glue;
+            return Optional<SizeType>::Empty();
+        }
 
-				++begin;
-			}
+        /**
+         * \brief Finds the last occurrence of a character
+         *
+         * \param haystack Pointer to the buffer to search in
+         * \param length Length of the buffer
+         * \param needle Character to find
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindLast(const CharType* haystack, SizeType length, CharType needle, bool caseSensitive = true)
+        {
+            assert(haystack && needle);
 
-			return oss.str();
-		}
+            for (SizeType i = length - 1; i >= 0; --i)
+            {
+                if (Equal(haystack[i], needle, caseSensitive))
+                    return Optional<SizeType>::Of(i);
+            }
 
-		/**
-		 * \brief
-		 * \tparam It
-		 * \tparam Char
-		 * \tparam Traits
-		 * \param begin
-		 * \param end
-		 * \param glue
-		 * \return
-		 */
-		template <typename It, typename Char, typename Traits>
-		static std::basic_string<Char, Traits> Join(It begin, It end, const std::basic_string_view<Char, Traits>& glue)
-		{
-			return Join(begin, end, std::basic_string<Char, Traits>(glue));
-		}
+            return Optional<SizeType>::Empty();
+        }
 
-		/**
-		 * \brief
-		 * \tparam It
-		 * \tparam Char
-		 * \param begin
-		 * \param end
-		 * \param glue
-		 * \return
-		 */
-		template <typename It, typename Char>
-		static std::basic_string<Char> Join(It begin, It end, const Char* glue)
-		{
-			return Join(begin, end, std::basic_string<Char>(glue));
-		}
+        /**
+         * \brief Finds the last occurrence of a substring
+         *
+         * \param haystack Pointer to the buffer to search in
+         * \param needle Pointer to the substring
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindLast(const CharType* haystack, const CharType* needle, bool caseSensitive = true)
+        {
+            return FindLast(haystack, GetLength(haystack), needle, GetLength(needle), caseSensitive);
+        }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static std::basic_string<Char, Traits, Alloc> Capitalize(const std::basic_string<Char, Traits, Alloc>& string)
-		{
-			return Capitalize(std::basic_string_view<Char, Traits>(string));
-		}
+        /**
+         * \brief Finds the last occurrence of a substring
+         *
+         * \param haystack Pointer to the buffer to search in
+         * \param haystackLength Length of haystack buffer
+         * \param needle Pointer to the substring
+         * \param needleLength Length of substring
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if not found
+         */
+        static Optional<SizeType> FindLast(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, bool caseSensitive = true)
+        {
+            assert(haystack && needle);
 
-		/**
-		 * \brief 
-		 * \tparam Char 
-		 * \tparam Traits 
-		 * \tparam Alloc 
-		 * \param string 
-		 * \return 
-		 */
-		template <typename Char, typename Traits, typename Alloc = std::allocator<Char>>
-		static std::basic_string<Char, Traits, Alloc> Capitalize(std::basic_string_view<Char, Traits> string)
-		{
-			std::basic_string<Char, Traits, Alloc> capitalized(string);
-			for (typename std::basic_string<Char, Traits, Alloc>::size_type i = 0; i < string.length(); ++i)
-			{
-				if (std::isalpha(capitalized[i]))
-					capitalized[i] = static_cast<Char>(std::toupper(capitalized[i]));
-			}
+            if (needleLength == 0 || needleLength > haystackLength)
+                return Optional<SizeType>::Empty();
 
-			return capitalized;
-		}
+            SizeType i = haystackLength - needleLength;
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param string
-		 * \return
-		 */
-		template <typename Char>
-		static std::basic_string<Char> Capitalize(const Char* string)
-		{
-			return Capitalize(std::basic_string_view<Char>(string));
-		}
+            while (true)
+            {
+                SizeType j = 0;
+                while (j < needleLength && Equal(haystack[i + j], needle[j], caseSensitive))
+                    ++j;
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc>
-		static std::basic_string<Char, Traits, Alloc> Minusculize(const std::basic_string<Char, Traits, Alloc>& string)
-		{
-			return Minusculize(std::basic_string_view<Char, Traits>(string));
-		}
+                if (j == needleLength)
+                    return Optional<SizeType>::Of(i);
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \tparam Traits
-		 * \tparam Alloc
-		 * \param string
-		 * \return
-		 */
-		template <typename Char, typename Traits, typename Alloc = std::allocator<Char>>
-		static std::basic_string<Char, Traits, Alloc> Minusculize(std::basic_string_view<Char, Traits> string)
-		{
-			std::basic_string<Char, Traits, Alloc> minusculized(string);
-			for (typename std::basic_string<Char, Traits, Alloc>::size_type i = 0; i < string.length(); ++i)
-			{
-				if (std::isalpha(minusculized[i]))
-					minusculized[i] = static_cast<Char>(std::tolower(minusculized[i]));
-			}
+                if (i == 0)
+                    break;
 
-			return minusculized;
-		}
+                --i;
+            }
 
-		/**
-		 * \brief
-		 * \tparam Char
-		 * \param string
-		 * \return
-		 */
-		template <typename Char>
-		static std::basic_string<Char> Minusculize(const Char* string)
-		{
-			return Minusculize(std::basic_string_view<Char>(string));
-		}
-	};
+            return Optional<SizeType>::Empty();
+        }
+
+        /**
+         * \brief Determines whether a sequence begins with a given prefix
+         *
+         * \param haystack Pointer to the sequence
+         * \param needle Pointer to prefix buffer
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if haystack starts with needle.
+         */
+        static bool StartsWith(const CharType* haystack, const CharType* needle, bool caseSensitive = true)
+        {
+            return StartsWith(haystack, GetLength(haystack), needle, GetLength(needle), caseSensitive);
+        }
+
+        /**
+         * \brief Determines whether a sequence begins with a given prefix
+         *
+         * \param haystack Pointer to the sequence
+         * \param haystackLength Length of the sequence
+         * \param needle Pointer to prefix buffer
+         * \param needleLength Length of prefix
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if haystack starts with needle.
+         */
+        static bool StartsWith(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, bool caseSensitive = true)
+        {
+            if (haystackLength < needleLength)
+                return false;
+
+            for (SizeType i = 0; i < needleLength; i++)
+            {
+                if (!Equal(haystack[i], needle[i], caseSensitive))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * \brief Determines whether a sequence ends with a given suffix
+         *
+         * \param haystack Pointer to the sequence
+         * \param needle Pointer to suffix buffer
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if haystack ends with needle.
+         */
+        static bool EndsWith(const CharType* haystack, const CharType* needle, bool caseSensitive = true)
+        {
+            return EndsWith(haystack, GetLength(haystack), needle, GetLength(needle), caseSensitive);
+        }
+
+        /**
+         * \brief Determines whether a sequence ends with a given suffix
+         *
+         * \param haystack Pointer to the sequence
+         * \param haystackLength Length of the sequence
+         * \param needle Pointer to suffix buffer
+         * \param needleLength Length of suffix
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return True if haystack ends with needle.
+         */
+        static bool EndsWith(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, bool caseSensitive = true)
+        {
+            if (haystackLength < needleLength)
+                return false;
+
+            for (SizeType i = 0; i < needleLength; i++)
+            {
+                if (!Equal(haystack[haystackLength - needleLength + i], needle[i], caseSensitive))
+                    return false;
+            }
+
+            return true;
+        }
+
+        static bool IsPureAnsi(const CharType* string)
+        {
+            return IsPureAnsi(string, GetLength(string));
+        }
+
+        static bool IsPureAnsi(const CharType* string, SizeType length)
+        {
+            if constexpr (std::is_same_v<CharType, AnsiChar>)
+            {
+                return true;
+            }
+            else
+            {
+                for (SizeType i = 0; i < length; ++i)
+                {
+                    if (string[i] > 127)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /**
+         * \brief Tell whether a string contains only numeric characters
+         * 
+         * \param string The string to check
+         * \param length Length of the \p string
+         *
+         * \return True if \p string contains only numeric characters, false otherwise
+         */
+        static bool IsNumeric(const CharType* string, SizeType length)
+        {
+            bool isRelative = false;
+            const bool startsWithSight = string[0] == '-' || string[0] == '+';
+            for (SizeType i = startsWithSight ? 1 : 0; i < length; ++i)
+            {
+                bool isNumeric = CharUtils<CharType>::IsDigit(string[i]);
+
+                if (string[i] == '.')
+                {
+                    if (isRelative)
+                        return false;
+
+                	isRelative = true;
+                }
+                else if (!isNumeric)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        template <typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+        static Optional<T> TryToInteger(const CharType* string, int base = 0)
+        {
+            using Unsigned = std::make_unsigned_t<T>;
+
+            while (CharUtils<CharType>::IsBlank(*string))
+                ++string;
+
+            bool negative = false;
+            if (*string == CharType('+') || *string == CharType('-'))
+            {
+                if (*string == CharType('-'))
+                    negative = true;
+
+                ++string;
+            }
+
+            if (base == 0)
+            {
+                if (string[0] == CharType('0'))
+                {
+                    if (CharUtils<CharType>::ToLower(string[1]) == CharType('x'))
+                    {
+                        base = 16;
+                        string += 2;
+                    }
+                    else
+                    {
+                        base = 8;
+                        ++string;
+                    }
+                }
+                else
+                {
+                    base = 10;
+                }
+            }
+
+            Unsigned result = 0;
+            const Unsigned limit = std::numeric_limits<Unsigned>::max() / base;
+            for (; *string; ++string)
+            {
+                int digit = CharUtils<CharType>::DigitValue(*string);
+                if (digit < 0 || digit >= base)
+                    break;
+
+                if (result > limit || (result == limit && Unsigned(digit) > std::numeric_limits<Unsigned>::max() % base))
+                    return Optional<T>::Empty();
+
+                result = result * base + digit;
+            }
+
+            return Optional<T>::Of(negative ? -static_cast<T>(result) : static_cast<T>(result));
+        }
+
+        template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
+        static Optional<T> TryToFloatingPoint(const CharType* string)
+        {
+            if constexpr (std::is_same_v<T, float>)
+            {
+                if constexpr (std::is_same_v<CharType, AnsiChar>)
+                {
+                    AnsiChar* end;
+                    T value = std::strtof(string, &end);
+                    if (end == string)
+                        return Optional<T>::Empty();
+
+                    return Optional<T>::Of(value);
+                }
+            }
+            else if constexpr (std::is_same_v<T, double>)
+            {
+                if constexpr (std::is_same_v<CharType, AnsiChar>)
+                {
+                    AnsiChar* end;
+                    T value = std::strtod(string, &end);
+                    if (end == string)
+                        return Optional<T>::Empty();
+
+                    return Optional<T>::Of(value);
+                }
+            }
+
+            return Optional<T>::Empty();
+        }
+    };
 }
 
-#endif // COCKTAIL_CORE_UTILITY_STRINGUTILS_HPP
+#endif // COCKTAIL_CORE_UTILITY_CHARACTERS_HPP

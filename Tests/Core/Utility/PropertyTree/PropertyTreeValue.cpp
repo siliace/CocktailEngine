@@ -6,17 +6,17 @@ TEST_CASE("Create a property tree value", "[PropertyTreeValue]")
 {
 	SECTION("With a string-able value")
 	{
-		Ck::Properties::Value value(42);
+		Ck::Properties::ValueType value(42);
 
-		REQUIRE(value.GetType() == Ck::Properties::Node::Type::Value);
-		REQUIRE(value.As<unsigned short>() == static_cast<unsigned short>(42));
+		REQUIRE(value.GetType() == Ck::Properties::NodeType::Type::Value);
+		REQUIRE(value.As<unsigned int>() == static_cast<unsigned int>(42));
 	}
 
 	SECTION("With a raw string")
 	{
-		Ck::Properties::Value value("Hello World");
+		Ck::Properties::ValueType value(CK_TEXT("Hello World"));
 
-		REQUIRE(value.GetType() == Ck::Properties::Node::Type::Value);
-		REQUIRE(value.As<std::string>() == "Hello World");
+		REQUIRE(value.GetType() == Ck::Properties::NodeType::Type::Value);
+		REQUIRE(value.As<Ck::String>() == CK_TEXT("Hello World"));
 	}
 }

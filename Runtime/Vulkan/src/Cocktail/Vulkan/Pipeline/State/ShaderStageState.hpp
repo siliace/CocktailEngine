@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		const char* EntryPoint = "main";
+		const AnsiChar* EntryPoint = "main";
 	};
 }
 

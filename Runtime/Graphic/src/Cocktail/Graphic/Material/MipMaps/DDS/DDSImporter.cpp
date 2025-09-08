@@ -36,10 +36,10 @@ namespace Ck
 					if (pixelFormat.FourCC == MakeFourCC('D', 'X', 'T', '5'))
 						return PixelFormat::Compressed(PixelFormat::CompressionScheme::Dxt5, false);
 
-					throw DDSImportException("Unknown texture compression format (FourCC {})", pixelFormat.FourCC);
+					throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC {})"), pixelFormat.FourCC);
 				}
 
-				throw DDSImportException("Unknown texture compression format (FourCC {})", pixelFormat.FourCC);
+				throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC {})"), pixelFormat.FourCC);
 			}
 
 			switch (pixelFormat.RGBBitCount)
@@ -57,7 +57,7 @@ namespace Ck
 			case 32:
 				{
 					if (!hasAlpha)
-						throw DDSImportException("Texture format has 32 bits but does not support alpha");
+						throw DDSImportException(CK_TEXT("Texture format has 32 bits but does not support alpha"));
 
 					if (pixelFormat.RedBitMask == 0x00FF0000 && pixelFormat.GreenBitMask == 0x0000FF00 && pixelFormat.BlueBitMask == 0x000000FF && pixelFormat.AlphaBitMask == 0xFF000000)
 						return PixelFormat::Color(PixelFormat::Layout::BGRA, DataType::UnsignedInt8);
@@ -68,7 +68,7 @@ namespace Ck
 				break;
 			}
 
-			throw DDSImportException("Unknown texture format");
+			throw DDSImportException(CK_TEXT("Unknown texture format"));
 		}
 
 		unsigned int GetTextureLayerCount(Optional<DDSHeaderDxt10> dxt10Header)
@@ -84,9 +84,9 @@ namespace Ck
 		}
 	}
 
-	std::shared_ptr<MipMaps> DDSImporter::LoadFromPath(const std::filesystem::path& path, const MipMapsImportParameters& parameters)
+	std::shared_ptr<MipMaps> DDSImporter::LoadFromPath(const Path& path, const MipMapsImportParameters& parameters)
 	{
-		CK_LOG(MipMapsLoaderLogCategory, LogLevel::Info, "Loading mipmaps from {}", path.string());
+		CK_LOG(MipMapsLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading mipmaps from %s"), path.ToString());
 		return AssetImporter<MipMaps, MipMapsImportParameters>::LoadFromPath(path, parameters);
 	}
 
@@ -98,15 +98,15 @@ namespace Ck
 		unsigned int magicKey;
 		std::size_t magicKeySize = inputStream.Read(&magicKey, sizeof(unsigned int));
 		if (magicKeySize != sizeof(unsigned int) || magicKey != DdsMagic)
-			throw DDSImportException("Invalid DDS MagicKey");
+			throw DDSImportException(CK_TEXT("Invalid DDS MagicKey"));
 
 		DDSHeader header;
 		std::size_t headerSize = inputStream.Read(&header, sizeof(DDSHeader));
 		if (headerSize != sizeof(DDSHeader) || header.Size != sizeof(DDSHeader) || !(header.FileFlags & RequiredFileFlags))
-			throw DDSImportException("Invalid DDS Header");
+			throw DDSImportException(CK_TEXT("Invalid DDS Header"));
 
 		if (header.PixelFormat.Size != sizeof(DDSPixelFormat) || header.PixelFormat.Flags & DDSPixelFormat::FlagBits::YUV || header.PixelFormat.Flags & DDSPixelFormat::FlagBits::Luminance)
-			throw DDSImportException("Invalid DDS PixelFormat");
+			throw DDSImportException(CK_TEXT("Invalid DDS PixelFormat"));
 
 		Optional<DDSHeaderDxt10> dxt10Header;
 		if (header.PixelFormat.Flags & DDSPixelFormat::FlagBits::FourCC && header.PixelFormat.FourCC == MakeFourCC('D', 'X', '1', '0'))
@@ -114,7 +114,7 @@ namespace Ck
 			DDSHeaderDxt10 ddsDxt10Header;
 			std::size_t dxt10HeaderSize = inputStream.Read(&ddsDxt10Header, sizeof(DDSHeaderDxt10));
 			if (dxt10HeaderSize != sizeof(DDSHeaderDxt10))
-				throw DDSImportException("Invalid DDS Dxt10Header");
+				throw DDSImportException(CK_TEXT("Invalid DDS Dxt10Header"));
 
 			dxt10Header = Optional<DDSHeaderDxt10>::Of(ddsDxt10Header);
 		}
@@ -133,7 +133,7 @@ namespace Ck
 				DDSHeader::Cap2Bits::CubemapPositiveZ | DDSHeader::Cap2Bits::CubemapNegativeZ;
 
 			if (!(header.Caps2 & RequiredCubeFlags))
-				throw DDSImportException("Missing face in DDS cubemap");
+				throw DDSImportException(CK_TEXT("Missing face in DDS cubemap"));
 
 			std::shared_ptr<CubeMipMaps> mipMaps = std::make_shared<CubeMipMaps>(MakeExtent(baseSize.Width, baseSize.Height), pixelFormat, arrayLayerCount, mipMapCount);
 			for (unsigned int slice = 0; slice < arrayLayerCount; slice++)
@@ -147,7 +147,7 @@ namespace Ck
 
 						std::size_t levelPixelSize = inputStream.Read(pixels.GetData(), levelAllocationSize);
 						if (levelPixelSize != levelAllocationSize)
-							throw DDSImportException("Invalid pixel memory length at slice {}, level {}", slice, level);
+							throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice {}, level {}"), slice, level);
 
 						mipMapLevel.CopyPixels(pixels.GetData());
 					}
@@ -167,7 +167,7 @@ namespace Ck
 
 				std::size_t levelPixelSize = inputStream.Read(pixels.GetData(), levelAllocationSize);
 				if (levelPixelSize != levelAllocationSize)
-					throw DDSImportException("Invalid pixel memory length at slice {}, level {}", slice, level);
+					throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice {}, level {}"), slice, level);
 
 				mipMapLevel.CopyPixels(pixels.GetData());
 			}
@@ -176,9 +176,9 @@ namespace Ck
 		return mipMaps;
 	}
 
-	bool DDSImporter::SupportExtension(std::string_view extension) const
+	bool DDSImporter::SupportExtension(StringView extension) const
 	{
-		return extension == ".dds";
+		return extension == CK_TEXT(".dds");
 	}
 
 	bool DDSImporter::SupportParameters(const MipMapsImportParameters& parameters) const

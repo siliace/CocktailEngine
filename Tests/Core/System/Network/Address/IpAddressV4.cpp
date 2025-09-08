@@ -26,7 +26,7 @@ TEST_CASE("Create an ipv4 address from four bytes", "[IpAddressV4]")
 
 TEST_CASE("Convert an ipv4 address to a string", "[IpAddressV4]")
 {
-    REQUIRE(Ck::IpAddressV4::Localhost.ToString() == "127.0.0.1");
+    REQUIRE(Ck::IpAddressV4::Localhost.ToString() == CK_TEXT("127.0.0.1"));
 }
 
 TEST_CASE("Convert an ipv4 address to a packed Uint32", "[IpAddressV4]")

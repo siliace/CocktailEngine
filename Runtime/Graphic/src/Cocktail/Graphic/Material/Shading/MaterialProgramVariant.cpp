@@ -12,8 +12,8 @@ namespace Ck
 
 		for (VertexAttributeSemantic vertexAttribute : Enum<VertexAttributeSemantic>::Values)
 		{
-			const std::string& vertexAttributeName = interface.VertexAttributes[vertexAttribute];
-			if (vertexAttributeName.empty())
+			const String& vertexAttributeName = interface.VertexAttributes[vertexAttribute];
+			if (vertexAttributeName.IsEmpty())
 				continue;
 
 			mVertexAttributeLocations[vertexAttribute] = mShaderProgram->GetStage(Renderer::ShaderType::Vertex)->FindInputAttribute(vertexAttributeName);
@@ -21,8 +21,8 @@ namespace Ck
 
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-			const std::string& textureSlotName = interface.Textures[textureType].Name;
-			if (textureSlotName.empty())
+			const String& textureSlotName = interface.Textures[textureType].Name;
+			if (textureSlotName.IsEmpty())
 				continue;
 
 			mTextureUniformSlots[textureType] = mShaderProgram->FindUniformSlot(textureSlotName);

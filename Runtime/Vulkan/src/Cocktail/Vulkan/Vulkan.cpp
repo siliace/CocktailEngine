@@ -80,7 +80,7 @@ namespace Ck::Vulkan
 			return std::make_unique<PipelineManager>(renderDevice);
 		});
 
-		std::filesystem::path pipelineCachePath = PipelineCacheSaver::ComputePipelineCachePath(createInfo.ApplicationName, createInfo.ApplicationVersion);
+		Path pipelineCachePath = PipelineCacheSaver::ComputePipelineCachePath(createInfo.ApplicationName, createInfo.ApplicationVersion);
 		renderDevice->Singleton<PipelineCacheSaver>([pipelineCachePath = std::move(pipelineCachePath)](PipelineManager* pipelineManager) {
 			return std::make_unique<PipelineCacheSaver>(pipelineManager, std::move(pipelineCachePath));
 		}, false);

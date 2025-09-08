@@ -44,7 +44,7 @@ namespace Ck::Detail::Xlib
 		 * \brief 
 		 * \return 
 		 */
-		std::string GetName() const override;
+		String GetName() const override;
 
 		/**
 		 * \brief 
@@ -80,7 +80,7 @@ namespace Ck::Detail::Xlib
 		XRROutputInfo* mOutputInfo;
 		Extent2D<unsigned int> mSize;
 		Orientation mOrientation;
-		std::string mName;
+		String mName;
 		VideoMode mCurrentVideoMode;
 	};
 }

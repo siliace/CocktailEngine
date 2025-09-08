@@ -4,16 +4,16 @@
 
 namespace Ck::Detail::Unix
 {
-	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(std::string_view name)
+	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(StringView name)
 	{
 		return std::make_unique<Library>(name);
 	}
 
-	void LibraryService::AddLibraryDirectory(const std::filesystem::path& path)
+	void LibraryService::AddLibraryDirectory(const Path& path)
 	{
 	}
 
-	void LibraryService::RemoveLibraryDirectory(const std::filesystem::path& path)
+	void LibraryService::RemoveLibraryDirectory(const Path& path)
 	{
 	}
 }

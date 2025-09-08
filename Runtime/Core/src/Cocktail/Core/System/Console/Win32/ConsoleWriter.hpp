@@ -36,13 +36,19 @@ namespace Ck::Detail::Win32
 		 * \param string 
 		 * \param length 
 		 */
-		void Write(const char* string, std::size_t length) override;
+		void Write(const TextChar* string, std::size_t length) override;
 
 		/**
 		 * \brief 
 		 */
 		void Flush() override;
-		
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		EncodingMode GetEncodingMode() override;
+
 	private:
 
 		HANDLE mHandle;

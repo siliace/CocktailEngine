@@ -17,12 +17,12 @@ namespace Ck::Vulkan
 		Renderer::ShaderProgramCreateInfo shaderProgramCreateInfo;
 		shaderProgramCreateInfo.Type = Renderer::ShaderProgramType::Graphic;
 		shaderProgramCreateInfo.ShaderCount = 2;
-		shaderProgramCreateInfo.Shaders[0] = LoadShader(*mRenderDevice, "builtin://vulkan/resources/depth_resolve.vert.spv", Renderer::ShaderType::Vertex);
-		shaderProgramCreateInfo.Shaders[1] = LoadShader(*mRenderDevice, "builtin://vulkan/resources/depth_resolve.frag.spv", Renderer::ShaderType::Fragment);
+		shaderProgramCreateInfo.Shaders[0] = LoadShader(*mRenderDevice, CK_TEXT("builtin://vulkan/resources/depth_resolve.vert.spv"), Renderer::ShaderType::Vertex);
+		shaderProgramCreateInfo.Shaders[1] = LoadShader(*mRenderDevice, CK_TEXT("builtin://vulkan/resources/depth_resolve.frag.spv"), Renderer::ShaderType::Fragment);
 
 		mShaderProgram = std::static_pointer_cast<ShaderProgram>(mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo));
 
-		mDepthSamplerSlot = mShaderProgram->FindUniformSlot("inTexture");
+		mDepthSamplerSlot = mShaderProgram->FindUniformSlot(CK_TEXT("inTexture"));
 		assert(mDepthSamplerSlot);
 	}
 
@@ -68,7 +68,7 @@ namespace Ck::Vulkan
 		commandList.Barrier(1, postBarriers);
 	}
 
-	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType)
+	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const Path& path, Renderer::ShaderType shaderType)
 	{
 		ByteArray shaderCode = FileUtils::ReadFile(path);
 

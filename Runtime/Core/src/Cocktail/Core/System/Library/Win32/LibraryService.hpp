@@ -12,15 +12,15 @@ namespace Ck::Detail::Win32
 	{
 	public:
 
-		std::unique_ptr<Ck::Library> LoadLibrary(std::string_view name) override;
+		std::unique_ptr<Ck::Library> LoadLibrary(StringView name) override;
 		
-		void AddLibraryDirectory(const std::filesystem::path& path) override;
+		void AddLibraryDirectory(const Path& path) override;
 
-		void RemoveLibraryDirectory(const std::filesystem::path& path) override;
+		void RemoveLibraryDirectory(const Path& path) override;
 
 	private:
 
-		std::unordered_map<std::string, DLL_DIRECTORY_COOKIE> mDirectoryCookies;
+		std::unordered_map<Path, DLL_DIRECTORY_COOKIE> mDirectoryCookies;
 	};
 }
 

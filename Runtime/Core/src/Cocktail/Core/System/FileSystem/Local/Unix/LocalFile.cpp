@@ -7,7 +7,7 @@
 
 namespace Ck::Detail::Unix
 {
-	LocalFile::LocalFile(const std::filesystem::path& path, const FileOpenFlags& flags) :
+	LocalFile::LocalFile(const Path& path, const FileOpenFlags& flags) :
 		mPath(path)
 	{
 		int sysFlags = 0;
@@ -27,7 +27,7 @@ namespace Ck::Detail::Unix
 		if (flags & FileOpenFlagBits::Write && flags & FileOpenFlagBits::Truncate)
 			sysFlags |= O_TRUNC;
 
-		mHandle = ::open64(path.c_str(), sysFlags, S_IRWXU);
+		mHandle = ::open64(CK_TEXT_TO_ANSI(path.ToString().GetData()), sysFlags, S_IRWXU);
 		if (mHandle == -1)
 			throw SystemError::GetLastError();
 	}
@@ -87,7 +87,7 @@ namespace Ck::Detail::Unix
 		return static_cast<Uint64>(info.st_size);
 	}
 
-	const std::filesystem::path& LocalFile::GetPath() const
+	const Path& LocalFile::GetPath() const
 	{
 		return mPath;
 	}

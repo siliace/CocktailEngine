@@ -14,22 +14,22 @@ namespace Ck::Detail::Unix
 	{
 	}
 
-	Signal<std::filesystem::path>& LocalDirectoryWatcher::OnFileCreated()
+	Signal<Path>& LocalDirectoryWatcher::OnFileCreated()
 	{
 		return mOnFileCreated;
 	}
 
-	Signal<std::filesystem::path> & LocalDirectoryWatcher::OnFileModified()
+	Signal<Path> & LocalDirectoryWatcher::OnFileModified()
 	{
 		return mOnFileModified;
 	}
 
-	Signal<std::filesystem::path, std::filesystem::path>& LocalDirectoryWatcher::OnFileRenamed()
+	Signal<Path, Path>& LocalDirectoryWatcher::OnFileRenamed()
 	{
 		return mOnFileRenamed;
 	}
 
-	Signal<std::filesystem::path>& LocalDirectoryWatcher::OnFileDeleted()
+	Signal<Path>& LocalDirectoryWatcher::OnFileDeleted()
 	{
 		return mOnFileDeleted;
 	}

@@ -1,5 +1,5 @@
 #include <Cocktail/Core/System/Network/Address/IpAddressV4.hpp>
-#include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/Utility/TranslatorCast.hpp>
 
 namespace Ck
 {
@@ -48,9 +48,18 @@ namespace Ck
         return Protocol::Ipv4;
     }
 
-    std::string IpAddressV4::ToString() const
+    String IpAddressV4::ToString() const
     {
-        return StringUtils::Join(mBytes.begin(), mBytes.end(), ".");
+        String result;
+        for (String::SizeType i = 0; i < mBytes.size(); i++)
+        {
+            if (i > 0)
+                result.Append(CK_TEXT('.'));
+
+            result.Append(TranslatorCast<String>(mBytes[i]));
+        }
+
+        return result;
     }
 
     bool IpAddressV4::operator==(const IpAddressV4& rhs) const

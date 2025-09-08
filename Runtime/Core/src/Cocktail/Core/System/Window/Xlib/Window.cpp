@@ -251,10 +251,10 @@ namespace Ck::Detail::Xlib
 
         // Set the atoms used internaly
         App::Invoke([&](AtomManager* atomManager) {
-            Atom deleteAtom = atomManager->GetAtom("WM_DELETE_WINDOW");
+            Atom deleteAtom = atomManager->GetAtom(CK_TEXT("WM_DELETE_WINDOW"));
             XSetWMProtocols(mHandle.Display, mHandle.Window, &deleteAtom, 1);
 
-            Atom hintsAtom = atomManager->GetAtom("_MOTIF_WM_HINTS", false);
+            Atom hintsAtom = atomManager->GetAtom(CK_TEXT("_MOTIF_WM_HINTS"), false);
             if (!hintsAtom)
                 return;
 
@@ -343,10 +343,10 @@ namespace Ck::Detail::Xlib
             case ClientMessage:
                 {
                     AtomManager* atomManager = App::Resolve<AtomManager>();
-                    if (xEvent.xclient.message_type == atomManager->GetAtom("WM_PROTOCOLS"))
+                    if (xEvent.xclient.message_type == atomManager->GetAtom(CK_TEXT("WM_PROTOCOLS")))
                     {
-                        static const Atom wmDeleteWindow = atomManager->GetAtom("WM_DELETE_WINDOW");
-                        static const Atom netWmPing = atomManager->GetAtom("_NET_WM_PING", false);
+                        static const Atom wmDeleteWindow = atomManager->GetAtom(CK_TEXT("WM_DELETE_WINDOW"));
+                        static const Atom netWmPing = atomManager->GetAtom(CK_TEXT("_NET_WM_PING"), false);
                         if (xEvent.xclient.format == 32 && xEvent.xclient.data.l[0] == static_cast<long>(wmDeleteWindow))
                         {
                             WindowCloseEvent closeEvent;
@@ -605,19 +605,17 @@ namespace Ck::Detail::Xlib
 	{
     }
 
-    std::string Window::GetTitle() const
+    String Window::GetTitle() const
     {
-        std::string title;
         char* buffer = COCKTAIL_STACK_ALLOC(char, 256);
         XFetchName(mHandle.Display, mHandle.Window, &buffer);
-        title = buffer;
-        XFree(buffer);
-        return title;
+
+        return CK_ANSI_TO_TEXT(buffer);
     }
 
-    void Window::SetTitle(const std::string& title)
+    void Window::SetTitle(const String& title)
     {
-        XStoreName(mHandle.Display, mHandle.Window, title.c_str());
+        XStoreName(mHandle.Display, mHandle.Window, CK_TEXT_TO_ANSI(title.GetData()));
     }
 
     Extent2D<unsigned int> Window::GetSize() const

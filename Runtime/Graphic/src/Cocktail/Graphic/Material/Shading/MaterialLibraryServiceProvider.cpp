@@ -22,19 +22,19 @@ namespace Ck
 		application->AfterBooted<SystemServiceProvider>([](Application* application, ServiceProvider* systemServiceProvider) {
 			application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
 				MaterialProgramLibrary::Entry entry;
-				entry.Name = "basic_mesh";
+				entry.Name = CK_TEXT("basic_mesh");
 				entry.RenderableType = RenderableType::Mesh;
 				entry.ShadingMode = Material::ShadingMode::Phong;
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-				entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-				entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = CK_TEXT("ck_VertexPosition");
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = CK_TEXT("ck_VertexTexCoord");
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = CK_TEXT("ck_VertexNormal");
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = CK_TEXT("ck_VertexColor");
+				entry.Interface.Textures[Material::TextureType::BaseColor] = { CK_TEXT("ck_MaterialBaseColor"), Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.Textures[Material::TextureType::Alpha] = { CK_TEXT("ck_MaterialAlpha"), Renderer::StaticSampler::TrilinearWrap };
 
 				{
-					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/default.vert.spv");
-					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/default.frag.spv");
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default.vert.spv"));
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default.frag.spv"));
 
 					EnumMap<Renderer::ShaderType, ByteArray> binaries;
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
@@ -44,8 +44,8 @@ namespace Ck
 				}
 
 				{
-					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/default-no-normal.vert.spv");
-					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/default-no-normal.frag.spv");
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default-no-normal.vert.spv"));
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default-no-normal.frag.spv"));
 
 					EnumMap<Renderer::ShaderType, ByteArray> binaries;
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
@@ -55,8 +55,8 @@ namespace Ck
 				}
 
 				{
-					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/colored.vert.spv");
-					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/colored.frag.spv");
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/colored.vert.spv"));
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/colored.frag.spv"));
 
 					EnumMap<Renderer::ShaderType, ByteArray> binaries;
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
@@ -66,8 +66,8 @@ namespace Ck
 				}
 
 				{
-					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/textured.vert.spv");
-					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/textured.frag.spv");
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured.vert.spv"));
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured.frag.spv"));
 
 					EnumMap<Renderer::ShaderType, ByteArray> binaries;
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
@@ -77,8 +77,8 @@ namespace Ck
 				}
 
 				{
-					ByteArray basicMeshVertexStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/textured-blended.vert.spv");
-					ByteArray basicMeshFragmentStage = FileUtils::ReadFile("builtin://graphic/resources/shaders/mesh/textured-blended.frag.spv");
+					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-blended.vert.spv"));
+					ByteArray basicMeshFragmentStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-blended.frag.spv"));
 
 					EnumMap<Renderer::ShaderType, ByteArray> binaries;
 					binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);

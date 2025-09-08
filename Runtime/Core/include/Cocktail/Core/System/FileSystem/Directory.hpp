@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_DIRECTORY_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_DIRECTORY_HPP
 
-#include <filesystem>
-
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
 {
@@ -23,13 +21,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual Array<std::filesystem::path> GetContent() const = 0;
+		virtual Array<Path> GetContent() const = 0;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual const std::filesystem::path& GetPath() const = 0;
+		virtual const Path& GetPath() const = 0;
 
 		/**
 		 * \brief 

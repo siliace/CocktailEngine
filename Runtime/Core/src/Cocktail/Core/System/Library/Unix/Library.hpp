@@ -9,11 +9,11 @@ namespace Ck::Detail::Unix
 	{
 	public:
 
-		explicit Library(std::string_view name);
+		explicit Library(StringView name);
 
 		~Library() override;
 
-		FunctionPtr LoadFunction(std::string_view functionName) override;
+		FunctionPtr LoadFunction(const AnsiChar* functionName) override;
 
 		void* GetSystemHandle() const override;
 

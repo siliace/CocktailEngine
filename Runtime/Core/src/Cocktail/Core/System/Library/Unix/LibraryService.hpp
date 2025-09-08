@@ -9,11 +9,11 @@ namespace Ck::Detail::Unix
 	{
 	public:
 
-		std::unique_ptr<Ck::Library> LoadLibrary(std::string_view name) override;
+		std::unique_ptr<Ck::Library> LoadLibrary(StringView name) override;
 		
-		void AddLibraryDirectory(const std::filesystem::path& path) override;
+		void AddLibraryDirectory(const Path& path) override;
 
-		void RemoveLibraryDirectory(const std::filesystem::path& path) override;
+		void RemoveLibraryDirectory(const Path& path) override;
 	};
 }
 

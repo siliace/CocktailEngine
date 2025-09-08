@@ -1,3 +1,4 @@
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/Image/ImageServiceProvider.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
@@ -17,7 +18,10 @@ namespace Ck::Main
 	ExitCode InvokeMain(Application* application)
 	{
 #ifndef NDEBUG
-		const bool waitedForDebugger = application->GetEnvironmentVariable("COCKTAIL_WAIT_FOR_DEBUGGER") == "1";
+		const bool waitedForDebugger = application->GetEnvironmentVariable(CK_TEXT("COCKTAIL_WAIT_FOR_DEBUGGER")).Map([](const String& variable) {
+			return variable == CK_TEXT("1");
+		}).GetOr(false);
+
 		if (waitedForDebugger)
 		{
 			ThreadUtils::WaitUntil([&]() {
@@ -34,10 +38,10 @@ namespace Ck::Main
 
 		application->Boot();
 		  
-		CK_LOG(MainLogCategory, LogLevel::Info, "Application has been booted");
+		CK_LOG(MainLogCategory, LogLevel::Info, CK_TEXT("Application has been booted"));
 #ifndef NDEBUG
 		if (waitedForDebugger)
-			CK_LOG(MainLogCategory, LogLevel::Info, "Debugger connected");
+			CK_LOG(MainLogCategory, LogLevel::Info, CK_TEXT("Debugger connected"));
 #endif
 
 		ExitCode exitCode;
@@ -48,18 +52,18 @@ namespace Ck::Main
 		}
 		catch (const Exception& e)
 		{
-			CK_LOG(MainLogCategory, LogLevel::Critical, "Process terminated with exception {} of type {} with message {}", e.GetName(), e.GetTypeName(), e.GetMessage());
+			CK_LOG(MainLogCategory, LogLevel::Critical, CK_TEXT("Process terminated with exception of type %s with message %s"), e.GetName(), e.GetMessage());
 			exitCode = ExitCode::GeneralError;
 		}
 		catch (const std::exception& e)
 		{
-			CK_LOG(MainLogCategory, LogLevel::Critical, "Process terminated with exception {}: {}", typeid(e).name(), e.what());
+			CK_LOG(MainLogCategory, LogLevel::Critical, CK_TEXT("Process terminated with exception %s with message %s"), typeid(e).name(), e.what());
 			exitCode = ExitCode::GeneralError;
 		}
 
 		application->Terminate();
 
-		CK_LOG(MainLogCategory, exitCode == ExitCode::Success ? LogLevel::Info : LogLevel::Error, "Application exited with code {}", Enum<ExitCode>::ToString(exitCode));
+		CK_LOG(MainLogCategory, exitCode == ExitCode::Success ? LogLevel::Info : LogLevel::Error, CK_TEXT("Application exited with code %hs"), exitCode);
 
 		return exitCode;
 	}

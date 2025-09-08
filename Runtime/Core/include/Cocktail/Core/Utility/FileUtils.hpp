@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_UTILITY_FILEUTILS_HPP
 #define COCKTAIL_CORE_UTILITY_FILEUTILS_HPP
 
-#include <filesystem>
-
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/System/FileSystem/URI.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 namespace Ck
@@ -19,21 +17,21 @@ namespace Ck
 		 * \brief 
 		 * \param path
 		 */
-		static void MakeDirectories(const std::filesystem::path& path);
+		static void MakeDirectories(const URI& uri);
 
 		/**
 		 * \brief 
 		 * \param path 
 		 * \return 
 		 */
-		static ByteArray ReadFile(const std::filesystem::path& path);
+		static ByteArray ReadFile(const URI& uri);
 
 		/**
 		 * \brief 
 		 * \param path 
 		 * \return 
 		 */
-		static Array<std::string> ReadFileLines(const std::filesystem::path& path);
+		static Array<String> ReadFileLines(const URI& uri);
 
 		/**
 		 * \brief 
@@ -41,7 +39,7 @@ namespace Ck
 		 * \param content
 		 * \param append Flag indicating whether append or truncate the file to write before opening it
 		 */
-		static void WriteFile(const std::filesystem::path& path, ByteArrayView content, bool append);
+		static void WriteFile(const URI& uri, ByteArrayView content, bool append);
 
 		/**
 		 * \brief Write an array of string into a file
@@ -49,7 +47,7 @@ namespace Ck
 		 * \param lines Strings to write to the file
 		 * \param append Flag indicating whether append or truncate the file to write before opening it
 		 */
-		static void WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines, bool append);
+		static void WriteFileLines(const URI& uri, const Array<String>& lines, bool append);
 	};
 }
 

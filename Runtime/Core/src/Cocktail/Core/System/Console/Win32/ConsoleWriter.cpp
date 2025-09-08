@@ -19,7 +19,7 @@ namespace Ck::Detail::Win32
 		/// Nothing
 	}
 
-	void ConsoleWriter::Write(const char* string, std::size_t length)
+	void ConsoleWriter::Write(const TextChar* string, std::size_t length)
 	{
 		if (WriteConsole(mHandle, string, length, nullptr, nullptr) == FALSE)
 			throw SystemError::GetLastError();
@@ -27,5 +27,10 @@ namespace Ck::Detail::Win32
 
 	void ConsoleWriter::Flush()
 	{
+	}
+
+	EncodingMode ConsoleWriter::GetEncodingMode()
+	{
+		return EncodingMode::Utf16LittleEndian;
 	}
 }

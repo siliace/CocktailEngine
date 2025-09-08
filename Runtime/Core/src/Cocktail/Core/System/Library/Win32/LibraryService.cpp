@@ -4,23 +4,23 @@
 
 namespace Ck::Detail::Win32
 {
-	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(std::string_view name)
+	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(StringView name)
 	{
 		return std::make_unique<Library>(name);
 	}
 
-	void LibraryService::AddLibraryDirectory(const std::filesystem::path& path)
+	void LibraryService::AddLibraryDirectory(const Path& path)
 	{
-		DLL_DIRECTORY_COOKIE cookie = AddDllDirectory(path.c_str());
+		DLL_DIRECTORY_COOKIE cookie = AddDllDirectory(path.ToString().GetData());
 		if (cookie == nullptr)
 			throw SystemError::GetLastError();
 
-		mDirectoryCookies[path.string()] = cookie;
+		mDirectoryCookies[path] = cookie;
 	}
 
-	void LibraryService::RemoveLibraryDirectory(const std::filesystem::path& path)
+	void LibraryService::RemoveLibraryDirectory(const Path& path)
 	{
-		DLL_DIRECTORY_COOKIE cookie = mDirectoryCookies[path.string()];
+		DLL_DIRECTORY_COOKIE cookie = mDirectoryCookies[path];
 		if (!cookie)
 			return;
 

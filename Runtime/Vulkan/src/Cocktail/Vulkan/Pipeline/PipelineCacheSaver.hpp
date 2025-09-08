@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_VULKAN_PIPELINE_PIPELINECACHESAVER_HPP
 #define COCKTAIL_VULKAN_PIPELINE_PIPELINECACHESAVER_HPP
 
-#include <filesystem>
-#include <string>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystem.hpp>
 
 #include <Cocktail/Vulkan/Volk.hpp>
 #include <Cocktail/Vulkan/VersionDescriptor.hpp>
@@ -24,14 +23,14 @@ namespace Ck::Vulkan
 		 * \param applicationVersion 
 		 * \return 
 		 */
-		static std::filesystem::path ComputePipelineCachePath(std::string_view applicationName, const VersionDescriptor& applicationVersion);
+		static Path ComputePipelineCachePath(StringView applicationName, const VersionDescriptor& applicationVersion);
 
 		/**
 		 * \brief 
 		 * \param pipelineManager 
 		 * \param pipelineCachePath 
 		 */
-		PipelineCacheSaver(PipelineManager* pipelineManager, std::filesystem::path pipelineCachePath);
+		PipelineCacheSaver(PipelineManager* pipelineManager, Path pipelineCachePath);
 
 		/**
 		 * \brief 
@@ -53,7 +52,7 @@ namespace Ck::Vulkan
 		};
 
 		PipelineManager* mPipelineManager;
-		std::filesystem::path mPipelineCachePath;
+		Path mPipelineCachePath;
 	};
 }
 

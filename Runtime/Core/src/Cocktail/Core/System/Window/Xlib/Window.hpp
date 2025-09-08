@@ -103,13 +103,13 @@ namespace Ck::Detail::Xlib
 		 * \brief 
 		 * \return 
 		 */
-		std::string GetTitle() const override;
+		String GetTitle() const override;
 
 		/**
 		 * \brief 
 		 * \param title 
 		 */
-		void SetTitle(const std::string& title) override;
+		void SetTitle(const String& title) override;
 
 		/**
 		 * \brief 

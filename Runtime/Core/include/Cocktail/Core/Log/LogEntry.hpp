@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_CORE_LOG_LOGENTRY_HPP
 #define COCKTAIL_CORE_LOG_LOGENTRY_HPP
 
-#include <string>
-
-#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Log/LogLevel.hpp>
 
 namespace Ck
@@ -23,7 +21,7 @@ namespace Ck
 		/**
 		 * \brief The formatted message of the entry 
 		 */
-		std::string Message;
+		String Message;
 
 		/**
 		 * \brief The level of the entry
@@ -33,7 +31,7 @@ namespace Ck
 		/**
 		 * \brief The source file where the entry has been emitted
 		 */
-		std::string_view File;
+		StringView File;
 		
 		/**
 		 * \brief The line where the entry has been emitted

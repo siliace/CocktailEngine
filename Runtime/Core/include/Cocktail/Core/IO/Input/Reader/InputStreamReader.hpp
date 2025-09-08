@@ -4,6 +4,7 @@
 #include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/IO/Input/Reader/Reader.hpp>
 #include <Cocktail/Core/IO/Input/Stream/InputStream.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
@@ -11,11 +12,11 @@ namespace Ck
 	{
 	public:
 
-		explicit InputStreamReader(InputStream& inputStream);
+		explicit InputStreamReader(InputStream& inputStream, EncodingMode encodingMode = EncodingMode::Utf8);
 
-		bool Read(char& c) override;
+		bool Read(TextChar& c) override;
 
-		std::size_t Read(char* buffer, std::size_t length) override;
+		std::size_t Read(TextChar* buffer, std::size_t length) override;
 
 		bool HasCursor() const override;
 
@@ -29,9 +30,15 @@ namespace Ck
 
 		bool IsEof() const override;
 
+		EncodingMode GetEncodingMode() const override
+		{
+			return mEncodingMode;
+		}
+
 	private:
 
 		InputStream& mInputStream;
+		EncodingMode mEncodingMode;
 	};
 }
 

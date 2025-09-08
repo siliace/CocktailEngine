@@ -34,12 +34,21 @@ namespace Ck::Detail::Unix
 		 * \param string 
 		 * \param length 
 		 */
-		void Write(const char* string, std::size_t length) override;
+		void Write(const TextChar* string, std::size_t length) override;
 
 		/**
 		 * \brief 
 		 */
 		void Flush() override;
+
+		/**
+		 * \brief Get the encoding mode used to write in the console
+		 *
+		 * On Unix style systems, this likely always be EncodingMode::Utf8
+		 *
+		 * \return The encoding mode
+		 */
+		EncodingMode GetEncodingMode() override;
 
 	private:
 

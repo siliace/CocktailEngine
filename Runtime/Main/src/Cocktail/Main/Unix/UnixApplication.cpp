@@ -5,38 +5,48 @@
 #include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Unix/UnixApplication.hpp>
 
+#include "../../../../../Core/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp"
+#include "Cocktail/Core/IO/Input/Stream/FileInputStream.hpp"
+#include "Cocktail/Core/System/FileSystem/Local/LocalFileSystemService.hpp"
+#include "Cocktail/Core/Utility/FileUtils.hpp"
+
 namespace Ck::Main::Unix
 {
     UnixApplication::UnixApplication(int argc, char** argv)
     {
         mArgv.Reserve(argc - 1);
         for (int i = 1; i < argc; i++)
-            mArgv.Emplace(argv[i]);
+            mArgv.Emplace(CK_ANSI_TO_TEXT(argv[i]));
     }
 
-    void UnixApplication::Exit(unsigned exitCode, bool force, std::string_view callSite)
+    void UnixApplication::Exit(unsigned int exitCode, bool force, StringView callSite)
     {
-        CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.empty() ? "<>" : callSite);
+		CK_LOG(MainLogCategory, LogLevel::Info, CK_TEXT("Requested %s exit with code %u from %s"), force ? CK_TEXT("forced") : CK_TEXT("soft"), exitCode, callSite);
 
         exit(static_cast<int>(exitCode));
     }
 
-    const Array<std::string>& UnixApplication::GetArgv() const
+    const Array<String>& UnixApplication::GetArgv() const
     {
         return mArgv;
     }
 
-    std::string UnixApplication::GetEnvironmentVariable(std::string_view name)
+    Optional<String> UnixApplication::GetEnvironmentVariable(StringView name)
     {
-        char* variable = secure_getenv(name.data());
+        char* variable = secure_getenv(CK_TEXT_TO_ANSI(name.GetData()));
         if (!variable)
-            return "";
+            return Optional<String>::Empty();
 
-        return std::string(variable, std::strlen(variable));
+        return Optional<String>::Of(InPlace, CK_ANSI_TO_TEXT(variable));
     }
 
     bool UnixApplication::IsDebuggerPresent() const
     {
+        for (const String& line : FileUtils::ReadFileLines(CK_TEXT("/proc/self/status")))
+        {
+
+        }
+
         return false;
     }
 }

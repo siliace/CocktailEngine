@@ -10,9 +10,6 @@
 [submodule "Vendor/SPIRV-Reflect"]
 	path = Vendor/SPIRV-Reflect
 	url = https://github.com/KhronosGroup/SPIRV-Reflect
-[submodule "Vendor/fmt"]
-	path = Vendor/fmt
-	url = https://github.com/fmtlib/fmt
 [submodule "Vendor/cmrc"]
 	path = Vendor/cmrc
 	url = https://github.com/vector-of-bool/cmrc

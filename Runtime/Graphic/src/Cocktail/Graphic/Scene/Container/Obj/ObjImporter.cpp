@@ -4,7 +4,7 @@
 #include <Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
-#include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 #include <Cocktail/Graphic/Scene/Container/Obj/ObjImporter.hpp>
 #include <Cocktail/Graphic/Scene/Container/Obj/ObjSceneContainer.hpp>
@@ -13,19 +13,19 @@ namespace Ck
 {
 	COCKTAIL_DECLARE_EXCEPTION(ObjParseError);
 
-	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
+	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
 	{
 		SceneImportParameters importParameters = parameters;
-		importParameters.BaseDirectory = path.parent_path();
+		importParameters.BaseDirectory = path.GetParent();
 
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
-		readerConfig.mtl_search_path = path.parent_path().string();
+		readerConfig.mtl_search_path = CK_TEXT_TO_ANSI(path.GetParent().ToString().GetData());
 
-		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
+		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
 		tinyobj::ObjReader reader;
-		if (!reader.ParseFromFile(path.string(), readerConfig))
-			throw ObjParseError(reader.Error());
+		if (!reader.ParseFromFile(CK_TEXT_TO_ANSI(path.ToString().GetData()), readerConfig))
+			throw ObjParseError(CK_ANSI_TO_TEXT(reader.Error().c_str()));
 
 		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
@@ -34,37 +34,42 @@ namespace Ck
 	{
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
-		readerConfig.mtl_search_path = parameters.BaseDirectory.string();
+		readerConfig.mtl_search_path = CK_TEXT_TO_ANSI(parameters.BaseDirectory.ToString().GetData());
 
-		std::string objText, mtlText;
+		String objText, mtlText;
 		{
-			Array<std::string> tokens;
+			Array<String> tokens;
 			InputStreamReader inputStreamReader(inputStream);
 			BufferedReader reader(inputStreamReader);
 			while (!reader.IsEof())
 			{
-				std::string line = reader.ReadLine();
-				if (line.empty())
+				String line = reader.ReadLine();
+				if (line.IsEmpty())
 					continue;
 
-				StringUtils::Split(tokens, line, ' ');
-				if (tokens[0] == "mtllib")
-					mtlText = FileUtils::ReadFile(parameters.BaseDirectory / tokens[1]).ToString();
+				line.Split(tokens, ' ');
+				if (tokens[0] == CK_TEXT("mtllib"))
+				{
+					Path mtlFilePath = parameters.BaseDirectory;
+					mtlFilePath = mtlFilePath.Join(tokens[1]);
 
-				objText.append(line);
+					mtlText = FileUtils::ReadFile(mtlFilePath).ToString();
+				}
+
+				objText.Append(line);
 			}
 		}
 
 		tinyobj::ObjReader reader;
-		if (!reader.ParseFromString(objText, mtlText, readerConfig))
-			throw ObjParseError(reader.Error());
+		if (!reader.ParseFromString(CK_TEXT_TO_ANSI(objText.GetData()), CK_TEXT_TO_ANSI(mtlText.GetData()), readerConfig))
+			throw ObjParseError(CK_ANSI_TO_TEXT(reader.Error().c_str()));
 
 		return std::make_shared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
 
-	bool ObjImporter::SupportExtension(std::string_view extension) const
+	bool ObjImporter::SupportExtension(StringView extension) const
 	{
-		return extension == ".obj";
+		return extension == CK_TEXT(".obj");
 	}
 
 	bool ObjImporter::SupportParameters(const SceneImportParameters& parameters) const

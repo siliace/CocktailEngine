@@ -12,22 +12,12 @@ namespace Ck::Main::Win32
 
 		mArgv.Reserve(argc);
 		for (int i = 0; i < argc; i++)
-		{
-			int wideArgumentLength = wcslen(wideArgument[i]);
-			int argumentLength = WideCharToMultiByte(CP_UTF8, 0, wideArgument[i], wideArgumentLength, nullptr, 0, nullptr, nullptr);
-
-			std::string argument(argumentLength, 0);
-			WideCharToMultiByte(CP_UTF8, 0, wideArgument[i], wideArgumentLength, argument.data(), argumentLength, nullptr, nullptr);
-
-			mArgv.Add(std::move(argument));
-		}
-
-		LocalFree(wideArgument);
+			mArgv.Emplace(wideArgument[i]);
 	}
 
-	void Win32Application::Exit(unsigned exitCode, bool force, std::string_view callSite)
+	void Win32Application::Exit(unsigned int exitCode, bool force, StringView callSite)
 	{
-		CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.empty() ? "<>" : callSite);
+		CK_LOG(MainLogCategory, LogLevel::Info, CK_TEXT("Requested %s exit with code %d from %s"), force ? CK_TEXT("forced") : CK_TEXT("soft"), exitCode, callSite);
 
 		if (force)
 		{
@@ -41,24 +31,24 @@ namespace Ck::Main::Win32
 		}
 	}
 
-	const Array<std::string>& Win32Application::GetArgv() const
+	const Array<String>& Win32Application::GetArgv() const
 	{
 		return mArgv;
 	}
 
-	std::string Win32Application::GetEnvironmentVariable(std::string_view name)
+	Optional<String> Win32Application::GetEnvironmentVariable(StringView name)
 	{
-		std::string value;
-		DWORD variableLength = ::GetEnvironmentVariableA(name.data(), nullptr, 0);
-		if (variableLength)
-		{
-			char* buffer = COCKTAIL_STACK_ALLOC(char, variableLength);
-			::GetEnvironmentVariableA(name.data(), buffer, variableLength);
+		DWORD variableLength = ::GetEnvironmentVariableW(name.GetData(), nullptr, 0);
+		if (!variableLength)
+			return Optional<String>::Empty();
 
-			value.assign(buffer, variableLength - 1);
-		}
+		TextChar* variable = COCKTAIL_STACK_ALLOC(TextChar, variableLength);
+		GetEnvironmentVariableW(name.GetData(), variable, variableLength);
 
-		return value;
+		String value;
+		value.Append(variable, variableLength);
+
+		return Optional<String>::Of(value);
 	}
 
 	bool Win32Application::IsDebuggerPresent() const

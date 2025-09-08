@@ -3,7 +3,7 @@
 
 namespace Ck::Detail::Win32
 {
-	LocalDirectory::LocalDirectory(const std::filesystem::path& path) :
+	LocalDirectory::LocalDirectory(const Path& path) :
 		mPath(path)
 	{
 		LUID privilege;
@@ -22,7 +22,7 @@ namespace Ck::Detail::Win32
 		if (AdjustTokenPrivileges(accessToken, FALSE, &tpPrivileges, 0, nullptr, nullptr) == FALSE)
 			throw SystemError::GetLastError();
 
-		mHandle = CreateFileW(path.c_str(),
+		mHandle = CreateFileW(path.ToString().GetData(),
 		                      GENERIC_READ,
 		                      FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
 		                      nullptr,
@@ -40,16 +40,16 @@ namespace Ck::Detail::Win32
 		CloseHandle(mHandle);
 	}
 
-	Array<std::filesystem::path> LocalDirectory::GetContent() const
+	Array<Path> LocalDirectory::GetContent() const
 	{
-		std::filesystem::path base = mPath / "*";
+		String contentPath = mPath.ToString().Append(CK_TEXT('*'));
 
 		WIN32_FIND_DATAW result;
-		HANDLE findHandle = FindFirstFileW(base.c_str(), &result);
+		HANDLE findHandle = FindFirstFile(contentPath.GetData(), &result);
 		if (findHandle == INVALID_HANDLE_VALUE)
 			throw SystemError::GetLastError();
 
-		Array<std::filesystem::path> content;
+		Array<Path> content;
 
 		do
 		{
@@ -61,7 +61,7 @@ namespace Ck::Detail::Win32
 		return content;
 	}
 
-	const std::filesystem::path& LocalDirectory::GetPath() const
+	const Path& LocalDirectory::GetPath() const
 	{
 		return mPath;
 	}

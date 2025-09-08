@@ -10,7 +10,7 @@ namespace Ck::Vulkan
 {
 	class RenderDevice;
 
-	using PipelineStateHash = std::size_t;
+	using PipelineStateHash = Uint64;
 
 	/**
 	 * \brief 

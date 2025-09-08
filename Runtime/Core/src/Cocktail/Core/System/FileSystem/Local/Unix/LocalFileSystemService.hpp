@@ -16,13 +16,19 @@ namespace Ck::Detail::Unix
 		 * \brief Get the path of the current working directory
 		 * \return The path of the working directory
 		 */
-		std::filesystem::path GetWorkingDirectory() const override;
+		Path GetWorkingDirectory() const override;
 
 		/**
 		 * \brief Set the path of the process current working directory
 		 * \param workingDirectory 
 		 */
-		void SetWorkingDirectory(const std::filesystem::path& workingDirectory) override;
+		void SetWorkingDirectory(const Path& workingDirectory) override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		Path GetTempDirectoryPath() const override;
 	};
 }
 

@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_FRAMEBUFFER_DEPTHRESOLVER_HPP
 #define COCKTAIL_VULKAN_FRAMEBUFFER_DEPTHRESOLVER_HPP
 
-#include <filesystem>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 #include <Cocktail/Renderer/Command/RenderPassBeginInfo.hpp>
 #include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
@@ -54,7 +54,7 @@ namespace Ck::Vulkan
 		 * \param shaderType 
 		 * \return 
 		 */
-		static std::shared_ptr<Shader> LoadShader(RenderDevice& renderDevice, const std::filesystem::path& path, Renderer::ShaderType shaderType);
+		static std::shared_ptr<Shader> LoadShader(RenderDevice& renderDevice, const Path& path, Renderer::ShaderType shaderType);
 
 		/**
 		 * \brief 

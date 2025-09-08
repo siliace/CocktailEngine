@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <Cocktail/Core/String.hpp>
+
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 
 #include <Cocktail/Vulkan/DescriptorSet/Layout/DescriptorSetLayoutBinding.hpp>
@@ -20,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param members 
 		 * \param name 
 		 */
-		UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, std::string name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
+		UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, String name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
 
 		/**
 		 * \brief 
@@ -71,7 +73,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		const std::string& GetName() const override;
+		const String& GetName() const override;
 
 		/**
 		 * \brief 
@@ -89,7 +91,7 @@ namespace Ck::Vulkan
 
 		Renderer::ShaderProgramType mProgramType;
 		Array<std::unique_ptr<Renderer::UniformMember>> mMembers;
-		std::string mName;
+		String mName;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;
 	};

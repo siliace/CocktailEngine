@@ -22,19 +22,19 @@ namespace Ck
 		 * \param fileSystem 
 		 * \param path 
 		 */
-		EmbeddedDirectory(cmrc::embedded_filesystem fileSystem, std::filesystem::path path);
+		EmbeddedDirectory(cmrc::embedded_filesystem fileSystem, Path path);
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Array<std::filesystem::path> GetContent() const override;
+		Array<Path> GetContent() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const std::filesystem::path& GetPath() const override;
+		const Path& GetPath() const override;
 
 		/**
 		 * \brief 
@@ -45,7 +45,7 @@ namespace Ck
 	private:
 
 		cmrc::embedded_filesystem mFileSystem;
-		std::filesystem::path mPath;
+		Path mPath;
 	};
 }
 

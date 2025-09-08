@@ -33,7 +33,7 @@ namespace Ck
 
 				if (vertexAttributes & attribute)
 				{
-					CK_LOG(RenderQueueLogCategory, LogLevel::Error, "Duplicated VertexAttribute {} in VertexBuffer {} of StaticMeshRecordInfo", Enum<VertexAttributeSemantic>::ToString(attribute), i);
+					CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("Duplicated VertexAttribute %hs in VertexBuffer %d of StaticMeshRecordInfo"), attribute, i);
 					return;
 				}
 				vertexAttributes |= attribute;
@@ -52,7 +52,7 @@ namespace Ck
 		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Mesh)->GetVariant(vertexAttributes, materialTextures);
 		if (!materialProgramVariant)
 		{
-			CK_LOG(RenderQueueLogCategory, LogLevel::Error, "No MaterialProgram found for Material");
+			CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No MaterialProgram found for Material"));
 			return;
 		}
 

@@ -34,6 +34,8 @@
 #include <Cocktail/Vulkan/Texture/Texture.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
+#include "Cocktail/Core/Utility/StringConvertion.hpp"
+
 namespace Ck::Vulkan
 {
 	RenderDevice::RenderDevice(const RenderDeviceCreateInfo& createInfo) :
@@ -244,7 +246,7 @@ namespace Ck::Vulkan
 		return usage;
 	}
 
-	Signal<LogLevel, Renderer::MessageType, std::string_view>& RenderDevice::OnDebugMessage()
+	Signal<LogLevel, Renderer::MessageType, const AnsiChar*>& RenderDevice::OnDebugMessage()
 	{
 		return mOnDebugMessage;
 	}
@@ -264,11 +266,13 @@ namespace Ck::Vulkan
 		return mHandle;
 	}
 
-	void RenderDevice::CreateInstance(std::string_view applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
+	void RenderDevice::CreateInstance(StringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
 	{
+		TextToAnsiConverter textConverter;
+
 		VkApplicationInfo applicationInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO, nullptr };
 		{
-			applicationInfo.pApplicationName = applicationName.data();
+			applicationInfo.pApplicationName = textConverter.Get(applicationName.GetData());
 			applicationInfo.applicationVersion = VK_MAKE_API_VERSION(0, applicationVersion.Major, applicationVersion.Minor, applicationVersion.Patch);
 			applicationInfo.pEngineName = "CocktailEngine";
 			applicationInfo.engineVersion = VK_MAKE_API_VERSION(0, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION);
@@ -298,9 +302,9 @@ namespace Ck::Vulkan
 		}
 
 		// Check for supported layers
-		constexpr static const char* ValidationLayerName = "VK_LAYER_KHRONOS_validation";
+		constexpr static const AnsiChar* ValidationLayerName = "VK_LAYER_KHRONOS_validation";
 
-		Array<const char*> enabledLayerNames;
+		Array<const AnsiChar*> enabledLayerNames;
 		if (enableValidationLayer && ExtensionManager::IsLayerSupported(ValidationLayerName))
 			enabledLayerNames.Add(ValidationLayerName);
 
@@ -310,7 +314,7 @@ namespace Ck::Vulkan
 		for (RenderDeviceFeature feature : Enum<RenderDeviceFeature>::Values)
 			mSupportedFeatures[feature] = mExtensionManager.EnableInstanceExtension(feature);
 
-		Array<const char*> enabledExtensionNames = mExtensionManager.GetInstanceExtensions();
+		const Array<const AnsiChar*>& enabledExtensionNames = mExtensionManager.GetInstanceExtensions();
 		VkInstanceCreateInfo createInfo{ VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO, nullptr };
 		{
 			createInfo.flags = 0;
@@ -442,7 +446,7 @@ namespace Ck::Vulkan
 		if (physicalDeviceFeatures.features.wideLines == VK_FALSE)
 			mSupportedFeatures[RenderDeviceFeature::WideLine] = false;
 
-		Array<const char*> enabledExtensionNames = mExtensionManager.GetDeviceExtensions();
+		const Array<const AnsiChar*>& enabledExtensionNames = mExtensionManager.GetDeviceExtensions();
 		VkDeviceCreateInfo createInfo{ VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO, nullptr };
 		{
 			if (hasPhysicalDeviceFeatures2)

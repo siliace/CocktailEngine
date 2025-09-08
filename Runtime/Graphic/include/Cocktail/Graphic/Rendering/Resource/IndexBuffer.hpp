@@ -16,7 +16,7 @@ namespace Ck
 		 * \param indices
 		 * \param name 
 		 */
-		IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, std::string_view name = "");
+		IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, const AnsiChar* name = "");
 
 		/**
 		 * \brief

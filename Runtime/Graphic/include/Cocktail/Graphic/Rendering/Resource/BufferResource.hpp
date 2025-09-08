@@ -23,7 +23,7 @@ namespace Ck
          * \param size 
          * \param name 
          */
-        BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, std::string_view name = "");
+        BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name = "");
 
         /**
          * \brief

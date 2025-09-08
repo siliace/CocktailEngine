@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<Image> LoadFromPath(const std::filesystem::path& path, const ImageImportParameters& parameters) override;
+		std::shared_ptr<Image> LoadFromPath(const Path& path, const ImageImportParameters& parameters) override;
 
 		/**
 		 * \brief 
@@ -41,7 +41,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtension(std::string_view extension) const override;
+		bool SupportExtension(StringView extension) const override;
 
 		/**
 		 * \brief 

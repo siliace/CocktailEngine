@@ -3,6 +3,7 @@
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfImporter.hpp>
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfSceneContainer.hpp>
@@ -82,18 +83,18 @@ namespace Ck
         mLoader.SetImageLoader(GltfImporter::LoadImageData, this);
     }
 
-    std::shared_ptr<SceneContainer> GltfImporter::LoadFromPath(const std::filesystem::path& path, const SceneImportParameters& parameters)
+    std::shared_ptr<SceneContainer> GltfImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
 
-        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
-        bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, path.string());
+        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
+        bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, CK_TEXT_TO_ANSI(path.ToString().GetData()));
         if (!success)
-            throw GltfParseError(errors);
+            throw GltfParseError(CK_ANSI_TO_TEXT(errors.c_str()));
 
         if (!warnings.empty())
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Scene {} loaded with warnings: {}", path.string(), warnings);
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %s"), path.ToString(), warnings.c_str());
 
         return std::make_shared<GltfSceneContainer>(model);
     }
@@ -106,17 +107,23 @@ namespace Ck
         InputStreamReader InputStreamReader(inputStream);
         BufferedReader reader(InputStreamReader);
         
-        std::string buffer = reader.ReadAll();
-        bool success = mLoader.LoadASCIIFromString(&model, &errors, &warnings, buffer.c_str(), buffer.length(), parameters.BaseDirectory.string());
+        String buffer = reader.ReadAll();
+        bool success = mLoader.LoadASCIIFromString(
+            &model,
+            &errors, &warnings,
+            CK_TEXT_TO_ANSI(buffer.GetData()), buffer.GetLength(),
+            CK_TEXT_TO_ANSI(parameters.BaseDirectory.ToString().GetData())
+        );
+
         if (!success)
             return nullptr;
 
         return std::make_shared<GltfSceneContainer>(model);
     }
     
-    bool GltfImporter::SupportExtension(std::string_view extension) const
+    bool GltfImporter::SupportExtension(StringView extension) const
     {
-        return extension == ".gltf";
+        return extension == CK_TEXT(".gltf");
     }
     
     bool GltfImporter::SupportParameters(const SceneImportParameters& parameters) const
@@ -131,15 +138,16 @@ namespace Ck
         std::shared_ptr<Image> image;
         try 
         {
-            image = App::Resolve<ImageLoader>()->LoadFromMemory(data, size, { ImageImportParameters::Format::RedGreenBlueAlpha });
+            image = self->mImageLoader->LoadFromMemory(data, size, { ImageImportParameters::Format::RedGreenBlueAlpha });
         }
         catch (const std::exception& exception)
         {
             if (errors)
                 errors->append(exception.what());
-
-            return false;
         }
+
+        if (!image)
+            return false;
 
         ToGltfImage(*image, *gltfImage);
 

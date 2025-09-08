@@ -1,12 +1,13 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectory.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck::Detail::Unix
 {
-	LocalDirectory::LocalDirectory(const std::filesystem::path& path) : 
+	LocalDirectory::LocalDirectory(const Path& path) :
 		mPath(path)
 	{
-		mHandle = opendir(path.c_str());
+		mHandle = opendir(CK_TEXT_TO_ANSI(path.ToString().GetData()));
 	}
 
 	LocalDirectory::~LocalDirectory()
@@ -14,18 +15,23 @@ namespace Ck::Detail::Unix
 		closedir(mHandle);
 	}
 
-	Array<std::filesystem::path> LocalDirectory::GetContent() const
+	Array<Path> LocalDirectory::GetContent() const
 	{
 		dirent64* result;
-		Array<std::filesystem::path> content;
+		Array<Path> content;
 
 		while ((result = readdir64(mHandle)))
-			content.Emplace(mPath / result->d_name);
+		{
+			String filename = CK_ANSI_TO_TEXT(&result->d_name[0]);
+
+			Path childPath = mPath;
+			content.Add(childPath.Join(filename));
+		}
 
 		return content;
 	}
 
-	const std::filesystem::path &LocalDirectory::GetPath() const
+	const Path &LocalDirectory::GetPath() const
 	{
 		return mPath;
 	}

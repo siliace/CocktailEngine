@@ -11,7 +11,7 @@ namespace Ck::Vulkan
 			Renderer::SamplerCreateInfo samplerCreateInfo;
 			samplerCreateInfo.EnableAnisotropy = true;
 			samplerCreateInfo.MaxAnisotropy = 8.f;
-			samplerCreateInfo.Name = Enum<Renderer::StaticSampler>::ToString(staticSampler).data();
+			samplerCreateInfo.Name = Enum<Renderer::StaticSampler>::ToString(staticSampler);
 
 			switch (staticSampler)
 			{

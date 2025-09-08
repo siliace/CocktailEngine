@@ -4,10 +4,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include <fmt/core.h>
-
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
+#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogChannel.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
@@ -36,7 +35,7 @@ namespace Ck
 		 * \param logChannel
 		 * \return
 		 */
-		void RegisterChannel(const std::string& name, std::unique_ptr<LogChannel> logChannel);
+		void RegisterChannel(const String& name, std::unique_ptr<LogChannel> logChannel);
 
 		/**
 		 * \brief 
@@ -48,14 +47,21 @@ namespace Ck
 		 * \param args 
 		 */
 		template <typename... Args>
-		void Trace(const LogCategory& category, LogLevel level, std::string_view message, std::string_view file, Uint64 line, Args&&... args)
+		void Trace(const LogCategory& category, LogLevel level, StringView message, StringView file, Uint64 line, Args&&... args)
 		{
 			if (category.IsSuppressed(level))
 				return;
 
 			LogEntry* logEntry = mEntryPool.AllocateUnsafe();
 			logEntry->Category = &category;
-			logEntry->Message = fmt::format(message, std::forward<Args>(args)...);
+			if constexpr (sizeof...(Args) > 0)
+			{
+				logEntry->Message = String::Format(message, std::forward<Args>(args)...);
+			}
+			else
+			{
+				logEntry->Message = message;
+			}
 			logEntry->Level = level;
 			logEntry->File = file;
 			logEntry->Line = line;
@@ -82,7 +88,7 @@ namespace Ck
 
 	private:
 
-		std::unordered_map<std::string, std::unique_ptr<LogChannel>> mChannels;
+		std::unordered_map<String, std::unique_ptr<LogChannel>> mChannels;
 		Array<LogEntry*> mEntries;
 		Signal<LogEntry*> mOnTraceEntry;
 		ObjectPool<LogEntry> mEntryPool;

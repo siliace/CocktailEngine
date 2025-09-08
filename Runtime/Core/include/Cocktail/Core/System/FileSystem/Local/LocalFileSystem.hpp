@@ -18,13 +18,19 @@ namespace Ck
 		 * \brief Get the path of the current working directory
 		 * \return The path of the working directory
 		 */
-		static std::filesystem::path GetWorkingDirectory();
+		static Path GetWorkingDirectory();
 
 		/**
 		 * \brief Set the path of the process current working directory
 		 * \param workingDirectory 
 		 */
-		static void SetWorkingDirectory(const std::filesystem::path& workingDirectory);
+		static void SetWorkingDirectory(const Path& workingDirectory);
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		static Path GetTempDirectoryPath();
 	};
 }
 #endif // COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEM_HPP

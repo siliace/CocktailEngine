@@ -18,7 +18,7 @@ namespace Ck::Detail::Win32
 		 * \param windowProc 
 		 * \param className 
 		 */
-		WindowClass(HINSTANCE instanceHandle, WNDPROC windowProc, const char* className);
+		WindowClass(HINSTANCE instanceHandle, WNDPROC windowProc, const TextChar* className);
 
 		/**
 		 * \brief 

@@ -18,14 +18,18 @@ namespace Ck
 		virtual ~OutputStream() = default;
 
         /**
-         * \brief
-         * \param
-         * \param
+         * \brief Write data to the stream
+         *
+    	 * \param data A buffer containing data to write in the stream
+		 * \param length The number of bytes to write to the stream
+		 *
+         * \return The number of bytes actually written
          */
         virtual std::size_t Write(const void* data, std::size_t length) = 0;
         
         /**
-         * \brief
+         * \brief Ensure every pending write operation is terminated
+         * Depending on the implementation, this function might be a no-op or
          */
         virtual void Flush() = 0;
     };

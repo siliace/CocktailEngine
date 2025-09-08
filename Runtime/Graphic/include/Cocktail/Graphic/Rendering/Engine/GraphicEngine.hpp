@@ -43,7 +43,7 @@ namespace Ck
 	     * \param name 
 	     * \return 
 	     */
-		std::shared_ptr<VertexBuffer> CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable = false, std::string_view name = "");
+		std::shared_ptr<VertexBuffer> CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable = false, const AnsiChar* name = "");
 
 		/**
 		 * \brief
@@ -52,14 +52,15 @@ namespace Ck
 		 * \param name
 		 * \return
 		 */
-		std::shared_ptr<IndexBuffer> CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable = false, std::string_view name = "");
+		std::shared_ptr<IndexBuffer> CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable = false, const AnsiChar* name = "");
 
 		/**
 		 * \brief 
-		 * \param mipMaps 
+		 * \param mipMaps
+		 * \param name 
 		 * \return 
 		 */
-		std::shared_ptr<TextureResource> CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, std::string_view name = "");
+		std::shared_ptr<TextureResource> CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name = "");
 
 		/**
 	     * \brief 

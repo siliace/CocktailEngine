@@ -129,7 +129,7 @@ namespace Ck
 		 * \param force 
 		 * \param callSite 
 		 */
-		static void Exit(unsigned int exitCode = 0, bool force = false, std::string_view callSite = "");
+		static void Exit(unsigned int exitCode = 0, bool force = false, StringView callSite = CK_TEXT(""));
 
 		/**
 		 * \brief Get the duration since the application started
@@ -141,14 +141,14 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		static const Array<std::string>& GetArgv();
+		static const Array<String>& GetArgv();
 
 		/**
 		 * \brief
 		 * \param name
 		 * \return
 		 */
-		static std::string GetEnvironmentVariable(std::string_view name);
+		static Optional<String> GetEnvironmentVariable(StringView name);
 
 		/**
 		 * \brief

@@ -4,69 +4,60 @@
 
 namespace Ck
 {
-	StorageService::StorageService(std::string defaultProtocol):
-		mDefaultProtocol(std::move(defaultProtocol))
+	StorageService::StorageService(String defaultScheme):
+		mDefaultScheme(std::move(defaultScheme))
 	{
-		assert(!mDefaultProtocol.empty());
+		assert(!mDefaultScheme.IsEmpty());
 	}
 
-	bool StorageService::IsFile(const std::filesystem::path& path) const
+	bool StorageService::IsFile(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->IsFile(p);
+		return ResolveDriver(uri.GetScheme())->IsFile(uri.GetPath());
 	}
 
-	bool StorageService::IsDirectory(const std::filesystem::path& path) const
+	bool StorageService::IsDirectory(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->IsDirectory(p);
+		return ResolveDriver(uri.GetScheme())->IsDirectory(uri.GetPath());
 	}
 
-	void StorageService::CreateFile(const std::filesystem::path& path) const
+	void StorageService::CreateFile(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->CreateFile(p);
+		return ResolveDriver(uri.GetScheme())->CreateFile(uri.GetPath());
 	}
 
-	void StorageService::CreateDirectory(const std::filesystem::path& path) const
+	void StorageService::CreateDirectory(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->CreateDirectory(p);
+		return ResolveDriver(uri.GetScheme())->CreateDirectory(uri.GetPath());
 	}
 
-	std::unique_ptr<File> StorageService::OpenFile(const std::filesystem::path& path, FileOpenFlags flags) const
+	std::unique_ptr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->OpenFile(p, flags);
+		return ResolveDriver(uri.GetScheme())->OpenFile(uri.GetPath(), flags);
 	}
 
-	std::unique_ptr<Directory> StorageService::OpenDirectory(const std::filesystem::path& path) const
+	std::unique_ptr<Directory> StorageService::OpenDirectory(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->OpenDirectory(p);
+		return ResolveDriver(uri.GetScheme())->OpenDirectory(uri.GetPath());
 	}
 
-	void StorageService::Copy(const std::filesystem::path& source, const std::filesystem::path& destination, bool failIfExists) const
+	void StorageService::Copy(const URI& source, const URI& destination, bool failIfExists) const
 	{
-		const auto [sourceProtocol, sourcePath] = SplitPathProtocol(source);
-		const auto [destinationProtocol, destinationPath] = SplitPathProtocol(destination);
-
-		FileSystemDriver* sourceDriver = ResolveProtocol(sourceProtocol);
-		FileSystemDriver* destinationDriver = ResolveProtocol(destinationProtocol);
+		FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+		FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
 		if (sourceDriver == destinationDriver)
 		{
-			sourceDriver->Copy(sourcePath, destinationPath, failIfExists);
+			sourceDriver->Copy(source.GetPath(), destination.GetPath(), failIfExists);
 		}
 		else
 		{
-			std::unique_ptr<File> sourceFile = sourceDriver->OpenFile(sourcePath, FileOpenFlagBits::Read);
+			std::unique_ptr<File> sourceFile = sourceDriver->OpenFile(source.GetPath(), FileOpenFlagBits::Read);
 
 			FileOpenFlags destinationOpenFlags = FileOpenFlagBits::Write | FileOpenFlagBits::Truncate;
 			if (failIfExists)
 				destinationOpenFlags |= FileOpenFlagBits::Existing;
 
-			std::unique_ptr<File> destinationFile = destinationDriver->OpenFile(destinationPath, destinationOpenFlags);
+			std::unique_ptr<File> destinationFile = destinationDriver->OpenFile(destination.GetPath(), destinationOpenFlags);
 
 			const std::size_t bufferSize = 2048;
 			unsigned char buffer[bufferSize] = { 0 };
@@ -82,64 +73,50 @@ namespace Ck
 		}
 	}
 
-	void StorageService::Move(const std::filesystem::path& source, const std::filesystem::path& destination) const
+	void StorageService::Move(const URI& source, const URI& destination) const
 	{
-		const auto [sourceProtocol, sourcePath] = SplitPathProtocol(source);
-		const auto [destinationProtocol, destinationPath] = SplitPathProtocol(destination);
-
-		FileSystemDriver* sourceDriver = ResolveProtocol(sourceProtocol);
-		FileSystemDriver* destinationDriver = ResolveProtocol(destinationProtocol);
+		FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+		FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
 		if (sourceDriver == destinationDriver)
 		{
-			sourceDriver->Move(sourcePath, destinationPath);
+			sourceDriver->Move(source.GetPath(), destination.GetPath());
 		}
 		else
 		{
 			Copy(source, destination, false);
-			sourceDriver->Remove(sourcePath);
+			sourceDriver->Remove(source.GetPath());
 		}
 	}
 
-	void StorageService::Remove(const std::filesystem::path& path) const
+	void StorageService::Remove(const URI& uri) const
 	{
-		const auto [protocol, p] = SplitPathProtocol(path);
-		return ResolveProtocol(protocol)->Remove(p);
+		return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
 	}
 
-	void StorageService::Mount(std::string protocol, FileSystemDriver* fileSystemDriver)
+	void StorageService::Mount(String scheme, FileSystemDriver* fileSystemDriver)
 	{
-		mDrivers.insert_or_assign(std::move(protocol), fileSystemDriver);
+		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver);
 	}
 
-	void StorageService::UnMount(const std::string& protocol)
+	void StorageService::UnMount(const String& scheme)
 	{
-		mDrivers.erase(protocol);
+		mDrivers.erase(scheme);
 	}
 
-	const std::string& StorageService::GetDefaultProtocol() const
+	const String& StorageService::GetDefaultScheme() const
 	{
-		return mDefaultProtocol;
+		return mDefaultScheme;
 	}
 
-	std::pair<std::string, std::filesystem::path> StorageService::SplitPathProtocol(const std::filesystem::path& path)
+	FileSystemDriver* StorageService::ResolveDriver(const String& scheme) const
 	{
-		std::string pathAsString = path.string();
-		std::size_t protocolSeparatorIndex = pathAsString.find(ProtocolSeparator);
-		if (protocolSeparatorIndex == std::string::npos)
-			return std::make_pair("", path);
+		if (scheme.IsEmpty())
+			return ResolveDriver(mDefaultScheme);
 
-		std::string protocol = pathAsString.substr(0, protocolSeparatorIndex);
-		std::filesystem::path splitPath = pathAsString.substr(protocolSeparatorIndex + ProtocolSeparator.length());
+		if (auto it = mDrivers.find(scheme); it != mDrivers.end())
+			return it->second;
 
-		return std::make_pair(std::move(protocol), std::move(splitPath));
-	}
-
-	FileSystemDriver* StorageService::ResolveProtocol(const std::string& protocol) const
-	{
-		if (protocol.empty())
-			return ResolveProtocol(mDefaultProtocol);
-
-		return mDrivers.at(protocol);
+		return nullptr;
 	}
 }

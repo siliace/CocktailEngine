@@ -4,23 +4,35 @@
 
 namespace Ck::Detail::Win32
 {
-	std::filesystem::path LocalFileSystemService::GetWorkingDirectory() const
+	Path LocalFileSystemService::GetWorkingDirectory() const
 	{
-		std::filesystem::path::string_type buffer;
-		DWORD size = GetCurrentDirectoryW(0, nullptr);
+		DWORD size = GetCurrentDirectory(0, nullptr);
 		if (size == 0)
 			throw SystemError::GetLastError();
 
-		buffer.resize(size + 1);
-		if (GetCurrentDirectoryW(static_cast<DWORD>(buffer.length()), buffer.data()))
+		TextChar* buffer = COCKTAIL_STACK_ALLOC(TextChar, size);
+		if (GetCurrentDirectory(size, buffer))
 			throw SystemError::GetLastError();
 
-		return buffer;
+		return Path(buffer, size);
 	}
 
-    void LocalFileSystemService::SetWorkingDirectory(const std::filesystem::path& workingDirectory)
+    void LocalFileSystemService::SetWorkingDirectory(const Path& workingDirectory)
     {
-		if (SetCurrentDirectoryW(workingDirectory.c_str()) == FALSE)
+		if (SetCurrentDirectory(workingDirectory.ToString().GetData()) == FALSE)
 			throw SystemError::GetLastError();
     }
+
+    Path LocalFileSystemService::GetTempDirectoryPath() const
+	{
+		DWORD size = ::GetTempPath(0, nullptr);
+		if (size == 0)
+			throw SystemError::GetLastError();
+
+		TextChar* buffer = COCKTAIL_STACK_ALLOC(TextChar, size);
+		if (::GetTempPath(size, buffer) == 0)
+			throw SystemError::GetLastError();
+
+		return Path(buffer, size - 1);
+	}
 }

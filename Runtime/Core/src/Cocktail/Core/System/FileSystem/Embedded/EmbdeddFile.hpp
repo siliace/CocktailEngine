@@ -20,7 +20,7 @@ namespace Ck
 		 * \param path 
 		 * \param flags 
 		 */
-		EmbeddedFile(const cmrc::embedded_filesystem& fileSystem, const std::filesystem::path& path, const FileOpenFlags& flags);
+		EmbeddedFile(const cmrc::embedded_filesystem& fileSystem, const Path& path, const FileOpenFlags& flags);
 
 		/**
 		 * \brief 
@@ -62,7 +62,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::filesystem::path& GetPath() const override;
+		const Path& GetPath() const override;
 
 		/**
 		 * \brief 
@@ -77,7 +77,7 @@ namespace Ck
 
 	private:
 
-		std::filesystem::path mPath;
+		Path mPath;
 		cmrc::file mHandle;
 		cmrc::file::const_iterator mCursor;
 	};

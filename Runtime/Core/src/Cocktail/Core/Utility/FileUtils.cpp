@@ -7,23 +7,22 @@
 
 namespace Ck
 {
-	void FileUtils::MakeDirectories(const std::filesystem::path& path)
+	void FileUtils::MakeDirectories(const URI& uri)
 	{
-		if (!Storage::IsDirectory(path))
+		if (!Storage::IsDirectory(uri))
 		{
-			MakeDirectories(path.parent_path());
-
-			Storage::CreateDirectory(path);
+			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
+			Storage::CreateDirectory(uri);
 		}
 	}
 
-	ByteArray FileUtils::ReadFile(const std::filesystem::path& path)
+	ByteArray FileUtils::ReadFile(const URI& uri)
 	{
 		ByteArray content;
-		if (!Storage::IsFile(path))
+		if (!Storage::IsFile(uri))
 			return content;
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		std::unique_ptr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
 		if (!size)
@@ -35,55 +34,55 @@ namespace Ck
 		return content;
 	}
 
-	Array<std::string> FileUtils::ReadFileLines(const std::filesystem::path& path)
+	Array<String> FileUtils::ReadFileLines(const URI& uri)
 	{
-		if (!Storage::IsFile(path))
+		if (!Storage::IsFile(uri))
 			return {};
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		std::unique_ptr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 		FileInputStream inputStream(*file);
 
 		InputStreamReader inputStreamReader(inputStream);
 		BufferedReader reader(inputStreamReader);
 
-		Array<std::string> lines;
+		Array<String> lines;
 		while (!reader.IsEof())
 			lines.Add(reader.ReadLine());
 
 		return lines;
 	}
 
-	void FileUtils::WriteFile(const std::filesystem::path& path, ByteArrayView content, bool append)
+	void FileUtils::WriteFile(const URI& uri, ByteArrayView content, bool append)
 	{
-		if (!Storage::IsFile(path))
+		if (!Storage::IsFile(uri))
 		{
-			MakeDirectories(path.parent_path());
-			Storage::CreateFile(path);
+			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
+			Storage::CreateFile(uri);
 		}
 
 		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
 		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, openFlags);
+		std::unique_ptr<File> file = Storage::OpenFile(uri, openFlags);
 		file->Write(content.GetData(), content.GetSize());
 	}
 
-	void FileUtils::WriteFileLines(const std::filesystem::path& path, const Array<std::string>& lines, bool append)
+	void FileUtils::WriteFileLines(const URI& uri, const Array<String>& lines, bool append)
 	{
-		if (!Storage::IsFile(path))
+		if (!Storage::IsFile(uri))
 		{
-			MakeDirectories(path.parent_path());
-			Storage::CreateFile(path);
+			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
+			Storage::CreateFile(uri);
 		}
 
 		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
 		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, openFlags);
+		std::unique_ptr<File> file = Storage::OpenFile(uri, openFlags);
 		FileOutputStream outputStream(*file);
 
-		lines.ForEach([&](const std::string& line) {
-			outputStream.Write(line.data(), line.length());
+		lines.ForEach([&](const String& line) {
+			outputStream.Write(line.GetData(), line.GetLength());
 		});
 
 		outputStream.Flush();

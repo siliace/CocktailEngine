@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<SceneContainer> LoadFromPath(const std::filesystem::path& path,	const SceneImportParameters& parameters) override;
+		std::shared_ptr<SceneContainer> LoadFromPath(const Path& path,	const SceneImportParameters& parameters) override;
 
 		/**
 		 * \brief 
@@ -41,7 +41,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtension(std::string_view extension) const override;
+		bool SupportExtension(StringView extension) const override;
 
 		/**
 		 * \brief 

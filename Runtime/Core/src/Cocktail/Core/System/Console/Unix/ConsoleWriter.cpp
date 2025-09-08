@@ -2,6 +2,7 @@
 
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleWriter.hpp>
+#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck::Detail::Unix
 {
@@ -21,9 +22,10 @@ namespace Ck::Detail::Unix
 		/// Nothing
 	}
 
-	void ConsoleWriter::Write(const char* string, std::size_t length)
+	void ConsoleWriter::Write(const TextChar* string, std::size_t length)
 	{
-		int err = ::write(mHandle, string, length);
+		TextToAnsiConverter converter;
+		int err = ::write(mHandle, converter.Get(string), length);
 		if (err == -1)
 			throw SystemError::GetLastError();
 	}
@@ -31,5 +33,10 @@ namespace Ck::Detail::Unix
 	void ConsoleWriter::Flush()
 	{
 		fflush(stdout);
+	}
+
+	EncodingMode ConsoleWriter::GetEncodingMode()
+	{
+		return EncodingMode::Utf8;
 	}
 }

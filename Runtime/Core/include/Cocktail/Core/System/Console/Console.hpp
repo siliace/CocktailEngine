@@ -13,6 +13,11 @@ namespace Ck
 	{
 	public:
 
+		static void Write(const String& text);
+		static void WriteLine(const String& text);
+		static void Write(StringView text);
+		static void WriteLine(StringView text);
+
 		/**
 		 * \brief 
 		 * \return 

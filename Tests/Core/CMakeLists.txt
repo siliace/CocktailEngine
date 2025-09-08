@@ -3,6 +3,7 @@ project(CoreTest)
 cocktail_source_directory(CORE_TEST_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Array.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/String.cpp
 )
 
 cocktail_source_directory(CORE_TEST_FILES
@@ -43,6 +44,13 @@ cocktail_source_directory(CORE_TEST_FILES
 )
 
 cocktail_source_directory(CORE_TEST_FILES    
+    FOLDER "System/FileSystem"
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/System/FileSystem/Path.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/System/FileSystem/URI.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES    
     FOLDER "System/Network/Address"
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/System/Network/Address/IpAddressV4.cpp
@@ -54,7 +62,6 @@ cocktail_source_directory(CORE_TEST_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/ByteArray.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/ByteArrayView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/Optional.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Utility/StringUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/TranslatorCast.cpp
 )
 

@@ -18,7 +18,7 @@ namespace Ck::Detail::Unix
 		 * \brief 
 		 * \param path 
 		 */
-		explicit LocalDirectory(const std::filesystem::path& path);
+		explicit LocalDirectory(const Path& path);
 
 		/**
 		 * \brief 
@@ -29,13 +29,13 @@ namespace Ck::Detail::Unix
 		 * \brief 
 		 * \return 
 		 */
-		Array<std::filesystem::path> GetContent() const override;
+		Array<Path> GetContent() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const std::filesystem::path& GetPath() const override;
+		const Path& GetPath() const override;
 
 		/**
 		 * \brief 
@@ -45,7 +45,7 @@ namespace Ck::Detail::Unix
 
 	private:
 
-		std::filesystem::path mPath;
+		Path mPath;
 		DIR* mHandle;
 	};
 }

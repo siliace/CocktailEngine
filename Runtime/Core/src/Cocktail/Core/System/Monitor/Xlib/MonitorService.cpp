@@ -11,7 +11,7 @@ namespace Ck::Detail::Xlib
 		mExtensionSupported = XQueryExtension(mDisplay, "RANDR", &version, &version, &version);
 		if (!mExtensionSupported)
 		{
-			CK_LOG(XlibLogCategory, LogLevel::Warning, "X11 extension RANDR is not supported, MonitorService will be disabled");
+			CK_LOG(XlibLogCategory, LogLevel::Warning, CK_TEXT("X11 extension RANDR is not supported, MonitorService will be disabled"));
 			return;
 		}	
 		
