@@ -149,4 +149,5 @@ namespace Ck
 		}
 	};
 }
+
 #endif // COCKTAIL_CORE_MEMORY_MEMORY_HPP
