@@ -237,9 +237,11 @@ namespace Ck::Vulkan
 #ifndef NDEBUG
 	ExtensionManager::ExtensionManager()
 	{
-		StringUtils::Split(App::GetEnvironmentVariable("COCKTAIL_VULKAN_DISABLED_EXTENSIONS"), ';').ForEach([&](const std::string& disabledExtension) {
-			mDisabledExtensions.emplace(disabledExtension);
-			CK_LOG(VulkanLogCategory, LogLevel::Info, "Extension {} disabled", disabledExtension);
+		App::GetEnvironmentVariable(CK_TEXT("COCKTAIL_VULKAN_DISABLED_EXTENSIONS")).Then([&](const String& variable) {
+			variable.Split(';').ForEach([&](const String& disabledExtension) {
+				mDisabledExtensions.emplace(disabledExtension);
+				CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Extension {} disabled"), disabledExtension);
+			});
 		});
 	}
 #else
@@ -438,7 +440,7 @@ namespace Ck::Vulkan
 			bool extensionSupported = false;
 			const char* extensionName = extensionNames[i];
 #ifndef NDEBUG
-			if (IsExtensionDisabled(extensionName))
+			if (IsExtensionDisabled(CK_TEXT(""))) /// TODO: compare const char* and const wchar_t*
 				return false;
 #endif
 
@@ -454,9 +456,9 @@ namespace Ck::Vulkan
 		return extensionsSupported;
 	}
 
-	bool ExtensionManager::IsExtensionDisabled(std::string_view extensionName) const
+	bool ExtensionManager::IsExtensionDisabled(const TextChar* extensionName) const
 	{
-		for (const std::string& disabledExtension : mDisabledExtensions)
+		for (const String& disabledExtension : mDisabledExtensions)
 		{
 			if (disabledExtension == extensionName)
 				return true;

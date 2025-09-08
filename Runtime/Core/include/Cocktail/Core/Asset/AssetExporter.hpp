@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/IO/Output/Stream/OutputStream.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
@@ -52,7 +53,7 @@ namespace Ck
 		 * \param extension
 		 * \return
 		 */
-		virtual bool SupportExtension(std::string_view extension) const = 0;
+		virtual bool SupportExtension(StringView extension) const = 0;
 
 		/**
 		 * \brief 

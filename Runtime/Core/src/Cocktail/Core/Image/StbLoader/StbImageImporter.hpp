@@ -41,7 +41,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtension(std::string_view extension) const override;
+		bool SupportExtension(StringView extension) const override;
 
 		/**
 		 * \brief 

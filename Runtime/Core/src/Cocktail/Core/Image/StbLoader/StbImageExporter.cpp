@@ -54,7 +54,7 @@ namespace Ck
 		}
 
 		if (err == 0)
-			throw StbExportError("Failed to export image");
+			throw StbExportError(CK_TEXT("Failed to export image"));
 	}
 
 	ByteArray StbImageExporter::SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const
@@ -66,9 +66,9 @@ namespace Ck
 		return byteArray;
 	}
 
-	bool StbImageExporter::SupportExtension(std::string_view extension) const
+	bool StbImageExporter::SupportExtension(StringView extension) const
 	{
-		for (const std::string_view supportedExtension : {".jpg", ".jpeg", ".png", ".tga", ".bmp"})
+		for (StringView supportedExtension : { CK_TEXT(".jpg"), CK_TEXT(".jpeg"), CK_TEXT(".png"), CK_TEXT(".tga"), CK_TEXT(".bmp") })
 		{
 			if (supportedExtension == extension)
 				return true;

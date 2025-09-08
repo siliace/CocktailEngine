@@ -1,8 +1,6 @@
 #include <Cocktail/Core/Log/ConsoleLogChannel.hpp>
+#include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
-
-#include "Cocktail/Core/Log/LogCategory.hpp"
-#include "fmt/format.h"
 
 namespace Ck
 {
@@ -27,7 +25,7 @@ namespace Ck
 
 		mConsole->SetColors(background, foreground);
 
-		std::string fullMessage = fmt::format("{} - {}\n", entry.Category->GetName(), entry.Message);
+		std::string fullMessage = ""; /// TODO: fmt::format("{} - {}\n", "TODO", entry.entry.LogCategory->GetName()); 
 		mConsole->GetOutput().Write(fullMessage.c_str(), fullMessage.length());
 	}
 }

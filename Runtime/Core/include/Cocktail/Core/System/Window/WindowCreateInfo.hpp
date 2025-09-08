@@ -1,17 +1,15 @@
 #ifndef COCKTAIL_CORE_SYSTEM_WINDOW_WINDOWCREATEINFO_HPP
 #define COCKTAIL_CORE_SYSTEM_WINDOW_WINDOWCREATEINFO_HPP
 
-#include <string>
-
 #include <Cocktail/Core/Extent2D.hpp>
 #include <Cocktail/Core/Flags.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Window/WindowDisplayMode.hpp>
 #include <Cocktail/Core/System/Window/WindowStyle.hpp>
 
 namespace Ck
 {
     class Window;
-	class WindowEventQueue;
 
     /**
      * \brief Flags of WindowStyle
@@ -33,7 +31,7 @@ namespace Ck
 	    /**
          * brief Specifies the initial title to display in the window's title bar
          */
-        std::string Title;
+        String Title;
 
 	    /**
          * \brief Specifies the initial position on the screen of the Window to create

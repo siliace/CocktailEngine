@@ -22,10 +22,10 @@ namespace Ck
 		readerConfig.vertex_color = false;
 		readerConfig.mtl_search_path = path.parent_path().string();
 
-		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
+		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from {}"), path.string());
 		tinyobj::ObjReader reader;
 		if (!reader.ParseFromFile(path.string(), readerConfig))
-			throw ObjParseError(reader.Error());
+			throw ObjParseError(CK_TEXT("reader.Error()")); /// TODO: ansi to wchar_t
 
 		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
@@ -57,7 +57,7 @@ namespace Ck
 
 		tinyobj::ObjReader reader;
 		if (!reader.ParseFromString(objText, mtlText, readerConfig))
-			throw ObjParseError(reader.Error());
+			throw ObjParseError(CK_TEXT("reader.Error()")); /// TODO: ansi to wchar_t
 
 		return std::make_shared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}

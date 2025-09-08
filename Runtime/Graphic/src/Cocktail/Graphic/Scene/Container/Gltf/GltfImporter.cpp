@@ -87,13 +87,13 @@ namespace Ck
         tinygltf::Model model;
         std::string errors, warnings;
 
-        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, "Loading scene from {}", path.string());
+        CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from {}"), path.string());
         bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, path.string());
         if (!success)
-            throw GltfParseError(errors);
+            throw GltfParseError(CK_TEXT("errors")); /// TODO: errors
 
         if (!warnings.empty())
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Scene {} loaded with warnings: {}", path.string(), warnings);
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene {} loaded with warnings: {}"), path.string(), warnings);
 
         return std::make_shared<GltfSceneContainer>(model);
     }
@@ -114,9 +114,9 @@ namespace Ck
         return std::make_shared<GltfSceneContainer>(model);
     }
     
-    bool GltfImporter::SupportExtension(std::string_view extension) const
+    bool GltfImporter::SupportExtension(StringView extension) const
     {
-        return extension == ".gltf";
+        return extension == CK_TEXT(".gltf");
     }
     
     bool GltfImporter::SupportParameters(const SceneImportParameters& parameters) const

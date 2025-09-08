@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_SYSTEM_JOYSTICK_JOYSTICK_HPP
 
 #include <Cocktail/Core/Enum.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
 #include <Cocktail/Core/System/Joystick/JoystickCapabilities.hpp>
 #include <Cocktail/Core/System/Joystick/JoystickEvent.hpp>
@@ -116,7 +117,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual const std::string& GetName() const = 0;
+		virtual const String& GetName() const = 0;
 
 		/**
 		 * \brief 

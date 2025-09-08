@@ -58,7 +58,7 @@ namespace Ck::Detail::Win32
 		mHandle = CreateWindowEx(
 			0,
 			MAKEINTATOM(windowClass.GetHandle()),
-			createInfo.Title.c_str(),
+			createInfo.Title.GetData(),
 			style,
 			createInfo.Position.Width, createInfo.Position.Height,
 			static_cast<int>(adjustedSize.Width), static_cast<int>(adjustedSize.Height),
@@ -218,7 +218,7 @@ namespace Ck::Detail::Win32
 		}
 	}
 
-	std::string Window::GetTitle() const
+	String Window::GetTitle() const
 	{
 		std::size_t titleLength = GetWindowTextLength(mHandle);
 		if (titleLength == 0)
@@ -227,20 +227,20 @@ namespace Ck::Detail::Win32
 			if (lastError)
 				throw std::system_error(static_cast<int>(lastError), SystemError::GetSystemErrorCategory());
 
-			return "";
+			return String::Empty;
 		}
 
-		std::string title(titleLength + 1, '\0');
-		int result = GetWindowText(mHandle, title.data(), title.size());
+		TextChar* title = COCKTAIL_STACK_ALLOC(TextChar, titleLength);
+		int result = GetWindowText(mHandle, title, titleLength);
 		if (result == 0)
 			throw SystemError::GetLastError();
 
-		return title;
+		return String(title, titleLength);
 	}
 
-	void Window::SetTitle(const std::string& title)
+	void Window::SetTitle(const String& title)
 	{
-		if (SetWindowText(mHandle, title.c_str()) == FALSE)
+		if (SetWindowText(mHandle, title.GetData()) == FALSE)
 			throw SystemError::GetLastError();
 	}
 

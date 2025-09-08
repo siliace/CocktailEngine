@@ -13,6 +13,19 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+	<Type Name="Ck::String&lt;*&gt;">
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity == 0">Empty</DisplayString>
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity &gt; 0">Empty, Capacity={mCharacters.mCapacity - 1}</DisplayString>
+		<DisplayString Condition="mCharacters.mSize &gt; 0">{{ Size={mData.mSize - 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mCharacters.mSize - 1</Item>
+			<Item Name="[capacity]" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>(wchar_t*)mCharacters.mAllocator.mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
 	<Type Name="Ck::Vector2&lt;*&gt;">
 		<DisplayString>{mComponents[0]}, {mComponents[1]}</DisplayString>
 		<Expand>

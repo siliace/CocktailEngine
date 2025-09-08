@@ -1,10 +1,9 @@
 #ifndef COCKTAIL_VULKAN_EXTENSIONMANAGER_HPP
 #define COCKTAIL_VULKAN_EXTENSIONMANAGER_HPP
 
-#include <string>
 #include <unordered_set>
 
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/String.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceExtension.hpp>
 
@@ -129,11 +128,11 @@ namespace Ck::Vulkan
 		 * \param extensionName 
 		 * \return 
 		 */
-		bool IsExtensionDisabled(std::string_view extensionName) const;
+		bool IsExtensionDisabled(const TextChar* extensionName) const;
 
 		std::unordered_set<const char*> mInstanceExtensions;
 		std::unordered_set<const char*> mDeviceExtensions;
-		std::unordered_set<std::string> mDisabledExtensions;
+		std::unordered_set<String> mDisabledExtensions;
 	};
 }
 

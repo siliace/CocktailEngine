@@ -7,7 +7,7 @@ namespace Ck
 		return Enum<LogLevel>::UnderlyingCast(level) > Enum<LogLevel>::UnderlyingCast(mLogLevel);
 	}
 
-	const std::string& LogCategory::GetName() const
+	const String& LogCategory::GetName() const
 	{
 		return mName;
 	}
@@ -27,7 +27,7 @@ namespace Ck
 		mLogLevel = level;
 	}
 
-	LogCategory::LogCategory(std::string name, LogLevel defaultLevel):
+	LogCategory::LogCategory(String name, LogLevel defaultLevel):
 		mName(std::move(name)),
 		mDefaultLogLevel(defaultLevel)
 	{

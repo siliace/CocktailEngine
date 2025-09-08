@@ -106,7 +106,7 @@ namespace Ck
          * \brief
          * \return
          */
-        std::string ToString() const override;
+        String ToString() const override;
 
 	    /**
          * \brief 

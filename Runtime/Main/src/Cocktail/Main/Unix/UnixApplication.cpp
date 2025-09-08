@@ -14,25 +14,27 @@ namespace Ck::Main::Unix
             mArgv.Emplace(argv[i]);
     }
 
-    void UnixApplication::Exit(unsigned exitCode, bool force, std::string_view callSite)
+    void UnixApplication::Exit(unsigned exitCode, bool force, StringView callSite)
     {
-        CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.empty() ? "<>" : callSite);
+        CK_LOG(MainLogCategory, LogLevel::Info, "Requested {} exit with code {} from {}", force ? "forced" : "soft", exitCode, callSite.IsEmpty() ? "<>" :
+            std::string_view(callSite.GetData())
+        );
 
         exit(static_cast<int>(exitCode));
     }
 
-    const Array<std::string>& UnixApplication::GetArgv() const
+    const Array<String>& UnixApplication::GetArgv() const
     {
         return mArgv;
     }
 
-    std::string UnixApplication::GetEnvironmentVariable(std::string_view name)
+    Optional<String> UnixApplication::GetEnvironmentVariable(StringView name)
     {
-        char* variable = secure_getenv(name.data());
+        char* variable = secure_getenv(name.GetData());
         if (!variable)
-            return "";
+            return Optional<String>::Empty();
 
-        return std::string(variable, std::strlen(variable));
+        return Optional<String>::Of(InPlace, variable);
     }
 
     bool UnixApplication::IsDebuggerPresent() const

@@ -96,7 +96,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not an element"), path.ToString());
 
         	return static_cast<Element&>(node);
         }
@@ -110,7 +110,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not a sequence"), path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -124,7 +124,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not a value"), path.ToString());
 
             return static_cast<Value&>(node);
         }

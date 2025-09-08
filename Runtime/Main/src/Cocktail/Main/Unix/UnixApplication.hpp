@@ -22,26 +22,26 @@ namespace Ck::Main::Unix
 		 * \param force
 		 * \param callSite
 		 */
-		void Exit(unsigned exitCode, bool force, std::string_view callSite) override;
+		void Exit(unsigned exitCode, bool force, StringView callSite) override;
 
 	    /**
 	     * \brief 
 	     * \return 
 	     */
-	    const Array<std::string>& GetArgv() const override;
+	    const Array<String>& GetArgv() const override;
 
 		/**
 		 * \brief
 		 * \param name
 		 * \return
 		 */
-		std::string GetEnvironmentVariable(std::string_view name) override;
+		Optional<String> GetEnvironmentVariable(StringView name) override;
 
 	    bool IsDebuggerPresent() const override;
 
     private:
 
-        Array<std::string> mArgv;
+        Array<String> mArgv;
     };
 }
 

@@ -63,7 +63,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		virtual bool SupportExtension(std::string_view extension) const = 0;
+		virtual bool SupportExtension(StringView extension) const = 0;
 
 		/**
 		 * \brief

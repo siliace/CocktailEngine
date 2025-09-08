@@ -48,9 +48,9 @@ namespace Ck
         return Protocol::Ipv4;
     }
 
-    std::string IpAddressV4::ToString() const
+    String IpAddressV4::ToString() const
     {
-        return StringUtils::Join(mBytes.begin(), mBytes.end(), ".");
+        return CK_TEXT("StringUtils::Join(mBytes.begin(), mBytes.end(), '.');");
     }
 
     bool IpAddressV4::operator==(const IpAddressV4& rhs) const

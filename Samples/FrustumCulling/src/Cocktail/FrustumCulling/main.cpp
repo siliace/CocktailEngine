@@ -23,7 +23,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
-		windowCreateInfo.Title = "Frustum Culling";
+		windowCreateInfo.Title = CK_TEXT("Frustum Culling");
 		windowCreateInfo.Style = Flags<WindowStyle>::All();
 		windowCreateInfo.Position = MakeExtent(100, 100);
 

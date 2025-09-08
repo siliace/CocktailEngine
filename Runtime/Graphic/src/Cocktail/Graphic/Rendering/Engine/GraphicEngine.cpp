@@ -49,7 +49,7 @@ namespace Ck
 		}
 
 		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, std::string_view message) {
-			CK_LOG(GraphicEngineLogCategory, logLevel, "Debug message of type {} from RenderDevice : {}", Enum<Renderer::MessageType>::ToString(messageType), message);
+			CK_LOG(GraphicEngineLogCategory, logLevel, CK_TEXT("Debug message of type {} from RenderDevice : {}"), Enum<Renderer::MessageType>::ToString(messageType), message);
 		});
 
 		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });

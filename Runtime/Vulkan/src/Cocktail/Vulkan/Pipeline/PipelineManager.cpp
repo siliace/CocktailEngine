@@ -168,7 +168,7 @@ namespace Ck::Vulkan
 		std::shared_ptr<ComputePipeline> pipeline = mRenderDevice->CreateComputePipeline(mCache.get(), createInfo);
 		mComputePipelines[stateHash] = pipeline;
 
-		CK_LOG(VulkanLogCategory, LogLevel::Info, "Created ComputePipeline with hash {}", stateHash);
+		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created ComputePipeline with hash {}"), stateHash);
 
 		return pipeline;
 	}
@@ -182,7 +182,7 @@ namespace Ck::Vulkan
 		std::shared_ptr<GraphicPipeline> pipeline = mRenderDevice->CreateGraphicPipeline(mCache.get(), createInfo);
 		mGraphicPipelines[stateHash] = pipeline;
 
-		CK_LOG(VulkanLogCategory, LogLevel::Info, "Created GraphicPipeline with hash {}", stateHash);
+		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created GraphicPipeline with hash {}"), stateHash);
 
 		return pipeline;
 	}

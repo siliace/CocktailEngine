@@ -24,7 +24,7 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		virtual std::unique_ptr<Library> LoadLibrary(std::string_view name) = 0;
+		virtual std::unique_ptr<Library> LoadLibrary(StringView name) = 0;
 
 		/**
 		 * \brief 

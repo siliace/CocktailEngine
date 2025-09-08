@@ -41,7 +41,7 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		std::string GetName() const override;
+		String GetName() const override;
 
 		/**
 		 * \brief 

@@ -49,7 +49,7 @@ namespace Ck
         std::filesystem::path fullpath = mImportParameters.BaseDirectory / path;
         if (!Storage::IsFile(fullpath))
         {
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "File {} not found", path.string());
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("File {} not found"), path.string());
             return nullptr;
         }
 
@@ -65,7 +65,7 @@ namespace Ck
         }
 		else
 		{
-			CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "No loader found for file {}", path.string());
+			CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("No loader found for file {}"), path.string());
 			return nullptr;
 		}
 
@@ -224,7 +224,7 @@ namespace Ck
 		{
 			bool processed = ProcessSubMesh(vertexCache, subMeshes, attributes, shape);
 			if (!processed)
-				CK_LOG(SceneLoaderLogCategory, LogLevel::Error, "Shape {} is invalid and will be ignored", shape.name);
+				CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Shape {} is invalid and will be ignored"), shape.name);
 		}
 
 		MeshInfo meshInfo;

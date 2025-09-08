@@ -53,8 +53,8 @@ namespace Ck
 		return Protocol::Ipv6;
 	}
 
-	std::string IpAddressV6::ToString() const
+	String IpAddressV6::ToString() const
 	{
-		return StringUtils::Join(Bytes.begin(), Bytes.end(), ":");
+		return CK_TEXT("String::Joint(Bytes.begin(), Bytes.end(), CK_TEXT(':'))");
 	}
 }

@@ -17,7 +17,7 @@ namespace Ck
 		ResolveFacadeInstance()->Boot();
 	}
 
-	void App::Exit(unsigned int exitCode, bool force, std::string_view callSite)
+	void App::Exit(unsigned int exitCode, bool force, StringView callSite)
 	{
 		ResolveFacadeInstance()->Exit(exitCode, force, callSite);
 	}
@@ -27,12 +27,12 @@ namespace Ck
 		return ResolveFacadeInstance()->Uptime();
 	}
 
-	const Array<std::string>& App::GetArgv()
+	const Array<String>& App::GetArgv()
 	{
 		return ResolveFacadeInstance()->GetArgv();
 	}
 
-	std::string App::GetEnvironmentVariable(std::string_view name)
+	Optional<String> App::GetEnvironmentVariable(StringView name)
 	{
 		return ResolveFacadeInstance()->GetEnvironmentVariable(name);
 	}

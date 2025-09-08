@@ -23,7 +23,7 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		static std::unique_ptr<Library> LoadLibrary(std::string_view name);
+		static std::unique_ptr<Library> LoadLibrary(StringView name);
 
 		/**
 		 * \brief 
@@ -47,7 +47,7 @@ namespace Ck
 		 * \param functionName 
 		 * \return 
 		 */
-		virtual FunctionPtr LoadFunction(std::string_view functionName) = 0;
+		virtual FunctionPtr LoadFunction(const AnsiChar* functionName) = 0;
 
 		/**
 		 * \brief 

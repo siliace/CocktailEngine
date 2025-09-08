@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 
-#include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Monitor/VideoMode.hpp>
 
 namespace Ck
@@ -66,7 +66,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::string GetName() const = 0;
+		virtual String GetName() const = 0;
 
 		/**
 		 * \brief 

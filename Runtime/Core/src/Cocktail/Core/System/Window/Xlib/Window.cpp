@@ -605,19 +605,17 @@ namespace Ck::Detail::Xlib
 	{
     }
 
-    std::string Window::GetTitle() const
+    String Window::GetTitle() const
     {
-        std::string title;
         char* buffer = COCKTAIL_STACK_ALLOC(char, 256);
         XFetchName(mHandle.Display, mHandle.Window, &buffer);
-        title = buffer;
-        XFree(buffer);
-        return title;
+
+        return buffer;
     }
 
-    void Window::SetTitle(const std::string& title)
+    void Window::SetTitle(const String& title)
     {
-        XStoreName(mHandle.Display, mHandle.Window, title.c_str());
+        XStoreName(mHandle.Display, mHandle.Window, title.GetData());
     }
 
     Extent2D<unsigned int> Window::GetSize() const

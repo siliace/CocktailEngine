@@ -172,7 +172,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtensionImport(std::string_view extension)
+		bool SupportExtensionImport(StringView extension)
 		{
 			return mImporters.AnyOf([&](AssetImporter<T, ImportParam>* importer) {
 				return importer->SupportExtension(extension);
@@ -184,7 +184,7 @@ namespace Ck
 		 * \param extension 
 		 * \return 
 		 */
-		bool SupportExtensionExport(std::string_view extension)
+		bool SupportExtensionExport(StringView extension)
 		{
 			return mExporters.AnyOf([&](AssetExporter<T, ExportParam>* exporter) {
 				return exporter->SupportExtension(extension);

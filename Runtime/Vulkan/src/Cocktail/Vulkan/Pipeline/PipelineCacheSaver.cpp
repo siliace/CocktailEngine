@@ -53,7 +53,7 @@ namespace Ck::Vulkan
 					PipelineCache pipelineCache(renderDevice, pipelineCacheCreateInfo, nullptr);
 					pipelineManager->GetCache()->Merge(pipelineCache);
 
-					CK_LOG(VulkanLogCategory, LogLevel::Info, "Pipeline cache loaded from {}", mPipelineCachePath.string());
+					CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Pipeline cache loaded from {}"), mPipelineCachePath.string());
 				}
 			}
 		}

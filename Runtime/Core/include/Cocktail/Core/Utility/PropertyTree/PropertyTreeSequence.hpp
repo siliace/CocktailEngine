@@ -84,7 +84,7 @@ namespace Ck
             Path p(path);
             std::size_t index = p.template Reduce<std::size_t>();
             if (index >= mChildren.GetSize())
-                throw InvalidPropertyPathException("Path target sequence {} does not contains child with index {}", this->mName, index);
+                throw InvalidPropertyPathException(CK_TEXT("Path target sequence {} does not contains child with index {}"), this->mName, index);
 
             const Node* child = mChildren[index].get();
             if (child->GetType() == Node::Type::Element)
@@ -93,7 +93,7 @@ namespace Ck
             if (child->GetType() == Node::Type::Sequence)
                 return static_cast<const PropertyTreeSequence*>(child)->GetChild(p);
 
-            throw InvalidPropertyPathException("Child with index {} in node {} is terminal", index, this->mName);
+            throw InvalidPropertyPathException(CK_TEXT("Child with index {} in node {} is terminal"), index, this->mName);
         }
         /**
          * \brief
@@ -104,7 +104,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Path target node {} is not an element", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not an element"), path.ToString());
 
             return static_cast<Element&>(node);
         }
@@ -118,7 +118,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw InvalidPropertyPathException("Path target node {} is not a sequence", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not a sequence"), path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -132,7 +132,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException("Path target node {} is not a value", path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("Path target node {} is not a value"), path.ToString());
 
             return static_cast<Value&>(node);
         }

@@ -12,9 +12,14 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent2D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent3D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/String.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/StringView.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/String.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/StringView.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -665,6 +670,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ByteArrayView.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/CompositeKey.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/EnumMap.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ExceptionUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/FileUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Finder.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/FixedArray.hpp
@@ -678,6 +684,7 @@ cocktail_source_directory(CORE_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArray.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArrayView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ExceptionUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp
 )

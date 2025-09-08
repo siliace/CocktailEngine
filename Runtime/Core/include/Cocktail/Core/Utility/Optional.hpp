@@ -2,12 +2,10 @@
 #define COCKTAIL_CORE_UTILITY_OPTIONAL_HPP
 
 #include <Cocktail/Core/Cocktail.hpp>
-#include <Cocktail/Core/Exception.hpp>
+#include <Cocktail/Core/Utility/ExceptionUtils.hpp>
 
 namespace Ck
 {
-	COCKTAIL_DECLARE_EXCEPTION(EmptyOptionalException);
-
 	/**
 	 * \brief 
 	 * \tparam T 
@@ -180,7 +178,10 @@ namespace Ck
 		 */
 		T& Get()
 		{
-			return GetOrThrow<EmptyOptionalException>();
+			if (mEmpty)
+				ExceptionUtils::ThrowEmptyOptional();
+
+			return GetValue();
 		}
 
 		/**
@@ -189,7 +190,10 @@ namespace Ck
 		 */
 		const T& Get() const
 		{
-			return GetOrThrow<EmptyOptionalException>();
+			if (mEmpty)
+				ExceptionUtils::ThrowEmptyOptional();
+
+			return GetValue();
 		}
 
 		/**
@@ -488,7 +492,10 @@ namespace Ck
 		 */
 		T& Get()
 		{
-			return GetOrThrow<EmptyOptionalException>();
+			if (!mValue)
+				ExceptionUtils::ThrowEmptyOptional();
+
+			return *mValue;
 		}
 
 		/**
@@ -497,7 +504,10 @@ namespace Ck
 		 */
 		const T& Get() const
 		{
-			return GetOrThrow<EmptyOptionalException>();
+			if (!mValue)
+				ExceptionUtils::ThrowEmptyOptional();
+
+			return *mValue;
 		}
 
 		/**

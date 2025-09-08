@@ -94,9 +94,9 @@ namespace Ck::Detail::Xlib
         return RotationToOrientation(mCrtcInfo->rotation);
     }
 
-    std::string Monitor::GetName() const
+    String Monitor::GetName() const
     {
-		return std::string(mOutputInfo->name, mOutputInfo->nameLen);;
+		return String(mOutputInfo->name, mOutputInfo->nameLen);
 	}
 
     VideoMode Monitor::GetCurrentVideoMode() const

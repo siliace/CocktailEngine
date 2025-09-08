@@ -6,18 +6,18 @@
 
 namespace Ck
 {
-	Array<std::unique_ptr<IpAddress>> IpAddress::Resolve(const std::string& hostname)
+	Array<std::unique_ptr<IpAddress>> IpAddress::Resolve(const String& hostname)
 	{
-		addrinfo hints = {};
+		ADDRINFOW hints = {};
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 
-		addrinfo* results;
-		if (getaddrinfo(hostname.c_str(), nullptr, &hints, &results) != 0)
+		ADDRINFOW* results;
+		if (GetAddrInfoW(hostname.GetData(), nullptr, &hints, &results) != 0)
 			throw SystemError::GetLastError();
 
 		Array<std::unique_ptr<IpAddress>> ipAddresses;
-		for (addrinfo* result = results; result; result = result->ai_next)
+		for (ADDRINFOW* result = results; result; result = result->ai_next)
 		{
 			std::unique_ptr<IpAddress> ipAddress;
 			if (result->ai_family == AF_INET)

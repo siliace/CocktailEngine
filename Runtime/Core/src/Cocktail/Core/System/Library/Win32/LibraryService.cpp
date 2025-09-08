@@ -4,7 +4,7 @@
 
 namespace Ck::Detail::Win32
 {
-	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(std::string_view name)
+	std::unique_ptr<Ck::Library> LibraryService::LoadLibrary(StringView name)
 	{
 		return std::make_unique<Library>(name);
 	}

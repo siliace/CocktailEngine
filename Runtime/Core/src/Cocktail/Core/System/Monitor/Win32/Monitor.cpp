@@ -1,6 +1,8 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Win32/Monitor.hpp>
 
+#include "Cocktail/Core/String.hpp"
+
 namespace Ck::Detail::Win32
 {
 	namespace
@@ -59,7 +61,7 @@ namespace Ck::Detail::Win32
 		COCKTAIL_UNREACHABLE();
 	}
 
-	std::string Monitor::GetName() const
+	String Monitor::GetName() const
 	{
 		return mMonitorInfo.szDevice;
 	}

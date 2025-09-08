@@ -200,6 +200,14 @@ function(cocktail_add_runtime_library)
         PRIVATE ${THIS_DEFINES}
     )
 
+    if (WIN32)
+        target_compile_definitions(${THIS_TARGET}
+            PUBLIC
+                UNICODE
+                _UNICODE
+        )
+    endif ()
+
     # set includes directories
     target_include_directories(${THIS_TARGET}
         PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

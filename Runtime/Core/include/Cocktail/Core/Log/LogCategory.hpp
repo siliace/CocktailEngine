@@ -4,7 +4,7 @@
 #include <string>
 
 #include <Cocktail/Core/Enum.hpp>
-#include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Log/LogLevel.hpp>
 
 #define COCKTAIL_DECLARE_LOG_CATEGORY(__Name, __Level)       \
@@ -12,7 +12,7 @@ extern class __Name ## Type : public ::Ck::LogCategory \
 {                                                      \
 public:                                                \
     __Name ## Type() :                                 \
-       ::Ck::LogCategory(#__Name, __Level)             \
+       ::Ck::LogCategory(CK_TEXT(#__Name), __Level)    \
     {                                                  \
     }                                                  \
 } __Name                                               \
@@ -39,7 +39,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        const std::string& GetName() const;
+        const String& GetName() const;
 
         /**
          * \brief 
@@ -67,11 +67,11 @@ namespace Ck
          * \param name
          * \param defaultLevel
          */
-        LogCategory(std::string name, LogLevel defaultLevel);
+        LogCategory(String name, LogLevel defaultLevel);
 
     private:
 
-        std::string mName;
+        String mName;
         LogLevel mDefaultLogLevel;
         LogLevel mLogLevel;
     };

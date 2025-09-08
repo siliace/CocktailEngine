@@ -1,9 +1,9 @@
 #ifndef COCKTAIL_CORE_SYSTEM_CONCURRENCY_THREADUTILS_HPP
 #define COCKTAIL_CORE_SYSTEM_CONCURRENCY_THREADUTILS_HPP
 
-#include <string>
 #include <thread>
 
+#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 
 namespace Ck
@@ -91,7 +91,7 @@ namespace Ck
 		 * \param threadHandle
 		 * \param name
 		 */
-		static void SetName(std::thread::native_handle_type threadHandle, std::string_view name);
+		static void SetName(std::thread::native_handle_type threadHandle, StringView name);
 
 		/**
 		 * \brief
