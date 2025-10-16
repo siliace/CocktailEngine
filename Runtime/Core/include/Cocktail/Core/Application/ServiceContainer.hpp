@@ -69,6 +69,9 @@ namespace Ck
 			Singleton<Abstract>([]() -> std::unique_ptr<Abstract> {
 				return std::make_unique<Concrete>();
 			}, lazy);
+
+			if constexpr (!std::is_same_v<Abstract, Concrete>)
+				Alias<Concrete, Abstract>();
 		}
 
 		/**
@@ -127,7 +130,7 @@ namespace Ck
 		}
 
 		/**
-		 * \brief Invoke a callable by resolving this parameters from the service container
+		 * \brief Invoke a callable by resolving its parameters from the service container
 		 * \param callable The callable to call
 		 * \return The return value of the callable
 		 */
