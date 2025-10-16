@@ -1,5 +1,6 @@
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/System/Clipboard/Xlib/ClipboardService.hpp>
+#include <Cocktail/Core/System/Concurrency/Pthread/ThreadManager.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleService.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemService.hpp>
@@ -25,6 +26,8 @@ namespace Ck::Detail::Unix
 
 		application->Singleton<Ck::LocalFileSystemService, LocalFileSystemService>();
 		application->Singleton<Ck::LocalFileSystemDriver, LocalFileSystemDriver>();
+
+    	application->Singleton<ThreadManager, Pthread::ThreadManager>();
 	}
 }
 

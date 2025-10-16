@@ -15,9 +15,11 @@ namespace Ck
 
         std::string message(int errorCode) const override
         {
-            char buffer[1024];
-            char* errorMessage = strerror_r(errorCode, buffer, 1024);
-            return std::string(errorMessage, std::strlen(errorMessage));
+            char buf[1024];
+            if (strerror_r(errorCode, buf, sizeof(buf)) == nullptr) {
+                return buf;
+            }
+            return "Unknown";
         }
     };
 

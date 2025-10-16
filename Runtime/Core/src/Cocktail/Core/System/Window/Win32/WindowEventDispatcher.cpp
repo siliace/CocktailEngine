@@ -139,7 +139,7 @@ namespace Ck::Detail::Win32
 				WORD keyFlags = HIWORD(lParam);
 
 				WORD scanCode = LOBYTE(keyFlags);
-				if (keyFlags & KF_EXTENDED == KF_EXTENDED)
+				if ((keyFlags & KF_EXTENDED) == KF_EXTENDED)
 					scanCode = MAKEWORD(scanCode, 0xE0);
 
 				if (virtualKey == VK_SHIFT || virtualKey == VK_CONTROL || virtualKey == VK_MENU)
@@ -149,7 +149,7 @@ namespace Ck::Detail::Win32
 				event.Window = window;
 				event.Key = GetMessageKey(virtualKey);
 				event.Pressed = msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN;
-				event.Repeated = lParam & (1 << 30);
+				event.Repeated = (lParam & Bit(30)) != 0;
 
 				window->OnKeyboardEvent().Emit(event);
 			}

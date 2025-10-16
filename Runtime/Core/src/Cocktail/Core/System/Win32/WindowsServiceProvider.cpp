@@ -1,6 +1,7 @@
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Clipboard/Win32/ClipboardService.hpp>
+#include <Cocktail/Core/System/Concurrency/Win32/ThreadManager.hpp>
 #include <Cocktail/Core/System/Console/Win32/ConsoleService.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileSystemDriver.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileSystemService.hpp>
@@ -59,6 +60,8 @@ namespace Ck::Detail::Win32
 		application->Singleton<Ck::MouseService>([](Application* app) -> std::unique_ptr<Ck::MouseService> {
 			return std::make_unique<MouseService>(app);
 		});
+
+		application->Singleton<Ck::ThreadManager, ThreadManager>(false);
 
 		application->Singleton<WindowEventDispatcher>();
 

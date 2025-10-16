@@ -4,7 +4,7 @@
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Log/LogServiceProvider.hpp>
 #include <Cocktail/Core/System/SystemServiceProvider.hpp>
-#include <Cocktail/Core/System/Concurrency/ThreadUtils.hpp>
+#include <Cocktail/Core/System/Concurrency/Thread.hpp>
 
 #include <Cocktail/Main/ExitCode.hpp>
 #include <Cocktail/Main/main.hpp>
@@ -24,7 +24,7 @@ namespace Ck::Main
 
 		if (waitedForDebugger)
 		{
-			ThreadUtils::WaitUntil([&]() {
+			Thread::WaitUntil([&]() {
 				return application->IsDebuggerPresent();
 			});
 		}

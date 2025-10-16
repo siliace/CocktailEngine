@@ -296,27 +296,39 @@ endif ()
 cocktail_source_directory(CORE_FILES    
     FOLDER "System/Concurrency"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/AffinityMaskBuilder.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/BlockingQueue.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/NullMutex.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/Runnable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/SpinMutex.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/ThreadUtils.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/Thread.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/ThreadManager.hpp
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/AffinityMaskBuilder.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/NullMutex.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/SpinMutex.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/ThreadUtils.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Thread.cpp
 )
 
 if (WIN32)
     cocktail_source_directory(CORE_FILES    
         FOLDER "System/Concurrency/Win32"
         SRC
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadUtils.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/Thread.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/Thread.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadManager.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadManager.cpp
     )
 elseif (LINUX)
     cocktail_source_directory(CORE_FILES    
-        FOLDER "System/Concurrency/Unix"
+        FOLDER "System/Concurrency/Pthread"
         SRC
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Unix/ThreadUtils.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/PthreadErrorCategory.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/Thread.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/Thread.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/ThreadManager.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/ThreadManager.cpp
     )
 endif ()
 

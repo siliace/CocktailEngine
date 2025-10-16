@@ -7,7 +7,7 @@ namespace Ck
 	Instant Instant::Now()
 	{
 		timespec timespec;
-		clock_gettime(0, &timespec);
+		clock_gettime(CLOCK_REALTIME, &timespec);
 
 		return Instant::EpochSeconds(timespec.tv_sec, timespec.tv_nsec);
 	}
