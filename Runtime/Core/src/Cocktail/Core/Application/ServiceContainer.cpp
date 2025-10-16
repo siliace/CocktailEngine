@@ -26,6 +26,6 @@ namespace Ck
 		if (auto it = mAliases.find(abstract); it != mAliases.end())
 			return GetConcrete(it->second);
 
-		return abstract;
+		return abstract;  // NOLINT(bugprone-return-const-ref-from-parameter)
 	}
 }
