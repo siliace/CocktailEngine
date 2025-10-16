@@ -11,10 +11,11 @@ namespace Ck
 	
 	void Application::RegisterServiceProvider(std::unique_ptr<ServiceProvider> serviceProvider)
 	{
-		serviceProvider->Register();
-
 		if (mBooted)
+		{
+			serviceProvider->Register();
 			serviceProvider->Boot();
+		}
 
 		mServiceProviders.Add(std::move(serviceProvider));
 	}
