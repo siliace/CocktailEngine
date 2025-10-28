@@ -1,6 +1,8 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleReader.hpp>
 
+#include "Cocktail/Core/Exception.hpp"
+
 namespace Ck::Detail::Unix
 {
 	bool ConsoleReader::Read(TextChar& c)
@@ -20,30 +22,27 @@ namespace Ck::Detail::Unix
 
 	Uint64 ConsoleReader::Seek(Uint64 position)
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	void ConsoleReader::Rewind()
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	Uint64 ConsoleReader::Tell() const
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	std::size_t ConsoleReader::GetSize() const
 	{
-		return 0;
+		throw NotImplementedException();
 	}
 
 	bool ConsoleReader::IsEof() const
 	{
-		return false;
+		throw NotImplementedException();
 	}
 
 	EncodingMode ConsoleReader::GetEncodingMode() const

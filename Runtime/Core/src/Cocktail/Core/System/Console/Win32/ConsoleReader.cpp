@@ -1,3 +1,4 @@
+#include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Win32/ConsoleReader.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -27,30 +28,27 @@ namespace Ck::Detail::Win32
 
 	Uint64 ConsoleReader::Seek(Uint64 position)
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	void ConsoleReader::Rewind()
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	Uint64 ConsoleReader::Tell() const
 	{
-		/// Todo: create an exception here ?
-		throw std::runtime_error("");
+		throw NotImplementedException();
 	}
 
 	std::size_t ConsoleReader::GetSize() const
 	{
-		return 0;
+		throw NotImplementedException();
 	}
 
 	bool ConsoleReader::IsEof() const
 	{
-		return false;
+		throw NotImplementedException();
 	}
 
 	EncodingMode ConsoleReader::GetEncodingMode() const
