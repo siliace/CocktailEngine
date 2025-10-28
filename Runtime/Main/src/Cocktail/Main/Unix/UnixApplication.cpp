@@ -42,10 +42,22 @@ namespace Ck::Main::Unix
 
     bool UnixApplication::IsDebuggerPresent() const
     {
-        for (const String& line : FileUtils::ReadFileLines(CK_TEXT("/proc/self/status")))
-        {
+        FILE* file = fopen("/proc/self/status", "r");
+        if (!file)
+            return false;
 
+        char line[256];
+        while (fgets(line, sizeof(line), file))
+        {
+            if (strncmp(line, "TracerPid:", 10) == 0)
+            {
+                int tracer = atoi(line + 10);
+                fclose(file);
+
+                return tracer != 0;
+            }
         }
+        fclose(file);
 
         return false;
     }
