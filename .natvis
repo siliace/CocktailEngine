@@ -16,21 +16,23 @@
 	<Type Name="Ck::String">
 		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity == 0">Empty</DisplayString>
 		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity &gt; 0">Empty, Capacity={mCharacters.mCapacity - 1}</DisplayString>
-		<DisplayString Condition="mCharacters.mSize &gt; 0">{{ Length={mData.mSize - 1} }}</DisplayString>
+		<DisplayString Condition="mCharacters.mSize &gt; 0">Content={(wchar_t*)mCharacters.mAllocator.mData}, Length={mCharacters.mSize - 1}, Capacity={mCharacters.mCapacity - 1}</DisplayString>
+		<StringView>(wchar_t*)mCharacters.mAllocator.mData</StringView>
 		<Expand>
-			<Item Name="[length]" ExcludeView="simple">mCharacters.mSize - 1</Item>
-			<Item Name="[capacity]" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
+			<Item Name="Length" ExcludeView="simple">mCharacters.mSize - 1</Item>
+			<Item Name="Capacity" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
 			<ArrayItems>
-				<Size>mSize</Size>
+				<Size>mCharacters.mSize - 1</Size>
 				<ValuePointer>(wchar_t*)mCharacters.mAllocator.mData</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>
 	<Type Name="Ck::StringView">
 		<DisplayString Condition="mLength == 0">Empty</DisplayString>
-		<DisplayString Condition="mLength &gt; 0">{{ Length={mLength} }}</DisplayString>
+		<DisplayString Condition="mLength &gt; 0">Content={(wchar_t*)mString}, Length={mLength}</DisplayString>
+		<StringView Condition="mLength &gt; 0 &amp;&amp; mString != 0">mString</StringView>
 		<Expand>
-			<Item Name="[length]" ExcludeView="simple">mLength</Item>
+			<Item Name="Length" ExcludeView="simple">mLength</Item>
 			<ArrayItems>
 				<Size>mLength</Size>
 				<ValuePointer>(wchar_t*)mString</ValuePointer>
@@ -59,6 +61,24 @@
 			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
 			<Item Name="z" ExcludeView="simple">mComponents[2]</Item>
 			<Item Name="w" ExcludeView="simple">mComponents[3]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::LazyValue&lt;*&gt;">
+		<DisplayString Condition="mDirty == true">Dirty</DisplayString>
+		<DisplayString Condition="mDirty == false">Value={mValue}</DisplayString>
+		<Expand>
+			<Item Name="Value" Condition="!mDirty">
+				mValue
+			</Item>
+		</Expand>
+	</Type>
+	<Type Name="Optional&lt;*&gt;">
+		<DisplayString>{mEmpty ? "Empty" : "{value}"}</DisplayString>
+		<Expand>
+			<Item Name="Value">
+				*(($T1*)$address(mStorage))
+			</Item>
+			<Item Name="IsEmpty">mEmpty</Item>
 		</Expand>
 	</Type>
 </AutoVisualizer>
