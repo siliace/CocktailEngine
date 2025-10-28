@@ -466,7 +466,7 @@ namespace Ck
 		{
 			using U = decltype(mapper(T{}));
 
-			if (mValue)
+			if (!mValue)
 				return Optional<U>::Empty();
 
 			return Optional<U>::Of(mapper(*mValue));
