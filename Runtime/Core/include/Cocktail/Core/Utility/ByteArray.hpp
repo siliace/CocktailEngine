@@ -17,37 +17,6 @@ namespace Ck
     public:
 
         /**
-         * \brief Create a ByteArray by copying an existing string view
-         * \param string The string to copy
-         * \return The created ByteArray
-         */
-        static ByteArray FromString(const String& string);
-
-        /**
-         * \brief Create a ByteArray by copying an existing string view
-         * \param string The string to copy
-         * \return The created ByteArray
-         */
-        static ByteArray FromString(StringView string);
-
-        /**
-         * \brief Create a ByteArray by copying an existing string view
-         * \param string The string to copy
-         * \return The created ByteArray
-         */
-        template <typename Char>
-        static ByteArray FromString(const Char* string)
-        {
-            assert(string != nullptr);
-
-            std::size_t size = 0;
-            while (string[size] != 0)
-                ++size;
-
-            return ByteArray(string, size * sizeof(Char));
-        }
-
-	    /**
          * \brief Default constructor
          */
         ByteArray();
