@@ -50,6 +50,8 @@ namespace Ck
         }
     }
 
+    const Path Path::Empty = Path();
+
 	Path Path::Parse(const String& string, Format format)
 	{
         return Parse(string.GetData(), string.GetLength(), format);
@@ -167,11 +169,6 @@ namespace Ck
         return Join(other.GetData(), other.GetLength());
     }
 
-    Path Path::Join(StringView other) const
-    {
-        return Path(*this).Join(other);
-    }
-
     Path& Path::Join(const Path& other)
     {
         if (other.IsAbsolute())
@@ -197,19 +194,9 @@ namespace Ck
         return *this;
     }
 
-    Path Path::Join(const Path& other) const
-    {
-        return Path(*this).Join(other);
-    }
-
     Path& Path::Join(const String& other)
     {
         return Join(other.GetData(), other.GetLength());
-    }
-
-    Path Path::Join(const String& other) const
-    {
-        return Path(*this).Join(other);
     }
 
     Path& Path::Join(const TextChar* other)
@@ -217,19 +204,9 @@ namespace Ck
         return Join(other, StringUtils<TextChar, SizeType>::GetLength(other));
     }
 
-    Path Path::Join(const TextChar* other) const
-    {
-        return Path(*this).Join(other);
-    }
-
     Path& Path::Join(const TextChar* other, SizeType length)
     {
         return Join(Parse(other, length));
-    }
-
-    Path Path::Join(const TextChar* other, SizeType length) const
-    {
-        return Path(*this).Join(other, length);
     }
 
     bool Path::IsEmpty() const

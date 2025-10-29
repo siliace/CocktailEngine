@@ -20,22 +20,6 @@ namespace Ck
 
         using SizeType = String::SizeType;
 
-    #ifdef COCKTAIL_OS_WINDOWS
-        /**
-         * \brief Platform-dependent path separator
-         *
-         * \note On Windows this is '\\'
-         */
-        static constexpr TextChar SystemSeparator = CK_TEXT('\\');
-    #else
-        /**
-         * \brief Platform-dependent path separator
-         *
-         * \note On POSIX-like systems this is '/'
-         */
-        static constexpr TextChar SystemSeparator = CK_TEXT('/');
-    #endif
-
         /**
          * \brief Enumeration of possible path formating
          * This will change the separator used by the path
@@ -59,6 +43,27 @@ namespace Ck
              */
             System,
         };
+
+    #ifdef COCKTAIL_OS_WINDOWS
+        /**
+         * \brief Platform-dependent path separator
+         *
+         * \note On Windows this is '\\'
+         */
+        static constexpr TextChar SystemSeparator = CK_TEXT('\\');
+    #else
+        /**
+         * \brief Platform-dependent path separator
+         *
+         * \note On POSIX-like systems this is '/'
+         */
+        static constexpr TextChar SystemSeparator = CK_TEXT('/');
+    #endif
+
+        /**
+		 * \brief Utility constant value to return a reference/pointer to an empty Path
+         */
+        static const Path Empty;
 
         /**
          * \brief Parses a character buffer into a Path object
@@ -100,6 +105,15 @@ namespace Ck
          * \return The parsed Path object
          */
         static Path Parse(const TextChar* path, SizeType length, Format format = Format::Auto);
+
+        template <typename... Args>
+        static Path Merge(Args&&... args)
+        {
+            Path p;
+            (p.Join(std::forward<Args>(args)), ...);
+
+            return p;
+        }
 
         /**
          * \brief Tell whether a character is a path separator
@@ -179,7 +193,6 @@ namespace Ck
          * \return Reference to this Path after joining
          */
         Path& Join(StringView other);
-        Path Join(StringView other) const;
 
         /**
          * \brief Joins another Path to this one
@@ -189,7 +202,6 @@ namespace Ck
          * \return Reference to this Path after joining
          */
         Path& Join(const Path& other);
-        Path Join(const Path& other) const;
 
         /**
          * \brief Joins a String to the current path
@@ -199,7 +211,6 @@ namespace Ck
          * \return Reference to this Path after joining
          */
         Path& Join(const String& other);
-        Path Join(const String& other) const;
 
         /**
          * \brief Joins a null-terminated C-string to the current path
@@ -209,7 +220,6 @@ namespace Ck
          * \return Reference to this Path after joining
          */
         Path& Join(const TextChar* other);
-        Path Join(const TextChar* other) const;
 
         /**
          * \brief Joins a character buffer with explicit size to the current path
@@ -220,7 +230,6 @@ namespace Ck
          * \return Reference to this Path after joining
          */
         Path& Join(const TextChar* other, SizeType length);
-        Path Join(const TextChar* other, SizeType length) const;
 
         /**
          * \brief Checks whether the path is empty

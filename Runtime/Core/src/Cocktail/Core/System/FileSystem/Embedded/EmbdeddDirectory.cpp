@@ -17,7 +17,7 @@ namespace Ck
 
 		children.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
-			children.Add(mPath.Join(CK_ANSI_TO_TEXT((*it).filename().c_str())));
+			children.Add(Path::Merge(mPath, CK_ANSI_TO_TEXT((*it).filename().c_str())));
 
 		return children;
 	}

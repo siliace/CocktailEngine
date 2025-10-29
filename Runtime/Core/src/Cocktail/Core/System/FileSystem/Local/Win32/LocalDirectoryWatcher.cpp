@@ -39,7 +39,7 @@ namespace Ck::Detail::Win32
 			notify = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(&buffer[offset]);
 			offset += notify->NextEntryOffset;
 
-			Path changeFullPath = mDirectory->GetPath().Join(notify->FileName, notify->FileNameLength);
+			Path changeFullPath = Path::Merge(mDirectory->GetPath(), Path::Parse(notify->FileName, notify->FileNameLength));
 			switch (notify->Action)
 			{
 			case FILE_ACTION_ADDED:
