@@ -98,4 +98,50 @@ namespace Ck::Detail::Win32
 	{
 		return std::make_unique<LocalDirectoryWatcher>(directory, recursive);
 	}
+
+	Path LocalFileSystemDriver::MakeCanonical(const Path& path)
+	{
+		return TryMakeCanonical(path).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+	}
+
+	Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
+	{
+		TextChar fullPath[MAX_PATH];
+		DWORD fullPathLength = GetFullPathName(path.ToString().GetData(), MAX_PATH, fullPath, nullptr);
+		if (fullPathLength == 0 || fullPathLength > MAX_PATH)
+		{
+			DWORD lastError = ::GetLastError();
+			if (lastError == ERROR_FILE_NOT_FOUND)
+				return Optional<Path>::Empty();
+
+			throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+		}
+
+		HANDLE hFile = ::CreateFileW(
+			fullPath,
+			0,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			nullptr,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			nullptr
+		);
+		if (hFile == INVALID_HANDLE_VALUE)
+			throw SystemError::GetLastError();
+
+		TextChar finalPath[MAX_PATH];
+		DWORD finalPathLength = GetFinalPathNameByHandle(hFile, finalPath, MAX_PATH, FILE_NAME_NORMALIZED);
+		CloseHandle(hFile);
+
+		if (finalPathLength == 0 || finalPathLength > MAX_PATH)
+		{
+			DWORD lastError = ::GetLastError();
+			if (lastError == ERROR_FILE_NOT_FOUND)
+				return Optional<Path>::Empty();
+
+			throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+		}
+
+		return Optional<Path>::Of(InPlace, finalPath, finalPathLength);
+	}
 }

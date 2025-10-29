@@ -82,6 +82,20 @@ namespace Ck
 		 * \param path 
 		 */
 		virtual void Remove(const Path& path) = 0;
+
+		/**
+		 * \brief 
+		 * \param path 
+		 * \return 
+		 */
+		virtual Path MakeCanonical(const Path& path) = 0;
+
+		/**
+		 * \brief
+		 * \param path
+		 * \return
+		 */
+		virtual Optional<Path> TryMakeCanonical(const Path& path) = 0;
 	};
 }
 

@@ -79,6 +79,20 @@ namespace Ck
 
 		/**
 		 * \brief 
+		 * \param path 
+		 * \return 
+		 */
+		Path MakeCanonical(const Path& path) override;
+
+		/**
+		 * \brief 
+		 * \param path 
+		 * \return 
+		 */
+		Optional<Path> TryMakeCanonical(const Path& path) override;
+
+		/**
+		 * \brief 
 		 * \param fileSystem 
 		 */
 		void Register(cmrc::embedded_filesystem fileSystem);

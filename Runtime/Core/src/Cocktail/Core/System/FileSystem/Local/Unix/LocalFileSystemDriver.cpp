@@ -81,4 +81,21 @@ namespace Ck::Detail::Unix
 	{
 		return std::make_unique<LocalDirectoryWatcher>(directory, recursive);
 	}
+
+	Path LocalFileSystemDriver::MakeCanonical(const Path& path)
+	{
+		return TryMakeCanonical(path).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+	}
+
+	Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
+	{
+		TextChar* resolvedPath = CK_ANSI_TO_TEXT(realpath(CK_TEXT_TO_ANSI(path.ToString().GetData()), nullptr));
+		if (!resolvedPath)
+			return Optional<Path>::Empty();
+
+		Path resolved = Path::Parse(resolvedPath);
+		free(resolvedPath);
+
+		return Optional<Path>::Of(resolvedPath);
+	}
 }

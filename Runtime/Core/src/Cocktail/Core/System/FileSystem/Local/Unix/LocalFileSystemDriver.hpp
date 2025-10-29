@@ -77,6 +77,20 @@ namespace Ck::Detail::Unix
 		std::unique_ptr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
 
 		std::unique_ptr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) override;
+
+		/**
+		 * \brief
+		 * \param path
+		 * \return
+		 */
+		Path MakeCanonical(const Path& path) override;
+
+		/**
+		 * \brief
+		 * \param path
+		 * \return
+		 */
+		Optional<Path> TryMakeCanonical(const Path& path) override;
 	};
 }
 

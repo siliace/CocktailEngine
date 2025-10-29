@@ -76,6 +76,16 @@ namespace Ck
 		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
 	}
 
+	Path EmbeddedFileSystemDriver::MakeCanonical(const Path& path)
+	{
+		return path;
+	}
+
+	Optional<Path> EmbeddedFileSystemDriver::TryMakeCanonical(const Path& path)
+	{
+		return Optional<Path>::Of(path);
+	}
+
 	void EmbeddedFileSystemDriver::Register(cmrc::embedded_filesystem fileSystem)
 	{
 		mFileSystems.Add(std::move(fileSystem));
