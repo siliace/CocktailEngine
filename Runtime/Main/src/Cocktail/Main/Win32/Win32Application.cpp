@@ -3,9 +3,12 @@
 #include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Win32/Win32Application.hpp>
 
+#include "Cocktail/Core/System/SystemError.hpp"
+
 namespace Ck::Main::Win32
 {
-	Win32Application::Win32Application(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+	Win32Application::Win32Application(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) :
+		mInstanceHandle(hInstance)
 	{
 		int argc = 0;
 		PWSTR* wideArgument = CommandLineToArgvW(pCmdLine, &argc);
@@ -54,5 +57,15 @@ namespace Ck::Main::Win32
 	bool Win32Application::IsDebuggerPresent() const
 	{
 		return ::IsDebuggerPresent() == TRUE;
+	}
+
+	Path Win32Application::GetExecutablePath() const
+	{
+		TextChar executablePath[MAX_PATH];
+		DWORD executablePathLength = GetModuleFileName(mInstanceHandle, executablePath, MAX_PATH);
+		if (executablePathLength == 0 || executablePathLength > MAX_PATH)
+			throw SystemError::GetLastError();
+
+		return Path::Parse(executablePath, executablePathLength);
 	}
 }

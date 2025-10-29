@@ -39,6 +39,8 @@ namespace Ck::Main::Unix
 
 	    bool IsDebuggerPresent() const override;
 
+	    Path GetExecutablePath() const override;
+
     private:
 
         Array<String> mArgv;

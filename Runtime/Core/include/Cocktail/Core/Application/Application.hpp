@@ -7,6 +7,7 @@
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
 #include <Cocktail/Core/Application/ServiceProvider.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
+#include <Cocktail/Core/System/FileSystem/Path.hpp>
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 #include <Cocktail/Core/Utility/Time/Instant.hpp>
 
@@ -127,6 +128,12 @@ namespace Ck
 		 * \return 
 		 */
 		virtual bool IsDebuggerPresent() const = 0;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		virtual Path GetExecutablePath() const = 0;
 
 		/**
 		 * \brief 

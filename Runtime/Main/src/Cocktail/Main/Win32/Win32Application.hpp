@@ -54,8 +54,15 @@ namespace Ck::Main::Win32
 	     */
 	    bool IsDebuggerPresent() const override;
 
+	    /**
+	     * \brief 
+	     * \return 
+	     */
+	    Path GetExecutablePath() const override;
+
     private:
 
+		HINSTANCE mInstanceHandle;
         Array<String> mArgv;
     };
 }

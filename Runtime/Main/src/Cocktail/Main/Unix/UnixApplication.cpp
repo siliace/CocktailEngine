@@ -1,14 +1,11 @@
 #include <cstdlib>
+#include <unistd.h>
 
 #include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/System/SystemError.hpp>
 
 #include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Unix/UnixApplication.hpp>
-
-#include "../../../../../Core/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp"
-#include "Cocktail/Core/IO/Input/Stream/FileInputStream.hpp"
-#include "Cocktail/Core/System/FileSystem/Local/LocalFileSystemService.hpp"
-#include "Cocktail/Core/Utility/FileUtils.hpp"
 
 namespace Ck::Main::Unix
 {
@@ -60,5 +57,17 @@ namespace Ck::Main::Unix
         fclose(file);
 
         return false;
+    }
+
+    Path UnixApplication::GetExecutablePath() const
+    {
+        static const ssize_t BufferSize = 1024;
+
+        AnsiChar buffer[BufferSize];
+        ssize_t bufferLength = readlink("/proc/self/exe", buffer, BufferSize);
+        if (bufferLength != -1)
+            throw SystemError::GetLastError();
+
+        return Path::Parse(CK_ANSI_TO_TEXT(buffer), bufferLength);
     }
 }
