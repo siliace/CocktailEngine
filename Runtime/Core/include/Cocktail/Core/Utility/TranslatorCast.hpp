@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_CORE_UTILITY_TRANSLATORCAST_HPP
 #define COCKTAIL_CORE_UTILITY_TRANSLATORCAST_HPP
 
-#include <any>
-
 #include <Cocktail/Core/String.hpp>
+#include <Cocktail/Core/Utility/Any.hpp>
 #include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
@@ -40,12 +39,12 @@ namespace Ck
 	struct ToAnyTranslator
 	{
 		using InputType = E;
-		using OutputType = std::any;
+		using OutputType = Any;
 
 		Optional<OutputType> operator()(const InputType& value) const
 		{
 			return Optional<OutputType>::Of(
-				std::make_any<InputType>(value)
+				Any(InPlaceType<InputType>, value)
 			);
 		}
 	};
@@ -53,21 +52,12 @@ namespace Ck
 	template <typename E>
 	struct FromAnyTranslator
 	{
-		using InputType = std::any;
+		using InputType = Any;
 		using OutputType = E;
 
 		Optional<OutputType> operator()(const InputType& value) const
 		{
-			try
-			{
-				return Optional<OutputType>::Of(
-					std::any_cast<E>(value)
-				);
-			}
-			catch (std::bad_any_cast)
-			{
-				return Optional<OutputType>::Empty();
-			}
+			return value.TryGet<OutputType>();
 		}
 	};
 
@@ -263,8 +253,8 @@ namespace Ck
 
 	template <typename T> struct TranslatorBetween<T, T> { using Type = IdentityTranslator<T>; };
 
-	template <typename T> struct TranslatorBetween<T, std::any> { using Type = ToAnyTranslator<T>; };
-	template <typename T> struct TranslatorBetween<std::any, T> { using Type = FromAnyTranslator<T>; };
+	template <typename T> struct TranslatorBetween<T, Any> { using Type = ToAnyTranslator<T>; };
+	template <typename T> struct TranslatorBetween<Any, T> { using Type = FromAnyTranslator<T>; };
 
 	template <> struct TranslatorBetween<const AnsiChar*, Int8> { using Type = CharsToIntegerTranslator<const AnsiChar*, Int8>; };
 	template <> struct TranslatorBetween<const AnsiChar*, Int16> { using Type = CharsToIntegerTranslator<const AnsiChar*, Int16>; };

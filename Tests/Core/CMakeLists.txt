@@ -59,6 +59,7 @@ cocktail_source_directory(CORE_TEST_FILES
 cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Utility"    
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Utility/Any.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/ByteArray.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/ByteArrayView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/Optional.cpp

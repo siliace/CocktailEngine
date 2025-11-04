@@ -86,7 +86,11 @@
 #endif
 
 #ifndef COCKTAIL_DECLARE_TAG
-	#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr __Name##Tag __Name;
+	#define COCKTAIL_DECLARE_TAG(__Name) struct __Name##Tag{}; constexpr inline __Name##Tag __Name;
+#endif
+
+#ifndef COCKTAIL_DECLARE_TEMPLATE_TAG
+	#define COCKTAIL_DECLARE_TEMPLATE_TAG(__Name) template <typename T> struct __Name##Tag{}; template <typename T> inline constexpr __Name##Tag<T> __Name;
 #endif
 
 #ifndef COCKTAIL_TEXT
@@ -126,6 +130,7 @@ namespace Ck
 
 	COCKTAIL_DECLARE_TAG(InPlace);
 	COCKTAIL_DECLARE_TAG(InOptional);
+	COCKTAIL_DECLARE_TEMPLATE_TAG(InPlaceType);
 
 	/**
 	 * \brief 
