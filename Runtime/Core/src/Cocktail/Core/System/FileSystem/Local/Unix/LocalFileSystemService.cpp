@@ -12,7 +12,7 @@ namespace Ck::Detail::Unix
 		if (!buffer)
 			throw SystemError::GetLastError();
 
-		Path workingDirectory(buffer);
+		Path workingDirectory(CK_ANSI_TO_TEXT(buffer));
 		free(buffer);
 
 		return workingDirectory;
@@ -20,12 +20,17 @@ namespace Ck::Detail::Unix
 
     void LocalFileSystemService::SetWorkingDirectory(const Path& workingDirectory)
     {
-		if (chdir(workingDirectory.ToString().GetData()) != 0)
+		if (chdir(CK_TEXT_TO_ANSI(workingDirectory.ToString().GetData())) != 0)
 			throw SystemError::GetLastError();
     }
 
     Path LocalFileSystemService::GetTempDirectoryPath() const
     {
 		return CK_TEXT("/var/tmp");
+    }
+
+    std::unique_ptr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
+    {
+		return std::make_unique<LocalFileSystemDriver>();
     }
 }

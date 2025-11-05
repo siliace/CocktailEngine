@@ -94,7 +94,13 @@ namespace Ck
 		return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
 	}
 
-	void StorageService::Mount(String scheme, FileSystemDriver* fileSystemDriver)
+	void StorageService::Mount(String scheme, std::unique_ptr<FileSystemDriver> fileSystemDriver)
+	{
+		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.get());
+		mInternalDrivers.Add(std::move(fileSystemDriver));
+	}
+
+	void StorageService::MountExternal(String scheme, FileSystemDriver* fileSystemDriver)
 	{
 		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver);
 	}

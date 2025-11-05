@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMSERVICE_HPP
 
 #include <Cocktail/Core/System/FileSystem/Path.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystemDriver.hpp>
 
 namespace Ck
 {
@@ -34,6 +35,12 @@ namespace Ck
 		 * \return
 		 */
 		virtual Path GetTempDirectoryPath() const = 0;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		virtual std::unique_ptr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty) = 0;
 	};
 }
 

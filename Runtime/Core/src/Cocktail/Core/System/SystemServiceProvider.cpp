@@ -3,7 +3,7 @@
 #include <Cocktail/Core/System/SystemServiceProviderImpl.hpp>
 #include <Cocktail/Core/System/FileSystem/StorageService.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp>
-#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystemDriver.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystemService.hpp>
 
 namespace Ck
 {
@@ -21,12 +21,12 @@ namespace Ck
 
 	void SystemServiceProvider::DoBoot(Application* application)
 	{
-		application->Invoke([](StorageService* storage, EmbeddedFileSystemDriver* embeddedFileSystemDriver) {
-			storage->Mount(CK_TEXT("builtin"), embeddedFileSystemDriver);
+		application->Invoke([&](StorageService* storage, LocalFileSystemService* fileSystemService) {
+			storage->Mount(storage->GetDefaultScheme(), fileSystemService->CreateDriver());
 		});
 
-		application->Invoke([](StorageService* storage, LocalFileSystemDriver* localFileSystemDriver) {
-			storage->Mount(storage->GetDefaultScheme(), localFileSystemDriver);
+		application->Invoke([](StorageService* storage, EmbeddedFileSystemDriver* embeddedFileSystemDriver) {
+			storage->MountExternal(CK_TEXT("builtin"), embeddedFileSystemDriver);
 		});
 	}
 }

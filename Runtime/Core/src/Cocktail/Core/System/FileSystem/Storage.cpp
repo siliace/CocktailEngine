@@ -47,9 +47,14 @@ namespace Ck
 		return ResolveFacadeInstance()->Remove(uri);
 	}
 
-	void Storage::Mount(String protocol, FileSystemDriver* fileSystemDriver)
+	void Storage::Mount(String protocol, std::unique_ptr<FileSystemDriver> fileSystemDriver)
 	{
-		ResolveFacadeInstance()->Mount(std::move(protocol), fileSystemDriver);
+		ResolveFacadeInstance()->Mount(std::move(protocol), std::move(fileSystemDriver));
+	}
+
+	void Storage::MountExternal(String protocol, FileSystemDriver* fileSystemDriver)
+	{
+		ResolveFacadeInstance()->MountExternal(std::move(protocol), fileSystemDriver);
 	}
 
 	void Storage::UnMount(const String& protocol)

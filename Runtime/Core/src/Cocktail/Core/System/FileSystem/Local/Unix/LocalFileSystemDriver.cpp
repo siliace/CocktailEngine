@@ -12,10 +12,17 @@
 
 namespace Ck::Detail::Unix
 {
+	LocalFileSystemDriver::LocalFileSystemDriver(Path base) :
+		mBase(std::move(base))
+	{
+		/// Nothing
+	}
+
 	bool LocalFileSystemDriver::IsFile(const Path& path) const
 	{
 		struct stat64 filestats;
-		if (stat64(CK_TEXT_TO_ANSI(path.ToString().GetData()), &filestats) == -1)
+		Path fullPath = Path::Merge(mBase, path);
+		if (stat64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISREG(filestats.st_mode);
@@ -24,7 +31,8 @@ namespace Ck::Detail::Unix
 	bool LocalFileSystemDriver::IsDirectory(const Path& path) const
 	{
 		struct stat64 filestats;
-		if (stat64(CK_TEXT_TO_ANSI(path.ToString().GetData()), &filestats) == -1)
+		Path fullPath = Path::Merge(mBase, path);
+		if (stat64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISDIR(filestats.st_mode);
@@ -32,7 +40,8 @@ namespace Ck::Detail::Unix
 
 	void LocalFileSystemDriver::CreateFile(const Path& path)
 	{
-        int handle = ::open64(CK_TEXT_TO_ANSI(path.ToString().GetData()), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
+		Path fullPath = Path::Merge(mBase, path);
+        int handle = ::open64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
 		if (handle == -1)
 			throw SystemError::GetLastError();
 		
@@ -41,19 +50,20 @@ namespace Ck::Detail::Unix
 	
 	void LocalFileSystemDriver::CreateDirectory(const Path& path)
 	{
-		int error = mkdir(CK_TEXT_TO_ANSI(path.ToString().GetData()), S_IRWXU | S_IRGRP | S_IROTH);
+		Path fullPath = Path::Merge(mBase, path);
+		int error = mkdir(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), S_IRWXU | S_IRGRP | S_IROTH);
 		if (error == -1)
 			throw SystemError::GetLastError();
 	}
 
 	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
-		return std::make_unique<LocalFile>(path, flags);
+		return std::make_unique<LocalFile>(Path::Merge(mBase, path), flags);
 	}
 
 	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
 	{
-		return std::make_unique<LocalDirectory>(path);
+		return std::make_unique<LocalDirectory>(Path::Merge(mBase, path));
 	}
 
 	void LocalFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
@@ -62,13 +72,14 @@ namespace Ck::Detail::Unix
 
 	void LocalFileSystemDriver::Move(const Path& source, const Path& destination)
 	{
-		if (::rename(CK_TEXT_TO_ANSI(source.ToString().GetData()), CK_TEXT_TO_ANSI(destination.ToString().GetData())) == -1)
+		if (::rename(CK_TEXT_TO_ANSI(Path::Merge(mBase, source).ToString().GetData()), CK_TEXT_TO_ANSI(Path::Merge(mBase, destination).ToString().GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 
 	void LocalFileSystemDriver::Remove(const Path& path)
 	{
-		if (::unlink(CK_TEXT_TO_ANSI(path.ToString().GetData())) == -1)
+		Path fullPath = Path::Merge(mBase, path);
+		if (::unlink(CK_TEXT_TO_ANSI(fullPath.ToString().GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 
@@ -89,7 +100,8 @@ namespace Ck::Detail::Unix
 
 	Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
 	{
-		TextChar* resolvedPath = CK_ANSI_TO_TEXT(realpath(CK_TEXT_TO_ANSI(path.ToString().GetData()), nullptr));
+		Path fullPath = Path::Merge(mBase, path);
+		TextChar* resolvedPath = CK_ANSI_TO_TEXT(realpath(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), nullptr));
 		if (!resolvedPath)
 			return Optional<Path>::Empty();
 

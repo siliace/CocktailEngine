@@ -80,7 +80,14 @@ namespace Ck
 		 * \param protocol
 		 * \param fileSystemDriver
 		 */
-		static void Mount(String protocol, FileSystemDriver* fileSystemDriver);
+		static void Mount(String protocol, std::unique_ptr<FileSystemDriver> fileSystemDriver);
+
+		/**
+		 * \brief
+		 * \param protocol
+		 * \param fileSystemDriver
+		 */
+		static void MountExternal(String protocol, FileSystemDriver* fileSystemDriver);
 
 		/**
 		 * \brief

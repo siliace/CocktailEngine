@@ -24,7 +24,18 @@ namespace Ck::Detail::Win32
 		 */
 		void SetWorkingDirectory(const Path& workingDirectory) override;
 
+		/**
+		 * \brief 
+		 * \return 
+		 */
 		Path GetTempDirectoryPath() const override;
+
+		/**
+		 * \brief 
+		 * \param base 
+		 * \return 
+		 */
+		std::unique_ptr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
 	};
 }
 

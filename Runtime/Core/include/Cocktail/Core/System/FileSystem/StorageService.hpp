@@ -42,6 +42,11 @@ namespace Ck
 		 */
 		explicit StorageService(String defaultScheme = CK_TEXT("file"));
 
+		StorageService(const StorageService& other) = delete;
+		StorageService(StorageService&& other) = default;
+		StorageService& operator=(const StorageService& other) = delete;
+		StorageService& operator=(StorageService&& other) = default;
+
 		/**
 		 * \brief Checks whether the given URI refers to an existing file
 		 *
@@ -134,6 +139,17 @@ namespace Ck
 		void Remove(const URI& uri) const;
 
 		/**
+		 * \brief Registers and retains a filesystem driver for the given URI scheme
+		 *
+		 * Once mounted, all operations on URIs whose scheme matches \p protocol
+		 * will be handled by the provided FileSystemDriver.
+		 *
+		 * \param scheme URI scheme (e.g. "file", "asset")
+		 * \param fileSystemDriver Driver instance responsible for this scheme
+		 */
+		void Mount(String scheme, std::unique_ptr<FileSystemDriver> fileSystemDriver);
+
+		/**
 		 * \brief Registers a filesystem driver for the given URI scheme
 		 *
 		 * Once mounted, all operations on URIs whose scheme matches \p protocol
@@ -144,7 +160,7 @@ namespace Ck
 		 *
 		 * \note The caller retains ownership of the driver object
 		 */
-		void Mount(String scheme, FileSystemDriver* fileSystemDriver);
+		void MountExternal(String scheme, FileSystemDriver* fileSystemDriver);
 
 		/**
 		 * \brief Unregisters a filesystem driver associated with a scheme
@@ -180,6 +196,7 @@ namespace Ck
 
 		String mDefaultScheme;
 		std::unordered_map<String, FileSystemDriver*> mDrivers;
+		Array<std::unique_ptr<FileSystemDriver>> mInternalDrivers;
 	};
 }
 

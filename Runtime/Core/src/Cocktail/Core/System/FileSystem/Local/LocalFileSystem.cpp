@@ -16,4 +16,9 @@ namespace Ck
     {
 		return ResolveFacadeInstance()->GetTempDirectoryPath();
     }
+
+    std::unique_ptr<LocalFileSystemDriver> LocalFileSystem::CreateDriver(const Path& base)
+    {
+        return ResolveFacadeInstance()->CreateDriver(std::move(base));
+    }
 }

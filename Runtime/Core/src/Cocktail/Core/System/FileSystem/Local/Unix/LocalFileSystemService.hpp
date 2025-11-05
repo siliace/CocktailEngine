@@ -29,6 +29,13 @@ namespace Ck::Detail::Unix
 		 * \return
 		 */
 		Path GetTempDirectoryPath() const override;
+
+		/**
+		 * \brief
+		 * \param base
+		 * \return
+		 */
+		std::unique_ptr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
 	};
 }
 

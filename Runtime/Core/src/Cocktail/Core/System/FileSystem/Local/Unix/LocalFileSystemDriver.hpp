@@ -14,6 +14,12 @@ namespace Ck::Detail::Unix
 
 		/**
 		 * \brief
+		 * \param base
+		 */
+		explicit LocalFileSystemDriver(Path base = Path::Empty);
+
+		/**
+		 * \brief
 		 * \param path
 		 * \return
 		 */
@@ -91,6 +97,10 @@ namespace Ck::Detail::Unix
 		 * \return
 		 */
 		Optional<Path> TryMakeCanonical(const Path& path) override;
+
+	private:
+
+		Path mBase;
 	};
 }
 

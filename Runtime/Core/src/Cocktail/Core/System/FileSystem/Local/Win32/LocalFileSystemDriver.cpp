@@ -7,9 +7,16 @@
 
 namespace Ck::Detail::Win32
 {
+	LocalFileSystemDriver::LocalFileSystemDriver(Path base) :
+		mBase(std::move(base))
+	{
+		/// Nothing
+	}
+
 	bool LocalFileSystemDriver::IsFile(const Path& path) const
 	{
-		DWORD attribtutes = GetFileAttributes(path.ToString().GetData());
+		Path fullPath = Path::Merge(mBase, path);
+		DWORD attribtutes = GetFileAttributes(fullPath.ToString().GetData());
 		if (attribtutes == INVALID_FILE_ATTRIBUTES)
 			return false;
 
@@ -18,7 +25,8 @@ namespace Ck::Detail::Win32
 
 	bool LocalFileSystemDriver::IsDirectory(const Path& path) const
 	{
-		DWORD attribtutes = GetFileAttributes(path.ToString().GetData());
+		Path fullPath = Path::Merge(mBase, path);
+		DWORD attribtutes = GetFileAttributes(fullPath.ToString().GetData());
 		if (attribtutes == INVALID_FILE_ATTRIBUTES)
 			return false;
 
@@ -27,8 +35,9 @@ namespace Ck::Detail::Win32
 
 	void LocalFileSystemDriver::CreateFile(const Path& path)
 	{
+		Path fullPath = Path::Merge(mBase, path);
 		HANDLE handle = ::CreateFileW(
-			path.ToString().GetData(),
+			fullPath.ToString().GetData(),
 			GENERIC_WRITE,
 			0,
 			nullptr,
@@ -49,42 +58,44 @@ namespace Ck::Detail::Win32
 
 	void LocalFileSystemDriver::CreateDirectory(const Path& path)
 	{
-		if (::CreateDirectoryW(path.ToString().GetData(), nullptr) == FALSE)
+		Path fullPath = Path::Merge(mBase, path);
+		if (::CreateDirectoryW(fullPath.ToString().GetData(), nullptr) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
 	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
-		return std::make_unique<LocalFile>(path, flags);
+		return std::make_unique<LocalFile>(Path::Merge(mBase, path), flags);
 	}
 
 	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
 	{
-		return std::make_unique<LocalDirectory>(path);
+		return std::make_unique<LocalDirectory>(Path::Merge(mBase, path));
 	}
 
 	void LocalFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
 	{
-		if (CopyFile(source.ToString().GetData(), destination.ToString().GetData(), failIfExists) == FALSE)
+		if (CopyFile(Path::Merge(mBase, source).ToString().GetData(), Path::Merge(mBase, destination).ToString().GetData(), failIfExists) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
 	void LocalFileSystemDriver::Move(const Path& source, const Path& destination)
 	{
-		if (MoveFile(source.ToString().GetData(), destination.ToString().GetData()) == FALSE)
+		if (MoveFile(Path::Merge(mBase, source).ToString().GetData(), Path::Merge(mBase, destination).ToString().GetData()) == FALSE)
 			throw SystemError::GetLastError();
 	}
 
 	void LocalFileSystemDriver::Remove(const Path& path)
 	{
-		if (IsFile(path))
+		Path fullpath = Path::Merge(mBase, path);
+		if (IsFile(fullpath))
 		{
-			if (DeleteFile(path.ToString().GetData()) == FALSE)
+			if (DeleteFile(fullpath.ToString().GetData()) == FALSE)
 				throw SystemError::GetLastError();
 		}
-		else if (IsDirectory(path))
+		else if (IsDirectory(fullpath))
 		{
-			if (RemoveDirectory(path.ToString().GetData()) == FALSE)
+			if (RemoveDirectory(fullpath.ToString().GetData()) == FALSE)
 				throw SystemError::GetLastError();
 		}
 	}
@@ -101,7 +112,7 @@ namespace Ck::Detail::Win32
 
 	Path LocalFileSystemDriver::MakeCanonical(const Path& path)
 	{
-		return TryMakeCanonical(path).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+		return TryMakeCanonical(Path::Merge(mBase, path)).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
 	}
 
 	Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)

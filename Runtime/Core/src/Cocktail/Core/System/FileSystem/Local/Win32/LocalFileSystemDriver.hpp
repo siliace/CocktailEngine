@@ -13,6 +13,12 @@ namespace Ck::Detail::Win32
 	public:
 
 		/**
+		 * \brief 
+		 * \param base 
+		 */
+		explicit LocalFileSystemDriver(Path base = Path::Empty);
+
+		/**
 		 * \brief
 		 * \param path
 		 * \return
@@ -104,6 +110,10 @@ namespace Ck::Detail::Win32
 		 * \return 
 		 */
 		Optional<Path> TryMakeCanonical(const Path& path) override;
+
+	private:
+
+		Path mBase;
 	};
 }
 

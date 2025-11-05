@@ -1,5 +1,6 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileSystemDriver.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Win32/LocalFileSystemService.hpp>
 
 namespace Ck::Detail::Win32
@@ -35,4 +36,9 @@ namespace Ck::Detail::Win32
 
 		return Path(buffer, size - 1);
 	}
+
+    std::unique_ptr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
+    {
+		return std::make_unique<LocalFileSystemDriver>(base);
+    }
 }
