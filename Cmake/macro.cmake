@@ -200,14 +200,6 @@ function(cocktail_add_runtime_library)
         PRIVATE ${THIS_DEFINES}
     )
 
-    if (WIN32)
-        target_compile_definitions(${THIS_TARGET}
-            PUBLIC
-                UNICODE
-                _UNICODE
-        )
-    endif ()
-
     # set includes directories
     target_include_directories(${THIS_TARGET}
         PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -249,12 +241,17 @@ endfunction()
 
 function(cocktail_add_catch_test)
     # parse the arguments
-    cmake_parse_arguments(THIS "" "NAME" "DEPENDS;SOURCES" ${ARGN})
+    cmake_parse_arguments(THIS "" "NAME;CUSTOM_MAIN" "DEPENDS;SOURCES" ${ARGN})
     if (NOT "${THIS_UNPARSED_ARGUMENTS}" STREQUAL "")
         message(FATAL_ERROR "Extra unparsed arguments when calling cocktail_add_catch_test: ${THIS_UNPARSED_ARGUMENTS}")
     endif ()
 
     string(TOLOWER cocktail-test-${THIS_NAME} THIS_TARGET)
+
+    if (THIS_CUSTOM_MAIN)
+        list(APPEND THIS_SOURCES ${THIS_CUSTOM_MAIN})
+    endif ()
+
     add_executable(${THIS_TARGET} ${THIS_SOURCES})
 
     # enable C++17 support
@@ -284,7 +281,11 @@ function(cocktail_add_catch_test)
         endif ()
     endforeach()
 
-    target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK} Catch2::Catch2WithMain)
+    if (${THIS_CUSTOM_MAIN})
+        target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK} Catch2::Catch2)
+    else ()
+        target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK} Catch2::Catch2WithMain)
+    endif ()
 
     if (WIN32)
         add_custom_command(TARGET ${THIS_TARGET} POST_BUILD

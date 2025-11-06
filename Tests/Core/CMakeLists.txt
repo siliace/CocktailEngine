@@ -80,6 +80,7 @@ cocktail_source_directory(CORE_TEST_FILES
 
 cocktail_add_catch_test(
     NAME Core
-    DEPENDS Core
+    DEPENDS Core Main
     SOURCES ${CORE_TEST_FILES}
+    CUSTOM_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/../main.cpp
 )
