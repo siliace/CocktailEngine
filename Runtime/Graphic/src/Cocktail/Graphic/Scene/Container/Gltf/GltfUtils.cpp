@@ -40,16 +40,16 @@ namespace Ck
 
 	VertexAttributeSemantic GltfUtils::ConvertAttributeName(const AnsiChar* name)
 	{
-        if (StringUtils<AnsiChar>::Equal(name, "POSITION"))
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "POSITION"))
             return VertexAttributeSemantic::Position;
 
-		if (StringUtils<AnsiChar>::Equal(name, "NORMAL"))
+		if (StringUtils<AnsiChar, Uint32>::Equal(name, "NORMAL"))
             return VertexAttributeSemantic::Normal;
         
-        if (StringUtils<AnsiChar>::Equal(name, "TEXCOORD_0"))
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "TEXCOORD_0"))
             return VertexAttributeSemantic::TexCoord;
         
-        if (StringUtils<AnsiChar>::Equal(name, "TANGENT"))
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "TANGENT"))
             return VertexAttributeSemantic::Tangent;
 
         COCKTAIL_UNREACHABLE();
@@ -134,13 +134,13 @@ namespace Ck
 
 	Material::AlphaMode GltfUtils::ConvertAlphaMode(const AnsiChar* value)
 	{
-        if (StringUtils<AnsiChar>::Equal(value, "OPAQUE"))
+        if (StringUtils<AnsiChar, Uint32>::Equal(value, "OPAQUE"))
 			return Material::AlphaMode::Opaque;
 
-		if (StringUtils<AnsiChar>::Equal(value, "BLEND"))
+		if (StringUtils<AnsiChar, Uint32>::Equal(value, "BLEND"))
 			return Material::AlphaMode::Blend;
 
-		if (StringUtils<AnsiChar>::Equal(value, "MASK"))
+		if (StringUtils<AnsiChar, Uint32>::Equal(value, "MASK"))
 			return Material::AlphaMode::Mask;
 
 		COCKTAIL_UNREACHABLE();

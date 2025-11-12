@@ -68,7 +68,7 @@ namespace Ck
 
 	char const* Exception::what() const noexcept
 	{
-		return CK_TEXT_TO_ANSI(GetName().GetData());
+		return "Exception";
 	}
 
 	StringView Exception::GetName() const

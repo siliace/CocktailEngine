@@ -3,7 +3,7 @@
 namespace Ck
 {
     PropertyTreePath::PropertyTreePath():
-        mSeparator(CK_TEXT('.'))
+        mSeparator(CK_CHAR('.'))
     {
         /// Nothing
     }

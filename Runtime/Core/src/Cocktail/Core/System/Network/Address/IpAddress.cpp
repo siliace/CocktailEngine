@@ -60,7 +60,7 @@ namespace Ck
 		hints.ai_socktype = SOCK_STREAM;
 
 		addrinfo* results;
-		if (getaddrinfo(CK_TEXT_TO_ANSI(hostname.GetData()), nullptr, &hints, &results) != 0)
+		if (getaddrinfo(reinterpret_cast<const AnsiChar*>(hostname.GetData()), nullptr, &hints, &results) != 0)
 			throw SystemError::GetLastError();
 
 		Array<std::unique_ptr<IpAddress>> ipAddresses;

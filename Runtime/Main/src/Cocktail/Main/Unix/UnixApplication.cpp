@@ -11,9 +11,9 @@ namespace Ck::Main::Unix
 {
     UnixApplication::UnixApplication(int argc, char** argv)
     {
-        mArgv.Reserve(argc - 1);
-        for (int i = 1; i < argc; i++)
-            mArgv.Emplace(CK_ANSI_TO_TEXT(argv[i]));
+        mArgv.Reserve(argc);
+        for (int i = 0; i < argc; i++)
+            mArgv.Emplace(reinterpret_cast<const Utf8Char*>(argv[i]));
     }
 
     void UnixApplication::Exit(unsigned int exitCode, bool force, StringView callSite)
@@ -30,11 +30,11 @@ namespace Ck::Main::Unix
 
     Optional<String> UnixApplication::GetEnvironmentVariable(StringView name)
     {
-        char* variable = secure_getenv(CK_TEXT_TO_ANSI(name.GetData()));
+        Utf8Char* variable = reinterpret_cast<Utf8Char*>(secure_getenv(reinterpret_cast<const AnsiChar*>(name.GetData())));
         if (!variable)
             return Optional<String>::Empty();
 
-        return Optional<String>::Of(InPlace, CK_ANSI_TO_TEXT(variable));
+        return Optional<String>::Of(InPlace, variable);
     }
 
     bool UnixApplication::IsDebuggerPresent() const
@@ -63,11 +63,11 @@ namespace Ck::Main::Unix
     {
         static const ssize_t BufferSize = 1024;
 
-        AnsiChar buffer[BufferSize];
-        ssize_t bufferLength = readlink("/proc/self/exe", buffer, BufferSize);
+        Utf8Char buffer[BufferSize];
+        ssize_t bufferLength = readlink("/proc/self/exe", reinterpret_cast<char*>(buffer), BufferSize);
         if (bufferLength != -1)
             throw SystemError::GetLastError();
 
-        return Path::Parse(CK_ANSI_TO_TEXT(buffer), bufferLength);
+        return Path::Parse(buffer, bufferLength);
     }
 }

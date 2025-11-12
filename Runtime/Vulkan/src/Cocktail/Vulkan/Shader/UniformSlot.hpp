@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param members 
 		 * \param name 
 		 */
-		UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, String name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
+		UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, AnsiString name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set);
 
 		/**
 		 * \brief 
@@ -73,7 +73,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		const String& GetName() const override;
+		const AnsiString& GetName() const override;
 
 		/**
 		 * \brief 
@@ -91,7 +91,7 @@ namespace Ck::Vulkan
 
 		Renderer::ShaderProgramType mProgramType;
 		Array<std::unique_ptr<Renderer::UniformMember>> mMembers;
-		String mName;
+		AnsiString mName;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;
 	};

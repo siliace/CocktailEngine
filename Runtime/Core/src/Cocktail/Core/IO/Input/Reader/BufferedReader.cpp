@@ -156,7 +156,7 @@ namespace Ck
 		for (std::size_t i = mPos; i < limit; i++)
 		{
 			const TextChar c = mBuffer[i];
-			if (c == CK_TEXT('\n'))
+			if (c == CK_CHAR('\n'))
 				return Optional<std::size_t>::Of(i);
 		}
 

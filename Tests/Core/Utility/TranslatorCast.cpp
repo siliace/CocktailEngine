@@ -2,11 +2,6 @@
 
 #include <Cocktail/Core/Utility/TranslatorCast.hpp>
 
-TEST_CASE("Parse an integer", "[String]")
-{
-
-}
-
 TEST_CASE("Translation cast between a string and a scalar", "[TranslatorCast]")
 {
 	SECTION("String to scalar")

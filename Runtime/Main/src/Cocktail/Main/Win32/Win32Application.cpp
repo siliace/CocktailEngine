@@ -11,11 +11,11 @@ namespace Ck::Main::Win32
 		mInstanceHandle(hInstance)
 	{
 		int argc = 0;
-		PWSTR* wideArgument = CommandLineToArgvW(pCmdLine, &argc);
+		PWSTR* arguments = CommandLineToArgvW(pCmdLine, &argc);
 
 		mArgv.Reserve(argc);
 		for (int i = 0; i < argc; i++)
-			mArgv.Emplace(wideArgument[i]);
+			mArgv.Emplace(arguments[i]);
 	}
 
 	void Win32Application::Exit(unsigned int exitCode, bool force, StringView callSite)

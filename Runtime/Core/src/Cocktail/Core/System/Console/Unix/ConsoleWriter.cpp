@@ -24,8 +24,7 @@ namespace Ck::Detail::Unix
 
 	void ConsoleWriter::Write(const TextChar* string, std::size_t length)
 	{
-		TextToAnsiConverter converter;
-		int err = ::write(mHandle, converter.Get(string), length);
+		int err = ::write(mHandle, string, length);
 		if (err == -1)
 			throw SystemError::GetLastError();
 	}

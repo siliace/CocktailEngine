@@ -9,8 +9,8 @@ namespace Ck
         void CheckElementSeparator(String& element, Path::Format format, TextChar systemSeparator)
         {
             String::SizeType lastIndex = element.GetLength() - 1;
-            const bool hasTrailingSlash = element[lastIndex] == CK_TEXT('/');
-            const bool hasTrailingBackSlash = element[lastIndex] == CK_TEXT('\\');
+            const bool hasTrailingSlash = element[lastIndex] == CK_CHAR('/');
+            const bool hasTrailingBackSlash = element[lastIndex] == CK_CHAR('\\');
 
             switch (format)
             {
@@ -25,11 +25,11 @@ namespace Ck
                 {
                     if (!hasTrailingSlash && !hasTrailingBackSlash)
                     {
-                        element.Append(CK_TEXT('/'));
+                        element.Append(CK_CHAR('/'));
                     }
                     else
                     {
-                        element[lastIndex] = CK_TEXT('/');
+                        element[lastIndex] = CK_CHAR('/');
                     }
                 }
                 break;
@@ -73,20 +73,20 @@ namespace Ck
         static const StringView NetRoot = CK_TEXT(R"(\\)");
         if (length >= 2 && StringUtils<TextChar, SizeType>::StartsWith(path, length, NetRoot.GetData(), NetRoot.GetLength()))
         {
-            SizeType serverEnd = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_TEXT('\\'), 2).GetOr(length);
-            SizeType shareEnd = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_TEXT('\\'), serverEnd + 1).GetOr(length);
+            SizeType serverEnd = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_CHAR('\\'), 2).GetOr(length);
+            SizeType shareEnd = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_CHAR('\\'), serverEnd + 1).GetOr(length);
 
             root = String(path, shareEnd);
         }
-        else if (length >= 2 && std::isalpha(path[0]) && path[1] == CK_TEXT(':'))
+        else if (length >= 2 && std::isalpha(path[0]) && path[1] == CK_CHAR(':'))
         {
-            SizeType firstSlash = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_TEXT('/')).GetOr(length);
-            SizeType firstAntiSlash = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_TEXT('\\')).GetOr(length);
+            SizeType firstSlash = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_CHAR('/')).GetOr(length);
+            SizeType firstAntiSlash = StringUtils<TextChar, SizeType>::FindFirst(path, length, CK_CHAR('\\')).GetOr(length);
             SizeType firstSeparator = std::min(firstSlash, firstAntiSlash);
 
             root = String(path, firstSeparator < length ? firstSeparator + 1 : 2);
         }
-        else if (path[0] == CK_TEXT('/'))
+        else if (path[0] == CK_CHAR('/'))
         {
             root = CK_TEXT("/");
         }
@@ -118,7 +118,7 @@ namespace Ck
 
     bool Path::IsSeparator(TextChar character)
     {
-        return character == CK_TEXT('\\') || character == CK_TEXT('/');
+        return character == CK_CHAR('\\') || character == CK_CHAR('/');
     }
 
     Path::Path(StringView string, Format format) :
@@ -231,7 +231,7 @@ namespace Ck
 
         Array<String> elements = mElements.Slice(0, mElements.GetSize() - 1);
         elements.TryLast().Then([](String& last){
-           if (last.EndsWith(CK_TEXT('/')) || last.EndsWith('\\'))
+           if (last.EndsWith(CK_CHAR('/')) || last.EndsWith('\\'))
                last = last.SubString(0, last.GetLength() - 1);
         });
 
@@ -263,8 +263,8 @@ namespace Ck
             if (IsAbsolute())
             {
                 string = mRoot;
-                if (mRoot != CK_TEXT("/") && !mRoot.EndsWith(CK_TEXT('\\')))
-                    string.Append(CK_TEXT('\\'));
+                if (mRoot != CK_TEXT("/") && !mRoot.EndsWith(CK_CHAR('\\')))
+                    string.Append(CK_CHAR('\\'));
             }
 
             for (SizeType i = 0; i < mElements.GetSize(); i++)

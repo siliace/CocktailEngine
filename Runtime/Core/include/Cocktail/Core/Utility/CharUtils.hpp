@@ -22,7 +22,10 @@ namespace Ck
     {
     public:
 
-        using CharType = TChar; /*!< Alias for the template character type */
+        /**
+         * \brief Alias for the template character type
+         */
+        using CharType = TChar;
 
         static_assert(std::is_same_v<CharType, AnsiChar> || std::is_same_v<CharType, WildChar>|| std::is_same_v<CharType, Utf8Char>);
 
@@ -51,6 +54,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a letter
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a letter, false otherwise
+         */
         static bool IsAlpha(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -69,6 +79,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a blank
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a blank, false otherwise
+         */
         static bool IsBlank(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -87,6 +104,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a control character
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a control character, false otherwise
+         */
         static bool IsControl(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -130,6 +154,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is graphic
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is graphic, false otherwise
+         */
         static bool IsGraphic(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -148,6 +179,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a lowercase letter
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a lowercase letter, false otherwise
+         */
         static bool IsLower(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -166,6 +204,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is printable
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is printable, false otherwise
+         */
         static bool IsPrintable(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -184,6 +229,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a punctuation character
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a punctuation character, false otherwise
+         */
         static bool IsPunctuation(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -202,6 +254,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a space character
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a space character, false otherwise
+         */
         static bool IsSpace(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -220,6 +279,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is an uppercase letter
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is an uppercase letter, false otherwise
+         */
         static bool IsUpper(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -238,6 +304,13 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Checks if the given character is a hexadecimal digit character
+         *
+         * \param character The character to test
+         *
+         * \return true if the character is a hexadecimal digit character, false otherwise
+         */
         static bool IsHexadecimalDigit(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -256,6 +329,15 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Transform an uppercase letter to its lowercase counterpart
+         *
+         * If the \p character is not a letter, the returned value is \p character unchanged.
+         *
+         * \param character The character to transform in lowercase
+         *
+         * \return The lowercase representation
+         */
         static CharType ToLower(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -274,6 +356,15 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Transform a lowercase letter to its uppercase counterpart
+         *
+         * If the \p character is not a letter, the returned value is \p character unchanged.
+         *
+         * \param character The character to transform in uppercase
+         *
+         * \return The uppercase representation
+         */
         static CharType ToUpper(CharType character)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)
@@ -292,6 +383,16 @@ namespace Ck
             COCKTAIL_UNREACHABLE();
         }
 
+        /**
+         * \brief Convert a digit character to its real value
+         *
+         * This function also handle hexadecimal digits.
+         * If \p character is not a digit char or a hexadecimal digit letter, the returned value is -1.
+         *
+         * \param character The character to convert
+         *
+         * \return The value of the character or -1
+         */
         static int DigitValue(CharType character)
         {
             if (character >= CharType('0') && character <= CharType('9'))

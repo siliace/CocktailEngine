@@ -42,7 +42,7 @@ namespace Ck::Detail::Win32
 
 	Array<Path> LocalDirectory::GetContent() const
 	{
-		String contentPath = mPath.ToString().Append(CK_TEXT('*'));
+		String contentPath = mPath.ToString().Append(CK_CHAR('*'));
 
 		WIN32_FIND_DATAW result;
 		HANDLE findHandle = FindFirstFile(contentPath.GetData(), &result);

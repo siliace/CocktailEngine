@@ -14,8 +14,8 @@ COCKTAIL_DEFINE_LOG_CATEGORY(Catch2);
 ExitCode ApplicationMain(Application* application)
 {
     Catch::Session session;
-    Array<const TextChar*> arguments = application->GetArgv().Transform([](const String& argument) {
-        return argument.GetData();
+    Array<const AnsiChar*> arguments = application->GetArgv().Transform([](const String& argument) {
+        return reinterpret_cast<const AnsiChar*>(argument.GetData());
     });
 
     int result = session.applyCommandLine(arguments.GetSize(), arguments.GetData());

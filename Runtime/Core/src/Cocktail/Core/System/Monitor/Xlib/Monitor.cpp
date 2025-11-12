@@ -98,7 +98,7 @@ namespace Ck::Detail::Xlib
 
     String Monitor::GetName() const
     {
-		return CK_ANSI_TO_TEXT(mOutputInfo->name);
+		return String(reinterpret_cast<const Utf8Char*>(mOutputInfo->name));
 	}
 
     VideoMode Monitor::GetCurrentVideoMode() const

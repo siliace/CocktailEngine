@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_CORE_UTILITY_CHARACTERS_HPP
 #define COCKTAIL_CORE_UTILITY_CHARACTERS_HPP
 
-#include <string>
-
-#include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 #include <Cocktail/Core/Utility/CharUtils.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
 
@@ -20,7 +17,7 @@ namespace Ck
      * \tparam TChar Character type (e.g. AnsiChar, WildChar and likely most of the time TextChar)
      * \tparam TSize Unsigned integer type used for sizes and indexing
      */
-    template <typename TChar, typename TSize = IndexSizeToSizeType<32>::Type>
+    template <typename TChar, typename TSize>
     class StringUtils
     {
     public:
@@ -127,11 +124,12 @@ namespace Ck
          */
         static SizeType GetLength(const CharType* string)
         {
-            assert(string != nullptr);
-
             SizeType length = 0;
-            while (string[length] != '\0')
-                ++length;
+            if (string)
+            {
+                while (string[length] != '\0')
+                    ++length;
+            }
 
             return length;
         }

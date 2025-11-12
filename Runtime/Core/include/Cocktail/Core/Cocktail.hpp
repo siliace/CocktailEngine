@@ -91,10 +91,13 @@
 
 #ifndef COCKTAIL_TEXT
 	#ifdef COCKTAIL_OS_WINDOWS
+		#define COCKTAIL_CHAR(__Char) L ## __Char
 		#define COCKTAIL_TEXT(__Text) L ## __Text
 	#else
-		#define COCKTAIL_TEXT(__Text) u ## __Text
+		#define COCKTAIL_CHAR(__Char) static_cast<::Ck::Utf8Char>(COCKTAIL_CONCATENATE_STRING(u8, __Char))
+		#define COCKTAIL_TEXT(__Text) reinterpret_cast<const ::Ck::Utf8Char*>(COCKTAIL_CONCATENATE_STRING(u8, __Text))
 	#endif
+	#define CK_CHAR(__Text) COCKTAIL_CHAR(__Text)
 	#define CK_TEXT(__Text) COCKTAIL_TEXT(__Text)
 #endif
 
@@ -110,17 +113,16 @@ namespace Ck
 	using Int64 = std::int64_t;
 
 	using AnsiChar = char;
+	using WildChar = wchar_t;
 	using Utf8Char = Uint8;
 	using Utf16Char = Uint16;
 	using Utf32Char = Uint32;
 
 #ifdef COCKTAIL_OS_WINDOWS
-	using WildChar = wchar_t;
-#else
-	using WildChar = char16_t;
-#endif
-
 	using TextChar = WildChar;
+#else
+	using TextChar = Utf8Char;
+#endif
 
 	COCKTAIL_DECLARE_TAG(InPlace);
 	COCKTAIL_DECLARE_TAG(InOptional);

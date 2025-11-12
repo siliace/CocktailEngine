@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_ASSET_ASSETEXPORTER_HPP
 #define COCKTAIL_CORE_ASSET_ASSETEXPORTER_HPP
 
-#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/IO/Output/Stream/OutputStream.hpp>
 #include <Cocktail/Core/System/FileSystem/Path.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>

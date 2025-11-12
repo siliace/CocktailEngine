@@ -15,7 +15,7 @@ namespace Ck::Detail::Xlib
             return it->second;
 
         XLockDisplay(mDisplay);
-        Atom atom = XInternAtom(mDisplay, CK_TEXT_TO_ANSI(name.GetData()), mustExists ? True : False);
+        Atom atom = XInternAtom(mDisplay, reinterpret_cast<const AnsiChar*>(name.GetData()), mustExists ? True : False);
         XUnlockDisplay(mDisplay);
 
         mAtoms[name] = atom;

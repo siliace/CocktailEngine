@@ -57,14 +57,14 @@ namespace Ck::Vulkan
 		 * \param name 
 		 * \return 
 		 */
-		Renderer::VertexAttributeLocation* FindInputAttribute(StringView name) const override;
+		Renderer::VertexAttributeLocation* FindInputAttribute(AnsiStringView name) const override;
 
 		/**
 		 * \brief 
 		 * \param name 
 		 * \return 
 		 */
-		Renderer::VertexAttributeLocation* FindOutputAttribute(StringView name) const override;
+		Renderer::VertexAttributeLocation* FindOutputAttribute(AnsiStringView name) const override;
 
 		/**
 		 * \brief

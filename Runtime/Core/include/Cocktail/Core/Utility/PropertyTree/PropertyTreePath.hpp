@@ -37,7 +37,7 @@ namespace Ck
 		 * \param translator 
 		 */
 		template <typename T, typename Tr = typename TranslatorBetween<T, String>::Type>
-		explicit PropertyTreePath(const T& value, TextChar separator = CK_TEXT('.'), const Tr& translator = Tr()) :
+		explicit PropertyTreePath(const T& value, TextChar separator = CK_CHAR('.'), const Tr& translator = Tr()) :
 			mSeparator(separator)
 		{
 			mPath = translator(value).Get();
@@ -49,7 +49,7 @@ namespace Ck
 		 * \param path The string to parse, possibly with separators
 		 * \param separator The separator used to parse the \p path
 		 */
-		PropertyTreePath(String path, TextChar separator = CK_TEXT('.'));
+		PropertyTreePath(String path, TextChar separator = CK_CHAR('.'));
 
 		/**
 		 * \brief Constructor
@@ -57,7 +57,7 @@ namespace Ck
 		 * \param path The string to parse, possibly with separators
 		 * \param separator The separator used to parse the \p path
 		 */
-		PropertyTreePath(const TextChar* path, TextChar separator = CK_TEXT('.'));
+		PropertyTreePath(const TextChar* path, TextChar separator = CK_CHAR('.'));
 
 		/**
 		 * \brief
@@ -79,12 +79,12 @@ namespace Ck
 		PropertyTreePath& Append(const PropertyTreePath& other);
 
 		/**
-		 * \brief 
-		 * \tparam T 
-		 * \tparam Tr 
-		 * \param other 
-		 * \param translator 
-		 * \return 
+		 * \brief
+		 * \tparam T
+		 * \tparam Tr
+		 * \param other
+		 * \param translator
+		 * \return
 		 */
 		template <typename T, typename Tr = typename TranslatorBetween<T, String>::Type>
 		PropertyTreePath& Append(const T& other, const Tr& translator = Tr())
@@ -111,14 +111,14 @@ namespace Ck
 		}
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		TextChar GetSeparator() const;
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		const String& ToString() const;
 

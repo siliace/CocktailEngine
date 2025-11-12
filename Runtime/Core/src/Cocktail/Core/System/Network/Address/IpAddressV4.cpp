@@ -54,7 +54,7 @@ namespace Ck
         for (String::SizeType i = 0; i < mBytes.size(); i++)
         {
             if (i > 0)
-                result.Append(CK_TEXT('.'));
+                result.Append(CK_CHAR('.'));
 
             result.Append(TranslatorCast<String>(mBytes[i]));
         }

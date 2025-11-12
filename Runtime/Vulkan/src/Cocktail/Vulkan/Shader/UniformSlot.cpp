@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 				mMembers.Emplace(new MyUniformMember(mSlot, mBlock.Members[i]));
 		}
 
-		const String& GetName() const override
+		const AnsiString& GetName() const override
 		{
 			return mBlock.Name;
 		}
@@ -70,7 +70,7 @@ namespace Ck::Vulkan
 		Array<std::unique_ptr<MyUniformMember>> mMembers;
 	};
 
-	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, String name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
+	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, AnsiString name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
 		mProgramType(programType),
 		mName(std::move(name)),
 		mLayoutBindingInfo(layoutBindingInfo),
@@ -124,7 +124,7 @@ namespace Ck::Vulkan
 		return mLayoutBindingInfo.ShaderStages;
 	}
 
-	const String& UniformSlot::GetName() const
+	const AnsiString& UniformSlot::GetName() const
 	{
 		return mName;
 	}

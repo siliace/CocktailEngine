@@ -24,6 +24,7 @@ namespace Ck
 
 		/**
 		 * \brief Throws an EmptyOptionalException error
+		 *
 		 * \param message The message to use to create the exception thrown
 		 */
 		[[noreturn]] static void ThrowEmptyOptional(const TextChar* message);
@@ -35,13 +36,16 @@ namespace Ck
 
 		/**
 		 * \brief Throws an ContainerEmpty error
+		 *
 		 * \param message The message to use to create the exception thrown
 		 */
 		[[noreturn]] static void ThrowEmptyContainer(const TextChar* message);
 
 		/**
 		 * \brief Throws an ContainerOutOfRange error
-		 * This exception with be formatted using \p index and \p max
+		 *
+		 * This exception with be formatted using \p index and \p max.
+		 *
 		 * \param index The index used 
 		 * \param max The size of the container
 		 */
@@ -49,11 +53,27 @@ namespace Ck
 
 		/**
 		 * \brief Throws an ContainerOutOfRange error
-		 * This exception with be formatted using \p index and \p max
+		 *
+		 * This exception with be formatted using \p index and \p max.
+		 *
 		 * \param index The index used
 		 * \param max The size of the container
 		 */
 		[[noreturn]] static void ThrowOutOfRange(Uint64 index, Uint64 max);
+
+		/**
+		 * \brief Throw a CodepointEncodingException
+		 *
+		 * \param codepoint The codepoint failed to encode
+		 */
+		[[noreturn]] static void ThrowCodepointEncodingException(Uint32 codepoint);
+
+		/**
+		 * \brief Throw a CodepointDecodingException
+		 *
+		 * \param codepointIndex The index of the codepoint failed to decode
+		 */
+		[[noreturn]] static void ThrowCodepointDecodingException(unsigned int codepointIndex);
 	};
 }
 

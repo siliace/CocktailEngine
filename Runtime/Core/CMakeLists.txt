@@ -13,13 +13,10 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Extent3D.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/String.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/StringView.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Exception.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/String.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/StringView.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -716,6 +713,15 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/StringConvertion.cpp
+)
+
+cocktail_source_directory(CORE_FILES
+    FOLDER "Utility/Encoding"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/AsciiEncoder.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf8Encoder.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf16Encoder.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf32Encoder.hpp
 )
 
 cocktail_source_directory(CORE_FILES    

@@ -246,7 +246,7 @@ namespace Ck::Vulkan
 		return usage;
 	}
 
-	Signal<LogLevel, Renderer::MessageType, const AnsiChar*>& RenderDevice::OnDebugMessage()
+	Signal<LogLevel, Renderer::MessageType, AnsiStringView>& RenderDevice::OnDebugMessage()
 	{
 		return mOnDebugMessage;
 	}
@@ -266,13 +266,11 @@ namespace Ck::Vulkan
 		return mHandle;
 	}
 
-	void RenderDevice::CreateInstance(StringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
+	void RenderDevice::CreateInstance(AnsiStringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
 	{
-		TextToAnsiConverter textConverter;
-
 		VkApplicationInfo applicationInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO, nullptr };
 		{
-			applicationInfo.pApplicationName = textConverter.Get(applicationName.GetData());
+			applicationInfo.pApplicationName = applicationName.GetData();
 			applicationInfo.applicationVersion = VK_MAKE_API_VERSION(0, applicationVersion.Major, applicationVersion.Minor, applicationVersion.Patch);
 			applicationInfo.pEngineName = "CocktailEngine";
 			applicationInfo.engineVersion = VK_MAKE_API_VERSION(0, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION);

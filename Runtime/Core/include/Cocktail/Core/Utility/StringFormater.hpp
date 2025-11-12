@@ -2,19 +2,14 @@
 #define COCKTAIL_CORE_UTILITY_STRINGFORMATER_HPP
 
 #include <cstdio>
-#include <cctype>
-#include <cwctype>
 
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
-#include <Cocktail/Core/StringView.hpp>
-
-#include "StringUtils.hpp"
 
 namespace Ck
 {
-    template <typename T, typename Enable = void>
-    struct Formater
+    template <typename T, typename Enabler = void>
+    struct Formatter
     {
         T Apply(T value) const noexcept
         {
@@ -23,20 +18,11 @@ namespace Ck
     };
 
     template <typename E>
-    struct Formater<E, std::enable_if_t<std::is_enum_v<E>>>
+    struct Formatter<E, std::enable_if_t<std::is_enum_v<E>>>
     {
         const AnsiChar* Apply(E value) const noexcept
         {
             return Enum<E>::ToString(value);
-        }
-    };
-
-    template <>
-    struct Formater<StringView, void>
-    {
-        const TextChar* Apply(const StringView& value) const noexcept
-        {
-            return value.GetData();
         }
     };
 
@@ -54,27 +40,33 @@ namespace Ck
 
             if constexpr (std::is_same_v<CharType, AnsiChar>)
             {
-                std::size_t size = std::sprintf(nullptr, format, Formater<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
+                std::size_t size = std::snprintf(nullptr, 0, format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
                 if (size <= 0)
                     return;
 
                 area.Resize(size);
 
-                std::sprintf(area.GetData(), format, Formater<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+                std::snprintf(area.GetData(), area.GetSize(), format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
             }
             else if constexpr (std::is_same_v<CharType, WildChar>)
             {
-#ifdef COCKTAIL_OS_WINDOWS
-                std::size_t size = std::swprintf(nullptr, 0, format, Formater<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
+                std::size_t size = std::swprintf(nullptr, 0, format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
                 if (size <= 0)
                     return;
 
                 area.Resize(size);
 
-                std::swprintf(area.GetData(), area.GetSize(), format, Formater<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
-#else
-                area.Append(format, StringUtils<CharType>::GetLength(format));
-#endif
+                std::swprintf(area.GetData(), area.GetSize(), format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+            }
+            else if constexpr (std::is_same_v<CharType, Utf8Char>)
+            {
+                std::size_t size = std::snprintf(nullptr, 0, reinterpret_cast<const char*>(format), Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
+                if (size <= 0)
+                    return;
+
+                area.Resize(size);
+
+                std::snprintf(reinterpret_cast<char*>(area.GetData()), area.GetSize(), reinterpret_cast<const char*>(format), Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
             }
         }
     };

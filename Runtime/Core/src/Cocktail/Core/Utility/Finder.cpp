@@ -12,8 +12,8 @@ namespace Ck
 
 	Finder& Finder::WithExtension(String fileExtension)
 	{
-		if (fileExtension[0] != CK_TEXT('.'))
-			fileExtension.Append(CK_TEXT('.'));
+		if (fileExtension[0] != CK_CHAR('.'))
+			fileExtension.Append(CK_CHAR('.'));
 
 		mFileExtension = std::move(fileExtension);
 

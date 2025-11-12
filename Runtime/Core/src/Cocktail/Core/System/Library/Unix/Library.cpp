@@ -9,9 +9,9 @@ namespace Ck::Detail::Unix
 
 	Library::Library(StringView name)
 	{
-		mHandle = dlopen(CK_TEXT_TO_ANSI(name.GetData()), RTLD_LOCAL | RTLD_LAZY);
+		mHandle = dlopen(reinterpret_cast<const AnsiChar*>(name.GetData()), RTLD_LOCAL | RTLD_LAZY);
 		if (!mHandle)
-			throw LibraryOpenException(CK_ANSI_TO_TEXT(dlerror()));
+			throw LibraryOpenException(reinterpret_cast<const Utf8Char*>(dlerror()));
 	}
 
 	Library::~Library()

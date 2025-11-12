@@ -48,6 +48,8 @@
 		{		                                                                                      \
 		}                                                                                             \
                                                                                                       \
+		char const* what() const noexcept override { return #__Name; }                                \
+					                                                                                  \
 		::Ck::StringView GetName() const override { return CK_TEXT(#__Name); }                        \
                                                                                                       \
 	protected:                                                                                        \
@@ -152,6 +154,10 @@ namespace Ck
 	COCKTAIL_DECLARE_EXCEPTION(RuntimeException);
 	COCKTAIL_DECLARE_EXCEPTION_FROM(OutOfMemory, RuntimeException);
 	COCKTAIL_DECLARE_EXCEPTION_FROM(EmptyOptionalException, RuntimeException);
+
+	COCKTAIL_DECLARE_EXCEPTION_FROM(EncodingException, RuntimeException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(CodepointEncodingException, EncodingException);
+	COCKTAIL_DECLARE_EXCEPTION_FROM(CodepointDecodingException, EncodingException);
 }
 
 #endif // COCKTAIL_CORE_EXCEPTION_HPP

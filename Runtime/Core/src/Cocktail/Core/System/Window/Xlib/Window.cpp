@@ -607,15 +607,20 @@ namespace Ck::Detail::Xlib
 
     String Window::GetTitle() const
     {
-        char* buffer = COCKTAIL_STACK_ALLOC(char, 256);
-        XFetchName(mHandle.Display, mHandle.Window, &buffer);
+        Utf8Char* buffer = COCKTAIL_STACK_ALLOC(Utf8Char, 256);
+        XFetchName(mHandle.Display, mHandle.Window, reinterpret_cast<char**>(&buffer));
 
-        return CK_ANSI_TO_TEXT(buffer);
+        return buffer;
     }
 
     void Window::SetTitle(const String& title)
     {
-        XStoreName(mHandle.Display, mHandle.Window, CK_TEXT_TO_ANSI(title.GetData()));
+        XChangeProperty(mHandle.Display, mHandle.Window,
+            XInternAtom(mHandle.Display, "_NET_WM_NAME", False),
+            XInternAtom(mHandle.Display, "UTF8_STRING", False),
+            8, PropModeReplace,
+            reinterpret_cast<const unsigned char*>(title.GetData()), title.GetLength()
+        );
     }
 
     Extent2D<unsigned int> Window::GetSize() const

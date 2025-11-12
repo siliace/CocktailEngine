@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_RENDERER_RENDERDEVICE_HPP
 #define COCKTAIL_RENDERER_RENDERDEVICE_HPP
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Log/LogLevel.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
@@ -172,7 +173,7 @@ namespace Ck::Renderer
          * \brief Get the signal emitted when the underlying api get a debug message from the driver
          * \return The signal
          */
-        virtual Signal<LogLevel, MessageType, const AnsiChar*>& OnDebugMessage() = 0;
+        virtual Signal<LogLevel, MessageType, AnsiStringView>& OnDebugMessage() = 0;
     };
 }
 

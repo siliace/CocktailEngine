@@ -31,14 +31,14 @@ namespace Ck::Renderer
          * \param name 
          * \return 
          */
-        virtual VertexAttributeLocation* FindInputAttribute(StringView name) const = 0;
+        virtual VertexAttributeLocation* FindInputAttribute(AnsiStringView name) const = 0;
 
 	    /**
          * \brief 
          * \param name 
          * \return 
          */
-        virtual VertexAttributeLocation* FindOutputAttribute(StringView name) const = 0;
+        virtual VertexAttributeLocation* FindOutputAttribute(AnsiStringView name) const = 0;
     };
 }
 

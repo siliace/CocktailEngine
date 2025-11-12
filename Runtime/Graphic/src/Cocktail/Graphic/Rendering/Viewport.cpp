@@ -42,7 +42,7 @@ namespace Ck
 		CameraInfo cameraInfo;
 		cameraInfo.ViewProjection = mCamera->ComputeProjectionViewMatrix().Transpose();
 		cameraInfo.ViewDirection = mCamera->GetFront();
-		drawContext.BindPersistentData(commandList, CK_TEXT("cameraInfo"), Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(CameraInfo), &cameraInfo);
+		drawContext.BindPersistentData(commandList, "cameraInfo", Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(CameraInfo), &cameraInfo);
 	}
 
 	Rectangle<unsigned int> Viewport::GetArea() const

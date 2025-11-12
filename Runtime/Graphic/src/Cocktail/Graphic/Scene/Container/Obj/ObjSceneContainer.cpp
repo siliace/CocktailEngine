@@ -79,21 +79,21 @@ namespace Ck
 	ObjSceneContainer::MaterialInfo ObjSceneContainer::ProcessMaterial(const tinyobj::material_t& objMaterial)
 	{
 		MaterialInfo materialInfo;
-		materialInfo.Name = CK_ANSI_TO_TEXT(objMaterial.name.c_str());
+		materialInfo.Name = objMaterial.name.c_str();
 		materialInfo.ShadingMode = Material::ShadingMode::Phong;
 		materialInfo.Colors.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
 		materialInfo.Colors.Specular = { objMaterial.specular[0], objMaterial.specular[1], objMaterial.specular[2], 1.f };
 		materialInfo.Colors.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
 
-		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.ambient_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.diffuse_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.specular_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.specular_highlight_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.bump_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.displacement_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.alpha_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.reflection_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(CK_ANSI_TO_TEXT(objMaterial.emissive_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.ambient_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.diffuse_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.specular_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.specular_highlight_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.bump_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.displacement_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.alpha_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.reflection_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.emissive_texname.c_str()));
 
 		if (objMaterial.dissolve != 1.f)
 		{
@@ -151,7 +151,7 @@ namespace Ck
 	bool ObjSceneContainer::ProcessSubMesh(ObjVertexCache& vertexCache, Array<SubMeshInfo>& subMeshes, const tinyobj::attrib_t& attributes, const tinyobj::shape_t& shape) const
 	{
 		SubMeshInfo subMesh;
-		subMesh.Name = CK_ANSI_TO_TEXT(shape.name.c_str());
+		subMesh.Name = shape.name.c_str();
 
 		if (!shape.mesh.indices.empty())
 		{

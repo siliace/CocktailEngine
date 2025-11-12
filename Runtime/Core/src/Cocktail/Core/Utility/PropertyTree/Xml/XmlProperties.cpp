@@ -1,5 +1,6 @@
 #include <tinyxml2.h>
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
 #include <Cocktail/Core/Utility/StringConvertion.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/Xml/XmlCDataNode.hpp>
@@ -14,11 +15,13 @@ namespace Ck
 			XmlProperties::ElementType element;
 			for (const tinyxml2::XMLAttribute* xmlAttribute = xmlElement.FirstAttribute(); xmlAttribute; xmlAttribute = xmlAttribute->Next())
 			{
-				const bool isProtectedAttribute = StringUtils<AnsiChar>::StartsWith(xmlAttribute->Name(), "__");
+				AnsiStringView nameAttribute = xmlAttribute->Name();
+				const bool isProtectedAttribute = StringUtils<AnsiChar, unsigned int>::StartsWith(nameAttribute.GetData(), "__");
 				if (isProtectedAttribute)
 					continue;
 
-				element.Insert(CK_ANSI_TO_TEXT(xmlAttribute->Name()), XmlProperties::ValueType(xmlAttribute->Value()));
+				String xmlAttributeValue = String::Convert(AnsiStringView(xmlAttribute->Value()));
+				element.Insert(String::Convert(nameAttribute), XmlProperties::ValueType(xmlAttributeValue));
 			}
 
 			for (const tinyxml2::XMLNode* xmlChildNode = xmlElement.FirstChild(); xmlChildNode; xmlChildNode = xmlChildNode->NextSibling())
@@ -68,19 +71,20 @@ namespace Ck
 						const char* data = xmlChildText->Value();
 
 						String childName = CK_TEXT("CData");
-						if (const AnsiChar* cdataName = xmlChildText->Parent()->ToElement()->Attribute("__cdata_name"))
-							childName = CK_ANSI_TO_TEXT(cdataName);
+						if (AnsiStringView cdataName = xmlChildText->Parent()->ToElement()->Attribute("__cdata_name"); !cdataName.IsEmpty())
+							childName = String::Convert(cdataName);
 
 						std::size_t length = xmlChildText->Parent()->ToElement()->Unsigned64Attribute("__cdata_length");
 						if (!length)
-							length = StringUtils<AnsiChar>::GetLength(data);
+							length = StringUtils<AnsiChar, unsigned int>::GetLength(data);
 
 						element.Insert(childName, XmlCDataNode(length, data));
 					}
 				}
 			}
 
-			return { CK_ANSI_TO_TEXT(xmlElement.Value()), std::move(element) };
+			AnsiStringView elementName = xmlElement.Value();
+			return { String::Convert(elementName), std::move(element) };
 		}
 	}
 
@@ -89,7 +93,8 @@ namespace Ck
 		tinyxml2::XMLDocument document;
 		String xml = FileUtils::ReadFile(path).ToString();
 
-		tinyxml2::XMLError error = document.Parse(CK_TEXT_TO_ANSI(xml.GetData()), xml.GetLength());
+		Utf8String xmlContent = Utf8String::Convert(xml);
+		tinyxml2::XMLError error = document.Parse(reinterpret_cast<const AnsiChar*>(xmlContent.GetData()), xml.GetLength());
 		if (error != tinyxml2::XML_SUCCESS)
 			throw std::runtime_error(document.ErrorStr());
 

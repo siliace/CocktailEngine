@@ -7,10 +7,10 @@ namespace Ck
 {
 	bool EmbeddedFileSystemDriver::IsFile(const Path& path) const
 	{
-		std::string p = CK_TEXT_TO_ANSI(path.ToString().GetData());
+		AnsiString p = AnsiString::Convert(path.ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
-			if (fileSystem.is_file(p))
+			if (fileSystem.is_file(p.GetData()))
 				return true;
 		}
 
@@ -19,10 +19,10 @@ namespace Ck
 
 	bool EmbeddedFileSystemDriver::IsDirectory(const Path& path) const
 	{
-		std::string p = CK_TEXT_TO_ANSI(path.ToString().GetData());
+		AnsiString p = AnsiString::Convert(path.ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
-			if (fileSystem.is_directory(p))
+			if (fileSystem.is_directory(p.GetData()))
 				return true;
 		}
 
@@ -41,9 +41,10 @@ namespace Ck
 
 	std::unique_ptr<File> EmbeddedFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
+		AnsiString p = AnsiString::Convert(path.ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
-			if (fileSystem.is_file(CK_TEXT_TO_ANSI(path.ToString().GetData())))
+			if (fileSystem.is_file(p.GetData()))
 				return std::make_unique<EmbeddedFile>(fileSystem, path, flags);
 		}
 
@@ -52,9 +53,10 @@ namespace Ck
 
 	std::unique_ptr<Directory> EmbeddedFileSystemDriver::OpenDirectory(const Path& path)
 	{
+		AnsiString p = AnsiString::Convert(path.ToString());
 		for (const cmrc::embedded_filesystem& mFileSystem : mFileSystems)
 		{
-			if (mFileSystem.is_directory(CK_TEXT_TO_ANSI(path.ToString().GetData())))
+			if (mFileSystem.is_directory(p.GetData()))
 				return std::make_unique<EmbeddedDirectory>(mFileSystem, path);
 		}
 

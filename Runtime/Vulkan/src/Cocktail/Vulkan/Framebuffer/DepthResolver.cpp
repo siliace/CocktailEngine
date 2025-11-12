@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 
 		mShaderProgram = std::static_pointer_cast<ShaderProgram>(mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo));
 
-		mDepthSamplerSlot = mShaderProgram->FindUniformSlot(CK_TEXT("inTexture"));
+		mDepthSamplerSlot = mShaderProgram->FindUniformSlot("inTexture");
 		assert(mDepthSamplerSlot);
 	}
 

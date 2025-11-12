@@ -20,12 +20,13 @@ namespace Ck
 
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
-		readerConfig.mtl_search_path = CK_TEXT_TO_ANSI(path.GetParent().ToString().GetData());
+		readerConfig.mtl_search_path = AnsiString::Convert(path.GetParent().ToString()).GetData();
 
+		AnsiString p = AnsiString::Convert(path.ToString());
 		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
 		tinyobj::ObjReader reader;
-		if (!reader.ParseFromFile(CK_TEXT_TO_ANSI(path.ToString().GetData()), readerConfig))
-			throw ObjParseError(CK_ANSI_TO_TEXT(reader.Error().c_str()));
+		if (!reader.ParseFromFile(p.GetData(), readerConfig))
+			throw ObjParseError(String::ConvertFrom<AsciiEncoder>(reader.Error().c_str()));
 
 		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
@@ -34,9 +35,9 @@ namespace Ck
 	{
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
-		readerConfig.mtl_search_path = CK_TEXT_TO_ANSI(parameters.BaseDirectory.ToString().GetData());
+		readerConfig.mtl_search_path = AnsiString::Convert(parameters.BaseDirectory.ToString()).GetData();
 
-		String objText, mtlText;
+		AnsiString objText, mtlText;
 		{
 			Array<String> tokens;
 			InputStreamReader inputStreamReader(inputStream);
@@ -53,16 +54,16 @@ namespace Ck
 					Path mtlFilePath = parameters.BaseDirectory;
 					mtlFilePath = mtlFilePath.Join(tokens[1]);
 
-					mtlText = FileUtils::ReadFile(mtlFilePath).ToString();
+					mtlText = AnsiString::Convert(FileUtils::ReadFile(mtlFilePath).ToString());
 				}
 
-				objText.Append(line);
+				objText.Append(AnsiString::Convert(line));
 			}
 		}
 
 		tinyobj::ObjReader reader;
-		if (!reader.ParseFromString(CK_TEXT_TO_ANSI(objText.GetData()), CK_TEXT_TO_ANSI(mtlText.GetData()), readerConfig))
-			throw ObjParseError(CK_ANSI_TO_TEXT(reader.Error().c_str()));
+		if (!reader.ParseFromString(objText.GetData(), mtlText.GetData(), readerConfig))
+			throw ObjParseError(String::ConvertFrom<AsciiEncoder>(reader.Error().c_str()));
 
 		return std::make_shared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}

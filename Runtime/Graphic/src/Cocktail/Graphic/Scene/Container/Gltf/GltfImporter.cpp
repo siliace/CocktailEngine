@@ -89,12 +89,14 @@ namespace Ck
         std::string errors, warnings;
 
         CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
-        bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, CK_TEXT_TO_ANSI(path.ToString().GetData()));
+
+        AnsiString p = AnsiString::Convert(path.ToString());
+        bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, p.GetData());
         if (!success)
-            throw GltfParseError(CK_ANSI_TO_TEXT(errors.c_str()));
+            throw GltfParseError(String::ConvertFrom<AsciiEncoder>(errors.c_str()));
 
         if (!warnings.empty())
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %s"), path.ToString(), warnings.c_str());
+            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %hs"), path.ToString(), warnings.c_str());
 
         return std::make_shared<GltfSceneContainer>(model);
     }
@@ -107,12 +109,12 @@ namespace Ck
         InputStreamReader InputStreamReader(inputStream);
         BufferedReader reader(InputStreamReader);
         
-        String buffer = reader.ReadAll();
+        AnsiString buffer = AnsiString::Convert(reader.ReadAll());
         bool success = mLoader.LoadASCIIFromString(
             &model,
             &errors, &warnings,
-            CK_TEXT_TO_ANSI(buffer.GetData()), buffer.GetLength(),
-            CK_TEXT_TO_ANSI(parameters.BaseDirectory.ToString().GetData())
+            buffer.GetData(), buffer.GetLength(),
+            AnsiString::Convert(parameters.BaseDirectory.ToString()).GetData()
         );
 
         if (!success)

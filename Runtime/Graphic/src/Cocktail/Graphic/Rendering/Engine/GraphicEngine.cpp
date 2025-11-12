@@ -28,7 +28,7 @@ namespace Ck
 			static std::unique_ptr<Renderer::RenderDevice> CreateVulkanRenderDevice(bool enableValidation)
 			{
 				Vulkan::RenderDeviceCreateInfo createInfo;
-				createInfo.ApplicationName = CK_TEXT("CocktailEngine");
+				createInfo.ApplicationName = "CocktailEngine";
 				createInfo.ApiVersion = Vulkan::GetSupportedApiVersion();
 				createInfo.EnableValidation = enableValidation;
 				return Vulkan::CreateRenderDevice(createInfo);
@@ -48,7 +48,7 @@ namespace Ck
 			assert(false);
 		}
 
-		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, const AnsiChar* message) {
+		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, AnsiStringView message) {
 			CK_LOG(GraphicEngineLogCategory, logLevel, CK_TEXT("Debug message of type %hs from RenderDevice : %hs"), messageType, message);
 		});
 

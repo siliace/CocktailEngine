@@ -1,5 +1,4 @@
 #include <Cocktail/Core/String.hpp>
-#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Win32/ConsoleService.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
@@ -150,7 +149,7 @@ namespace Ck::Detail::Win32
 		}
 		else
 		{
-			String line(text);
+			String line = String::FromView(text);
 			line.Append(EndLine);
 
 			return Write(line);

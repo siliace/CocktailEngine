@@ -34,7 +34,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
 	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor(1.f, 1.f, 1.f));
-	std::shared_ptr<Material> material = std::make_shared<Material>(CK_TEXT("default-cube"), Material::ShadingMode::Phong, true);
+	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Phong, true);
 	material->SetEmissiveColor(LinearColor(1.f, 1.f, 1.f));
 	std::shared_ptr<Shape> shape = std::make_shared<Shape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
 

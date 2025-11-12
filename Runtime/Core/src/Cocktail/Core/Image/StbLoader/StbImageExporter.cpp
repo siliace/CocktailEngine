@@ -1,5 +1,6 @@
 #include <stb_image_write/stb_image_write.h>
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Image/StbLoader/StbImageExporter.hpp>
 #include <Cocktail/Core/IO/Output/Stream/FileOutputStream.hpp>

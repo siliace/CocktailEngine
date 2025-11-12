@@ -32,7 +32,7 @@ namespace Ck::Vulkan
 		 * \param layerName
 		 * \return
 		 */
-		static bool IsLayerSupported(const char* layerName);
+		static bool IsLayerSupported(const AnsiChar* layerName);
 
 		/**
 		 * \brief 
@@ -128,11 +128,11 @@ namespace Ck::Vulkan
 		 * \param extensionName 
 		 * \return 
 		 */
-		bool IsExtensionDisabled(const TextChar* extensionName) const;
+		bool IsExtensionDisabled(const AnsiChar* extensionName) const;
 
 		Array<const AnsiChar*> mInstanceExtensions;
 		Array<const AnsiChar*> mDeviceExtensions;
-		Array<String> mDisabledExtensions;
+		Array<AnsiString> mDisabledExtensions;
 	};
 }
 

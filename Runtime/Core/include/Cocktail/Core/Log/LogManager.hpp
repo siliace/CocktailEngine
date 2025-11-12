@@ -6,7 +6,6 @@
 
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
-#include <Cocktail/Core/StringView.hpp>
 #include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogChannel.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
@@ -60,7 +59,7 @@ namespace Ck
 			}
 			else
 			{
-				logEntry->Message = message;
+				logEntry->Message = String::FromView(message);
 			}
 			logEntry->Level = level;
 			logEntry->File = file;

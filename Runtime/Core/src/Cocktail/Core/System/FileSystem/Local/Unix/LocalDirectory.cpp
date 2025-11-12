@@ -7,7 +7,7 @@ namespace Ck::Detail::Unix
 	LocalDirectory::LocalDirectory(const Path& path) :
 		mPath(path)
 	{
-		mHandle = opendir(CK_TEXT_TO_ANSI(path.ToString().GetData()));
+		mHandle = opendir(reinterpret_cast<const AnsiChar*>(path.ToString().GetData()));
 	}
 
 	LocalDirectory::~LocalDirectory()
@@ -22,7 +22,7 @@ namespace Ck::Detail::Unix
 
 		while ((result = readdir64(mHandle)))
 		{
-			String filename = CK_ANSI_TO_TEXT(&result->d_name[0]);
+			String filename = reinterpret_cast<const Utf8Char*>(result->d_name);
 
 			Path childPath = mPath;
 			content.Add(childPath.Join(filename));

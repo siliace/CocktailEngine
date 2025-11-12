@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param applicationVersion 
 		 * \return 
 		 */
-		static Path ComputePipelineCachePath(StringView applicationName, const VersionDescriptor& applicationVersion);
+		static Path ComputePipelineCachePath(AnsiStringView applicationName, const VersionDescriptor& applicationVersion);
 
 		/**
 		 * \brief 

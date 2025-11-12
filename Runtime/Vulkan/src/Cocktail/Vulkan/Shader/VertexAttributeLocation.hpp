@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 		 * \param elementCount 
 		 * \param name 
 		 */	
-		VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, String name);
+		VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, AnsiString name);
 
 		/**
 		 * \brief 
@@ -45,14 +45,14 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		const String& GetName() const override;
+		const AnsiString& GetName() const override;
 
 	private:
 
 		unsigned int mLocation;
 		DataType mDataType;
 		unsigned int mElementCount;
-		String mName;
+		AnsiString mName;
 	};
 }
 

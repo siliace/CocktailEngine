@@ -37,4 +37,14 @@ namespace Ck
 	{
 		throw ContainerOutOfRange(CK_TEXT("Index %u is out of container size %u"), index, max);
 	}
+
+	void ExceptionUtils::ThrowCodepointEncodingException(Uint32 codepoint)
+	{
+		throw CodepointEncodingException(CK_TEXT("Invalid codepoint encoding %u"), codepoint);
+	}
+
+	void ExceptionUtils::ThrowCodepointDecodingException(unsigned int codepointIndex)
+	{
+		throw CodepointDecodingException(CK_TEXT("Invalid codepoint decoded at index %u"), codepointIndex);
+	}
 }

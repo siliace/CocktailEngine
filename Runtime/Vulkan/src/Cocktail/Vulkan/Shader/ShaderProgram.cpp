@@ -88,7 +88,7 @@ namespace Ck::Vulkan
 		return mShaders[type];
 	}
 
-	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(StringView name) const
+	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(AnsiStringView name) const
 	{	
 		for (const std::unique_ptr<UniformSlot>& uniformSlot : mUniformSlots)
 		{
@@ -208,7 +208,7 @@ namespace Ck::Vulkan
 			for (const DescriptorSetLayoutBinding& binding : descriptorSetLayout->GetBindings())
 			{
 				// Get name of the uniform, keep the first one found.
-				String name;
+				AnsiString name;
 				Array<BlockMember> members;
 				for (Renderer::ShaderType type : Enum<Renderer::ShaderType>::Values)
 				{

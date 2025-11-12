@@ -1,4 +1,3 @@
-#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleService.hpp>
 
 namespace Ck::Detail::Unix
@@ -88,6 +87,11 @@ namespace Ck::Detail::Unix
             COCKTAIL_UNREACHABLE();
 		    return 0;
         }
+
+		String FormatConsoleStyle(unsigned int style, unsigned int color)
+		{
+			return String::Format(CK_TEXT("\033[%d;%dm"), style, color);
+		}
 	}
 
 	ConsoleService::ConsoleService() : 
@@ -132,7 +136,7 @@ namespace Ck::Detail::Unix
 	    }
 	    else
 	    {
-	        String line(text);
+	        String line = String::FromView(text);
 	        line.Append(EndLine);
 
 	        return Write(line);
@@ -162,8 +166,8 @@ namespace Ck::Detail::Unix
 
 	void ConsoleService::SetColors(ConsoleColor background, ConsoleColor foreground)
 	{
-		Write(String::Format(CK_TEXT("\033[%dm"), ConsoleColorToTextAttribute(background)));
-		Write(String::Format(CK_TEXT("\033[%dm"), ConsoleColorToBackgroundAttribute(background)));
+		Write(FormatConsoleStyle(1, ConsoleColorToTextAttribute(foreground)));
+		Write(FormatConsoleStyle(1, ConsoleColorToBackgroundAttribute(background)));
 	}
 
 	void ConsoleService::Beep() const

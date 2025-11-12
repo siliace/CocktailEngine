@@ -7,6 +7,7 @@ if (WIN32)
 	endif ()
 
 	add_compile_definitions(UNICODE _UNICODE)
+	add_compile_options(/utf-8)
 endif ()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

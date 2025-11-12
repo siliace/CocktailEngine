@@ -22,7 +22,7 @@ namespace Ck::Detail::Unix
 	{
 		struct stat64 filestats;
 		Path fullPath = Path::Merge(mBase, path);
-		if (stat64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), &filestats) == -1)
+		if (stat64(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISREG(filestats.st_mode);
@@ -32,7 +32,7 @@ namespace Ck::Detail::Unix
 	{
 		struct stat64 filestats;
 		Path fullPath = Path::Merge(mBase, path);
-		if (stat64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), &filestats) == -1)
+		if (stat64(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData()), &filestats) == -1)
 			return false;
 
 		return S_ISDIR(filestats.st_mode);
@@ -41,7 +41,7 @@ namespace Ck::Detail::Unix
 	void LocalFileSystemDriver::CreateFile(const Path& path)
 	{
 		Path fullPath = Path::Merge(mBase, path);
-        int handle = ::open64(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
+        int handle = ::open64(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData()), O_CREAT | O_TRUNC | O_EXCL, S_IRWXU);
 		if (handle == -1)
 			throw SystemError::GetLastError();
 		
@@ -51,7 +51,7 @@ namespace Ck::Detail::Unix
 	void LocalFileSystemDriver::CreateDirectory(const Path& path)
 	{
 		Path fullPath = Path::Merge(mBase, path);
-		int error = mkdir(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), S_IRWXU | S_IRGRP | S_IROTH);
+		int error = mkdir(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData()), S_IRWXU | S_IRGRP | S_IROTH);
 		if (error == -1)
 			throw SystemError::GetLastError();
 	}
@@ -72,14 +72,17 @@ namespace Ck::Detail::Unix
 
 	void LocalFileSystemDriver::Move(const Path& source, const Path& destination)
 	{
-		if (::rename(CK_TEXT_TO_ANSI(Path::Merge(mBase, source).ToString().GetData()), CK_TEXT_TO_ANSI(Path::Merge(mBase, destination).ToString().GetData())) == -1)
+		auto old = Path::Merge(mBase, source).ToString();
+		auto next = Path::Merge(mBase, destination).ToString();
+
+		if (::rename(reinterpret_cast<const AnsiChar*>(old.GetData()), reinterpret_cast<const AnsiChar*>(next.GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 
 	void LocalFileSystemDriver::Remove(const Path& path)
 	{
 		Path fullPath = Path::Merge(mBase, path);
-		if (::unlink(CK_TEXT_TO_ANSI(fullPath.ToString().GetData())) == -1)
+		if (::unlink(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData())) == -1)
 			throw SystemError::GetLastError();
 	}
 
@@ -101,7 +104,7 @@ namespace Ck::Detail::Unix
 	Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
 	{
 		Path fullPath = Path::Merge(mBase, path);
-		TextChar* resolvedPath = CK_ANSI_TO_TEXT(realpath(CK_TEXT_TO_ANSI(fullPath.ToString().GetData()), nullptr));
+		Utf8Char* resolvedPath = reinterpret_cast<Utf8Char*>(realpath(reinterpret_cast<const AnsiChar*>(fullPath.ToString().GetData()), nullptr));
 		if (!resolvedPath)
 			return Optional<Path>::Empty();
 

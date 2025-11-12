@@ -41,7 +41,7 @@ namespace Ck
 		{
 			CameraInfo& cameraInfo = mCameras.Emplace();
 
-			cameraInfo.Name = CK_ANSI_TO_TEXT(gltfCamera.name.c_str());
+			cameraInfo.Name = String::ConvertFrom<AsciiEncoder>(gltfCamera.name.c_str());
 			cameraInfo.IsPerspective = gltfCamera.type == "perspective";
 			if (cameraInfo.IsPerspective)
 			{
@@ -85,7 +85,7 @@ namespace Ck
 	SceneContainer::MaterialInfo GltfSceneContainer::ProcessMaterial(const tinygltf::Model& model, const tinygltf::Material& gltfMaterial) const
 	{
 		MaterialInfo materialInfo;
-		materialInfo.Name = CK_ANSI_TO_TEXT(gltfMaterial.name.c_str());
+		materialInfo.Name = gltfMaterial.name.c_str();
 		materialInfo.Colors.Base = GltfUtils::ConvertLinearColor(gltfMaterial.pbrMetallicRoughness.baseColorFactor);
 		materialInfo.Colors.Emission = GltfUtils::ConvertLinearColor(gltfMaterial.emissiveFactor);
 		materialInfo.ShadingMode = Material::ShadingMode::Phong;
@@ -232,7 +232,7 @@ namespace Ck
 				subMesh.FirstVertex = 0;
 
 				MeshInfo meshInfo;
-				meshInfo.Name = CK_ANSI_TO_TEXT(gltfMesh.name.c_str());
+				meshInfo.Name = gltfMesh.name.c_str();
 				meshInfo.Vertices = std::move(vertices);
 				meshInfo.Indices = std::move(indices);
 				meshInfo.SubMeshes.Add(subMesh);

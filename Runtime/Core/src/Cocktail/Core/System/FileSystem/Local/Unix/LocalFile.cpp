@@ -27,7 +27,7 @@ namespace Ck::Detail::Unix
 		if (flags & FileOpenFlagBits::Write && flags & FileOpenFlagBits::Truncate)
 			sysFlags |= O_TRUNC;
 
-		mHandle = ::open64(CK_TEXT_TO_ANSI(path.ToString().GetData()), sysFlags, S_IRWXU);
+		mHandle = ::open64(reinterpret_cast<const AnsiChar*>(path.ToString().GetData()), sysFlags, S_IRWXU);
 		if (mHandle == -1)
 			throw SystemError::GetLastError();
 	}

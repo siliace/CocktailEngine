@@ -13,10 +13,10 @@
 
 namespace Ck::Vulkan
 {
-	Path PipelineCacheSaver::ComputePipelineCachePath(StringView applicationName, const VersionDescriptor& applicationVersion)
+	Path PipelineCacheSaver::ComputePipelineCachePath(AnsiStringView applicationName, const VersionDescriptor& applicationVersion)
 	{
 		return LocalFileSystem::GetTempDirectoryPath()
-				.Join(applicationName)
+				.Join(String::Convert(applicationName))
 				.Join(TranslatorCast<String>(applicationVersion.ToInteger()))
 				.Join(CK_TEXT("pipelinecache.bin"));
 	}

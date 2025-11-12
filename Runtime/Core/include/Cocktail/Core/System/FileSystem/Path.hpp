@@ -50,14 +50,14 @@ namespace Ck
          *
          * \note On Windows this is '\\'
          */
-        static constexpr TextChar SystemSeparator = CK_TEXT('\\');
+        static constexpr TextChar SystemSeparator = CK_CHAR('\\');
     #else
         /**
          * \brief Platform-dependent path separator
          *
          * \note On POSIX-like systems this is '/'
          */
-        static constexpr TextChar SystemSeparator = CK_TEXT('/');
+        static constexpr TextChar SystemSeparator = CK_CHAR('/');
     #endif
 
         /**

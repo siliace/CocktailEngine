@@ -92,18 +92,18 @@ namespace Ck
 
 				while (n > 0)
 				{
-					result.Prepend(static_cast<TextChar>(CK_TEXT('0') + (n % 10)));
+					result.Prepend(CK_CHAR('0') + n % 10);
 					n /= 10;
 				}
 
 				if (isNegative)
-					result.Prepend(CK_TEXT('-'));
+					result.Prepend(CK_CHAR('-'));
 			}
 			else
 			{
 				while (value > 0)
 				{
-					result.Prepend(static_cast<TextChar>(CK_TEXT('0') + (value % 10)));
+					result.Prepend(static_cast<String::CharType>(CK_CHAR('0') + value % 10));
 					value /= 10;
 				}
 			}
@@ -129,14 +129,14 @@ namespace Ck
 
 			String result = StringParseIntegerTranslator<long long>()(integerPart).Get();
 			if (negative)
-				result.Prepend(CK_TEXT('-'));
+				result.Prepend('-');
 
-			result.Append(CK_TEXT("."));
+			result.Append('.');
 			for (int i = 0; i < std::numeric_limits<InputType>::digits; i++)
 			{
 				fractionalPart *= 10;
 				int digit = static_cast<int>(fractionalPart);
-				result.Append(static_cast<TextChar>(CK_TEXT('0') + digit));
+				result.Append(static_cast<String::CharType>('0' + digit));
 
 				fractionalPart -= digit;
 			}
@@ -153,7 +153,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const
 		{
-			return StringUtils<Detail::NakedType<T>>::template TryToInteger<E>(value);
+			return StringUtils<Detail::NakedType<T>, Uint32>::template TryToInteger<E>(value);
 		}
 	};
 
@@ -165,7 +165,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const
 		{
-			return StringUtils<Detail::NakedType<T>>::template TryToFloatingPoint<E>(value);
+			return StringUtils<Detail::NakedType<T>, Uint32>::template TryToFloatingPoint<E>(value);
 		}
 	};
 
@@ -177,10 +177,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const noexcept
 		{
-			if (!value.IsNumeric())
-				return Optional<OutputType>::Empty();
-
-			return StringUtils<TextChar>::TryToInteger<E>(value.GetData());
+			return StringUtils<String::CharType, String::SizeType>::TryToInteger<E>(value.GetData());
 		}
 	};
 
@@ -192,10 +189,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const noexcept
 		{
-			if (!value.IsNumeric())
-				return Optional<OutputType>::Empty();
-
-			return StringUtils<TextChar>::TryToFloatingPoint<E>(value.GetData());
+			return StringUtils<String::CharType, String::SizeType>::TryToFloatingPoint<E>(value.GetData());
 		}
 	};
 
@@ -207,10 +201,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const noexcept
 		{
-			if (!value.IsNumeric())
-				return Optional<OutputType>::Empty();
-
-			return StringUtils<TextChar>::TryToInteger<E>(value.GetData());
+			return StringUtils<String::CharType, String::SizeType>::TryToInteger<E>(value.GetData());
 		}
 	};
 
@@ -222,10 +213,7 @@ namespace Ck
 
 		Optional<OutputType> operator()(const InputType& value) const noexcept
 		{
-			if (!value.IsNumeric())
-				return Optional<OutputType>::Empty();
-
-			return StringUtils<TextChar>::TryToFloatingPoint<E>(value.GetData());
+			return StringUtils<String::CharType, String::SizeType>::TryToFloatingPoint<E>(value.GetData());
 		}
 	};
 
@@ -241,9 +229,9 @@ namespace Ck
 
 			if constexpr (std::is_same_v<Decayed, const AnsiChar*> || std::is_same_v<Decayed, AnsiChar*>)
 			{
-				return Optional<OutputType>::Of(InPlace, CK_ANSI_TO_TEXT(value));
+				return Optional<OutputType>::Of(InPlace, value);
 			}
-			else if constexpr (std::is_same_v<Decayed, const TextChar*> || std::is_same_v<Decayed, TextChar*>)
+			else if constexpr (std::is_same_v<Decayed, const String::CharType*> || std::is_same_v<Decayed, String::CharType*>)
 			{
 				return Optional<OutputType>::Of(InPlace, value);
 			}
@@ -311,38 +299,71 @@ namespace Ck
 	template <std::size_t N> struct TranslatorBetween<const AnsiChar[N], float> { using Type = CharsToFloatingPointTranslator<const AnsiChar[N], float>; };
 	template <std::size_t N> struct TranslatorBetween<const AnsiChar[N], double> { using Type = CharsToFloatingPointTranslator<const AnsiChar[N], double>; };
 
-	template <> struct TranslatorBetween<const TextChar*, Int8> { using Type = CharsToIntegerTranslator<const TextChar*, Int8>; };
-	template <> struct TranslatorBetween<const TextChar*, Int16> { using Type = CharsToIntegerTranslator<const TextChar*, Int16>; };
-	template <> struct TranslatorBetween<const TextChar*, Int32> { using Type = CharsToIntegerTranslator<const TextChar*, Int32>; };
-	template <> struct TranslatorBetween<const TextChar*, Int64> { using Type = CharsToIntegerTranslator<const TextChar*, Int64>; };
-	template <> struct TranslatorBetween<const TextChar*, Uint8> { using Type = CharsToIntegerTranslator<const TextChar*, Uint8>; };
-	template <> struct TranslatorBetween<const TextChar*, Uint16> { using Type = CharsToIntegerTranslator<const TextChar*, Uint16>; };
-	template <> struct TranslatorBetween<const TextChar*, Uint32> { using Type = CharsToIntegerTranslator<const TextChar*, Uint32>; };
-	template <> struct TranslatorBetween<const TextChar*, Uint64> { using Type = CharsToIntegerTranslator<const TextChar*, Uint64>; };
-	template <> struct TranslatorBetween<const TextChar*, float> { using Type = CharsToFloatingPointTranslator<const TextChar*, float>; };
-	template <> struct TranslatorBetween<const TextChar*, double> { using Type = CharsToFloatingPointTranslator<const TextChar*, double>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Int8> { using Type = CharsToIntegerTranslator<const Utf8Char*, Int8>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Int16> { using Type = CharsToIntegerTranslator<const Utf8Char*, Int16>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Int32> { using Type = CharsToIntegerTranslator<const Utf8Char*, Int32>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Int64> { using Type = CharsToIntegerTranslator<const Utf8Char*, Int64>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Uint8> { using Type = CharsToIntegerTranslator<const Utf8Char*, Uint8>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Uint16> { using Type = CharsToIntegerTranslator<const Utf8Char*, Uint16>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Uint32> { using Type = CharsToIntegerTranslator<const Utf8Char*, Uint32>; };
+	template <> struct TranslatorBetween<const Utf8Char*, Uint64> { using Type = CharsToIntegerTranslator<const Utf8Char*, Uint64>; };
+	template <> struct TranslatorBetween<const Utf8Char*, float> { using Type = CharsToFloatingPointTranslator<const Utf8Char*, float>; };
+	template <> struct TranslatorBetween<const Utf8Char*, double> { using Type = CharsToFloatingPointTranslator<const Utf8Char*, double>; };
 
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Int8> { using Type = CharsToIntegerTranslator<TextChar[N], Int8>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Int16> { using Type = CharsToIntegerTranslator<TextChar[N], Int16>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Int32> { using Type = CharsToIntegerTranslator<TextChar[N], Int32>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Int64> { using Type = CharsToIntegerTranslator<TextChar[N], Int64>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Uint8> { using Type = CharsToIntegerTranslator<TextChar[N], Uint8>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Uint16> { using Type = CharsToIntegerTranslator<TextChar[N], Uint16>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Uint32> { using Type = CharsToIntegerTranslator<TextChar[N], Uint32>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], Uint64> { using Type = CharsToIntegerTranslator<TextChar[N], Uint64>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], float> { using Type = CharsToFloatingPointTranslator<TextChar[N], float>; };
-	template <std::size_t N> struct TranslatorBetween<TextChar[N], double> { using Type = CharsToFloatingPointTranslator<TextChar[N], double>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Int8> { using Type = CharsToIntegerTranslator<Utf8Char[N], Int8>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Int16> { using Type = CharsToIntegerTranslator<Utf8Char[N], Int16>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Int32> { using Type = CharsToIntegerTranslator<Utf8Char[N], Int32>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Int64> { using Type = CharsToIntegerTranslator<Utf8Char[N], Int64>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Uint8> { using Type = CharsToIntegerTranslator<Utf8Char[N], Uint8>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Uint16> { using Type = CharsToIntegerTranslator<Utf8Char[N], Uint16>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Uint32> { using Type = CharsToIntegerTranslator<Utf8Char[N], Uint32>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], Uint64> { using Type = CharsToIntegerTranslator<Utf8Char[N], Uint64>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], float> { using Type = CharsToFloatingPointTranslator<Utf8Char[N], float>; };
+	template <std::size_t N> struct TranslatorBetween<Utf8Char[N], double> { using Type = CharsToFloatingPointTranslator<Utf8Char[N], double>; };
 
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Int8> { using Type = CharsToIntegerTranslator<const TextChar[N], Int8>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Int16> { using Type = CharsToIntegerTranslator<const TextChar[N], Int16>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Int32> { using Type = CharsToIntegerTranslator<const TextChar[N], Int32>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Int64> { using Type = CharsToIntegerTranslator<const TextChar[N], Int64>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Uint8> { using Type = CharsToIntegerTranslator<const TextChar[N], Uint8>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Uint16> { using Type = CharsToIntegerTranslator<const TextChar[N], Uint16>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Uint32> { using Type = CharsToIntegerTranslator<const TextChar[N], Uint32>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], Uint64> { using Type = CharsToIntegerTranslator<const TextChar[N], Uint64>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], float> { using Type = CharsToFloatingPointTranslator<const TextChar[N], float>; };
-	template <std::size_t N> struct TranslatorBetween<const TextChar[N], double> { using Type = CharsToFloatingPointTranslator<const TextChar[N], double>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Int8> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Int8>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Int16> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Int16>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Int32> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Int32>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Int64> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Int64>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Uint8> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Uint8>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Uint16> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Uint16>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Uint32> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Uint32>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], Uint64> { using Type = CharsToIntegerTranslator<const Utf8Char[N], Uint64>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], float> { using Type = CharsToFloatingPointTranslator<const Utf8Char[N], float>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf8Char[N], double> { using Type = CharsToFloatingPointTranslator<const Utf8Char[N], double>; };
+
+	template <> struct TranslatorBetween<const Utf16Char*, Int8> { using Type = CharsToIntegerTranslator<const Utf16Char*, Int8>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Int16> { using Type = CharsToIntegerTranslator<const Utf16Char*, Int16>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Int32> { using Type = CharsToIntegerTranslator<const Utf16Char*, Int32>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Int64> { using Type = CharsToIntegerTranslator<const Utf16Char*, Int64>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Uint8> { using Type = CharsToIntegerTranslator<const Utf16Char*, Uint8>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Uint16> { using Type = CharsToIntegerTranslator<const Utf16Char*, Uint16>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Uint32> { using Type = CharsToIntegerTranslator<const Utf16Char*, Uint32>; };
+	template <> struct TranslatorBetween<const Utf16Char*, Uint64> { using Type = CharsToIntegerTranslator<const Utf16Char*, Uint64>; };
+	template <> struct TranslatorBetween<const Utf16Char*, float> { using Type = CharsToFloatingPointTranslator<const Utf16Char*, float>; };
+	template <> struct TranslatorBetween<const Utf16Char*, double> { using Type = CharsToFloatingPointTranslator<const Utf16Char*, double>; };
+
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Int8> { using Type = CharsToIntegerTranslator<Utf16Char[N], Int8>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Int16> { using Type = CharsToIntegerTranslator<Utf16Char[N], Int16>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Int32> { using Type = CharsToIntegerTranslator<Utf16Char[N], Int32>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Int64> { using Type = CharsToIntegerTranslator<Utf16Char[N], Int64>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Uint8> { using Type = CharsToIntegerTranslator<Utf16Char[N], Uint8>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Uint16> { using Type = CharsToIntegerTranslator<Utf16Char[N], Uint16>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Uint32> { using Type = CharsToIntegerTranslator<Utf16Char[N], Uint32>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], Uint64> { using Type = CharsToIntegerTranslator<Utf16Char[N], Uint64>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], float> { using Type = CharsToFloatingPointTranslator<Utf16Char[N], float>; };
+	template <std::size_t N> struct TranslatorBetween<Utf16Char[N], double> { using Type = CharsToFloatingPointTranslator<Utf16Char[N], double>; };
+
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Int8> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Int8>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Int16> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Int16>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Int32> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Int32>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Int64> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Int64>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Uint8> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Uint8>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Uint16> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Uint16>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Uint32> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Uint32>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], Uint64> { using Type = CharsToIntegerTranslator<const Utf16Char[N], Uint64>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], float> { using Type = CharsToFloatingPointTranslator<const Utf16Char[N], float>; };
+	template <std::size_t N> struct TranslatorBetween<const Utf16Char[N], double> { using Type = CharsToFloatingPointTranslator<const Utf16Char[N], double>; };
 
 	template <> struct TranslatorBetween<String, Int8> { using Type = StringToIntegerTranslator<Int8>; };
 	template <> struct TranslatorBetween<String, Int16> { using Type = StringToIntegerTranslator<Int16>; };
@@ -377,13 +398,9 @@ namespace Ck
 	template <> struct TranslatorBetween<float, String> { using Type = StringParseFloatingPointTranslator<float>; };
 	template <> struct TranslatorBetween<double, String> { using Type = StringParseFloatingPointTranslator<double>; };
 
-	template <> struct TranslatorBetween<const AnsiChar*, String> { using Type = StringConstructionTranslator<const AnsiChar*>; };
-	template <> struct TranslatorBetween<const WildChar*, String> { using Type = StringConstructionTranslator<const WildChar*>; };
-
-	template <unsigned int TSize> struct TranslatorBetween<AnsiChar[TSize], String> { using Type = StringConstructionTranslator<AnsiChar[TSize]>; };
-	template <unsigned int TSize> struct TranslatorBetween<const AnsiChar[TSize], String> { using Type = StringConstructionTranslator<const AnsiChar[TSize]>; };
-	template <unsigned int TSize> struct TranslatorBetween<WildChar[TSize], String> { using Type = StringConstructionTranslator<WildChar[TSize]>; };
-	template <unsigned int TSize> struct TranslatorBetween<const WildChar[TSize], String> { using Type = StringConstructionTranslator<const WildChar[TSize]>; };
+	template <> struct TranslatorBetween<const TextChar*, String> { using Type = StringConstructionTranslator<const TextChar*>; };
+	template <unsigned int TSize> struct TranslatorBetween<TextChar[TSize], String> { using Type = StringConstructionTranslator<TextChar[TSize]>; };
+	template <unsigned int TSize> struct TranslatorBetween<const TextChar[TSize], String> { using Type = StringConstructionTranslator<const TextChar[TSize]>; };
 
 	template <typename TDst, typename TSrc, typename Tr = typename TranslatorBetween<TSrc, TDst>::Type>
 	Optional<TDst> TryTranslatorCast(const TSrc& value, const Tr& translator = Tr())

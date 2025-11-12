@@ -234,10 +234,12 @@ namespace Ck::Vulkan
 	ExtensionManager::ExtensionManager()
 	{
 		mDisabledExtensions = App::GetEnvironmentVariable(CK_TEXT("COCKTAIL_VULKAN_DISABLED_EXTENSIONS")).Map([&](const String& variable) {
-			return variable.Split(';');
-		}).GetOr(Array<String>());
+			return variable.Split(';').Transform([](const String& extensionName) {
+				return AnsiString::Convert(extensionName);
+			});
+		}).GetOr(Array<AnsiString>());
 
-		mDisabledExtensions.ForEach([&](const String& disabledExtension) {
+		mDisabledExtensions.ForEach([&](const AnsiString& disabledExtension) {
 			CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Extension %s disabled"), disabledExtension);
 		});
 	}
@@ -453,7 +455,7 @@ namespace Ck::Vulkan
 			bool extensionSupported = false;
 			const AnsiChar* extensionName = extensionNames[i];
 #ifndef NDEBUG
-			if (IsExtensionDisabled(CK_ANSI_TO_TEXT(extensionName)))
+			if (IsExtensionDisabled(extensionName))
 				return false;
 #endif
 
@@ -469,9 +471,9 @@ namespace Ck::Vulkan
 		return extensionsSupported;
 	}
 
-	bool ExtensionManager::IsExtensionDisabled(const TextChar* extensionName) const
+	bool ExtensionManager::IsExtensionDisabled(const AnsiChar* extensionName) const
 	{
-		for (const String& disabledExtension : mDisabledExtensions)
+		for (const AnsiString& disabledExtension : mDisabledExtensions)
 		{
 			if (disabledExtension == extensionName)
 				return true;

@@ -102,7 +102,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 		shaderProgramCreateInfo.Shaders[1] = loadShader(Renderer::ShaderType::Fragment, CK_TEXT("builtin://sponza/resources/Shaders/ImGui/default.frag.spv"));
 		mShaderProgram = renderDevice.CreateShaderProgram(shaderProgramCreateInfo);
 
-		mTextureUniformSlot = mShaderProgram->FindUniformSlot(CK_TEXT("inTexture"));
+		mTextureUniformSlot = mShaderProgram->FindUniformSlot("inTexture");
 		assert(mTextureUniformSlot);
 	}
 

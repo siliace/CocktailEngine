@@ -8,11 +8,11 @@ namespace Ck::Detail::Unix
 {
 	Path LocalFileSystemService::GetWorkingDirectory() const
 	{
-		char* buffer = getcwd(nullptr, 0);
+		Utf8Char* buffer = reinterpret_cast<Utf8Char*>(getcwd(nullptr, 0));
 		if (!buffer)
 			throw SystemError::GetLastError();
 
-		Path workingDirectory(CK_ANSI_TO_TEXT(buffer));
+		Path workingDirectory(buffer);
 		free(buffer);
 
 		return workingDirectory;
@@ -20,7 +20,7 @@ namespace Ck::Detail::Unix
 
     void LocalFileSystemService::SetWorkingDirectory(const Path& workingDirectory)
     {
-		if (chdir(CK_TEXT_TO_ANSI(workingDirectory.ToString().GetData())) != 0)
+		if (chdir(reinterpret_cast<const AnsiChar*>(workingDirectory.ToString().GetData())) != 0)
 			throw SystemError::GetLastError();
     }
 

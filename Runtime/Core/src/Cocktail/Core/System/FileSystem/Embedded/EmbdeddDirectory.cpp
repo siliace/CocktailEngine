@@ -7,17 +7,20 @@ namespace Ck
 		mFileSystem(fileSystem),
 		mPath(std::move(path))
 	{
-		/// Nothing
+		mUtf8Path = Utf8String::Convert(path.ToString());
 	}
 
 	Array<Path> EmbeddedDirectory::GetContent() const
 	{
 		Array<Path> children;
-		cmrc::directory_iterator iterable = mFileSystem.iterate_directory(CK_TEXT_TO_ANSI(mPath.ToString().GetData()));
+		cmrc::directory_iterator iterable = mFileSystem.iterate_directory(reinterpret_cast<const AnsiChar*>(mUtf8Path.GetData()));
 
 		children.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
-			children.Add(Path::Merge(mPath, CK_ANSI_TO_TEXT((*it).filename().c_str())));
+		{
+			AnsiStringView filename = (*it).filename().c_str();
+			children.Add(Path::Merge(mPath, String::Convert(filename)));
+		}
 
 		return children;
 	}

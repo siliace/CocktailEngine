@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 #define COCKTAIL_VULKAN_RENDERDEVICECREATEINFO_HPP
 
-#include <Cocktail/Core/StringView.hpp>
+#include <Cocktail/Core/String.hpp>
 
 #include <Cocktail/Vulkan/ApiVersion.hpp>
 #include <Cocktail/Vulkan/VersionDescriptor.hpp>
@@ -16,10 +16,10 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		StringView ApplicationName;
+		AnsiStringView ApplicationName;
 
 		/**
-		 * \brief 
+		 * \brief
 		 */
 		VersionDescriptor ApplicationVersion = { 0, 0, 0 };
 

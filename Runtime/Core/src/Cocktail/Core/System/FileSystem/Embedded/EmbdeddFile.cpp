@@ -1,5 +1,6 @@
 #include <cstring>
 
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.hpp>
 #include <Cocktail/Core/Utility/StringConvertion.hpp>
 
@@ -11,7 +12,8 @@ namespace Ck
 		if (flags & FileOpenFlagBits::Truncate | flags & FileOpenFlagBits::Write)
 			throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
 
-		mHandle = fileSystem.open(CK_TEXT_TO_ANSI(path.ToString().GetData()));
+		Utf8String utf8Path = Utf8String::Convert(path.ToString());
+		mHandle = fileSystem.open(reinterpret_cast<const char *>(utf8Path.GetData()));
 		mCursor = flags & FileOpenFlagBits::Append ? mHandle.cend() : mHandle.cbegin();
 	}
 

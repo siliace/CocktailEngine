@@ -5,33 +5,32 @@
 
 TEST_CASE("Default optional is empty", "[Optional]")
 {
-	Ck::Optional<std::string> opt;
+	Ck::Optional<Ck::String> opt;
 	REQUIRE(opt.IsEmpty());
 }
 
 TEST_CASE("Construct optional in-place", "[Optional]")
 {
-	Ck::Optional<std::string> opt = Ck::Optional<std::string>::Of(Ck::InPlace, "Hello world");
+	Ck::Optional<Ck::String> opt = Ck::Optional<Ck::String>::Of(Ck::InPlace, CK_TEXT("Hello world"));
 	REQUIRE_FALSE(opt.IsEmpty());
-	REQUIRE(opt.Get() == "Hello world");
+	REQUIRE(opt.Get() == CK_TEXT("Hello world"));
 }
 
 TEST_CASE("Construct optional from a reference", "[Optional]")
 {
-	std::string str = "Hello World";
-	Ck::Optional<std::string&> opt = Ck::Optional<std::string&>::Of(str);
-	Ck::Optional<const std::string&> constOpt = opt;
+	Ck::String str = CK_TEXT("Hello world");
+	Ck::Optional<Ck::String&> opt = Ck::Optional<Ck::String&>::Of(str);
 
-	std::string& stringRef = opt.Get();
+	Ck::String& stringRef = opt.Get();
 	REQUIRE(&str == &stringRef);
 }
 
 TEST_CASE("Move construct leave optional empty", "[Optional]")
 {
-	const std::string str = "foo";
+	const Ck::String str = CK_TEXT("foo");
 
-	Ck::Optional<std::string> opt = Ck::Optional<std::string>::Of(str);
-	Ck::Optional<std::string> opt2;
+	Ck::Optional<Ck::String> opt = Ck::Optional<Ck::String>::Of(str);
+	Ck::Optional<Ck::String> opt2;
 
 	REQUIRE_FALSE(opt.IsEmpty());
 	REQUIRE(opt.Get() == str);
@@ -46,9 +45,9 @@ TEST_CASE("Move construct leave optional empty", "[Optional]")
 
 TEST_CASE("Map of an optional", "[Optional]")
 {
-	Ck::Optional<std::string> opt;
+	Ck::Optional<Ck::String> opt;
 
-	auto mapper = [](const std::string& str) {
+	auto mapper = [](const Ck::String& str) {
 		return str + str;
 	};
 
@@ -61,21 +60,21 @@ TEST_CASE("Map of an optional", "[Optional]")
 
 	SECTION("Not empty optional invoke mapper")
 	{
-		opt = Ck::Optional<std::string>::Of("foo");
+		opt = Ck::Optional<Ck::String>::Of(CK_TEXT("foo"));
 
 		opt = opt.Map(mapper);
 
 		REQUIRE_FALSE(opt.IsEmpty());
-		REQUIRE(opt.Get() == "foofoo");
+		REQUIRE(opt.Get() == CK_TEXT("foofoo"));
 	}
 }
 
 TEST_CASE("Then of an optional", "[Optional]")
 {
-	Ck::Optional<std::string> opt;
+	Ck::Optional<Ck::String> opt;
 
 	bool called = false;
-	auto then = [&](const std::string&) {
+	auto then = [&](const Ck::String&) {
 		called = true;
 	};
 
@@ -88,7 +87,7 @@ TEST_CASE("Then of an optional", "[Optional]")
 
 	SECTION("Not empty optional invoke mapper")
 	{
-		opt = Ck::Optional<std::string>::Of("foo");
+		opt = Ck::Optional<Ck::String>::Of(CK_TEXT("foo"));
 		opt.Then(then);
 
 		REQUIRE(called);
@@ -97,7 +96,7 @@ TEST_CASE("Then of an optional", "[Optional]")
 
 TEST_CASE("Get the value of an optional", "[Optional]")
 {
-	Ck::Optional<std::string> opt;
+	Ck::Optional<Ck::String> opt;
 	
 	SECTION("Empty optional gives an exception")
 	{
@@ -106,23 +105,23 @@ TEST_CASE("Get the value of an optional", "[Optional]")
 
 	SECTION("Not empty optional gives a value")
 	{
-		opt = Ck::Optional<std::string>::Of("foo");
-		REQUIRE(opt.Get() == "foo");
+		opt = Ck::Optional<Ck::String>::Of(CK_TEXT("foo"));
+		REQUIRE(opt.Get() == CK_TEXT("foo"));
 	}
 }
 
 TEST_CASE("Get the value with fallback of an optional", "[Optional]")
 {
-	Ck::Optional<std::string> opt;
+	Ck::Optional<Ck::String> opt;
 
 	SECTION("Empty optional gives the fallback")
 	{
-		REQUIRE(opt.GetOr("fallback") == "fallback");
+		REQUIRE(opt.GetOr(CK_TEXT("fallback")) == CK_TEXT("fallback"));
 	}
 
 	SECTION("Not empty optional gives a value")
 	{
-		opt = Ck::Optional<std::string>::Of("foo");
-		REQUIRE(opt.GetOr("fallback") == "foo");
+		opt = Ck::Optional<Ck::String>::Of(CK_TEXT("foo"));
+		REQUIRE(opt.GetOr(CK_TEXT("fallback")) == CK_TEXT("foo"));
 	}
 }

@@ -25,12 +25,12 @@ namespace Ck
 				entry.Name = CK_TEXT("basic_mesh");
 				entry.RenderableType = RenderableType::Mesh;
 				entry.ShadingMode = Material::ShadingMode::Phong;
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = CK_TEXT("ck_VertexPosition");
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = CK_TEXT("ck_VertexTexCoord");
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = CK_TEXT("ck_VertexNormal");
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = CK_TEXT("ck_VertexColor");
-				entry.Interface.Textures[Material::TextureType::BaseColor] = { CK_TEXT("ck_MaterialBaseColor"), Renderer::StaticSampler::TrilinearWrap };
-				entry.Interface.Textures[Material::TextureType::Alpha] = { CK_TEXT("ck_MaterialAlpha"), Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+				entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
 
 				{
 					ByteArray basicMeshVertexStage = FileUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default.vert.spv"));

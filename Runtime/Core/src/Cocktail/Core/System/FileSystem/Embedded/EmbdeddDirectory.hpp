@@ -46,6 +46,7 @@ namespace Ck
 
 		cmrc::embedded_filesystem mFileSystem;
 		Path mPath;
+		Utf8String mUtf8Path;
 	};
 }
 
