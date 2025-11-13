@@ -37,7 +37,7 @@ namespace Ck::Main
 		application->RegisterServiceProvider<SystemServiceProvider>();
 
 		application->Boot();
-		  
+
 		CK_LOG(MainLogCategory, LogLevel::Info, CK_TEXT("Application has been booted"));
 #ifndef NDEBUG
 		if (waitedForDebugger)
