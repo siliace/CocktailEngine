@@ -8,23 +8,23 @@ namespace Ck
 	ConsoleLogChannel::ConsoleLogChannel(ConsoleService* console):
 		mConsole(console)
 	{
-		SetLevelColors(LogLevel::Debug, ConsoleColor::Black, ConsoleColor::White);
-		SetLevelColors(LogLevel::Info, ConsoleColor::Black, ConsoleColor::Blue);
-		SetLevelColors(LogLevel::Warning, ConsoleColor::Black, ConsoleColor::Yellow);
-		SetLevelColors(LogLevel::Error, ConsoleColor::Black, ConsoleColor::Red);
-		SetLevelColors(LogLevel::Critical, ConsoleColor::Red, ConsoleColor::White);
+		SetLevelColors(LogLevel::Debug, ConsoleColor::White, ConsoleColor::Transparent);
+		SetLevelColors(LogLevel::Info, ConsoleColor::Blue, ConsoleColor::Transparent);
+		SetLevelColors(LogLevel::Warning, ConsoleColor::Yellow, ConsoleColor::Transparent);
+		SetLevelColors(LogLevel::Error, ConsoleColor::Red, ConsoleColor::Transparent);
+		SetLevelColors(LogLevel::Critical, ConsoleColor::Red, ConsoleColor::Transparent, ConsoleStyle::Bold);
 	}
 
-	void ConsoleLogChannel::SetLevelColors(LogLevel level, ConsoleColor background, ConsoleColor foreground)
+	void ConsoleLogChannel::SetLevelColors(LogLevel level, ConsoleColor text, ConsoleColor background, ConsoleStyle style)
 	{
-		mColors[level] = std::make_pair(background, foreground);
+		mColors[level] = LevelColors{ text, background, style };
 	}
 
 	void ConsoleLogChannel::WriteEntry(const LogEntry& entry)
 	{
-		const auto& [background, foreground] = mColors[entry.Level];
+		const auto& [text, background, style] = mColors[entry.Level];
 
-		mConsole->SetColors(background, foreground);
+		mConsole->SetColors(text, background, style);
 		mConsole->WriteLine(String::Format(CK_TEXT("%s - %s"), entry.Category->GetName(), entry.Message));
 	}
 }

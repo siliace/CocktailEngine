@@ -55,10 +55,10 @@ namespace Ck::Detail::Win32
 
 		/**
 		 * \brief 
-		 * \param background 
-		 * \param foreground 
+		 * \param text
+		 * \param background
 		 */
-		void SetColors(ConsoleColor background, ConsoleColor foreground) override;
+		void SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle) override;
 
 		/**
 		 * \brief 

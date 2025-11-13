@@ -5,6 +5,7 @@
 #include <Cocktail/Core/IO/Input/Reader/Reader.hpp>
 #include <Cocktail/Core/IO/Output/Writer/Writer.hpp>
 #include <Cocktail/Core/System/Console/ConsoleColor.hpp>
+#include <Cocktail/Core/System/Console/ConsoleStyle.hpp>
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 
 namespace Ck
@@ -51,11 +52,15 @@ namespace Ck
 		virtual void Clear() = 0;
 
 		/**
-		 * \brief 
-		 * \param background 
-		 * \param foreground 
+		 * \brief Set colors and style used to print text in the system console
+		 *
+		 * Depending on the underlying implementation, some parameters might not be used by the system
+		 *
+		 * \param text The color of the text
+		 * \param background The color of the background
+		 * \param style The style of the text
 		 */
-		virtual void SetColors(ConsoleColor background, ConsoleColor foreground) = 0;
+		virtual void SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle style = ConsoleStyle::Normal) = 0;
 
 		/**
 		 * \brief 

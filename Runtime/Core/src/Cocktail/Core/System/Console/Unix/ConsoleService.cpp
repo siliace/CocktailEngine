@@ -5,92 +5,67 @@ namespace Ck::Detail::Unix
 	namespace
 	{
 		int ConsoleColorToTextAttribute(ConsoleColor color)
-        {
-            switch(color)
-            {
-                case ConsoleColor::Red:
-                    return 0;
-                case ConsoleColor::Blue:
-                    return 91;
-                case ConsoleColor::Cyan:
-                    return 96;
-                case ConsoleColor::Gray:
-                    return 37;
-                case ConsoleColor::Black:
-                    return 30;
-                case ConsoleColor::Green:
-                    return 92;
-                case ConsoleColor::White:
-                    return 39;
-                case ConsoleColor::Yellow:
-                    return 93;
-                case ConsoleColor::DarkRed:
-                    return 31;
-                case ConsoleColor::Magenta:
-                    return 95;
-                case ConsoleColor::DarkBlue:
-                    return 34;
-                case ConsoleColor::DarkCyan:
-                    return 36;
-                case ConsoleColor::DarkGray:
-                    return 90;
-                case ConsoleColor::DarkGreen:
-                    return 32;
-                case ConsoleColor::DarkYellow:
-                    return 33;
-                case ConsoleColor::DarkMagenta:
-                    return 35;
-            }
-
-            COCKTAIL_UNREACHABLE();
-		    return 0;
-        }
-
-        int ConsoleColorToBackgroundAttribute(ConsoleColor color)
-        {
-            switch(color)
-            {
-                case ConsoleColor::Red:
-                    return 101;
-                case ConsoleColor::Blue:
-                    return 104;
-                case ConsoleColor::Cyan:
-                    return 106;
-                case ConsoleColor::Gray:
-                    return 47;
-                case ConsoleColor::Black:
-                    return 49;
-                case ConsoleColor::Green:
-                    return 102;
-                case ConsoleColor::White:
-                    return 107;
-                case ConsoleColor::Yellow:
-                    return 103;
-                case ConsoleColor::DarkRed:
-                    return 41;
-                case ConsoleColor::Magenta:
-                    return 105;
-                case ConsoleColor::DarkBlue:
-                    return 44;
-                case ConsoleColor::DarkCyan:
-                    return 46;
-                case ConsoleColor::DarkGray:
-                    return 100;
-                case ConsoleColor::DarkGreen:
-                    return 42;
-                case ConsoleColor::DarkYellow:
-                    return 43;
-                case ConsoleColor::DarkMagenta:
-                    return 45;
-            }
-
-            COCKTAIL_UNREACHABLE();
-		    return 0;
-        }
-
-		String FormatConsoleStyle(unsigned int style, unsigned int color)
 		{
-			return String::Format(CK_TEXT("\033[%d;%dm"), style, color);
+			switch (color)
+			{
+			case ConsoleColor::Black:
+			case ConsoleColor::Red:
+			case ConsoleColor::Green:
+			case ConsoleColor::Yellow:
+			case ConsoleColor::Blue:
+			case ConsoleColor::Magenta:
+			case ConsoleColor::Cyan:
+			case ConsoleColor::White:
+				return static_cast<int>(color) + 30;
+
+			case ConsoleColor::BrightBlack:
+			case ConsoleColor::BrightRed:
+			case ConsoleColor::BrightGreen:
+			case ConsoleColor::BrightYellow:
+			case ConsoleColor::BrightBlue:
+			case ConsoleColor::BrightMagenta:
+			case ConsoleColor::BrightCyan:
+			case ConsoleColor::BrightWhite:
+				return 90 + (static_cast<int>(color) - 8);
+
+			case ConsoleColor::Transparent:
+				return 0;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return 0;
+		}
+
+		int ConsoleColorToBackgroundAttribute(ConsoleColor color)
+		{
+			switch (color)
+			{
+			case ConsoleColor::Black:
+			case ConsoleColor::Red:
+			case ConsoleColor::Green:
+			case ConsoleColor::Yellow:
+			case ConsoleColor::Blue:
+			case ConsoleColor::Magenta:
+			case ConsoleColor::Cyan:
+			case ConsoleColor::White:
+				return static_cast<int>(color) + 40;
+
+			case ConsoleColor::BrightBlack:
+			case ConsoleColor::BrightRed:
+			case ConsoleColor::BrightGreen:
+			case ConsoleColor::BrightYellow:
+			case ConsoleColor::BrightBlue:
+			case ConsoleColor::BrightMagenta:
+			case ConsoleColor::BrightCyan:
+			case ConsoleColor::BrightWhite:
+				return 100 + (static_cast<int>(color) - 8);
+
+			case ConsoleColor::Transparent:
+				return 0;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return 0;
 		}
 	}
 
@@ -164,10 +139,27 @@ namespace Ck::Detail::Unix
 		Write(ClearString);
 	}
 
-	void ConsoleService::SetColors(ConsoleColor background, ConsoleColor foreground)
+	void ConsoleService::SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle style)
 	{
-		Write(FormatConsoleStyle(1, ConsoleColorToTextAttribute(foreground)));
-		Write(FormatConsoleStyle(1, ConsoleColorToBackgroundAttribute(background)));
+		int styleCode = static_cast<int>(style);
+		int textCode = ConsoleColorToTextAttribute(text);
+		int backgroundCode = ConsoleColorToBackgroundAttribute(background);
+
+		if (text != ConsoleColor::Transparent)
+		{
+			if (background != ConsoleColor::Transparent)
+			{
+				Write(String::Format(CK_TEXT("\033[%d;%d;%dm"), styleCode, textCode, backgroundCode));
+			}
+			else
+			{
+				Write(String::Format(CK_TEXT("\033[%d;%dm"), styleCode, textCode));
+			}
+		}
+		else if (background != ConsoleColor::Transparent)
+		{
+			Write(String::Format(CK_TEXT("\033[%dm"), backgroundCode));
+		}
 	}
 
 	void ConsoleService::Beep() const

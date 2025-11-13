@@ -6,21 +6,22 @@ namespace Ck
 	enum class ConsoleColor
 	{
 		Black,
-		DarkGray,
-		DarkBlue,
-		DarkGreen,
-		DarkCyan,
-		DarkRed,
-		DarkMagenta,
-		DarkYellow,
-		Gray,
-		Blue,
-		Green,
-		Cyan,
 		Red,
-		Magenta,
+		Green,
 		Yellow,
-		White
+		Blue,
+		Magenta,
+		Cyan,
+		White,
+		BrightBlack,
+		BrightRed,
+		BrightGreen,
+		BrightYellow,
+		BrightBlue,
+		BrightMagenta,
+		BrightCyan,
+		BrightWhite,
+		Transparent,
 	};
 }
 

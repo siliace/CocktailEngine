@@ -42,9 +42,9 @@ namespace Ck
 		ResolveFacadeInstance()->Clear();
 	}
 
-	void Console::SetColors(ConsoleColor background, ConsoleColor foreground)
+	void Console::SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle style)
 	{
-		ResolveFacadeInstance()->SetColors(background, foreground);
+		ResolveFacadeInstance()->SetColors(text, background, style);
 	}
 
 	void Console::Beep()

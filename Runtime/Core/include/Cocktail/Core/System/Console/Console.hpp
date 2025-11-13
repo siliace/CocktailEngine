@@ -42,11 +42,15 @@ namespace Ck
 		static void Clear();
 
 		/**
-		 * \brief 
-		 * \param background 
-		 * \param foreground 
+		 * \brief Set colors and style used to print text in the system console
+		 *
+		 * Depending on the underlying implementation, some parameters might not be used by the system
+		 *
+		 * \param text The color of the text
+		 * \param background The color of the background
+		 * \param style The style of the text
 		 */
-		static void SetColors(ConsoleColor background, ConsoleColor foreground);
+		static void SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle style);
 
 		/**
 		 * \brief

@@ -335,6 +335,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Console/Console.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Console/ConsoleColor.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Console/ConsoleService.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Console/ConsoleStyle.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Console/Console.cpp
 )

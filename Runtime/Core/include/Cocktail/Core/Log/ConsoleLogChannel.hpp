@@ -23,12 +23,14 @@ namespace Ck
 		explicit ConsoleLogChannel(ConsoleService* console);
 
 		/**
-		 * \brief 
-		 * \param level 
-		 * \param background 
-		 * \param foreground 
+		 * \brief Configure the colors and style of log entries written into the console
+		 *
+		 * \param level The LogLevel to configure
+		 * \param text The color of the text
+		 * \param background The color of the background
+		 * \param style The style of the text
 		 */
-		void SetLevelColors(LogLevel level, ConsoleColor background, ConsoleColor foreground);
+		void SetLevelColors(LogLevel level, ConsoleColor text, ConsoleColor background, ConsoleStyle style = ConsoleStyle::Normal);
 
 	protected:
 
@@ -40,8 +42,15 @@ namespace Ck
 
 	private:
 
+		struct LevelColors
+		{
+			ConsoleColor Text;
+			ConsoleColor Background;
+			ConsoleStyle Style;
+		};
+
 		ConsoleService* mConsole;
-		EnumMap<LogLevel, std::pair<ConsoleColor, ConsoleColor>> mColors;
+		EnumMap<LogLevel, LevelColors> mColors;
 	};
 }
 
