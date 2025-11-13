@@ -4,7 +4,7 @@ namespace Ck
 {
 	bool LogCategory::IsSuppressed(LogLevel level) const
 	{
-		return Enum<LogLevel>::UnderlyingCast(level) > Enum<LogLevel>::UnderlyingCast(mLogLevel);
+		return Enum<LogLevel>::UnderlyingCast(level) < Enum<LogLevel>::UnderlyingCast(mLogLevel);
 	}
 
 	const String& LogCategory::GetName() const
