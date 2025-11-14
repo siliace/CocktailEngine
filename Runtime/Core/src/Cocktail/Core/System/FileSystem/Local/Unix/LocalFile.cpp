@@ -11,7 +11,7 @@ namespace Ck::Detail::Unix
 		mPath(path)
 	{
 		int sysFlags = 0;
-		if (flags & (FileOpenFlagBits::Read | FileOpenFlagBits::Write))
+		if (flags & FileOpenFlagBits::Read && flags & FileOpenFlagBits::Write)
 		{
 			sysFlags |= O_RDWR;
 		}
@@ -26,6 +26,9 @@ namespace Ck::Detail::Unix
 
 		if (flags & FileOpenFlagBits::Write && flags & FileOpenFlagBits::Truncate)
 			sysFlags |= O_TRUNC;
+
+		if (flags & FileOpenFlagBits::Write && flags & FileOpenFlagBits::Append)
+			sysFlags |= O_APPEND;
 
 		mHandle = ::open64(reinterpret_cast<const AnsiChar*>(path.ToString().GetData()), sysFlags, S_IRWXU);
 		if (mHandle == -1)

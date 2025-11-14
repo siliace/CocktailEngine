@@ -43,7 +43,7 @@ namespace Ck
 		/**
 		 * \brief Forbid other processes to write the file while it's still opened
 		 */
-		Locked = Bit(5),
+		Locked = Bit(6),
 	};
 
 	using FileOpenFlags = Flags<FileOpenFlagBits>;
