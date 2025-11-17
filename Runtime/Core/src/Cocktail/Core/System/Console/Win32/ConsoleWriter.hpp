@@ -9,7 +9,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class ConsoleWriter : public Writer
+	class ConsoleWriter : public Writer<>
 	{
 	public:
 
@@ -36,18 +36,12 @@ namespace Ck::Detail::Win32
 		 * \param string 
 		 * \param length 
 		 */
-		void Write(const TextChar* string, std::size_t length) override;
+		void Write(const TextChar* string, SizeType length) override;
 
 		/**
 		 * \brief 
 		 */
 		void Flush() override;
-
-		/**
-		 * \brief
-		 * \return
-		 */
-		EncodingMode GetEncodingMode() override;
 
 	private:
 

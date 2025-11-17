@@ -31,7 +31,7 @@ namespace Ck
 		Truncate = Bit(3),
 
 		/**
-		 * \brief Fail to open the file it it does not exists even combined with Write
+		 * \brief Fail to open the file it does not exist even combined with Write
 		 */
 		Existing = Bit(4),
 

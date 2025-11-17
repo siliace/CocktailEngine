@@ -46,7 +46,7 @@ namespace Ck
 		 * \param outputStream Output stream to write serialized data into.
 	     * \param parameters Export parameters used to configure the export
 		 */
-		virtual void SaveToStream(const T& asset, OutputStream& outputStream, const P& parameters = {}) const = 0;
+		virtual void SaveToStream(const T& asset, OutputStream<>& outputStream, const P& parameters = {}) const = 0;
 
 		/**
 		 * \brief Serializes an asset into a byte array in memory

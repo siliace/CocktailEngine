@@ -1,12 +1,12 @@
 #include <Cocktail/Core/Log/ConsoleLogChannel.hpp>
 #include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
 	ConsoleLogChannel::ConsoleLogChannel(ConsoleService* console):
-		mConsole(console)
+		mConsole(console),
+        mLineWriter(console->GetOutput())
 	{
 		SetLevelColors(LogLevel::Debug, ConsoleColor::White, ConsoleColor::Transparent);
 		SetLevelColors(LogLevel::Info, ConsoleColor::Blue, ConsoleColor::Transparent);
@@ -25,6 +25,6 @@ namespace Ck
 		const auto& [text, background, style] = mColors[entry.Level];
 
 		mConsole->SetColors(text, background, style);
-		mConsole->WriteLine(String::Format(CK_TEXT("%s - %s"), entry.Category->GetName(), entry.Message));
+		mLineWriter.PrintLine(CK_TEXT("%s - %s"), entry.Category->GetName(), entry.Message);
 	}
 }

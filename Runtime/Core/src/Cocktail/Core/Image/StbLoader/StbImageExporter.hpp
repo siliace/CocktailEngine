@@ -27,7 +27,7 @@ namespace Ck
 		 * \param outputStream 
 		 * \param parameters 
 		 */
-		void SaveToStream(const Image& asset, OutputStream& outputStream, const ImageExportParameters& parameters) const override;
+		void SaveToStream(const Image& asset, OutputStream<>& outputStream, const ImageExportParameters& parameters) const override;
 
 		/**
 		 * \brief 

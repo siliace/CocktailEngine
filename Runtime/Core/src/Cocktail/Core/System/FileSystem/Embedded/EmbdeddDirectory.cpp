@@ -1,5 +1,4 @@
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectory.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {

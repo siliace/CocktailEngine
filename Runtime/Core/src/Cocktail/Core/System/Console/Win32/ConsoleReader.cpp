@@ -10,7 +10,7 @@ namespace Ck::Detail::Win32
 		return Read(&c, 1) == 1;
 	}
 
-	std::size_t ConsoleReader::Read(TextChar* buffer, std::size_t length)
+	ConsoleReader::SizeType ConsoleReader::Read(TextChar* buffer, SizeType length)
 	{
 		DWORD read;
 		HANDLE handle = GetStdHandle(STD_INPUT_HANDLE);
@@ -41,7 +41,7 @@ namespace Ck::Detail::Win32
 		throw NotImplementedException();
 	}
 
-	std::size_t ConsoleReader::GetSize() const
+	ConsoleReader::SizeType ConsoleReader::GetSize() const
 	{
 		throw NotImplementedException();
 	}
@@ -49,10 +49,5 @@ namespace Ck::Detail::Win32
 	bool ConsoleReader::IsEof() const
 	{
 		throw NotImplementedException();
-	}
-
-	EncodingMode ConsoleReader::GetEncodingMode() const
-	{
-		return EncodingMode::Utf16LittleEndian;
 	}
 }

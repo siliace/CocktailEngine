@@ -1,5 +1,4 @@
 #include <Cocktail/Core/System/Window/Xlib/AtomManager.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck::Detail::Xlib
 {

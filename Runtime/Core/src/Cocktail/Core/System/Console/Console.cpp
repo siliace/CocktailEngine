@@ -2,37 +2,17 @@
 
 namespace Ck
 {
-	void Console::Write(const String& text)
-	{
-		ResolveFacadeInstance()->Write(text);
-	}
-
-	void Console::WriteLine(const String& text)
-	{ 
-		ResolveFacadeInstance()->Write(text);
-	}
-
-	void Console::Write(StringView text)
-	{ 
-		ResolveFacadeInstance()->Write(text);
-	}
-
-	void Console::WriteLine(StringView text)
-	{
-		ResolveFacadeInstance()->Write(text);
-	}
-
-	Writer& Console::GetOutput()
+	Writer<>& Console::GetOutput()
 	{
 		return ResolveFacadeInstance()->GetOutput();
 	}
 
-	Writer& Console::GetError()
+	Writer<>& Console::GetError()
 	{
 		return ResolveFacadeInstance()->GetError();
 	}
 
-	Reader& Console::GetInput()
+	Reader<>& Console::GetInput()
 	{
 		return ResolveFacadeInstance()->GetInput();
 	}

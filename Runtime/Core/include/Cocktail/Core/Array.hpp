@@ -500,7 +500,7 @@ namespace Ck
          */
         Optional<E&> TryFirst()
         {
-            if (mSize == 0)
+            if (IsEmpty())
                 return Optional<E&>::Empty();
 
             return Optional<E&>::Of(At(0));
@@ -512,7 +512,7 @@ namespace Ck
          */
         Optional<const E&> TryFirst() const
         {
-            if (mSize == 0)
+            if (IsEmpty())
                 return Optional<const E&>::Empty();
 
             return Optional<const E&>::Of(At(0));
@@ -550,7 +550,7 @@ namespace Ck
          */
         Optional<E&> TryLast()
         {
-            if (mSize == 0)
+            if (IsEmpty())
                 return Optional<E&>::Empty();
 
             return Optional<E&>::Of(At(mSize - 1));
@@ -562,7 +562,7 @@ namespace Ck
          */
         Optional<const E&> TryLast() const
         {
-            if (mSize == 0)
+            if (IsEmpty())
                 return Optional<const E&>::Empty();
 
             return Optional<const E&>::Of(At(mSize - 1));

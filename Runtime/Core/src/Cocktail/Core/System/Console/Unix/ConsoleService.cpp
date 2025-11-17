@@ -1,3 +1,4 @@
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleService.hpp>
 
 namespace Ck::Detail::Unix
@@ -76,59 +77,17 @@ namespace Ck::Detail::Unix
         /// Nothing
 	}
 
-    void ConsoleService::Write(const String& text)
-	{
-	    GetOutput().Write(text.GetData(), text.GetLength());
-	}
-
-    void ConsoleService::WriteLine(const String& text)
-	{
-	    static const StringView EndLine = CK_TEXT("\n");
-	    if (text.EndsWith(EndLine))
-	    {
-	        Write(text);
-	    }
-	    else
-	    {
-	        String line = text;
-	        line.Append(EndLine);
-
-	        return Write(line);
-	    }
-	}
-
-    void ConsoleService::Write(StringView text)
-	{
-	    GetOutput().Write(text.GetData(), text.GetLength());
-	}
-
-    void ConsoleService::WriteLine(StringView text)
-	{
-	    static const StringView EndLine = CK_TEXT("\n");
-	    if (text.EndsWith(EndLine))
-	    {
-	        Write(text);
-	    }
-	    else
-	    {
-	        String line = String::FromView(text);
-	        line.Append(EndLine);
-
-	        return Write(line);
-	    }
-	}
-
-    Writer& ConsoleService::GetOutput()
+    Writer<>& ConsoleService::GetOutput()
 	{
 		return mOutput;
 	}
 
-	Writer& ConsoleService::GetError()
+	Writer<>& ConsoleService::GetError()
 	{
 		return mError;
 	}
 
-	Reader& ConsoleService::GetInput()
+	Reader<>& ConsoleService::GetInput()
 	{
 		return mInput;
 	}
@@ -136,7 +95,7 @@ namespace Ck::Detail::Unix
 	void ConsoleService::Clear()
 	{
 		static const StringView ClearString = CK_TEXT("\e[1;1H\e[2J");
-		Write(ClearString);
+	    GetOutput().Write(ClearString.GetData(), ClearString.GetLength());
 	}
 
 	void ConsoleService::SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle style)
@@ -145,21 +104,24 @@ namespace Ck::Detail::Unix
 		int textCode = ConsoleColorToTextAttribute(text);
 		int backgroundCode = ConsoleColorToBackgroundAttribute(background);
 
+	    String colorString;
 		if (text != ConsoleColor::Transparent)
 		{
 			if (background != ConsoleColor::Transparent)
 			{
-				Write(String::Format(CK_TEXT("\033[%d;%d;%dm"), styleCode, textCode, backgroundCode));
+				colorString = String::Format(CK_TEXT("\033[%d;%d;%dm"), styleCode, textCode, backgroundCode);
 			}
 			else
 			{
-				Write(String::Format(CK_TEXT("\033[%d;%dm"), styleCode, textCode));
+				colorString = String::Format(CK_TEXT("\033[%d;%dm"), styleCode, textCode);
 			}
 		}
 		else if (background != ConsoleColor::Transparent)
 		{
-			Write(String::Format(CK_TEXT("\033[%dm"), backgroundCode));
+			colorString = String::Format(CK_TEXT("\033[%dm"), backgroundCode);
 		}
+
+	    GetOutput().Write(colorString.GetData(), colorString.GetLength());
 	}
 
 	void ConsoleService::Beep() const

@@ -24,29 +24,23 @@ namespace Ck::Detail::Win32
 		 */
 		~ConsoleService() override;
 
-		void Write(const String& text) override;
-		void WriteLine(const String& text) override;
-
-		void Write(StringView text) override;
-		void WriteLine(StringView text) override;
-
-		/**
+	    /**
 		 * \brief 
 		 * \return 
 		 */
-		Writer& GetOutput() override;
+		Writer<>& GetOutput() override;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Writer& GetError() override;
+		Writer<>& GetError() override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Reader& GetInput() override;
+		Reader<>& GetInput() override;
 
 		/**
 		 * \brief 
@@ -74,7 +68,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		WORD mIntialAttributes;
+		WORD mInitialAttributes;
 		ConsoleWriter mOutput;
 		ConsoleWriter mError;
 		ConsoleReader mInput;

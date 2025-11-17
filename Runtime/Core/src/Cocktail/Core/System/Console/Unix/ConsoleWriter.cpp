@@ -2,7 +2,6 @@
 
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleWriter.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck::Detail::Unix
 {
@@ -22,20 +21,15 @@ namespace Ck::Detail::Unix
 		/// Nothing
 	}
 
-	void ConsoleWriter::Write(const TextChar* string, std::size_t length)
+	void ConsoleWriter::Write(const CharType* text, SizeType length)
 	{
-		int err = ::write(mHandle, string, length);
+		int err = ::write(mHandle, text, length * sizeof(CharType));
 		if (err == -1)
 			throw SystemError::GetLastError();
 	}
 
 	void ConsoleWriter::Flush()
 	{
-		fflush(stdout);
-	}
-
-	EncodingMode ConsoleWriter::GetEncodingMode()
-	{
-		return EncodingMode::Utf8;
+		fflush(mHandle == STDERR_FILENO ? stderr : stdout);
 	}
 }

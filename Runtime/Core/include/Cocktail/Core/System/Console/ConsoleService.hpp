@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_CONSOLE_CONSOLESERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_CONSOLE_CONSOLESERVICE_HPP
 
-#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/IO/Input/Reader/Reader.hpp>
 #include <Cocktail/Core/IO/Output/Writer/Writer.hpp>
 #include <Cocktail/Core/System/Console/ConsoleColor.hpp>
@@ -22,29 +21,23 @@ namespace Ck
 		 */
 		virtual ~ConsoleService() = default;
 
-		virtual void Write(const String& text) = 0;
-		virtual void WriteLine(const String& text) = 0;
-
-		virtual void Write(StringView text) = 0;
-		virtual void WriteLine(StringView text) = 0;
-
 		/**
 		 * \brief
 		 * \return 
 		 */
-		virtual Writer& GetOutput() = 0;
+		virtual Writer<>& GetOutput() = 0;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		virtual Writer& GetError() = 0;
+		virtual Writer<>& GetError() = 0;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual Reader& GetInput() = 0;
+		virtual Reader<>& GetInput() = 0;
 
 		/**
 		 * \brief 

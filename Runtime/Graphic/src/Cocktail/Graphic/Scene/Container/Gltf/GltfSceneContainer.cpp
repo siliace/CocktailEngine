@@ -1,5 +1,3 @@
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
-
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfSceneContainer.hpp>
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfUtils.hpp>
 
@@ -41,7 +39,7 @@ namespace Ck
 		{
 			CameraInfo& cameraInfo = mCameras.Emplace();
 
-			cameraInfo.Name = String::ConvertFrom<AsciiEncoder>(gltfCamera.name.c_str());
+			cameraInfo.Name = String::ConvertFrom<Encoders::Ascii>(gltfCamera.name.c_str());
 			cameraInfo.IsPerspective = gltfCamera.type == "perspective";
 			if (cameraInfo.IsPerspective)
 			{

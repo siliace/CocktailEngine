@@ -12,7 +12,7 @@ namespace Ck
 
 		for (VertexAttributeSemantic vertexAttribute : Enum<VertexAttributeSemantic>::Values)
 		{
-			const AnsiString& vertexAttributeName = interface.VertexAttributes[vertexAttribute];
+			const AsciiString& vertexAttributeName = interface.VertexAttributes[vertexAttribute];
 			if (vertexAttributeName.IsEmpty())
 				continue;
 
@@ -21,7 +21,7 @@ namespace Ck
 
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-			const AnsiString& textureSlotName = interface.Textures[textureType].Name;
+			const AsciiString& textureSlotName = interface.Textures[textureType].Name;
 			if (textureSlotName.IsEmpty())
 				continue;
 

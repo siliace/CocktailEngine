@@ -97,7 +97,7 @@ namespace Ck
 		 *
 		 * \return A shared pointer to the loaded asset, or nullptr on failure.
 		 */
-		std::shared_ptr<T> LoadFromStream(InputStream& inputStream, const ImportParam& parameters = {}) const
+		std::shared_ptr<T> LoadFromStream(InputStream<>& inputStream, const ImportParam& parameters = {}) const
 		{
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
 			{
@@ -124,7 +124,7 @@ namespace Ck
 		 * \param outputStream Output stream to write serialized data to
 		 * \param parameters Export parameters used to configure the export
 		 */
-		void SaveToStream(const T& asset, OutputStream& outputStream, const ExportParam& parameters = {}) const
+		void SaveToStream(const T& asset, OutputStream<>& outputStream, const ExportParam& parameters = {}) const
 		{
 			for (AssetExporter<T, ExportParam>* exporter : mExporters)
 			{
@@ -145,7 +145,7 @@ namespace Ck
 		 *
 		 * \return A shared pointer to the loaded asset, or nullptr on failure
 		 */
-		std::shared_ptr<T> LoadFromMemory(const void* buffer, std::size_t length, const ImportParam& parameters = {}) const
+		std::shared_ptr<T> LoadFromMemory(const Byte* buffer, std::size_t length, const ImportParam& parameters = {}) const
 		{
 			for (AssetImporter<T, ImportParam>* importer : mImporters)
 			{

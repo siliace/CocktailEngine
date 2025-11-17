@@ -2,8 +2,8 @@
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
+#include <Cocktail/Core/IO/Output/Writer/StringWriter.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfImporter.hpp>
 #include <Cocktail/Graphic/Scene/Container/Gltf/GltfSceneContainer.hpp>
@@ -90,10 +90,10 @@ namespace Ck
 
         CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
 
-        AnsiString p = AnsiString::Convert(path.ToString());
+        AsciiString p = AsciiString::Convert(path.ToString());
         bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, p.GetData());
         if (!success)
-            throw GltfParseError(String::ConvertFrom<AsciiEncoder>(errors.c_str()));
+            throw GltfParseError(String::ConvertFrom<Encoders::Ascii>(errors.c_str()));
 
         if (!warnings.empty())
             CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %hs"), path.ToString(), warnings.c_str());
@@ -101,20 +101,25 @@ namespace Ck
         return std::make_shared<GltfSceneContainer>(model);
     }
 
-    std::shared_ptr<SceneContainer> GltfImporter::LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters)
+    std::shared_ptr<SceneContainer> GltfImporter::LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
 
-        InputStreamReader InputStreamReader(inputStream);
-        BufferedReader reader(InputStreamReader);
-        
-        AnsiString buffer = AnsiString::Convert(reader.ReadAll());
+        InputStreamReader<Encoders::Utf8> inputStreamReader(inputStream);
+        BufferedReader reader(inputStreamReader);
+
+        StringWriter<Encoders::Utf8> stringWriter;
+        reader.TransferTo(stringWriter);
+        Utf8String gltfContent = stringWriter.ToString();
+
+        Utf8String baseDirectory = Utf8String::Convert(parameters.BaseDirectory.ToString());
+
         bool success = mLoader.LoadASCIIFromString(
             &model,
             &errors, &warnings,
-            buffer.GetData(), buffer.GetLength(),
-            AnsiString::Convert(parameters.BaseDirectory.ToString()).GetData()
+            reinterpret_cast<const AnsiChar*>(gltfContent.GetData()), gltfContent.GetLength(),
+            reinterpret_cast<const AnsiChar*>(baseDirectory.GetData())
         );
 
         if (!success)

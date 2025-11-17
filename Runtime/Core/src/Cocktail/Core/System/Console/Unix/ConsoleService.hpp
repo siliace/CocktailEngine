@@ -19,29 +19,23 @@ namespace Ck::Detail::Unix
 		 */
 		ConsoleService();
 
-		void Write(const String& text) override;
-		void WriteLine(const String& text) override;
-		void Write(StringView text) override;
-		void WriteLine(StringView text) override;
-
-
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Writer& GetOutput() override;
+		Writer<>& GetOutput() override;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		Writer& GetError() override;
+		Writer<>& GetError() override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		Reader& GetInput() override;
+		Reader<>& GetInput() override;
 
 		/**
 		 * \brief 

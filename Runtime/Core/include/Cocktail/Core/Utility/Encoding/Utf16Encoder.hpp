@@ -102,23 +102,26 @@ namespace Ck
          * If the sequence is invalid, the function returns 0.
          *
          * \param in Pointer to the UTF-16 sequence to decode
+         * \param length The length of data available inside of \p in
          * \param out Reference to a UTF-32 variable to store the decoded code point
          *
          * \return The number of bytes read from \p in, or 0 if decoding failed
          */
-        static SizeType Decode(const CharType* in, Utf32Char& out)
+        static SizeType Decode(const CharType* in, SizeType length, Utf32Char& out)
         {
+            if (length < 1)
+                return 0;
+
             CharType w1 = in[0];
             if (w1 >= 0xDC00 && w1 <= 0xDFFF)
                 return 0;
 
             if (w1 >= 0xD800 && w1 <= 0xDBFF)
             {
-                CharType w2 = in[1];
-                if (w2 < 0xDC00 || w2 > 0xDFFF)
+                if (length < 2 || in[1] < 0xDC00 || in[1] > 0xDFFF)
                     return 0;
 
-                out = (static_cast<Utf32Char>(w1 - 0xD800) << 10) + (w2 - 0xDC00) + 0x10000;
+                out = (static_cast<Utf32Char>(w1 - 0xD800) << 10) + (in[1] - 0xDC00) + 0x10000;
                 return 2;
             }
 

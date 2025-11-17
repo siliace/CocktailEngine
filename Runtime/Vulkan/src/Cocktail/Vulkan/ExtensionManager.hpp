@@ -132,7 +132,7 @@ namespace Ck::Vulkan
 
 		Array<const AnsiChar*> mInstanceExtensions;
 		Array<const AnsiChar*> mDeviceExtensions;
-		Array<AnsiString> mDisabledExtensions;
+		Array<AsciiString> mDisabledExtensions;
 	};
 }
 

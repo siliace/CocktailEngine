@@ -1,26 +1,27 @@
 #ifndef COCKTAIL_CORE_IO_OUTPUT_WRITER_FILEWRITER_HPP
 #define COCKTAIL_CORE_IO_OUTPUT_WRITER_FILEWRITER_HPP
 
-#include <Cocktail/Core/Export.hpp>
-#include <Cocktail/Core/IO/Output/Writer/Writer.hpp>
+#include <Cocktail/Core/IO/Output/Stream/FileOutputStream.hpp>
+#include <Cocktail/Core/IO/Output/Writer/OutputStreamWriter.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 
 namespace Ck
 {
-    class COCKTAIL_CORE_API FileWriter : public Writer
+    template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+    class FileWriter : public OutputStreamWriter<TEncoding>
     {
     public:
 
-        FileWriter(File& file, EncodingMode encodingMode);
-
-        void Write(const TextChar* text, std::size_t length) override;
-
-        void Flush() override;
+        explicit FileWriter(File& file) :
+            mFileOutputStream(file),
+            OutputStreamWriter<TEncoding>(mFileOutputStream)
+        {
+            /// Nothing
+        }
 
     private:
 
-        File* mFile;
-        EncodingMode mEncodingMode;
+        FileOutputStream<TAllocator> mFileOutputStream;
     };
 }
 

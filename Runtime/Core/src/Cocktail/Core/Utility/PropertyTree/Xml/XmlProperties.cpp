@@ -2,9 +2,12 @@
 
 #include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
+#include <Cocktail/Core/Utility/Encoding/Encoders.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/Xml/XmlCDataNode.hpp>
 #include <Cocktail/Core/Utility/PropertyTree/Xml/XmlProperties.hpp>
+
+#include "Cocktail/Core/IO/Input/Reader/BufferedReader.hpp"
+#include "Cocktail/Core/IO/Input/Reader/FileReader.hpp"
 
 namespace Ck
 {
@@ -91,10 +94,10 @@ namespace Ck
 	XmlProperties::XmlProperties(const Path& path)
 	{
 		tinyxml2::XMLDocument document;
-		String xml = FileUtils::ReadFile(path).ToString();
+		ByteArray content = FileUtils::ReadFile(path);
+		Utf8String xml = Encoders::GetString<Encoders::Utf8, Utf8String>(content);
 
-		Utf8String xmlContent = Utf8String::Convert(xml);
-		tinyxml2::XMLError error = document.Parse(reinterpret_cast<const AnsiChar*>(xmlContent.GetData()), xml.GetLength());
+		tinyxml2::XMLError error = document.Parse(reinterpret_cast<const AnsiChar*>(xml.GetData()), xml.GetLength());
 		if (error != tinyxml2::XML_SUCCESS)
 			throw std::runtime_error(document.ErrorStr());
 

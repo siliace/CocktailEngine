@@ -40,7 +40,7 @@ namespace Ck::Renderer
          * \brief
          * \return
          */
-        virtual const AnsiString& GetName() const = 0;
+        virtual const AsciiString& GetName() const = 0;
     };
 }
 

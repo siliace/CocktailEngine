@@ -29,7 +29,7 @@ namespace Ck::Renderer
 		 * \brief 
 		 * \return 
 		 */
-		virtual const AnsiString& GetName() const = 0;
+		virtual const AsciiString& GetName() const = 0;
 
 		/**
 		 * \brief 
@@ -139,7 +139,7 @@ namespace Ck::Renderer
 		 * \brief Get the name of the descriptor in the shader code
 		 * \return The name of the uniform if found in the stage
 		 */
-		virtual const AnsiString& GetName() const = 0;
+		virtual const AsciiString& GetName() const = 0;
 	};
 }
 

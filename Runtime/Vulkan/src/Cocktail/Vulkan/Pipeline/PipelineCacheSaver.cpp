@@ -32,7 +32,7 @@ namespace Ck::Vulkan
 		{
 			PipelineCacheHeader cacheHeader;
 			MemoryInputStream inputStream(pipelineBinaryCache.GetData(), pipelineBinaryCache.GetSize());
-			inputStream.Read(&cacheHeader, sizeof(PipelineCacheHeader));
+			inputStream.Read(reinterpret_cast<Byte*>(&cacheHeader), sizeof(PipelineCacheHeader));
 
 			if (cacheHeader.Length == sizeof(PipelineCacheHeader) && cacheHeader.Version == VK_PIPELINE_CACHE_HEADER_VERSION_ONE)
 			{

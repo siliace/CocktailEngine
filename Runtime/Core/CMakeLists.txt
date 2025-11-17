@@ -79,51 +79,57 @@ cocktail_source_directory(CORE_FILES
 )
 
 cocktail_source_directory(CORE_FILES
-    FOLDER "IO"
+    FOLDER "IO/Input"
     INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/EncodingMode.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/InputAccumulator.hpp
 )
 
 cocktail_source_directory(CORE_FILES    
     FOLDER "IO/Input/Reader"
     INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/Reader.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/BufferedReader.hpp
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Input/Reader/InputStreamReader.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Input/Reader/BufferedReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/FileReader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/LineReader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/Reader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/StringReader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Reader/TranscodingReader.hpp
 )
 
 cocktail_source_directory(CORE_FILES    
     FOLDER "IO/Input/Stream"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Stream/BufferedInputStream.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Stream/FileInputStream.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Stream/InputStream.hpp
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Input/Stream/FileInputStream.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Input/Stream/MemoryInputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp
+)
+
+cocktail_source_directory(CORE_FILES
+    FOLDER "IO/Output"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/OutputAccumulator.hpp
 )
 
 cocktail_source_directory(CORE_FILES    
     FOLDER "IO/Output/Stream"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Stream/BufferedOutputStream.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Stream/FileOutputStream.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Stream/MemoryOutputStream.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Stream/OutputStream.hpp
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Output/Stream/FileOutputStream.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Output/Stream/MemoryOutputStream.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
     FOLDER "IO/Output/Writer"
     INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/Writer.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/BufferedWriter.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/FileWriter.hpp
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/IO/Output/Writer/FileWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/LineWriter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/OutputStreamWriter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/StringWriter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/TranscodingWriter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/IO/Output/Writer/Writer.hpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -704,7 +710,6 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ObjectPool.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Optional.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ParameterPack.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringConvertion.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringFormater.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/TranslatorCast.hpp
@@ -715,13 +720,13 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ExceptionUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/StringConvertion.cpp
 )
 
 cocktail_source_directory(CORE_FILES
     FOLDER "Utility/Encoding"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/AsciiEncoder.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Encoders.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf8Encoder.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf16Encoder.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Encoding/Utf32Encoder.hpp

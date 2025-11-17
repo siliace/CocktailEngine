@@ -4,7 +4,6 @@
 #include <cstring>
 #include <memory>
 
-#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Utility/ByteArrayView.hpp>
 
 namespace Ck
@@ -158,13 +157,6 @@ namespace Ck
          * \return True if empty, false otherwise
          */
         bool IsEmpty() const;
-
-	    /**
-         * \brief 
-         * \tparam Char 
-         * \return 
-         */
-        String ToString() const;
 
         std::size_t GetSize() const;
         Uint8* GetData();

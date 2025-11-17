@@ -1,3 +1,5 @@
+#include <system_error>
+
 #include <Cocktail/Core/System/Joystick/Win32/Joystick.hpp>
 #include <Cocktail/Core/System/Window/Window.hpp>
 

@@ -59,7 +59,7 @@ namespace Ck
 		 * \param shadingMode
 		 * \param doubleSided 
 		 */
-		Material(AnsiString name, ShadingMode shadingMode, bool doubleSided = false);
+		Material(AsciiString name, ShadingMode shadingMode, bool doubleSided = false);
 
 		/**
 		 * \brief
@@ -103,7 +103,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const AnsiString& GetName() const;
+		const AsciiString& GetName() const;
 
 		/**
 		 * \brief 
@@ -131,7 +131,7 @@ namespace Ck
 
 	private:
 
-		AnsiString mName;
+		AsciiString mName;
 		ShadingMode mShadingMode;
 		UniformColors mUniformColors;
 		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;

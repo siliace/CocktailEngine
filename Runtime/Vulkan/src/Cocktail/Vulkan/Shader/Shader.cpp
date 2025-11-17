@@ -1,7 +1,5 @@
 #include <spirv_reflect.h>
 
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
-
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Shader/Shader.hpp>
@@ -109,7 +107,7 @@ namespace Ck::Vulkan
 		std::unique_ptr<VertexAttributeLocation> ReflectInterfaceVariable(const SpvReflectInterfaceVariable* reflectInterfaceVariable)
 		{
 			unsigned int location = reflectInterfaceVariable->location;
-			AnsiString name = reflectInterfaceVariable->name;
+			AsciiString name = reflectInterfaceVariable->name;
 			unsigned int elementCount = ReflectElementCount(reflectInterfaceVariable->numeric);
 
 			return std::make_unique<VertexAttributeLocation>(location, GetReflectFormatDataType(reflectInterfaceVariable->format), elementCount, std::move(name));

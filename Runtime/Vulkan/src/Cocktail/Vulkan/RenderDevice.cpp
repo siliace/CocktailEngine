@@ -34,8 +34,6 @@
 #include <Cocktail/Vulkan/Texture/Texture.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
-#include "Cocktail/Core/Utility/StringConvertion.hpp"
-
 namespace Ck::Vulkan
 {
 	RenderDevice::RenderDevice(const RenderDeviceCreateInfo& createInfo) :

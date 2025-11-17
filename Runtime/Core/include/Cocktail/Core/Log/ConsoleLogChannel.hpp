@@ -6,6 +6,8 @@
 #include <Cocktail/Core/System/Console/Console.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
+#include "Cocktail/Core/IO/Output/Writer/LineWriter.hpp"
+
 namespace Ck
 {
 
@@ -50,6 +52,7 @@ namespace Ck
 		};
 
 		ConsoleService* mConsole;
+	    LineWriter<> mLineWriter;
 		EnumMap<LogLevel, LevelColors> mColors;
 	};
 }

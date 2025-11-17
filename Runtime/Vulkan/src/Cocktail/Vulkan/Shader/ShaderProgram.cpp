@@ -208,7 +208,7 @@ namespace Ck::Vulkan
 			for (const DescriptorSetLayoutBinding& binding : descriptorSetLayout->GetBindings())
 			{
 				// Get name of the uniform, keep the first one found.
-				AnsiString name;
+				AsciiString name;
 				Array<BlockMember> members;
 				for (Renderer::ShaderType type : Enum<Renderer::ShaderType>::Values)
 				{

@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include <Cocktail/Core/IO/Input/Stream/BufferedInputStream.hpp>
 #include <Cocktail/Core/IO/Input/Stream/FileInputStream.hpp>
 #include <Cocktail/Core/IO/Input/Stream/MemoryInputStream.hpp>
 #include <Cocktail/Core/System/FileSystem/Storage.hpp>
@@ -44,8 +45,9 @@ namespace Ck
 		{
 			std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read);
 			FileInputStream inputStream(*file);
+			BufferedInputStream bufferedInputStream(inputStream);
 
-			return LoadFromStream(inputStream, parameters);
+			return LoadFromStream(bufferedInputStream, parameters);
 		}
 
 		/**
@@ -59,7 +61,7 @@ namespace Ck
 		 *
 		 * \return A shared pointer to the loaded asset, or nullptr on failure
 		 */
-		virtual std::shared_ptr<T> LoadFromStream(InputStream& inputStream, const P& parameters = {}) = 0;
+		virtual std::shared_ptr<T> LoadFromStream(InputStream<>& inputStream, const P& parameters = {}) = 0;
 
 		/**
 		 * \brief Loads an asset from a raw memory buffer
@@ -72,7 +74,7 @@ namespace Ck
 		 *
 		 * \return A shared pointer to the loaded asset, or nullptr if loading fails.
 		 */
-		virtual std::shared_ptr<T> LoadFromMemory(const void* buffer, std::size_t length, const P& parameters = {})
+		virtual std::shared_ptr<T> LoadFromMemory(const Byte* buffer, std::size_t length, const P& parameters = {})
 		{
 			MemoryInputStream inputStream(buffer, length);
 			return LoadFromStream(inputStream, parameters);

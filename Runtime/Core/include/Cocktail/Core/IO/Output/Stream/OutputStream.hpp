@@ -1,36 +1,21 @@
 #ifndef COCKTAIL_CORE_IO_OUTPUTSTREAM_HPP
 #define COCKTAIL_CORE_IO_OUTPUTSTREAM_HPP
 
-#include <utility>
+#include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 
 namespace Ck
 {
-    /**
-     * \brief Base interface for custom output streams
-     */
+    template <typename TAllocator = SizedHeapAllocator<32>>
     class OutputStream
     {
     public:
-		
-		/**
-		 * \brief Destructor
-		 */
-		virtual ~OutputStream() = default;
 
-        /**
-         * \brief Write data to the stream
-         *
-    	 * \param data A buffer containing data to write in the stream
-		 * \param length The number of bytes to write to the stream
-		 *
-         * \return The number of bytes actually written
-         */
-        virtual std::size_t Write(const void* data, std::size_t length) = 0;
-        
-        /**
-         * \brief Ensure every pending write operation is terminated
-         * Depending on the implementation, this function might be a no-op or
-         */
+        using SizeType = typename TAllocator::SizeType;
+
+        virtual ~OutputStream() = default;
+
+        virtual SizeType Write(const Byte* data, SizeType length) = 0;
+
         virtual void Flush() = 0;
     };
 }

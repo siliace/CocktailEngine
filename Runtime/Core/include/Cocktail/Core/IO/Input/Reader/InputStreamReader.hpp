@@ -1,45 +1,77 @@
 #ifndef COCKTAIL_CORE_IO_INPUT_READER_INPUTSTREAMREADER_HPP
 #define COCKTAIL_CORE_IO_INPUT_READER_INPUTSTREAMREADER_HPP
 
-#include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/IO/Input/Reader/Reader.hpp>
 #include <Cocktail/Core/IO/Input/Stream/InputStream.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {
-	class COCKTAIL_CORE_API InputStreamReader : public Reader
-	{
-	public:
+    template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+    class InputStreamReader : public Reader<TEncoding>
+    {
+    public:
 
-		explicit InputStreamReader(InputStream& inputStream, EncodingMode encodingMode = EncodingMode::Utf8);
+        using CharType = typename Reader<TEncoding>::CharType;
 
-		bool Read(TextChar& c) override;
+        using SizeType = typename Reader<TEncoding>::SizeType;
 
-		std::size_t Read(TextChar* buffer, std::size_t length) override;
+        using EncodingType = typename Reader<TEncoding>::EncodingType;
 
-		bool HasCursor() const override;
+        explicit InputStreamReader(InputStream<TAllocator>& inputStream) :
+            mInner(&inputStream)
+        {
+            /// Nothing
+        }
 
-		Uint64 Seek(Uint64 position) override;
+        bool Read(CharType& c) override
+        {
+            return Reader<TEncoding>::Read(c);
+        }
 
-		void Rewind() override;
+        SizeType Read(CharType* buffer, SizeType length) override
+        {
+            return mInner->Read(reinterpret_cast<Byte*>(buffer), length * sizeof(CharType)) / sizeof(CharType);
+        }
 
-		Uint64 Tell() const override;
+        SizeType TransferTo(Writer<EncodingType>& writer) override
+        {
+            return Reader<TEncoding>::TransferTo(writer);
+        }
 
-		std::size_t GetSize() const override;
+        bool HasCursor() const override
+        {
+            return mInner->HasCursor();
+        }
 
-		bool IsEof() const override;
+        Uint64 Seek(Uint64 position) override
+        {
+            return mInner->Seek(position / sizeof(CharType));
+        }
 
-		EncodingMode GetEncodingMode() const override
-		{
-			return mEncodingMode;
-		}
+        void Rewind() override
+        {
+            mInner->Rewind();
+        }
 
-	private:
+        Uint64 Tell() const override
+        {
+            return mInner->Tell();
+        }
 
-		InputStream& mInputStream;
-		EncodingMode mEncodingMode;
-	};
+        SizeType GetSize() const override
+        {
+            return mInner->GetSize() / sizeof(CharType);
+        }
+
+        bool IsEof() const override
+        {
+            return mInner->IsEof();
+        }
+
+    private:
+
+        InputStream<TAllocator>* mInner;
+    };
 }
 
 #endif // COCKTAIL_CORE_IO_INPUT_READER_INPUTSTREAMREADER_HPP

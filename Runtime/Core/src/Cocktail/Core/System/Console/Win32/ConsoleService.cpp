@@ -62,83 +62,40 @@ namespace Ck::Detail::Win32
 
 	ConsoleService::ConsoleService() :
 		mOutput(ConsoleWriter::FromOutputHandle()),
-		mError(ConsoleWriter::FromErrorHandle()),
-		mInput()
+		mError(ConsoleWriter::FromErrorHandle())
 	{
 		CONSOLE_SCREEN_BUFFER_INFO info;
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 		if (GetConsoleScreenBufferInfo(handle, &info) == TRUE)
 		{
-			mIntialAttributes = info.wAttributes;
+			mInitialAttributes = info.wAttributes;
 		}
 		else
 		{
 			// When the console does not support this function (like the console in CLion IDE)
 			WORD textAttribute = ConsoleColorToTextAttribute(ConsoleColor::White);
 			WORD backgroundAttribute = ConsoleColorToBackgroundAttribute(ConsoleColor::Transparent);
-			mIntialAttributes = textAttribute | backgroundAttribute;
+			mInitialAttributes = textAttribute | backgroundAttribute;
 		}
 	}
 
 	ConsoleService::~ConsoleService()
 	{
 		HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(handle, mIntialAttributes);
+		SetConsoleTextAttribute(handle, mInitialAttributes);
 	}
 
-	void ConsoleService::Write(const String& text)
-	{
-		GetOutput().Write(text.GetData(), text.GetLength());
-	}
-
-	void ConsoleService::WriteLine(const String& text)
-	{
-		static const StringView EndLine = CK_TEXT("\r\n");
-		if (text.EndsWith(EndLine))
-		{
-			Write(text);
-		}
-		else
-		{
-			String line = text;
-			line.Append(EndLine);
-
-			return Write(line);
-		}
-	}
-
-	void ConsoleService::Write(StringView text)
-	{
-		GetOutput().Write(text.GetData(), text.GetLength());
-	}
-
-	void ConsoleService::WriteLine(StringView text)
-	{
-		static const StringView EndLine = CK_TEXT("\r\n");
-		if (text.EndsWith(EndLine))
-		{
-			Write(text);
-		}
-		else
-		{
-			String line = String::FromView(text);
-			line.Append(EndLine);
-
-			return Write(line);
-		}
-	}
-
-	Writer& ConsoleService::GetOutput()
+	Writer<>& ConsoleService::GetOutput()
 	{
 		return mOutput;
 	}
 
-	Writer& ConsoleService::GetError()
+	Writer<>& ConsoleService::GetError()
 	{
 		return mError;
 	}
 
-	Reader& ConsoleService::GetInput()
+	Reader<>& ConsoleService::GetInput()
 	{
 		return mInput;
 	}

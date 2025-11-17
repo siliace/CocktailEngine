@@ -24,7 +24,7 @@ namespace Ck
 		return AssetImporter<Image, ImageImportParameters>::LoadFromPath(path, parameters);
 	}
 
-	std::shared_ptr<Image> StbImageImporter::LoadFromStream(InputStream& inputStream, const ImageImportParameters& parameters)
+	std::shared_ptr<Image> StbImageImporter::LoadFromStream(InputStream<>& inputStream, const ImageImportParameters& parameters)
 	{
 		void* pixels;
 		DataType dataType;
@@ -134,19 +134,19 @@ namespace Ck
 
 	int StbImageImporter::ReadCallback(void* user, char* data, int size)
 	{
-		InputStream* stream = static_cast<InputStream*>(user);
-		return static_cast<int>(stream->Read(data, static_cast<std::size_t>(size)));
+		InputStream<>* stream = static_cast<InputStream<>*>(user);
+		return static_cast<int>(stream->Read(reinterpret_cast<Byte*>(data), static_cast<std::size_t>(size)));
 	}
 
 	void StbImageImporter::SkipCallback(void* user, int n)
 	{
-		InputStream* stream = static_cast<InputStream*>(user);
+		InputStream<>* stream = static_cast<InputStream<>*>(user);
 		stream->Seek(stream->Tell() + n);
 	}
 
 	int StbImageImporter::EofCallback(void* user)
 	{
-		InputStream* stream = static_cast<InputStream*>(user);
+		InputStream<>* stream = static_cast<InputStream<>*>(user);
 		return stream->GetSize() == stream->Tell();
 	}
 }

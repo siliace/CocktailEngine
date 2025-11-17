@@ -16,14 +16,14 @@ namespace Ck
 		/**
 		 * \brief Names of vertex attributes in the vertex shader
 		 */
-		EnumMap<VertexAttributeSemantic, AnsiString> VertexAttributes;
+		EnumMap<VertexAttributeSemantic, AsciiString> VertexAttributes;
 
 		struct TextureInterface
 		{
 			/**
 			 * \brief 
 			 */
-			AnsiString Name;
+			AsciiString Name;
 
 			/**
 			 * \brief 

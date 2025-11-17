@@ -2,7 +2,6 @@
 
 #include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {

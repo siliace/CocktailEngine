@@ -2,7 +2,7 @@
 
 namespace Ck::Vulkan
 {
-	VertexAttributeLocation::VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, AnsiString name) :
+	VertexAttributeLocation::VertexAttributeLocation(unsigned int location, const DataType& dataType, unsigned int elementCount, AsciiString name) :
 		mLocation(location),
 		mDataType(dataType),
 		mElementCount(elementCount),
@@ -26,7 +26,7 @@ namespace Ck::Vulkan
 		return mElementCount;
 	}
 
-	const AnsiString& VertexAttributeLocation::GetName() const
+	const AsciiString& VertexAttributeLocation::GetName() const
 	{
 		return mName;
 	}

@@ -83,12 +83,16 @@ namespace Ck
          * \brief Decodes a single ASCII character into a UTF-32 code point
          *
          * \param in Pointer to the input ASCII character
+         * \param length The length of data available inside of \p in
          * \param out Reference to the output UTF-32 character
          *
          * \return The number of character read from the input (always 1)
          */
-        static SizeType Decode(const CharType* in, Utf32Char& out)
+        static SizeType Decode(const CharType* in, SizeType length, Utf32Char& out)
         {
+            if (length < 1)
+                return 0;
+
             out = static_cast<Utf32Char>(in[0]);
             return 1;
         }

@@ -238,7 +238,7 @@ namespace Ck
 
         void Thread::SetName(StringView name)
         {
-            int error = pthread_setname_np(mHandle, AnsiString::Convert(name).GetData());
+            int error = pthread_setname_np(mHandle, AsciiString::Convert(name).GetData());
             if (error != 0)
                 throw std::system_error(error, PthreadErrorCategory::Instance);
         }
@@ -252,7 +252,7 @@ namespace Ck
             if (error != 0)
                 throw std::system_error(error, PthreadErrorCategory::Instance);
 
-            return String::ConvertFrom<AsciiEncoder>(buffer);
+            return String::ConvertFrom<Encoders::Ascii>(buffer);
         }
 
         unsigned int Thread::GetId() const

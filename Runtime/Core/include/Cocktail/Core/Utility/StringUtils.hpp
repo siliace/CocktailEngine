@@ -360,11 +360,26 @@ namespace Ck
             return true;
         }
 
+        /**
+         * \brief Tell whether a null-terminated c-style string is encoding using only ascii characters
+         *
+         * \param string The string to test
+         *
+         * \return True if \p string only contains ansi characters, false otherwise
+         */
         static bool IsPureAnsi(const CharType* string)
         {
             return IsPureAnsi(string, GetLength(string));
         }
 
+        /**
+         * \brief Tell whether c-style string is encoding using only ascii characters
+         *
+         * \param string The string to test
+         * \param length The length of the \p string to test
+         *
+         * \return True if \p string only contains ansi characters, false otherwise
+         */
         static bool IsPureAnsi(const CharType* string, SizeType length)
         {
             if constexpr (std::is_same_v<CharType, AnsiChar>)

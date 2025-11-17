@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	Material::Material(AnsiString name, ShadingMode shadingMode, bool doubleSided) :
+	Material::Material(AsciiString name, ShadingMode shadingMode, bool doubleSided) :
 		mName(std::move(name)),
 		mShadingMode(shadingMode),
 		mDoubleSided(doubleSided),
@@ -42,7 +42,7 @@ namespace Ck
 		return mUniformColors.Base != LinearColor{ 0.f, 0.f, 0.f, 1.f } || mTextures[TextureType::Emission] != nullptr;
 	}
 
-	const AnsiString& Material::GetName() const
+	const AsciiString& Material::GetName() const
 	{
 		return mName;
 	}

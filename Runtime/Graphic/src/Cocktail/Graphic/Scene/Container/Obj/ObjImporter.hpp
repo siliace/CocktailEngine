@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<SceneContainer> LoadFromStream(InputStream& inputStream, const SceneImportParameters& parameters) override;
+		std::shared_ptr<SceneContainer> LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters) override;
 		
 		/**
 		 * \brief 

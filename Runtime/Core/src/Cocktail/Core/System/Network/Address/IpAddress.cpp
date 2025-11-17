@@ -3,7 +3,6 @@
 #include <Cocktail/Core/System/Network/Address/IpAddress.hpp>
 #include <Cocktail/Core/System/Network/Address/IpAddressV4.hpp>
 #include <Cocktail/Core/System/Network/Address/IpAddressV6.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {

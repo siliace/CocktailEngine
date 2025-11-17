@@ -30,7 +30,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		AnsiString Name;
+		AsciiString Name;
 
 		/**
 		 * \brief The array size of the descriptor

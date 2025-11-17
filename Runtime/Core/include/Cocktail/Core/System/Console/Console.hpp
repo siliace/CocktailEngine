@@ -13,28 +13,23 @@ namespace Ck
 	{
 	public:
 
-		static void Write(const String& text);
-		static void WriteLine(const String& text);
-		static void Write(StringView text);
-		static void WriteLine(StringView text);
-
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		static Writer& GetOutput();
+		static Writer<>& GetOutput();
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		static Writer& GetError();
+		static Writer<>& GetError();
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		static Reader& GetInput();
+		static Reader<>& GetInput();
 
 		/**
 		 * \brief 

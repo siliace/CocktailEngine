@@ -3,8 +3,6 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/Monitor.hpp>
 
-#include "Cocktail/Core/Utility/StringConvertion.hpp"
-
 namespace Ck::Detail::Xlib
 {
 	namespace

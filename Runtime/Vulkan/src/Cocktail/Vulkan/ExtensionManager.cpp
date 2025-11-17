@@ -2,7 +2,6 @@
 
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 #include <Cocktail/Vulkan/ExtensionManager.hpp>
 #include <Cocktail/Vulkan/Vulkan.hpp>
@@ -235,11 +234,11 @@ namespace Ck::Vulkan
 	{
 		mDisabledExtensions = App::GetEnvironmentVariable(CK_TEXT("COCKTAIL_VULKAN_DISABLED_EXTENSIONS")).Map([&](const String& variable) {
 			return variable.Split(';').Transform([](const String& extensionName) {
-				return AnsiString::Convert(extensionName);
+				return AsciiString::Convert(extensionName);
 			});
-		}).GetOr(Array<AnsiString>());
+		}).GetOr(Array<AsciiString>());
 
-		mDisabledExtensions.ForEach([&](const AnsiString& disabledExtension) {
+		mDisabledExtensions.ForEach([&](const AsciiString& disabledExtension) {
 			CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Extension %s disabled"), disabledExtension);
 		});
 	}
@@ -473,7 +472,7 @@ namespace Ck::Vulkan
 
 	bool ExtensionManager::IsExtensionDisabled(const AnsiChar* extensionName) const
 	{
-		for (const AnsiString& disabledExtension : mDisabledExtensions)
+		for (const AsciiString& disabledExtension : mDisabledExtensions)
 		{
 			if (disabledExtension == extensionName)
 				return true;

@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		AnsiString Name;
+		AsciiString Name;
 
 		/**
 		 * \brief

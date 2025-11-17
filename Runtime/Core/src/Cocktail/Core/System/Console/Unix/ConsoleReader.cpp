@@ -10,7 +10,7 @@ namespace Ck::Detail::Unix
 		return Read(&c, 1) == 1;
 	}
 
-	std::size_t ConsoleReader::Read(TextChar* buffer, std::size_t length)
+	ConsoleReader::SizeType ConsoleReader::Read(TextChar* buffer, SizeType length)
 	{
 		return 0;
 	}
@@ -35,7 +35,7 @@ namespace Ck::Detail::Unix
 		throw NotImplementedException();
 	}
 
-	std::size_t ConsoleReader::GetSize() const
+	ConsoleReader::SizeType ConsoleReader::GetSize() const
 	{
 		throw NotImplementedException();
 	}
@@ -44,10 +44,4 @@ namespace Ck::Detail::Unix
 	{
 		throw NotImplementedException();
 	}
-
-	EncodingMode ConsoleReader::GetEncodingMode() const
-	{
-		return EncodingMode::Utf8;
-	}
-
 }

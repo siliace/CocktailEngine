@@ -106,7 +106,7 @@ namespace Ck
 		Renderer::RenderContext* mRenderContext;
 		RenderingModifiers mModifiers;
 		const MaterialProgramVariant* mCurrentMaterialProgram;
-		std::unordered_map<CompositeKey<AnsiString , unsigned int>, Renderer::BufferArea> mPersistentBuffers;
+		std::unordered_map<CompositeKey<AsciiString , unsigned int>, Renderer::BufferArea> mPersistentBuffers;
 	};
 }
 

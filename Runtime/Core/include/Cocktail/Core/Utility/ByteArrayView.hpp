@@ -20,6 +20,13 @@ namespace Ck
         ByteArrayView();
 
         /**
+         * \brief
+         * \param data
+         * \param size
+         */
+        ByteArrayView(const Byte* data, std::size_t size);
+
+        /**
          * \brief 
          * \param byteArray 
          * \param offset 
@@ -80,7 +87,7 @@ namespace Ck
     	 * \param index 
     	 * \return 
     	 */
-    	const Uint8& At(std::size_t index) const;
+    	const Byte& At(std::size_t index) const;
 
         /**
          * \brief 
@@ -98,7 +105,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        const Uint8* GetData() const;
+        const Byte* GetData() const;
 
         bool operator==(const ByteArray& rhs) const;
         bool operator==(const ByteArrayView& rhs) const;
@@ -109,7 +116,7 @@ namespace Ck
     private:
 
         std::size_t mSize;
-        const Uint8* mData;
+        const Byte* mData;
     };
 }
 

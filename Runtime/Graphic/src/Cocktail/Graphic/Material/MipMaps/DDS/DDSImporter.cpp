@@ -90,18 +90,18 @@ namespace Ck
 		return AssetImporter<MipMaps, MipMapsImportParameters>::LoadFromPath(path, parameters);
 	}
 
-	std::shared_ptr<MipMaps> DDSImporter::LoadFromStream(InputStream& inputStream, const MipMapsImportParameters& parameters)
+	std::shared_ptr<MipMaps> DDSImporter::LoadFromStream(InputStream<>& inputStream, const MipMapsImportParameters& parameters)
 	{
 		static Flags RequiredFileFlags = DDSHeader::FlagBits::Caps | DDSHeader::FlagBits::Height |
 			DDSHeader::FlagBits::Width | DDSHeader::FlagBits::PixelFormat;
 
 		unsigned int magicKey;
-		std::size_t magicKeySize = inputStream.Read(&magicKey, sizeof(unsigned int));
+		std::size_t magicKeySize = inputStream.Read(reinterpret_cast<Byte*>(&magicKey), sizeof(unsigned int));
 		if (magicKeySize != sizeof(unsigned int) || magicKey != DdsMagic)
 			throw DDSImportException(CK_TEXT("Invalid DDS MagicKey"));
 
 		DDSHeader header;
-		std::size_t headerSize = inputStream.Read(&header, sizeof(DDSHeader));
+		std::size_t headerSize = inputStream.Read(reinterpret_cast<Byte*>(&header), sizeof(DDSHeader));
 		if (headerSize != sizeof(DDSHeader) || header.Size != sizeof(DDSHeader) || !(header.FileFlags & RequiredFileFlags))
 			throw DDSImportException(CK_TEXT("Invalid DDS Header"));
 
@@ -112,7 +112,7 @@ namespace Ck
 		if (header.PixelFormat.Flags & DDSPixelFormat::FlagBits::FourCC && header.PixelFormat.FourCC == MakeFourCC('D', 'X', '1', '0'))
 		{
 			DDSHeaderDxt10 ddsDxt10Header;
-			std::size_t dxt10HeaderSize = inputStream.Read(&ddsDxt10Header, sizeof(DDSHeaderDxt10));
+			std::size_t dxt10HeaderSize = inputStream.Read(reinterpret_cast<Byte*>(&ddsDxt10Header), sizeof(DDSHeaderDxt10));
 			if (dxt10HeaderSize != sizeof(DDSHeaderDxt10))
 				throw DDSImportException(CK_TEXT("Invalid DDS Dxt10Header"));
 

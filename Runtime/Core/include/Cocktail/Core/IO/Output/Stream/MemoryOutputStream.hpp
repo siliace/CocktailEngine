@@ -6,22 +6,28 @@
 
 namespace Ck
 {
-    class COCKTAIL_CORE_API MemoryOutputStream : public OutputStream
+    template <typename TAllocator = SizedHeapAllocator<32>>
+    class MemoryOutputStream : public OutputStream<TAllocator>
     {
     public:
 
-        /**
-         * \brief Constructor
-         *
-         * Create a new instance of MemoryOutputStream
-         *
-         * \param output The ByteArray to write
-         */
-        explicit MemoryOutputStream(ByteArray& output);
-        
-        std::size_t Write(const void* data, std::size_t length) override;
+        using SizeType = typename TAllocator::SizeType;
 
-        void Flush() override;
+        explicit MemoryOutputStream(ByteArray& output) :
+            mOutput(output)
+        {
+            /// Nothing
+        }
+
+        SizeType Write(const Byte* data, SizeType length) override
+        {
+            mOutput.Append(data, length);
+            return length;
+        }
+
+        void Flush() override
+        {
+        }
 
     private:
 

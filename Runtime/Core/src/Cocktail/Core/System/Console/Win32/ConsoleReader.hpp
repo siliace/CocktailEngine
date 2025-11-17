@@ -8,7 +8,7 @@ namespace Ck::Detail::Win32
 	/**
 	 * \brief 
 	 */
-	class ConsoleReader : public Reader
+	class ConsoleReader : public Reader<>
 	{
 	public:
 
@@ -25,7 +25,7 @@ namespace Ck::Detail::Win32
 		 * \param length 
 		 * \return 
 		 */
-		std::size_t Read(TextChar* buffer, std::size_t length) override;
+		SizeType Read(TextChar* buffer, SizeType length) override;
 
 		/**
 		 * \brief 
@@ -55,15 +55,13 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		std::size_t GetSize() const override;
+		SizeType GetSize() const override;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
 		bool IsEof() const override;
-
-		EncodingMode GetEncodingMode() const override;
 	};
 }
 

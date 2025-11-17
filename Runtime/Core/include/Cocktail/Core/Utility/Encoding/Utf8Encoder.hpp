@@ -115,12 +115,16 @@ namespace Ck
          * If the sequence is invalid, the function returns 0.
          *
          * \param in Pointer to the UTF-8 sequence to decode
+         * \param length The length of data available inside of \p in
          * \param out Reference to a UTF-32 variable to store the decoded code point
          *
          * \return The number of bytes read from \p in, or 0 if decoding failed
          */
-        static SizeType Decode(const CharType* in, Utf32Char& out)
+        static SizeType Decode(const CharType* in, SizeType length, Utf32Char& out)
         {
+            if (length < 1)
+                return 0;
+
             if (in[0] < 0x80)
             {
                 out = in[0];
@@ -129,7 +133,7 @@ namespace Ck
 
             if ((in[0] & 0xE0) == 0xC0)
             {
-                if ((in[1] & 0xC0) != 0x80)
+                if (length < 2 || (in[1] & 0xC0) != 0x80)
                     return 0;
 
                 out = (in[0] & 0x1F) << 6 | in[1] & 0x3F;
@@ -138,7 +142,7 @@ namespace Ck
 
             if ((in[0] & 0xF0) == 0xE0)
             {
-                if ((in[1] & 0xC0) != 0x80 || (in[2] & 0xC0) != 0x80)
+                if (length < 3 || (in[1] & 0xC0) != 0x80 || (in[2] & 0xC0) != 0x80)
                     return 0;
 
                 out = (in[0] & 0x0F) << 12 | (in[1] & 0x3F) << 6 | in[2] & 0x3F;
@@ -146,7 +150,7 @@ namespace Ck
             }
             if ((in[0] & 0xF8) == 0xF0)
             {
-                if ((in[1] & 0xC0) != 0x80 || (in[2] & 0xC0) != 0x80 || (in[3] & 0xC0) != 0x80)
+                if (length < 4 || (in[1] & 0xC0) != 0x80 || (in[2] & 0xC0) != 0x80 || (in[3] & 0xC0) != 0x80)
                     return 0;
 
                 out = (in[0] & 0x07) << 18 | (in[1] & 0x3F) << 12 | (in[2] & 0x3F) << 6 | in[3] & 0x3F;

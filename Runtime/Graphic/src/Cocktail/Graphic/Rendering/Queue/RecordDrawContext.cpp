@@ -19,7 +19,7 @@ namespace Ck
 		commandList.BindShaderProgram(mCurrentMaterialProgram->GetShaderProgram().get());
 		for (const auto& [key, area] : mPersistentBuffers)
 		{
-			const AnsiString& name = std::get<0>(key);
+			const AsciiString& name = std::get<0>(key);
 			unsigned int arrayIndex = std::get<1>(key);
 
 			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
@@ -66,7 +66,7 @@ namespace Ck
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
-		mPersistentBuffers[CompositeKey<AnsiString, unsigned int>(AnsiString::FromView(name), arrayIndex)] = area;
+		mPersistentBuffers[CompositeKey<AsciiString, unsigned int>(AsciiString::FromView(name), arrayIndex)] = area;
 
 		if (mCurrentMaterialProgram)
 		{

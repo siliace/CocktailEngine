@@ -1,5 +1,4 @@
 #include <Cocktail/Core/Exception.hpp>
-#include <Cocktail/Core/Utility/StringConvertion.hpp>
 
 namespace Ck
 {

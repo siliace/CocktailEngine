@@ -86,12 +86,16 @@ namespace Ck
          * This function is just a copy of a character to another one since no decoding is needed.
          *
          * \param in Pointer to the input UTF-32 character
+         * \param length The length of data available inside of \p in
          * \param out Reference to the output UTF-32 character
          *
          * \return The number of character read from the input (always 1)
          */
-        static Utf32Char Decode(const CharType* in, Utf32Char& out)
+        static Utf32Char Decode(const CharType* in, SizeType length, Utf32Char& out)
         {
+            if (length < 1)
+                return 0;
+
             out = static_cast<Utf32Char>(in[0]);
             return 1;
         }

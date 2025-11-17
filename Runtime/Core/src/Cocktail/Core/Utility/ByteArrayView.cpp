@@ -12,6 +12,13 @@ namespace Ck
 		/// Nothing
 	}
 
+	ByteArrayView::ByteArrayView(const Byte* data, std::size_t size) :
+		mData(data),
+		mSize(size)
+	{
+		assert(mData != nullptr);
+	}
+
 	ByteArrayView::ByteArrayView(const ByteArray& byteArray, std::size_t offset) :
 		ByteArrayView(byteArray, offset, byteArray.GetSize() - offset)
 	{
@@ -55,7 +62,7 @@ namespace Ck
 		return view;
 	}
 
-	const Uint8& ByteArrayView::At(std::size_t index) const
+	const Byte& ByteArrayView::At(std::size_t index) const
 	{
 		assert(index < mSize);
 		return mData[index];
@@ -71,7 +78,7 @@ namespace Ck
 		return mSize;
 	}
 
-	const Uint8* ByteArrayView::GetData() const
+	const Byte* ByteArrayView::GetData() const
 	{
 		return mData;
 	}

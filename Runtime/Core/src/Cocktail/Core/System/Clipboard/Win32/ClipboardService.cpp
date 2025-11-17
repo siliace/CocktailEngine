@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Clipboard/Win32/ClipboardService.hpp>

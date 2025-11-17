@@ -46,7 +46,7 @@ namespace Ck
 
 		struct MaterialInfo
 		{
-			AnsiString Name;
+			AsciiString Name;
 			Material::UniformColors Colors;
 			Material::ShadingMode ShadingMode;
 			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
@@ -57,7 +57,7 @@ namespace Ck
 
 		struct SubMeshInfo
 		{
-			AnsiString Name;
+			AsciiString Name;
 			unsigned int Count;
 			unsigned int FirstVertex;
 			unsigned int FirstIndex;
@@ -67,7 +67,7 @@ namespace Ck
 
 		struct MeshInfo
 		{
-			AnsiString Name;
+			AsciiString Name;
 			std::shared_ptr<VertexArray> Vertices;
 			std::shared_ptr<IndexArray> Indices;
 			Array<SubMeshInfo> SubMeshes;

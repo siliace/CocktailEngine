@@ -15,7 +15,7 @@ namespace Ck
 	{
 		void imageWriteFunc(void* context, void* data, int size)
 		{
-			static_cast<OutputStream*>(context)->Write(data, size);
+			static_cast<OutputStream<>*>(context)->Write(static_cast<const Byte*>(data), size);
 		}
 	}
 
@@ -30,7 +30,7 @@ namespace Ck
 		SaveToStream(asset, outputStream, streamExportParameters);
 	}
 
-	void StbImageExporter::SaveToStream(const Image& asset, OutputStream& outputStream, const ImageExportParameters& parameters) const
+	void StbImageExporter::SaveToStream(const Image& asset, OutputStream<>& outputStream, const ImageExportParameters& parameters) const
 	{
 		Extent2D<unsigned int> size = asset.GetSize();
 		unsigned int channelCount = asset.GetFormat().GetChannelCount();

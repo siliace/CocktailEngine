@@ -216,13 +216,6 @@ namespace Ck
 		return mSize == 0;
 	}
 
-	String ByteArray::ToString() const
-	{
-		return String(
-			reinterpret_cast<const TextChar*>(mData.get())
-		);
-	}
-
 	std::size_t ByteArray::GetSize() const
 	{
 		return mSize;

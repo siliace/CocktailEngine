@@ -1,9 +1,13 @@
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
+#include <Cocktail/Core/IO/Input/Reader/LineReader.hpp>
 #include <Cocktail/Core/IO/Input/Stream/FileInputStream.hpp>
 #include <Cocktail/Core/IO/Output/Stream/FileOutputStream.hpp>
+#include <Cocktail/Core/IO/Output/Writer/BufferedWriter.hpp>
+#include <Cocktail/Core/IO/Output/Writer/FileWriter.hpp>
 #include <Cocktail/Core/System/FileSystem/Storage.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
+#include <Cocktail/Core/Utility/Encoding/Encoders.hpp>
 
 namespace Ck
 {
@@ -34,22 +38,13 @@ namespace Ck
 		return content;
 	}
 
-	Array<String> FileUtils::ReadFileLines(const URI& uri)
+	String FileUtils::ReadFileText(const URI& uri)
 	{
-		if (!Storage::IsFile(uri))
-			return {};
+		auto content = ReadFile(uri);
+		if (content.IsEmpty())
+			return String::Empty;
 
-		std::unique_ptr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
-		FileInputStream inputStream(*file);
-
-		InputStreamReader inputStreamReader(inputStream);
-		BufferedReader reader(inputStreamReader);
-
-		Array<String> lines;
-		while (!reader.IsEof())
-			lines.Add(reader.ReadLine());
-
-		return lines;
+		return Encoders::GetString<Encoders::Text, String>(content);
 	}
 
 	void FileUtils::WriteFile(const URI& uri, ByteArrayView content, bool append)
@@ -79,12 +74,11 @@ namespace Ck
 		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
 
 		std::unique_ptr<File> file = Storage::OpenFile(uri, openFlags);
-		FileOutputStream outputStream(*file);
+		FileWriter writer(*file);
+		BufferedWriter bufferedWriter(writer);
 
 		lines.ForEach([&](const String& line) {
-			outputStream.Write(line.GetData(), line.GetLength());
+			bufferedWriter.Write(line.GetData(), line.GetLength());
 		});
-
-		outputStream.Flush();
 	}
 }

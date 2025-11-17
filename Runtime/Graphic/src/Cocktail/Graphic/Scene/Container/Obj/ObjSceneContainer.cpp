@@ -9,8 +9,6 @@
 #include <Cocktail/Graphic/Scene/SceneLoader.hpp>
 #include <Cocktail/Graphic/Scene/Container/Obj/ObjSceneContainer.hpp>
 
-#include "Cocktail/Core/Utility/StringConvertion.hpp"
-
 namespace Ck
 {
 	ObjSceneContainer::ObjSceneContainer(const SceneImportParameters& importParameters, const tinyobj::attrib_t& attributes, const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials) :
@@ -85,15 +83,15 @@ namespace Ck
 		materialInfo.Colors.Specular = { objMaterial.specular[0], objMaterial.specular[1], objMaterial.specular[2], 1.f };
 		materialInfo.Colors.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
 
-		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.ambient_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.diffuse_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.specular_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.specular_highlight_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.bump_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.displacement_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.alpha_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.reflection_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(String::ConvertFrom<AsciiEncoder>(objMaterial.emissive_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.ambient_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.diffuse_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_highlight_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.bump_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.displacement_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.alpha_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.reflection_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Emission] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.emissive_texname.c_str()));
 
 		if (objMaterial.dissolve != 1.f)
 		{
