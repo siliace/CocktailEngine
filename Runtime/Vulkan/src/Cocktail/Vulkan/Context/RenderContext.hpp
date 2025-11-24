@@ -136,7 +136,7 @@ namespace Ck::Vulkan
 		std::unique_ptr<SubmitScheduler> mScheduler;
 		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;
 		unsigned int mCurrentFrameContext;
-		FixedArray<std::unique_ptr<FrameContext>> mFrameContexts;
+		Array<std::unique_ptr<FrameContext>> mFrameContexts;
 	};
 }
 

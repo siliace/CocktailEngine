@@ -1,10 +1,8 @@
 #ifndef COCKTAIL_VULKAN_CONTEXT_FRAMECONTEXT_HPP
 #define COCKTAIL_VULKAN_CONTEXT_FRAMECONTEXT_HPP
 
+#include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Utility/CompositeKey.hpp>
-#include <Cocktail/Core/Utility/FixedArray.hpp>
-
-#include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 
 namespace Ck::Vulkan
 {
