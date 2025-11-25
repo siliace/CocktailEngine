@@ -22,7 +22,7 @@ namespace Ck
 			throw SystemError::GetLastError();
 	}
 
-	std::tuple<std::size_t, std::unique_ptr<IpAddress>, unsigned short> UdpSocket::Receive(void* data, std::size_t length) const
+	std::tuple<std::size_t, UniquePtr<IpAddress>, unsigned short> UdpSocket::Receive(void* data, std::size_t length) const
 	{
 		assert(data && length);
 		assert(mHandle != InvalidHandle);

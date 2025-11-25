@@ -35,9 +35,9 @@ namespace Ck
             throw SystemError::GetLastError();
     }
 
-    std::unique_ptr<Thread> Thread::Create(Runnable* runnable, StringView name, unsigned int stackSize)
+    UniquePtr<Thread> Thread::Create(Runnable* runnable, StringView name, unsigned int stackSize)
     {
-        return std::make_unique<Detail::Pthread::Thread>(runnable, name, stackSize);
+        return MakeUnique<Detail::Pthread::Thread>(runnable, name, stackSize);
     }
 
     namespace Detail::Pthread

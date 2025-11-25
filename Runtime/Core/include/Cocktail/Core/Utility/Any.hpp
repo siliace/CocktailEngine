@@ -37,7 +37,7 @@ namespace Ck
 		template <typename T>
 		explicit Any(const T& value)
 		{
-			mHolder = std::make_unique<AnyHolder<T>>(value);
+			mHolder = MakeUnique<AnyHolder<T>>(value);
 		}
 
 		/**
@@ -51,7 +51,7 @@ namespace Ck
 		template <typename T>
 		explicit Any(T&& value)
 		{
-			mHolder = std::make_unique<AnyHolder<T>>(std::move(value));
+			mHolder = MakeUnique<AnyHolder<T>>(std::move(value));
 		}
 
 		/**
@@ -66,7 +66,7 @@ namespace Ck
 		template <typename T, typename... Args>
 		explicit Any(InPlaceTypeTag<T>, Args&&... args)
 		{
-			mHolder = std::make_unique<AnyHolder<T>>(InPlace, std::forward<Args>(args)...);
+			mHolder = MakeUnique<AnyHolder<T>>(InPlace, std::forward<Args>(args)...);
 		}
 
 		/**
@@ -131,7 +131,7 @@ namespace Ck
 			if (mHolder && mHolder->GetTypeInfo() == typeid(U))
 			{
 				return Optional<U&>::Of(
-					static_cast<AnyHolder<U>*>(mHolder.get())->Get()
+					static_cast<AnyHolder<U>*>(mHolder.Get())->Get()
 				);
 			}
 
@@ -151,7 +151,7 @@ namespace Ck
 			if (mHolder && mHolder->GetTypeInfo() == typeid(U))
 			{
 				return Optional<const U&>::Of(
-					static_cast<AnyHolder<U>*>(mHolder.get())->Get()
+					static_cast<AnyHolder<U>*>(mHolder.Get())->Get()
 				);
 			}
 
@@ -226,7 +226,7 @@ namespace Ck
 			T mValue;
 		};
 
-		std::unique_ptr<AbstractAnyHolder> mHolder;
+		UniquePtr<AbstractAnyHolder> mHolder;
 	};
 }
 

@@ -29,8 +29,8 @@ namespace Ck::Detail::Unix
 		return CK_TEXT("/var/tmp");
     }
 
-    std::unique_ptr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
+    UniquePtr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
     {
-		return std::make_unique<LocalFileSystemDriver>();
+		return MakeUnique<LocalFileSystemDriver>();
     }
 }

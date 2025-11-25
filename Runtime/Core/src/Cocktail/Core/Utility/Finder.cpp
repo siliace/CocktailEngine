@@ -53,7 +53,7 @@ namespace Ck
 	Array<Path> Finder::Get(const Path& source, unsigned int depth) const
 	{
 		Array<Path> content;
-		std::shared_ptr<Directory> directory = Storage::OpenDirectory(source);
+		UniquePtr<Directory> directory = Storage::OpenDirectory(source);
 
 		for (const Path& child : directory->GetContent())
 		{

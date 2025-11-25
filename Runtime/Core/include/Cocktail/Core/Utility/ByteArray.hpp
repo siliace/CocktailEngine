@@ -2,8 +2,8 @@
 #define COCKTAIL_CORE_UTILITY_BYTEARRAY_HPP
 
 #include <cstring>
-#include <memory>
 
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/Utility/ByteArrayView.hpp>
 
 namespace Ck
@@ -44,8 +44,8 @@ namespace Ck
             if constexpr (!std::is_void_v<T>)
                 mSize *= sizeof(T);
 
-            mData = std::make_unique<Uint8[]>(mSize);
-            std::memcpy(mData.get(), data, mSize);
+            mData = MakeUnique<Uint8[]>(mSize);
+            std::memcpy(mData.Get(), data, mSize);
         }
 
         /**
@@ -171,7 +171,7 @@ namespace Ck
     private:
 
         std::size_t mSize;
-        std::unique_ptr<Uint8[]> mData;
+        UniquePtr<Uint8[]> mData;
     };
 }
 

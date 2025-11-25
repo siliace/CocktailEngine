@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 	{
 		mHasMutableFormat = true;
 		mViewFormatCount = viewFormatCount;
-		mViewFormats = std::make_unique<PixelFormat[]>(mViewFormatCount);
+		mViewFormats = MakeUnique<PixelFormat[]>(mViewFormatCount);
 		for (unsigned int i = 0; i < mViewFormatCount; i++)
 			mViewFormats[i] = viewFormats[i];
 	}

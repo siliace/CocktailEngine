@@ -77,18 +77,18 @@ namespace Ck::Vulkan
 			vkCreateInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		}
 
-		std::unique_ptr<VkFormat[]> vkViewFormats;
+		UniquePtr<VkFormat[]> vkViewFormats;
 		VkImageFormatListCreateInfoKHR imageFormatList{ VK_STRUCTURE_TYPE_IMAGE_FORMAT_LIST_CREATE_INFO_KHR, nullptr };
 		if (Renderer::TextureMutableFormatCreateInfo* mutableFormat = createInfo.MutableFormat; mutableFormat)
 		{
 			SetViewFormats(mutableFormat->CompatibleFormatCount, mutableFormat->CompatibleFormats);
 
-			vkViewFormats = std::make_unique<VkFormat[]>(mutableFormat->CompatibleFormatCount);
+			vkViewFormats = MakeUnique<VkFormat[]>(mutableFormat->CompatibleFormatCount);
 			for (unsigned int i = 0; i < mutableFormat->CompatibleFormatCount; i++)
 				vkViewFormats[i] = ToVkType(mutableFormat->CompatibleFormats[i]);
 
 			imageFormatList.viewFormatCount = mutableFormat->CompatibleFormatCount;
-			imageFormatList.pViewFormats = vkViewFormats.get();
+			imageFormatList.pViewFormats = vkViewFormats.Get();
 
 			imageFormatList.pNext = vkCreateInfo.pNext;
 			vkCreateInfo.pNext = &imageFormatList;

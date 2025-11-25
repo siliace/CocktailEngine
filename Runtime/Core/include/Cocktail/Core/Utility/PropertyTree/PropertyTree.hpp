@@ -122,7 +122,7 @@ namespace Ck
         {
             NodeType& node = GetChild(path);
             if (node.GetType() != NodeType::Type::Value)
-                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a value"), path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node %s is not a value"), path.ToString());
 
             return static_cast<ValueType&>(node);
         }
@@ -133,7 +133,7 @@ namespace Ck
          */
         ElementType* GetRoot()
         {
-            return mRoot.get();
+            return mRoot.Get();
         }
 
         /**
@@ -142,7 +142,7 @@ namespace Ck
          */
         const ElementType* GetRoot() const
         {
-            return mRoot.get();
+            return mRoot.Get();
         }
 
     protected:
@@ -152,16 +152,16 @@ namespace Ck
          */
         void ResetRoot(const String& name, const ElementType& rootElement)
         {
-            mRoot = std::unique_ptr<ElementType>(
+            mRoot = UniquePtr<ElementType>(
                 static_cast<ElementType*>(
-                    rootElement.Clone(nullptr, name).release()
+                    rootElement.Clone(nullptr, name).Release()
                 )
             );
         }
 
     private:
 
-        std::unique_ptr<ElementType> mRoot;
+        UniquePtr<ElementType> mRoot;
     };
 
     using Properties = PropertyTree<String>;

@@ -1,10 +1,11 @@
 #ifndef COCKTAIL_CORE_UTILITY_OBJECTPOOL_HPP
 #define COCKTAIL_CORE_UTILITY_OBJECTPOOL_HPP
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 #include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/System/Concurrency/NullMutex.hpp>
 #include <Cocktail/Core/System/Concurrency/SpinMutex.hpp>
 
@@ -32,8 +33,8 @@ namespace Ck
 				ObjectPoolBase* Pool;
 			};
 
-			using SharedPtr = std::shared_ptr<T>;
-			using UniquePtr = std::unique_ptr<T, Deleter>;
+			using Shared = std::shared_ptr<T>;
+			using Unique = UniquePtr<T, Deleter>;
 
 			/**
 			 * \brief Constructor
@@ -130,9 +131,9 @@ namespace Ck
 			 * \return
 			 */
 			template <typename... Args>
-			SharedPtr Allocate(Args&&... args)
+			Shared Allocate(Args&&... args)
 			{
-				return SharedPtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
+				return Shared(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
 			}
 
 			/**
@@ -142,9 +143,9 @@ namespace Ck
 			 * \return
 			 */
 			template <typename... Args>
-			UniquePtr AllocateUnique(Args&&... args)
+			Unique AllocateUnique(Args&&... args)
 			{
-				return UniquePtr(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
+				return Unique(AllocateUnsafe(std::forward<Args>(args)...), Deleter{ this });
 			}
 
 			/**
@@ -180,8 +181,8 @@ namespace Ck
 			 */
 			void AllocatePage(std::size_t objectCount)
 			{
-				auto page = std::make_unique<unsigned char[]>(sizeof(T) * objectCount);
-				T* vacants = reinterpret_cast<T*>(page.get());
+				auto page = MakeUnique<Byte[]>(sizeof(T) * objectCount);
+				T* vacants = reinterpret_cast<T*>(page.Get());
 				for (std::size_t i = 0; i < objectCount; i++)
 					mVacants.Add(&vacants[i]);
 
@@ -191,7 +192,7 @@ namespace Ck
 			bool mGrowable;
 			Lockable mMutex;
 			Array<T*> mVacants;
-			Array<std::unique_ptr<unsigned char[]>> mPages;
+			Array<UniquePtr<Byte[]>> mPages;
 			std::size_t mAllocatedObjectCount;
 		};
 	}

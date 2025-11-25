@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_GEOMETRY_INDEX_INDEXARRAY_HPP
 #define COCKTAIL_GRAPHIC_GEOMETRY_INDEX_INDEXARRAY_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Graphic/Geometry/Index/IndexRef.hpp>

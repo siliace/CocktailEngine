@@ -320,7 +320,7 @@ namespace Ck::Vulkan
 		ExtensionManager mExtensionManager;
 		VkInstance mInstance;
 		VkPhysicalDevice mPhysicalDevice;
-		std::unique_ptr<QueueFamilyContext> mQueueFamilyContext;
+		UniquePtr<QueueFamilyContext> mQueueFamilyContext;
 		VkDevice mHandle;
 		ObjectPool<Buffer> mBufferPool;
 		ObjectPool<BufferView> mBufferViewPool;

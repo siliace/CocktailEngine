@@ -40,7 +40,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::unique_ptr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty) = 0;
+		virtual UniquePtr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty) = 0;
 	};
 }
 

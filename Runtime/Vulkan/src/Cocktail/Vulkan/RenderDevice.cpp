@@ -381,7 +381,7 @@ namespace Ck::Vulkan
 			}
 		}
 
-		mQueueFamilyContext = std::make_unique<QueueFamilyContext>(mPhysicalDevice);
+		mQueueFamilyContext = MakeUnique<QueueFamilyContext>(mPhysicalDevice);
 	}
 
 	void RenderDevice::CreateDevice()

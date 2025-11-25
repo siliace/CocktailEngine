@@ -25,7 +25,7 @@ namespace Ck::Vulkan
 		mHandle = WSI::CreateWindowSurface(mRenderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
 
 		// Create the PresentationContext used to manage swapchains creation
-		mPresentationContext = std::make_unique<PresentationContext>(mRenderDevice, this, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
+		mPresentationContext = MakeUnique<PresentationContext>(mRenderDevice, this, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.ColorSpace);
 
 		CreateRenderPass(createInfo.Samples, createInfo.DepthStencilFormat);
 

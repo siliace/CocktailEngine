@@ -37,8 +37,8 @@ namespace Ck::Detail::Win32
 		return Path(buffer, size - 1);
 	}
 
-    std::unique_ptr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
+    UniquePtr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
     {
-		return std::make_unique<LocalFileSystemDriver>(base);
+		return MakeUnique<LocalFileSystemDriver>(base);
     }
 }

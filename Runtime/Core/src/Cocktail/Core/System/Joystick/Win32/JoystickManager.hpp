@@ -37,7 +37,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		std::unique_ptr<Joystick> mJoysticks[MaxJoystickCount];
+		UniquePtr<Joystick> mJoysticks[MaxJoystickCount];
 	};
 }
 

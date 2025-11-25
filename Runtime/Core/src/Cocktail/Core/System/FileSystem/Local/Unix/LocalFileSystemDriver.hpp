@@ -50,14 +50,14 @@ namespace Ck::Detail::Unix
 		 * \param flags
 		 * \return
 		 */
-		std::unique_ptr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
+		UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		std::unique_ptr<Directory> OpenDirectory(const Path& path) override;
+		UniquePtr<Directory> OpenDirectory(const Path& path) override;
 
 		/**
 		 * \brief
@@ -80,9 +80,9 @@ namespace Ck::Detail::Unix
 		 */
 		void Remove(const Path& path) override;
 
-		std::unique_ptr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
+		UniquePtr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
 
-		std::unique_ptr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) override;
+		UniquePtr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) override;
 
 		/**
 		 * \brief

@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREENODE_HPP
 #define COCKTAIL_CORE_UTILITY_PROPERTYTREE_PROPERTYTREENODE_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/String.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 
 namespace Ck
 {
@@ -86,7 +85,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        std::unique_ptr<PropertyTreeNode<Data>> DropNextSibling()
+        UniquePtr<PropertyTreeNode<Data>> DropNextSibling()
         {
             // Disconnect ourselves form the next sibling
             if (mNextSibling)
@@ -128,7 +127,7 @@ namespace Ck
          */
         virtual PropertyTreeNode<Data>* GetNextSibling()
         {
-            return mNextSibling.get();
+            return mNextSibling.Get();
         }
 
         /**
@@ -137,7 +136,7 @@ namespace Ck
          */
         virtual const PropertyTreeNode<Data>* GetNextSibling() const
         {
-            return mNextSibling.get();
+            return mNextSibling.Get();
         }
 
         /**
@@ -156,11 +155,11 @@ namespace Ck
          * \param node
          * \return
          */
-        PropertyTreeNode<Data>* SetNextSibling(std::unique_ptr<PropertyTreeNode<Data>> node)
+        PropertyTreeNode<Data>* SetNextSibling(UniquePtr<PropertyTreeNode<Data>> node)
         {
             if (mNextSibling)
             {
-                mNextSibling->mPreviousSibling = node.get();
+                mNextSibling->mPreviousSibling = node.Get();
                 if (node)
 					node->mNextSibling = std::move(mNextSibling);
             }
@@ -170,7 +169,7 @@ namespace Ck
 
             mNextSibling = std::move(node);
 
-            return mNextSibling.get();
+            return mNextSibling.Get();
         }
 
         /**
@@ -227,14 +226,14 @@ namespace Ck
          * \param name
          * \return
          */
-        virtual std::unique_ptr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const = 0;
+        virtual UniquePtr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const = 0;
 
     private:
 
         PropertyTreeNode<Data>* mParent;
         String mName;
         PropertyTreeNode<Data>* mPreviousSibling;
-        std::unique_ptr<PropertyTreeNode<Data>> mNextSibling;
+        UniquePtr<PropertyTreeNode<Data>> mNextSibling;
     };
 }
 

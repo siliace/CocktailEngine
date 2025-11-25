@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	std::unique_ptr<Library> Library::LoadLibrary(StringView name)
+	UniquePtr<Library> Library::LoadLibrary(StringView name)
 	{
 		return ResolveFacadeInstance()->LoadLibrary(name);
 	}

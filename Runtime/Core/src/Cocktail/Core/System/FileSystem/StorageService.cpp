@@ -30,12 +30,12 @@ namespace Ck
 		return ResolveDriver(uri.GetScheme())->CreateDirectory(uri.GetPath());
 	}
 
-	std::unique_ptr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
+	UniquePtr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
 	{
 		return ResolveDriver(uri.GetScheme())->OpenFile(uri.GetPath(), flags);
 	}
 
-	std::unique_ptr<Directory> StorageService::OpenDirectory(const URI& uri) const
+	UniquePtr<Directory> StorageService::OpenDirectory(const URI& uri) const
 	{
 		return ResolveDriver(uri.GetScheme())->OpenDirectory(uri.GetPath());
 	}
@@ -51,13 +51,13 @@ namespace Ck
 		}
 		else
 		{
-			std::unique_ptr<File> sourceFile = sourceDriver->OpenFile(source.GetPath(), FileOpenFlagBits::Read);
+			UniquePtr<File> sourceFile = sourceDriver->OpenFile(source.GetPath(), FileOpenFlagBits::Read);
 
 			FileOpenFlags destinationOpenFlags = FileOpenFlagBits::Write | FileOpenFlagBits::Truncate;
 			if (failIfExists)
 				destinationOpenFlags |= FileOpenFlagBits::Existing;
 
-			std::unique_ptr<File> destinationFile = destinationDriver->OpenFile(destination.GetPath(), destinationOpenFlags);
+			UniquePtr<File> destinationFile = destinationDriver->OpenFile(destination.GetPath(), destinationOpenFlags);
 
 			const std::size_t bufferSize = 2048;
 			unsigned char buffer[bufferSize] = { 0 };
@@ -94,9 +94,9 @@ namespace Ck
 		return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
 	}
 
-	void StorageService::Mount(String scheme, std::unique_ptr<FileSystemDriver> fileSystemDriver)
+	void StorageService::Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver)
 	{
-		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.get());
+		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.Get());
 		mInternalDrivers.Add(std::move(fileSystemDriver));
 	}
 

@@ -104,13 +104,13 @@ namespace Ck::Vulkan
 			return 1;
 		}
 
-		std::unique_ptr<VertexAttributeLocation> ReflectInterfaceVariable(const SpvReflectInterfaceVariable* reflectInterfaceVariable)
+		UniquePtr<VertexAttributeLocation> ReflectInterfaceVariable(const SpvReflectInterfaceVariable* reflectInterfaceVariable)
 		{
 			unsigned int location = reflectInterfaceVariable->location;
 			AsciiString name = reflectInterfaceVariable->name;
 			unsigned int elementCount = ReflectElementCount(reflectInterfaceVariable->numeric);
 
-			return std::make_unique<VertexAttributeLocation>(location, GetReflectFormatDataType(reflectInterfaceVariable->format), elementCount, std::move(name));
+			return MakeUnique<VertexAttributeLocation>(location, GetReflectFormatDataType(reflectInterfaceVariable->format), elementCount, std::move(name));
 		}
 
 		BlockMember ReflectBlockMember(const SpvReflectBlockVariable& blockVariable)
@@ -319,10 +319,10 @@ namespace Ck::Vulkan
 
 	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(AnsiStringView name) const
 	{
-		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mInputAttributeLocations)
+		for (const UniquePtr<VertexAttributeLocation>& vertexAttributeLocation : mInputAttributeLocations)
 		{
 			if (vertexAttributeLocation->GetName() == name)
-				return vertexAttributeLocation.get();
+				return vertexAttributeLocation.Get();
 		}
 
 		return nullptr;
@@ -330,10 +330,10 @@ namespace Ck::Vulkan
 
 	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(AnsiStringView name) const
 	{
-		for (const std::unique_ptr<VertexAttributeLocation>& vertexAttributeLocation : mOutputAttributeLocations)
+		for (const UniquePtr<VertexAttributeLocation>& vertexAttributeLocation : mOutputAttributeLocations)
 		{
 			if (vertexAttributeLocation->GetName() == name)
-				return vertexAttributeLocation.get();
+				return vertexAttributeLocation.Get();
 		}
 
 		return nullptr;

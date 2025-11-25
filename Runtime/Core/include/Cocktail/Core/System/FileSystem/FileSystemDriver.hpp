@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILESYSTEMDRIVER_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_FILESYSTEMDRIVER_HPP
 
-#include <memory>
-
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 #include <Cocktail/Core/System/FileSystem/FileOpenFlags.hpp>
@@ -53,14 +52,14 @@ namespace Ck
 		 * \param flags
 		 * \return
 		 */
-		virtual std::unique_ptr<File> OpenFile(const Path& path, const FileOpenFlags& flags) = 0;
+		virtual UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) = 0;
 
 		/**
 		 * \brief
 		 * \param path
 		 * \return
 		 */
-		virtual std::unique_ptr<Directory> OpenDirectory(const Path& path) = 0;
+		virtual UniquePtr<Directory> OpenDirectory(const Path& path) = 0;
 
 		/**
 		 * \brief

@@ -16,7 +16,7 @@ namespace Ck
 		mAliases.clear();
 	}
 
-	void ServiceContainer::RegisterBinding(std::unique_ptr<Detail::ServiceBindingBase> binding)
+	void ServiceContainer::RegisterBinding(UniquePtr<Detail::ServiceBindingBase>&& binding)
 	{
 		mBindings.insert_or_assign(binding->GetResolvedType(), std::move(binding));
 	}

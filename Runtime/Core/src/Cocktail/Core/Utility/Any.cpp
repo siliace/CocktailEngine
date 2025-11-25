@@ -9,7 +9,7 @@ namespace Ck
 
 	void Any::Reset()
 	{
-		mHolder = nullptr;
+		mHolder.Reset();
 	}
 
 	void Any::Swap(Any& other)

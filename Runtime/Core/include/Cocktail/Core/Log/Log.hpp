@@ -23,7 +23,7 @@ namespace Ck
 		 * \param logChannel
 		 * \return
 		 */
-		static void RegisterChannel(const String& name, std::unique_ptr<LogChannel> logChannel);
+		static void RegisterChannel(const String& name, UniquePtr<LogChannel> logChannel);
 
 		/**
 		 * \brief 

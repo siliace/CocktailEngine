@@ -47,8 +47,8 @@ namespace Ck::Vulkan
 
 			return block->GetSize() >= allocationSize;
 		}).Map([&](unsigned int index) {
-			DeviceMemoryBlock* allocatedBlock = mBlocks[index].get();
-			ObjectPool<DeviceMemoryBlock>::UniquePtr remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
+			DeviceMemoryBlock* allocatedBlock = mBlocks[index].Get();
+			ObjectPool<DeviceMemoryBlock>::Unique remainingBlock = allocatedBlock->Split(mBlockPool, alignment, size);
 			if (remainingBlock)
 				mBlocks.AddAt(index + 1, std::move(remainingBlock));
 
@@ -62,8 +62,8 @@ namespace Ck::Vulkan
 	{
 		for (unsigned int i = 0; i < mBlocks.GetSize();)
 		{
-			DeviceMemoryBlock* block = mBlocks[i].get();
-			DeviceMemoryBlock* nextBlock = mBlocks.TryAt(i + 1).GetOr(nullptr).get();
+			DeviceMemoryBlock* block = mBlocks[i].Get();
+			DeviceMemoryBlock* nextBlock = mBlocks.TryAt(i + 1).GetOr(nullptr).Get();
 
 			if (block->IsFree() && nextBlock && nextBlock->IsFree())
 			{
@@ -79,7 +79,7 @@ namespace Ck::Vulkan
 
 	bool DeviceMemoryChunk::IsFree() const
 	{
-		return mBlocks.AllOf([](const ObjectPool<DeviceMemoryBlock>::UniquePtr& block) {
+		return mBlocks.AllOf([](const ObjectPool<DeviceMemoryBlock>::Unique& block) {
 			return block->IsFree();
 		});
 	}

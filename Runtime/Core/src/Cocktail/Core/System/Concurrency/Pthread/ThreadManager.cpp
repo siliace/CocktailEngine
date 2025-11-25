@@ -11,11 +11,11 @@ namespace Ck::Detail::Pthread
         if (int error = pthread_key_create(&mCurrentThreadKey, nullptr); error != 0)
             throw std::system_error(error, PthreadErrorCategory::Instance);
 
-        mMainThread = std::make_unique<Thread>(pthread_self(), syscall(SYS_gettid), true);
-        pthread_setspecific(mCurrentThreadKey, mMainThread.get());
+        mMainThread = MakeUnique<Thread>(pthread_self(), syscall(SYS_gettid), true);
+        pthread_setspecific(mCurrentThreadKey, mMainThread.Get());
 
         std::lock_guard<std::mutex> lg(mThreadMutex);
-        mThreads.Add(mMainThread.get());
+        mThreads.Add(mMainThread.Get());
     }
 
     ThreadManager::~ThreadManager()

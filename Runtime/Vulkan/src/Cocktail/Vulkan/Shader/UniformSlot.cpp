@@ -47,7 +47,7 @@ namespace Ck::Vulkan
 			if (firstMember < total)
 			{
 				for (; i < memberCount && i + firstMember < total; i++)
-					members[i] = mMembers[i + firstMember].get();
+					members[i] = mMembers[i + firstMember].Get();
 			}
 
 			return i;
@@ -67,7 +67,7 @@ namespace Ck::Vulkan
 
 		UniformSlot* mSlot;
 		BlockMember mBlock;
-		Array<std::unique_ptr<MyUniformMember>> mMembers;
+		Array<UniquePtr<MyUniformMember>> mMembers;
 	};
 
 	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, AsciiString name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
@@ -113,7 +113,7 @@ namespace Ck::Vulkan
 		if (firstMember < total)
 		{
 			for (; i < memberCount && i + firstMember < total; i++)
-				members[i] = mMembers[i + firstMember].get();
+				members[i] = mMembers[i + firstMember].Get();
 		}
 
 		return i;

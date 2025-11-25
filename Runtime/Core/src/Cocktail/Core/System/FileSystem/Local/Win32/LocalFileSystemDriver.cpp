@@ -63,14 +63,14 @@ namespace Ck::Detail::Win32
 			throw SystemError::GetLastError();
 	}
 
-	std::unique_ptr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
+	UniquePtr<File> LocalFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
-		return std::make_unique<LocalFile>(Path::Merge(mBase, path), flags);
+		return MakeUnique<LocalFile>(Path::Merge(mBase, path), flags);
 	}
 
-	std::unique_ptr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
+	UniquePtr<Directory> LocalFileSystemDriver::OpenDirectory(const Path& path)
 	{
-		return std::make_unique<LocalDirectory>(Path::Merge(mBase, path));
+		return MakeUnique<LocalDirectory>(Path::Merge(mBase, path));
 	}
 
 	void LocalFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
@@ -100,14 +100,14 @@ namespace Ck::Detail::Win32
 		}
 	}
 
-	std::unique_ptr<FileLock> LocalFileSystemDriver::CreateLock(File& file, std::size_t offset, std::size_t length)
+	UniquePtr<FileLock> LocalFileSystemDriver::CreateLock(File& file, std::size_t offset, std::size_t length)
 	{
-		return std::make_unique<LocalFileLock>(file, offset, length);
+		return MakeUnique<LocalFileLock>(file, offset, length);
 	}
 
-	std::unique_ptr<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(Directory& directory, bool recursive)
+	UniquePtr<DirectoryWatcher> LocalFileSystemDriver::CreateWatcher(Directory& directory, bool recursive)
 	{
-		return std::make_unique<LocalDirectoryWatcher>(directory, recursive);
+		return MakeUnique<LocalDirectoryWatcher>(directory, recursive);
 	}
 
 	Path LocalFileSystemDriver::MakeCanonical(const Path& path)

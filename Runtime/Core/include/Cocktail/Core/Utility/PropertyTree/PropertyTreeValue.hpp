@@ -81,9 +81,9 @@ namespace Ck
          * \param name
          * \return
          */
-        std::unique_ptr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const override
+        UniquePtr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const override
         {
-            return std::unique_ptr<PropertyTreeNode<Data>>(
+            return UniquePtr<PropertyTreeNode<Data>>(
                 new PropertyTreeValue(parent, name, mValue)
             );
         }

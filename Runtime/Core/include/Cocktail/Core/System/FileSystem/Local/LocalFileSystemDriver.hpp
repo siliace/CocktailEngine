@@ -21,7 +21,7 @@ namespace Ck
 		 * \param length
 		 * \return
 		 */
-		virtual std::unique_ptr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) = 0;
+		virtual UniquePtr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) = 0;
 
 		/**
 		 * \brief
@@ -29,7 +29,7 @@ namespace Ck
 		 * \param recursive
 		 * \return
 		 */
-		virtual std::unique_ptr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) = 0;
+		virtual UniquePtr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) = 0;
 	};
 }
 

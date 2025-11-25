@@ -24,7 +24,7 @@ namespace Ck
 		ImageExportParameters streamExportParameters = parameters;
 		streamExportParameters.Format = path.GetExtension();
 
-		std::unique_ptr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
+		UniquePtr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Write | FileOpenFlagBits::Truncate);
 		FileOutputStream outputStream(*file);
 
 		SaveToStream(asset, outputStream, streamExportParameters);

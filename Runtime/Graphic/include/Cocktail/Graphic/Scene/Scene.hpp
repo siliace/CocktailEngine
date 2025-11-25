@@ -33,7 +33,7 @@ namespace Ck
 		 * \brief 
 		 * \param camera
 		 */
-		void AddCamera(std::unique_ptr<Camera> camera);
+		void AddCamera(UniquePtr<Camera> camera);
 
 		/**
 		 * \brief 
@@ -45,7 +45,7 @@ namespace Ck
 		 * \brief 
 		 * \param light 
 		 */
-		void AddLight(std::unique_ptr<Light> light);
+		void AddLight(UniquePtr<Light> light);
 
 		/**
 		 * \brief 
@@ -106,10 +106,10 @@ namespace Ck
 	private:
 
 		std::shared_ptr<GraphicEngine> mGraphicEngine;
-		std::unique_ptr<TransformationGraph> mTransformationGraph;
-		std::unique_ptr<SceneGraph> mSceneGraph;
-		Array<std::unique_ptr<Camera>> mCameras;
-		Array<std::unique_ptr<Light>> mLights;
+		UniquePtr<TransformationGraph> mTransformationGraph;
+		UniquePtr<SceneGraph> mSceneGraph;
+		Array<UniquePtr<Camera>> mCameras;
+		Array<UniquePtr<Light>> mLights;
 		Signal<Camera*> mOnCameraAdded;
 		Signal<Light*> mOnLightAdded;
 		Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;

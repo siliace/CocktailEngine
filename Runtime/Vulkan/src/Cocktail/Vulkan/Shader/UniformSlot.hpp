@@ -90,7 +90,7 @@ namespace Ck::Vulkan
 	private:
 
 		Renderer::ShaderProgramType mProgramType;
-		Array<std::unique_ptr<Renderer::UniformMember>> mMembers;
+		Array<UniquePtr<Renderer::UniformMember>> mMembers;
 		AsciiString mName;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;

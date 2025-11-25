@@ -200,6 +200,12 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Volume/Volume.hpp
 )
 
+cocktail_source_directory(CORE_FILES
+    FOLDER "Memory"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/UniquePtr.hpp
+)
+
 cocktail_source_directory(CORE_FILES    
     FOLDER "Memory/Allocator"
     INCLUDE

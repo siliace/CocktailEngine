@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/Application/Detail/ServiceBinding.hpp>
 
 namespace Ck
@@ -11,12 +12,12 @@ namespace Ck
 	class ServiceContainer;
 
 	template <typename T>
-	using ServiceDecoratorFactory = std::function<std::unique_ptr<T>(std::unique_ptr<T>)>;
+	using ServiceDecoratorFactory = std::function<UniquePtr<T>(UniquePtr<T>)>;
 
 	namespace Detail
 	{
 		template <typename T>
-		using ServiceResolver = std::function<std::unique_ptr<T>(ServiceContainer*)>;
+		using ServiceResolver = std::function<UniquePtr<T>(ServiceContainer*)>;
 
 		template <typename T>
 		class CallableServiceBinding : public ServiceBinding<T>
@@ -47,7 +48,7 @@ namespace Ck
 			 * \brief
 			 * \return
 			 */
-			std::unique_ptr<T> InvokeDecorators(std::unique_ptr<T> instance)
+			UniquePtr<T> InvokeDecorators(UniquePtr<T> instance)
 			{
 				for (const ServiceDecoratorFactory<T>& decoratorFactory : mDecoratorFactories)
 					instance = decoratorFactory(std::move(instance));

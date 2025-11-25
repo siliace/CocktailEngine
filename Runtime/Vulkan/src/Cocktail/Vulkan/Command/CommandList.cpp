@@ -384,10 +384,10 @@ namespace Ck::Vulkan
 
 		if (mUsage != Renderer::CommandListUsageBits::Transfer)
 		{
-			mStateManagers[Renderer::ShaderProgramType::Compute] = std::make_unique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
+			mStateManagers[Renderer::ShaderProgramType::Compute] = MakeUnique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
 
 			if (mUsage == Renderer::CommandListUsageBits::Graphic)
-				mStateManagers[Renderer::ShaderProgramType::Graphic] = std::make_unique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator, mDynamicState);
+				mStateManagers[Renderer::ShaderProgramType::Graphic] = MakeUnique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator, mDynamicState);
 		}
 
 		mOneShot = mAllocator->IsTransient();
@@ -1430,7 +1430,7 @@ namespace Ck::Vulkan
 
 	StateManager* CommandList::GetStateManager(Renderer::ShaderProgramType programType) const
 	{
-		return mStateManagers[programType].get();
+		return mStateManagers[programType].Get();
 	}
 
 	void CommandList::FlushComputeState()

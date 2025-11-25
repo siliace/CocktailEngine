@@ -105,8 +105,8 @@ namespace Ck::Vulkan
 		VkFramebuffer mHandle;
 		Extent3D<unsigned int> mSize;
 		unsigned int mColorBufferCount;
-		std::unique_ptr<AttachmentBuffer> mColorBuffers[MaxColorAttachmentCount];
-		std::unique_ptr<AttachmentBuffer> mDepthStencilBuffer;
+		UniquePtr<AttachmentBuffer> mColorBuffers[MaxColorAttachmentCount];
+		UniquePtr<AttachmentBuffer> mDepthStencilBuffer;
 	};
 }
 

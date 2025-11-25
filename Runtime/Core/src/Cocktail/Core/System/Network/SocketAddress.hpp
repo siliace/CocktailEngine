@@ -51,7 +51,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::unique_ptr<IpAddress> ToIpAddress() const;
+		UniquePtr<IpAddress> ToIpAddress() const;
 
 		/**
 		 * \brief
@@ -71,13 +71,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::unique_ptr<IpAddressV4> ToIpAddressV4() const;
+		UniquePtr<IpAddressV4> ToIpAddressV4() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::unique_ptr<IpAddressV6> ToIpAddressV6() const;
+		UniquePtr<IpAddressV6> ToIpAddressV6() const;
 
 		union
 		{

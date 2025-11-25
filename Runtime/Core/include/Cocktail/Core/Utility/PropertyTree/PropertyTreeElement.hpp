@@ -91,7 +91,7 @@ namespace Ck
             if (!mFirstChild)
                 return SetFirstChild(name, node);
 
-            return InsertBefore<NodeType>(mFirstChild.get(), name, node);
+            return InsertBefore<NodeType>(mFirstChild.Get(), name, node);
         }
 
         /**
@@ -116,11 +116,11 @@ namespace Ck
             }
         	else
             {
-                std::unique_ptr<Node> firstChild = static_cast<const Node&>(node).Clone(this, name);
+                UniquePtr<Node> firstChild = static_cast<const Node&>(node).Clone(this, name);
                 firstChild->SetNextSibling(std::move(mFirstChild));
 
                 mFirstChild = std::move(firstChild);
-                inserted = mFirstChild.get();
+                inserted = mFirstChild.Get();
             }
 
             return static_cast<NodeType<Data>*>(inserted);
@@ -155,7 +155,7 @@ namespace Ck
          */
         void Remove(const String& key)
         {
-            for (Node* current = mFirstChild.get(); current; current = current->GetNextSibling())
+            for (Node* current = mFirstChild.Get(); current; current = current->GetNextSibling())
             {
                 if (current->GetName() != key)
                     continue;
@@ -174,11 +174,11 @@ namespace Ck
             if (this != node->GetParent())
                 throw RuntimeException(CK_TEXT("Cannot insert property node after a node that does not belongs to the same element"));
 
-            if (mFirstChild.get() == node)
+            if (mFirstChild.Get() == node)
             {
                 mFirstChild = mFirstChild->DropNextSibling();
                 if (node == mLastChild)
-                    mLastChild = mFirstChild.get();
+                    mLastChild = mFirstChild.Get();
             }
             else if (mLastChild == node)
             {
@@ -189,7 +189,7 @@ namespace Ck
             }
             else
             {
-                for (Node* current = mFirstChild.get(); current != nullptr; current = current->GetNextSibling())
+                for (Node* current = mFirstChild.Get(); current != nullptr; current = current->GetNextSibling())
                 {
                     if (current != node)
                         continue;
@@ -223,7 +223,7 @@ namespace Ck
          */
         bool HasChild(const String& childName) const
         {
-	        for (auto child = mFirstChild.get(); child; child = child->GetNextSibling())
+	        for (auto child = mFirstChild.Get(); child; child = child->GetNextSibling())
 	        {
                 if (child->GetName() == childName)
                     return true;
@@ -311,7 +311,7 @@ namespace Ck
          */
         Node* GetFirstChild() const
         {
-            return mFirstChild.get();
+            return mFirstChild.Get();
         }
 
         /**
@@ -355,10 +355,10 @@ namespace Ck
          * \param name
          * \return
          */
-        std::unique_ptr<Node> Clone(Node* parent, const String& name) const override
+        UniquePtr<Node> Clone(Node* parent, const String& name) const override
         {
-            std::unique_ptr<PropertyTreeElement<Data>> clone(new PropertyTreeElement<Data>(parent, name)); /// TODO: find a way to use std::make_unique
-            for (auto* child = mFirstChild.get(); child != nullptr; child = child->GetNextSibling())
+            UniquePtr<PropertyTreeElement<Data>> clone(new PropertyTreeElement<Data>(parent, name)); /// TODO: find a way to use MakeUnique
+            for (auto* child = mFirstChild.Get(); child != nullptr; child = child->GetNextSibling())
                 clone->Insert(child->GetName(), *child);
 
             return clone;
@@ -370,12 +370,12 @@ namespace Ck
         NodeType<Data>* SetFirstChild(const String& name, const NodeType<Data>& node)
         {
             mFirstChild = static_cast<const Node&>(node).Clone(this, name);
-            mLastChild = mFirstChild.get();
+            mLastChild = mFirstChild.Get();
 
             return static_cast<NodeType<Data>*>(mLastChild);
         }
 
-        std::unique_ptr<Node> mFirstChild;
+        UniquePtr<Node> mFirstChild;
         Node* mLastChild;
     };
 }

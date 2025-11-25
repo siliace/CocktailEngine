@@ -7,8 +7,8 @@ namespace Ck
 	{
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
 
-		std::unique_ptr<OrthographicCamera> camera = std::make_unique<OrthographicCamera>(std::move(transformationNode), area, zBounds);
-		OrthographicCamera* cameraPtr = camera.get();
+		UniquePtr<OrthographicCamera> camera = MakeUnique<OrthographicCamera>(std::move(transformationNode), area, zBounds);
+		OrthographicCamera* cameraPtr = camera.Get();
 		scene->AddCamera(std::move(camera));
 
 		return cameraPtr;

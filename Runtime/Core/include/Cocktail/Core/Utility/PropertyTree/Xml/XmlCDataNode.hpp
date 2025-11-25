@@ -18,7 +18,7 @@ namespace Ck
 
 		XmlCDataNode(XmlProperties::NodeType* parent, const String& name, ByteArray data);
 
-		std::unique_ptr<XmlProperties::NodeType> Clone(XmlProperties::NodeType* parent, const String& name) const override;
+		UniquePtr<XmlProperties::NodeType> Clone(XmlProperties::NodeType* parent, const String& name) const override;
 
 	private:
 

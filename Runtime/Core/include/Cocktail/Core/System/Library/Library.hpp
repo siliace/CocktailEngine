@@ -23,7 +23,7 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		static std::unique_ptr<Library> LoadLibrary(StringView name);
+		static UniquePtr<Library> LoadLibrary(StringView name);
 
 		/**
 		 * \brief 

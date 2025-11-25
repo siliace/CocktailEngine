@@ -45,14 +45,14 @@ namespace Ck
 		 * \param flags
 		 * \return
 		 */
-		static std::unique_ptr<File> OpenFile(const URI& uri, FileOpenFlags flags);
+		static UniquePtr<File> OpenFile(const URI& uri, FileOpenFlags flags);
 
 		/**
 		 * \brief
 		 * \param uri
 		 * \return
 		 */
-		static std::unique_ptr<Directory> OpenDirectory(const URI& uri);
+		static UniquePtr<Directory> OpenDirectory(const URI& uri);
 
 		/**
 		 * \brief
@@ -80,7 +80,7 @@ namespace Ck
 		 * \param protocol
 		 * \param fileSystemDriver
 		 */
-		static void Mount(String protocol, std::unique_ptr<FileSystemDriver> fileSystemDriver);
+		static void Mount(String protocol, UniquePtr<FileSystemDriver> fileSystemDriver);
 
 		/**
 		 * \brief

@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	void App::RegisterServiceProvider(std::unique_ptr<ServiceProvider> serviceProvider)
+	void App::RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider)
 	{
 		ResolveFacadeInstance()->RegisterServiceProvider(std::move(serviceProvider));
 	}

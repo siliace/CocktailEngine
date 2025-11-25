@@ -47,14 +47,14 @@ namespace Ck
 		 * \param flags 
 		 * \return 
 		 */
-		std::unique_ptr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
+		UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
 
 		/**
 		 * \brief 
 		 * \param path 
 		 * \return 
 		 */
-		std::unique_ptr<Directory> OpenDirectory(const Path& path) override;
+		UniquePtr<Directory> OpenDirectory(const Path& path) override;
 
 		/**
 		 * \brief 

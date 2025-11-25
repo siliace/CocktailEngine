@@ -9,7 +9,7 @@ namespace Ck
 		Terminate();
 	}
 	
-	void Application::RegisterServiceProvider(std::unique_ptr<ServiceProvider> serviceProvider)
+	void Application::RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider)
 	{
 		if (mBooted)
 		{
@@ -27,14 +27,14 @@ namespace Ck
 
 	void Application::Boot()
 	{
-		mServiceProviders.ForEach([](const std::unique_ptr<ServiceProvider>& serviceProvider) {
+		mServiceProviders.ForEach([](const UniquePtr<ServiceProvider>& serviceProvider) {
 			serviceProvider->Register();
 		});
 		
 		mBooted = true;
 		Detail::ServiceFacadeBase::Boot(this);
 
-		mServiceProviders.ForEach([](const std::unique_ptr<ServiceProvider>& serviceProvider) {
+		mServiceProviders.ForEach([](const UniquePtr<ServiceProvider>& serviceProvider) {
 			serviceProvider->Boot();
 		});
 

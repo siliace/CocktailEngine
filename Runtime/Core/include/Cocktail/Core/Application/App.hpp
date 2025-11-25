@@ -88,7 +88,7 @@ namespace Ck
 		 * \param serviceProvider The ServiceProvider to register
 		 * \return A pointer to the registered ServiceProvider
 		 */
-		static void RegisterServiceProvider(std::unique_ptr<ServiceProvider> serviceProvider);
+		static void RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider);
 
 		/**
 		 * \brief 

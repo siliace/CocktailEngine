@@ -2,6 +2,7 @@
 #define COCKTAIL_VULKAN_PIPELINE_STATE_STATEMANAGER_HPP
 
 #include <Cocktail/Core/Flags.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 
 #include <Cocktail/Vulkan/DescriptorSet/State/DescriptorSetStateManager.hpp>
@@ -235,7 +236,7 @@ namespace Ck::Vulkan
 		unsigned int mDescriptorSetDirtyFlags;
 		Array<DescriptorSetStateManager> mDescriptorSetStateManagers;
 		unsigned int mPipelineConstantStorageSize;
-		std::unique_ptr<unsigned char[]> mPipelineConstantStorage;
+		UniquePtr<unsigned char[]> mPipelineConstantStorage;
 		EnumMap<Renderer::ShaderType, PipelineConstantRangeState> mPipelineConstantRanges;
 	};
 }

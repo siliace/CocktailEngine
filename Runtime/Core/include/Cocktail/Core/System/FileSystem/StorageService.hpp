@@ -95,7 +95,7 @@ namespace Ck
 		 * \see File
 		 * \see FileOpenFlags
 		 */
-		std::unique_ptr<File> OpenFile(const URI& uri, FileOpenFlags flags) const;
+		UniquePtr<File> OpenFile(const URI& uri, FileOpenFlags flags) const;
 
 		/**
 		  * \brief Opens a directory for enumeration
@@ -106,7 +106,7 @@ namespace Ck
 		  *
 		  * \see Directory
 		  */
-		std::unique_ptr<Directory> OpenDirectory(const URI& uri) const;
+		UniquePtr<Directory> OpenDirectory(const URI& uri) const;
 
 		/**
 		 * \brief Copies a resource from a source URI to a destination URI
@@ -147,7 +147,7 @@ namespace Ck
 		 * \param scheme URI scheme (e.g. "file", "asset")
 		 * \param fileSystemDriver Driver instance responsible for this scheme
 		 */
-		void Mount(String scheme, std::unique_ptr<FileSystemDriver> fileSystemDriver);
+		void Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver);
 
 		/**
 		 * \brief Registers a filesystem driver for the given URI scheme
@@ -196,7 +196,7 @@ namespace Ck
 
 		String mDefaultScheme;
 		std::unordered_map<String, FileSystemDriver*> mDrivers;
-		Array<std::unique_ptr<FileSystemDriver>> mInternalDrivers;
+		Array<UniquePtr<FileSystemDriver>> mInternalDrivers;
 	};
 }
 

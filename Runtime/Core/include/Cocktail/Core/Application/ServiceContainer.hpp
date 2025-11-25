@@ -53,7 +53,7 @@ namespace Ck
 		void Instance(Abstract* instance)
 		{
 			RegisterBinding(
-				std::make_unique<Detail::InstanceServiceBinding<Abstract>>(instance)
+				MakeUnique<Detail::InstanceServiceBinding<Abstract>>(instance)
 			);
 		}
 
@@ -66,8 +66,8 @@ namespace Ck
 		template <typename Abstract, typename Concrete = Abstract>
 		void Singleton(bool lazy = true)
 		{
-			Singleton<Abstract>([]() -> std::unique_ptr<Abstract> {
-				return std::make_unique<Concrete>();
+			Singleton<Abstract>([]() -> UniquePtr<Abstract> {
+				return MakeUnique<Concrete>();
 			}, lazy);
 
 			if constexpr (!std::is_same_v<Abstract, Concrete>)
@@ -84,10 +84,10 @@ namespace Ck
 		template <typename Abstract, typename Callable>
 		void Singleton(Callable&& callable, bool lazy = true)
 		{
-			static_assert(std::is_same_v<std::unique_ptr<Abstract>, FunctionReturnType<Callable>>);
+			static_assert(std::is_same_v<UniquePtr<Abstract>, FunctionReturnType<Callable>>);
 
 			RegisterBinding(
-				std::make_unique<Detail::SingletonServiceBinding<Abstract>>(
+				MakeUnique<Detail::SingletonServiceBinding<Abstract>>(
 					this,
 					MakeResolver<Abstract>(std::forward<Callable>(callable)),
 					lazy
@@ -106,7 +106,7 @@ namespace Ck
 			const std::type_info& concrete = GetConcrete(abstract);
 			if (auto itBinding = mBindings.find(concrete); itBinding != mBindings.end())
 			{
-				auto binding = static_cast<Detail::ServiceBinding<Abstract>*>(itBinding->second.get());
+				auto binding = static_cast<Detail::ServiceBinding<Abstract>*>(itBinding->second.Get());
 				if (binding->IsCallable())
 				{
 					auto callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(binding);
@@ -122,7 +122,7 @@ namespace Ck
 			const std::type_info& concrete = GetConcrete(abstract);
 			if (auto itBinding = mBindings.find(concrete); itBinding != mBindings.end())
 			{
-				auto binding = static_cast<Detail::ServiceBinding<T>*>(itBinding->second.get());
+				auto binding = static_cast<Detail::ServiceBinding<T>*>(itBinding->second.Get());
 				return binding->Resolve();
 			}
 
@@ -197,7 +197,7 @@ namespace Ck
 		template <typename T, typename Callable>
 		static Detail::ServiceResolver<T> MakeResolver(Callable&& callable)
 		{
-			return [callback = std::forward<Callable>(callable)](ServiceContainer* self) -> std::unique_ptr<T> {
+			return [callback = std::forward<Callable>(callable)](ServiceContainer* self) -> UniquePtr<T> {
 				if constexpr (FunctionTraits<Callable>::Arity > 0)
 				{
 					using ParameterResolverHelperType = typename FunctionTraits<Callable>::Arguments::template Apply<ParameterResolverHelper>;
@@ -217,7 +217,7 @@ namespace Ck
 		 * \brief 
 		 * \param binding 
 		 */
-		void RegisterBinding(std::unique_ptr<Detail::ServiceBindingBase> binding);
+		void RegisterBinding(UniquePtr<Detail::ServiceBindingBase>&& binding);
 
 		/**
 		 * \brief 
@@ -226,7 +226,7 @@ namespace Ck
 		 */
 		const std::type_info& GetConcrete(const std::type_info& abstract) const;
 
-		std::unordered_map<std::type_index, std::unique_ptr<Detail::ServiceBindingBase>> mBindings;
+		std::unordered_map<std::type_index, UniquePtr<Detail::ServiceBindingBase>> mBindings;
 		std::unordered_map<std::type_index, std::reference_wrapper<const std::type_info>> mAliases;
 	};
 }

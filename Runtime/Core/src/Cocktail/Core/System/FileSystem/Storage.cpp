@@ -22,12 +22,12 @@ namespace Ck
 		return ResolveFacadeInstance()->CreateDirectory(uri);
 	}
 
-	std::unique_ptr<File> Storage::OpenFile(const URI& uri, FileOpenFlags flags)
+	UniquePtr<File> Storage::OpenFile(const URI& uri, FileOpenFlags flags)
 	{
 		return ResolveFacadeInstance()->OpenFile(uri, flags);
 	}
 
-	std::unique_ptr<Directory> Storage::OpenDirectory(const URI& uri)
+	UniquePtr<Directory> Storage::OpenDirectory(const URI& uri)
 	{
 		return ResolveFacadeInstance()->OpenDirectory(uri);
 	}
@@ -47,7 +47,7 @@ namespace Ck
 		return ResolveFacadeInstance()->Remove(uri);
 	}
 
-	void Storage::Mount(String protocol, std::unique_ptr<FileSystemDriver> fileSystemDriver)
+	void Storage::Mount(String protocol, UniquePtr<FileSystemDriver> fileSystemDriver)
 	{
 		ResolveFacadeInstance()->Mount(std::move(protocol), std::move(fileSystemDriver));
 	}

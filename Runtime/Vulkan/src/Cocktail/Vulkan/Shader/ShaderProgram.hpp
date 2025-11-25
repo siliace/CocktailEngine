@@ -85,7 +85,7 @@ namespace Ck::Vulkan
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		Renderer::ShaderProgramType mType;
 		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaders;
-		Array<std::unique_ptr<UniformSlot>> mUniformSlots;
+		Array<UniquePtr<UniformSlot>> mUniformSlots;
 		std::shared_ptr<PipelineLayout> mPipelineLayout;
 	};
 }

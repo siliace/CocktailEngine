@@ -106,10 +106,10 @@ namespace Ck
 
 		if (CameraInfo* cameraInfo = nodeInfo.Camera)
 		{
-			std::unique_ptr<Camera> camera;
+			UniquePtr<Camera> camera;
 			if (cameraInfo->IsPerspective)
 			{
-				camera = std::make_unique<PerspectiveCamera>(
+				camera = MakeUnique<PerspectiveCamera>(
 					sceneNode->GetTransformationNode(),
 					cameraInfo->Perspective.FieldOfView, cameraInfo->Perspective.AspectRatio, 
 					cameraInfo->DepthBounds
@@ -118,7 +118,7 @@ namespace Ck
 			else
 			{
 				Rectangle<unsigned int> area;
-				camera = std::make_unique<OrthographicCamera>(
+				camera = MakeUnique<OrthographicCamera>(
 					sceneNode->GetTransformationNode(),
 					area,
 					cameraInfo->DepthBounds

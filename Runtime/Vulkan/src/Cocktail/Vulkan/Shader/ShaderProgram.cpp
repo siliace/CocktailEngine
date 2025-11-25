@@ -90,10 +90,10 @@ namespace Ck::Vulkan
 
 	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(AnsiStringView name) const
 	{	
-		for (const std::unique_ptr<UniformSlot>& uniformSlot : mUniformSlots)
+		for (const UniquePtr<UniformSlot>& uniformSlot : mUniformSlots)
 		{
 			if (uniformSlot->GetName() == name)
-				return uniformSlot.get();
+				return uniformSlot.Get();
 		}
 
 		return nullptr;
@@ -225,7 +225,7 @@ namespace Ck::Vulkan
 					break;
 				}
 
-				std::unique_ptr<UniformSlot> slot = std::make_unique<UniformSlot>(mType, members, std::move(name), binding, i);
+				UniquePtr<UniformSlot> slot = MakeUnique<UniformSlot>(mType, members, std::move(name), binding, i);
 				mUniformSlots.Emplace(std::move(slot));
 			}
 		}

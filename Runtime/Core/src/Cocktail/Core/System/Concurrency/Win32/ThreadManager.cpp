@@ -13,11 +13,11 @@ namespace Ck::Detail::Win32
 				throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
 		}
 
-		mMainThread = std::make_unique<Thread>(::GetCurrentThread(), ::GetCurrentThreadId(), true);
-		TlsSetValue(mTlsIndex, mMainThread.get());
+		mMainThread = MakeUnique<Thread>(::GetCurrentThread(), ::GetCurrentThreadId(), true);
+		TlsSetValue(mTlsIndex, mMainThread.Get());
 
 		std::lock_guard<std::mutex> lg(mThreadMutex);
-		mThreads.Add(mMainThread.get());
+		mThreads.Add(mMainThread.Get());
 	}
 
 	ThreadManager::~ThreadManager()

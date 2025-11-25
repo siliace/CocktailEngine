@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param size 
 		 * \return 
 		 */
-		ObjectPool<DeviceMemoryBlock>::UniquePtr Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size);
+		ObjectPool<DeviceMemoryBlock>::Unique Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size);
 
 		/**
 		 * \brief 

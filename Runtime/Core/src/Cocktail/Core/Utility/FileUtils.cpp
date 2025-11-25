@@ -26,7 +26,7 @@ namespace Ck
 		if (!Storage::IsFile(uri))
 			return content;
 
-		std::unique_ptr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		UniquePtr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
 		if (!size)
@@ -58,7 +58,7 @@ namespace Ck
 		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
 		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
 
-		std::unique_ptr<File> file = Storage::OpenFile(uri, openFlags);
+		UniquePtr<File> file = Storage::OpenFile(uri, openFlags);
 		file->Write(content.GetData(), content.GetSize());
 	}
 
@@ -73,7 +73,7 @@ namespace Ck
 		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
 		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
 
-		std::unique_ptr<File> file = Storage::OpenFile(uri, openFlags);
+		UniquePtr<File> file = Storage::OpenFile(uri, openFlags);
 		FileWriter writer(*file);
 		BufferedWriter bufferedWriter(writer);
 

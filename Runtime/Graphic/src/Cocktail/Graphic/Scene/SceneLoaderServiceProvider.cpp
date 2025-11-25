@@ -21,7 +21,7 @@ namespace Ck
 		application->Singleton<SceneLoader>();
 		application->Singleton<ObjImporter>();
 		application->Singleton<GltfImporter>([](ImageLoader* imageLoader) {
-			return std::make_unique<GltfImporter>(imageLoader);
+			return MakeUnique<GltfImporter>(imageLoader);
 		});
 	}
 

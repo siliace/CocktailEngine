@@ -35,7 +35,7 @@ namespace Ck::Detail::Unix
 		 * \param base
 		 * \return
 		 */
-		std::unique_ptr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
+		UniquePtr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
 	};
 }
 

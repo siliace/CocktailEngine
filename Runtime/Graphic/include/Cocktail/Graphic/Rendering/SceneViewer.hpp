@@ -123,8 +123,8 @@ namespace Ck
 
 		std::shared_ptr<Scene> mScene;
 		std::set<ViewportEntry, ViewportComparator> mViewports;
-		std::unique_ptr<RenderQueue> mOpaqueRenderQueue;
-		std::unique_ptr<RenderQueue> mBlendingRenderQueue;
+		UniquePtr<RenderQueue> mOpaqueRenderQueue;
+		UniquePtr<RenderQueue> mBlendingRenderQueue;
 		Signal<Renderer::RenderContext&, Renderer::Framebuffer&> mOnRendered;
 	};
 }

@@ -133,10 +133,10 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		VkQueue mPresentationQueue;
-		std::unique_ptr<SubmitScheduler> mScheduler;
-		EnumMap<Renderer::CommandQueueType, std::unique_ptr<QueueSubmitter>> mSubmitters;
+		UniquePtr<SubmitScheduler> mScheduler;
+		EnumMap<Renderer::CommandQueueType, UniquePtr<QueueSubmitter>> mSubmitters;
 		unsigned int mCurrentFrameContext;
-		Array<std::unique_ptr<FrameContext>> mFrameContexts;
+		Array<UniquePtr<FrameContext>> mFrameContexts;
 	};
 }
 

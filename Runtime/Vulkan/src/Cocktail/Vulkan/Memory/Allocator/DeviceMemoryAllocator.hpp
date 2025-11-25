@@ -115,7 +115,7 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		std::size_t mDefaultChuckSize;
-		Array<ObjectPool<DeviceMemoryChunk>::UniquePtr> mChunks;
+		Array<ObjectPool<DeviceMemoryChunk>::Unique> mChunks;
 		ObjectPool<DeviceMemoryChunk> mChunkPool;
 		ObjectPool<DeviceMemoryBlock> mBlockPool;
 	}; 

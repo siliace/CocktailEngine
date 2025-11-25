@@ -39,7 +39,7 @@ namespace Ck::Detail
 					mInstance = CallableServiceBinding<T>::InvokeDecorators(mResolver(mOwner));
 			}
 
-			return mInstance.get();
+			return mInstance.Get();
 		}
 
 	private:
@@ -48,7 +48,7 @@ namespace Ck::Detail
 		ServiceResolver<T> mResolver;
 		bool mLazy;
 		std::mutex mLock;
-		std::unique_ptr<T> mInstance;
+		UniquePtr<T> mInstance;
 	};
 }
 

@@ -19,7 +19,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		std::unique_ptr<Thread> mMainThread;
+		UniquePtr<Thread> mMainThread;
 		Array<Thread*> mThreads;
 		std::mutex mThreadMutex;
 		DWORD mTlsIndex;

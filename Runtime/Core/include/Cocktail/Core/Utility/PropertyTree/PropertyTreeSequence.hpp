@@ -40,8 +40,8 @@ namespace Ck
         {
             unsigned int index = GetSize();
             String keyIndex = TranslatorCast<String>(index);
-            std::unique_ptr<Node> clone = static_cast<const Node&>(node).Clone(this, keyIndex);
-            Node* inserted = mChildren.Emplace(std::move(clone)).get();
+            UniquePtr<Node> clone = static_cast<const Node&>(node).Clone(this, keyIndex);
+            Node* inserted = mChildren.Emplace(std::move(clone)).Get();
             return static_cast<NodeType<Data>*>(inserted);
         }
 
@@ -85,7 +85,7 @@ namespace Ck
             if (index >= mChildren.GetSize())
                 throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target sequence %s does not contains child with index %u"), this->mName, index);
 
-            const Node* child = mChildren[index].get();
+            const Node* child = mChildren[index].Get();
             if (child->GetType() == Node::Type::Element)
                 return static_cast<const PropertyTreeElement<Data>*>(child)->GetChild(p);
 
@@ -230,10 +230,10 @@ namespace Ck
          * \param name 
          * \return 
          */
-        std::unique_ptr<Node> Clone(Node* parent, const String& name) const override
+        UniquePtr<Node> Clone(Node* parent, const String& name) const override
         {
-            std::unique_ptr<PropertyTreeSequence<Data>> clone(new PropertyTreeSequence<Data>(parent, name)); /// TODO: find a way to use std::make_unique
-            for (const std::unique_ptr<Node>& child : mChildren)
+            UniquePtr<PropertyTreeSequence<Data>> clone(new PropertyTreeSequence<Data>(parent, name)); /// TODO: find a way to use MakeUnique
+            for (const UniquePtr<Node>& child : mChildren)
                 clone->Add(*child);
 
             return clone;
@@ -241,7 +241,7 @@ namespace Ck
 
     private:
 
-        Array64<std::unique_ptr<Node>> mChildren;
+        Array64<UniquePtr<Node>> mChildren;
     };
 }
 

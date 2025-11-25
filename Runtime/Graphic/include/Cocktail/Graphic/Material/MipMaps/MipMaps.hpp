@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 
+#include <memory>
+
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
 

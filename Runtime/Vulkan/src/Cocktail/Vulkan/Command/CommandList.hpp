@@ -133,7 +133,7 @@ namespace Ck::Vulkan
 		const Framebuffer* mCurrentFramebuffer;
 		Optional<Renderer::RenderPassMode> mCurrentRenderPassMode;
 		EnumMap<Renderer::ShaderProgramType, std::shared_ptr<Pipeline>> mCurrentPipelines;
-		EnumMap<Renderer::ShaderProgramType, std::unique_ptr<StateManager>> mStateManagers;
+		EnumMap<Renderer::ShaderProgramType, UniquePtr<StateManager>> mStateManagers;
 	};
 }
 

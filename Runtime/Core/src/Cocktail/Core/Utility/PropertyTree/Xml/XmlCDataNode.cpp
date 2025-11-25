@@ -20,9 +20,9 @@ namespace Ck
 		/// Nothing
 	}
 
-	std::unique_ptr<XmlProperties::NodeType> XmlCDataNode::Clone(XmlProperties::NodeType* parent, const String& name) const
+	UniquePtr<XmlProperties::NodeType> XmlCDataNode::Clone(XmlProperties::NodeType* parent, const String& name) const
 	{
-		return std::unique_ptr<XmlProperties::NodeType>(
+		return UniquePtr<XmlProperties::NodeType>(
 			new XmlCDataNode(parent, name, mData)
 		);
 	}

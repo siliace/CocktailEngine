@@ -16,16 +16,18 @@ namespace Ck
 	{
 		assert(mSize);
 
-		mData = std::make_unique<Uint8[]>(mSize);
-		std::memset(mData.get(), value, mSize);
+		mData = MakeUnique<Uint8[]>(mSize);
+		std::memset(mData.Get(), value, mSize);
 	}
 
-	ByteArray::ByteArray(const ByteArray& other)
+    ByteArray::ByteArray(const ByteArray& other) :
+        mSize(0)
 	{
 		*this = other;
 	}
 
-	ByteArray::ByteArray(ByteArray&& other) noexcept
+	ByteArray::ByteArray(ByteArray&& other) noexcept :
+        mSize(0)
 	{
 		*this = std::move(other);
 	}
@@ -33,12 +35,12 @@ namespace Ck
 	ByteArray& ByteArray::operator=(const ByteArray& other)
 	{
 		mSize = other.mSize;
-		mData = nullptr;
+		mData.Reset();
 
 		if (mSize)
 		{
-			mData = std::make_unique<Uint8[]>(mSize);
-			std::memcpy(mData.get(), other.GetData(), mSize);
+			mData = MakeUnique<Uint8[]>(mSize);
+			std::memcpy(mData.Get(), other.GetData(), mSize);
 		}
 
 		return *this;
@@ -99,35 +101,35 @@ namespace Ck
 		assert(length > 0);
 
 		std::size_t fullSize = mSize + length;
-		std::unique_ptr<Uint8[]> fullData = std::make_unique<Uint8[]>(fullSize);
+		UniquePtr<Uint8[]> fullData = MakeUnique<Uint8[]>(fullSize);
 
 		if (mSize)
 		{
 			if (where == 0)
 			{
-				std::memcpy(fullData.get(), data, length);
-				std::memcpy(fullData.get() + length, mData.get(), mSize);
+				std::memcpy(fullData.Get(), data, length);
+				std::memcpy(fullData.Get() + length, mData.Get(), mSize);
 			}
 			else if (where == mSize)
 			{
-				std::memcpy(fullData.get(), mData.get(), mSize);
-				std::memcpy(fullData.get() + mSize, data, length);
+				std::memcpy(fullData.Get(), mData.Get(), mSize);
+				std::memcpy(fullData.Get() + mSize, data, length);
 			}
 			else
 			{
 				std::size_t offset = 0;
-				std::memcpy(fullData.get() + offset, mData.get(), where);
+				std::memcpy(fullData.Get() + offset, mData.Get(), where);
 
 				offset += where;
-				std::memcpy(fullData.get() + offset, data, length);
+				std::memcpy(fullData.Get() + offset, data, length);
 
 				offset += length;
-				std::memcpy(fullData.get() + offset, mData.get() + where, mSize - where);
+				std::memcpy(fullData.Get() + offset, mData.Get() + where, mSize - where);
 			}
 		}
 		else
 		{
-			std::memcpy(fullData.get(), data, fullSize);
+			std::memcpy(fullData.Get(), data, fullSize);
 		}
 
 		mSize = fullSize;
@@ -144,7 +146,7 @@ namespace Ck
 	ByteArray ByteArray::Slice(std::size_t offset, std::size_t length) const
 	{
 		assert(offset + length < mSize);
-		return ByteArray(mData.get() + offset, length);
+		return ByteArray(mData.Get() + offset, length);
 	}
 
 	ByteArray& ByteArray::Remove(std::size_t offset)
@@ -157,20 +159,20 @@ namespace Ck
 		assert(offset + length < mSize);
 
 		std::size_t fullSize = mSize - length;
-		std::unique_ptr<Uint8[]> fullData = std::make_unique<Uint8[]>(fullSize);
+		UniquePtr<Uint8[]> fullData = MakeUnique<Uint8[]>(fullSize);
 
 		if (offset == 0)
 		{
-			std::memcpy(fullData.get(), mData.get() + length, fullSize);
+			std::memcpy(fullData.Get(), mData.Get() + length, fullSize);
 		}
 		else if (offset + length == mSize - 1)
 		{
-			std::memcpy(fullData.get(), mData.get(), fullSize);
+			std::memcpy(fullData.Get(), mData.Get(), fullSize);
 		}
 		else
 		{
-			std::memcpy(fullData.get(), mData.get(), offset);
-			std::memcpy(fullData.get() + offset, mData.get() + offset + length, fullSize - offset);
+			std::memcpy(fullData.Get(), mData.Get(), offset);
+			std::memcpy(fullData.Get() + offset, mData.Get() + offset + length, fullSize - offset);
 		}
 
 		mSize = fullSize;
@@ -184,15 +186,15 @@ namespace Ck
 		if (newSize == mSize)
 			return;
 
-		std::unique_ptr<Uint8[]> newData = std::make_unique<Uint8[]>(newSize);
+		UniquePtr<Uint8[]> newData = MakeUnique<Uint8[]>(newSize);
 		if (newSize > mSize)
 		{
-			std::memcpy(newData.get(), mData.get(), mSize);
-			std::memset(newData.get() + mSize, value, newSize - mSize);
+			std::memcpy(newData.Get(), mData.Get(), mSize);
+			std::memset(newData.Get() + mSize, value, newSize - mSize);
 		}
 		else
 		{
-			std::memcpy(newData.get(), mData.get(), newSize);
+			std::memcpy(newData.Get(), mData.Get(), newSize);
 		}
 
 		mSize = newSize;
@@ -223,12 +225,12 @@ namespace Ck
 
 	Uint8* ByteArray::GetData()
 	{
-		return mData.get();
+		return mData.Get();
 	}
 
 	const Uint8* ByteArray::GetData() const
 	{
-		return mData.get();
+		return mData.Get();
 	}
 
 	bool ByteArray::operator==(const ByteArray& rhs) const

@@ -69,7 +69,7 @@ namespace Ck
 		return reinterpret_cast<const sockaddr*>(&mAddress);
 	}
 
-	std::unique_ptr<IpAddress> SocketAddress::ToIpAddress() const
+	UniquePtr<IpAddress> SocketAddress::ToIpAddress() const
 	{
 		switch (AsSockAddr()->sa_family)
 		{
@@ -102,20 +102,20 @@ namespace Ck
 		return mLength;
 	}
 
-	std::unique_ptr<IpAddressV4> SocketAddress::ToIpAddressV4() const
+	UniquePtr<IpAddressV4> SocketAddress::ToIpAddressV4() const
 	{
 		const sockaddr_in* addr = reinterpret_cast<const sockaddr_in*>(this);
 		const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin_addr);
 
-		return std::make_unique<IpAddressV4>(bytes[0], bytes[1], bytes[2], bytes[3]);
+		return MakeUnique<IpAddressV4>(bytes[0], bytes[1], bytes[2], bytes[3]);
 	}
 
-	std::unique_ptr<IpAddressV6> SocketAddress::ToIpAddressV6() const
+	UniquePtr<IpAddressV6> SocketAddress::ToIpAddressV6() const
 	{
 		const sockaddr_in6* addr = reinterpret_cast<const sockaddr_in6*>(this);
 		const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin6_addr);
 
-		std::unique_ptr<IpAddressV6> ipAddress = std::make_unique<IpAddressV6>();
+		UniquePtr<IpAddressV6> ipAddress = MakeUnique<IpAddressV6>();
 		for (std::size_t i = 0; i < 16; i++)
 			ipAddress->SetByte(i, bytes[i]);
 

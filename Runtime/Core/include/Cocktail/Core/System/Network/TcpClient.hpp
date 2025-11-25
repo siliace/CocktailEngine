@@ -52,9 +52,9 @@ namespace Ck
 		 * \param remoteAddress 
 		 * \param remotePort 
 		 */
-		TcpClient(Handle handle, std::unique_ptr<IpAddress> remoteAddress, unsigned short remotePort);
+		TcpClient(Handle handle, UniquePtr<IpAddress> remoteAddress, unsigned short remotePort);
 
-		std::unique_ptr<IpAddress> mRemoteAddress;
+		UniquePtr<IpAddress> mRemoteAddress;
 		unsigned short mRemotePort;
 	};
 }

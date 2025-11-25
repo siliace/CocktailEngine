@@ -12,7 +12,7 @@ namespace Ck::Detail::Win32
 	{
 	public:
 
-		std::unique_ptr<Ck::Library> LoadLibrary(StringView name) override;
+		UniquePtr<Ck::Library> LoadLibrary(StringView name) override;
 		
 		void AddLibraryDirectory(const Path& path) override;
 

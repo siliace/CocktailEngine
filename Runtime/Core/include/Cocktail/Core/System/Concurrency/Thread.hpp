@@ -127,7 +127,7 @@ namespace Ck
          *
          * \note The thread starts execution immediately after creation
          */
-        static std::unique_ptr<Thread> Create(Runnable* runnable, StringView name = CK_TEXT(""), unsigned int stackSize = 0);
+        static UniquePtr<Thread> Create(Runnable* runnable, StringView name = CK_TEXT(""), unsigned int stackSize = 0);
 
         /**
          * \brief Returns a pointer to the currently executing thread

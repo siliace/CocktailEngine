@@ -15,7 +15,7 @@ namespace Ck::Detail::Xlib
 
 		PixelFormat imageFormat = image.GetFormat();
 		std::size_t allocationSize = imageFormat.ComputeAllocationSize(image.GetSize());
-		std::unique_ptr<unsigned char[]> bgraPixels = std::make_unique<unsigned char[]>(allocationSize);
+		UniquePtr<unsigned char[]> bgraPixels = MakeUnique<unsigned char[]>(allocationSize);
 
 		const Uint8* pixelOffset = image.GetPixels().GetData();
 		std::uint32_t* bitmapOffset = cursorImage->pixels;

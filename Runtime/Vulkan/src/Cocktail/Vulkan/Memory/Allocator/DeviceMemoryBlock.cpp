@@ -34,7 +34,7 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkBindImageMemory(renderDevice.GetHandle(), texture.GetHandle(), GetChunk()->GetDeviceMemory()->GetHandle(), mOffset + mPadding));
 	}
 
-	ObjectPool<DeviceMemoryBlock>::UniquePtr DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size)
+	ObjectPool<DeviceMemoryBlock>::Unique DeviceMemoryBlock::Split(ObjectPool<DeviceMemoryBlock>& blockPool, VkDeviceSize alignment, VkDeviceSize size)
 	{
 		assert(mFree);
 

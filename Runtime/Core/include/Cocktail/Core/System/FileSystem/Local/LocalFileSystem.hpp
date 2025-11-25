@@ -36,7 +36,7 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		static std::unique_ptr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty);
+		static UniquePtr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty);
 	};
 }
 #endif // COCKTAIL_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEM_HPP

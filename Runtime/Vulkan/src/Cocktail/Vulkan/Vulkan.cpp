@@ -49,44 +49,44 @@ namespace Ck::Vulkan
 		return ApiVersion::Version_1_0;
 	}
 
-	std::unique_ptr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
+	UniquePtr<Renderer::RenderDevice> CreateRenderDevice(const RenderDeviceCreateInfo& createInfo)
 	{
-		std::unique_ptr<RenderDevice> renderDevice = std::make_unique<RenderDevice>(createInfo);
+		UniquePtr<RenderDevice> renderDevice = MakeUnique<RenderDevice>(createInfo);
 
 		if (createInfo.EnableValidation && renderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
 		{
-			renderDevice->Singleton<DebugMessenger>([renderDevice = renderDevice.get()]() {
-				return std::make_unique<DebugMessenger>(renderDevice, DebugMessengerCreateInfo{}, nullptr);
+			renderDevice->Singleton<DebugMessenger>([renderDevice = renderDevice.Get()]() {
+				return MakeUnique<DebugMessenger>(renderDevice, DebugMessengerCreateInfo{}, nullptr);
 			});
 			renderDevice->Resolve<DebugMessenger>();
 		}
 
 		if (renderDevice->IsFeatureSupported(RenderDeviceFeature::ValidationCache))
 		{
-			renderDevice->Singleton<ValidationCache>([renderDevice = renderDevice.get()]() {
-				return std::make_unique<ValidationCache>(renderDevice, ValidationCacheCreateInfo{}, nullptr);
+			renderDevice->Singleton<ValidationCache>([renderDevice = renderDevice.Get()]() {
+				return MakeUnique<ValidationCache>(renderDevice, ValidationCacheCreateInfo{}, nullptr);
 			});
 		}
 
-		renderDevice->Singleton<DepthResolver>([renderDevice = renderDevice.get()]() {
-			return std::make_unique<DepthResolver>(renderDevice);
+		renderDevice->Singleton<DepthResolver>([renderDevice = renderDevice.Get()]() {
+			return MakeUnique<DepthResolver>(renderDevice);
 		});
 
-		renderDevice->Singleton<DeviceMemoryAllocator>([renderDevice = renderDevice.get(), createInfo = createInfo]() {
-			return std::make_unique<DeviceMemoryAllocator>(renderDevice, createInfo.DeviceMemoryBlockSize);
+		renderDevice->Singleton<DeviceMemoryAllocator>([renderDevice = renderDevice.Get(), createInfo = createInfo]() {
+			return MakeUnique<DeviceMemoryAllocator>(renderDevice, createInfo.DeviceMemoryBlockSize);
 		});
 
-		renderDevice->Singleton<PipelineManager>([renderDevice = renderDevice.get()]() {
-			return std::make_unique<PipelineManager>(renderDevice);
+		renderDevice->Singleton<PipelineManager>([renderDevice = renderDevice.Get()]() {
+			return MakeUnique<PipelineManager>(renderDevice);
 		});
 
 		Path pipelineCachePath = PipelineCacheSaver::ComputePipelineCachePath(createInfo.ApplicationName, createInfo.ApplicationVersion);
 		renderDevice->Singleton<PipelineCacheSaver>([pipelineCachePath = std::move(pipelineCachePath)](PipelineManager* pipelineManager) {
-			return std::make_unique<PipelineCacheSaver>(pipelineManager, std::move(pipelineCachePath));
+			return MakeUnique<PipelineCacheSaver>(pipelineManager, std::move(pipelineCachePath));
 		}, false);
 
-		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice.get()]() {
-			return std::make_unique<StaticSamplerManager>(renderDevice);
+		renderDevice->Singleton<StaticSamplerManager>([renderDevice = renderDevice.Get()]() {
+			return MakeUnique<StaticSamplerManager>(renderDevice);
 		});
 
 		return renderDevice;

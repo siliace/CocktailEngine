@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
+
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 #include <Cocktail/Renderer/Texture/Texture.hpp>
 
@@ -76,7 +78,7 @@ namespace Ck::Vulkan
 
 		bool mHasMutableFormat;
 		unsigned int mViewFormatCount;
-		std::unique_ptr<PixelFormat[]> mViewFormats;
+		UniquePtr<PixelFormat[]> mViewFormats;
 	};
 }
 

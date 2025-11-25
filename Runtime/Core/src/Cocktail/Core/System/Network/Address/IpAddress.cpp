@@ -7,7 +7,7 @@
 namespace Ck
 {
 #ifdef COCKTAIL_OS_WINDOWS
-	Array<std::unique_ptr<IpAddress>> IpAddress::Resolve(StringView hostname)
+	Array<UniquePtr<IpAddress>> IpAddress::Resolve(StringView hostname)
 	{
 		ADDRINFOW hints = {};
 		hints.ai_family = AF_UNSPEC;
@@ -17,17 +17,17 @@ namespace Ck
 		if (GetAddrInfoW(hostname.GetData(), nullptr, &hints, &results) != 0)
 			throw SystemError::GetLastError();
 
-		Array<std::unique_ptr<IpAddress>> ipAddresses;
+		Array<UniquePtr<IpAddress>> ipAddresses;
 		for (ADDRINFOW* result = results; result; result = result->ai_next)
 		{
-			std::unique_ptr<IpAddress> ipAddress;
+			UniquePtr<IpAddress> ipAddress;
 			if (result->ai_family == AF_INET)
 			{
 				sockaddr_in* ipv4 = reinterpret_cast<sockaddr_in*>(result->ai_addr);
 
 				Uint8* bytes = reinterpret_cast<Uint8*>(&ipv4->sin_addr);
 				
-				ipAddress = std::make_unique<IpAddressV4>(0, 0, 0, 0);
+				ipAddress = MakeUnique<IpAddressV4>(0, 0, 0, 0);
 				for (std::size_t i = 0; i < 4; i++)
 					ipAddress->SetByte(i, bytes[i]);
 			}
@@ -37,7 +37,7 @@ namespace Ck
 
 				Uint8* bytes = reinterpret_cast<Uint8*>(&ipv6->sin6_addr);
 
-				ipAddress = std::make_unique<IpAddressV6>();
+				ipAddress = MakeUnique<IpAddressV6>();
 				for (std::size_t i = 0; i < 16; i++)
 					ipAddress->SetByte(i, bytes[i]);
 			}
@@ -52,7 +52,7 @@ namespace Ck
 		return ipAddresses;
 	}
 #else
-	Array<std::unique_ptr<IpAddress>> IpAddress::Resolve(StringView hostname)
+	Array<UniquePtr<IpAddress>> IpAddress::Resolve(StringView hostname)
 	{
 		addrinfo hints = {};
 		hints.ai_family = AF_UNSPEC;
@@ -62,17 +62,17 @@ namespace Ck
 		if (getaddrinfo(reinterpret_cast<const AnsiChar*>(hostname.GetData()), nullptr, &hints, &results) != 0)
 			throw SystemError::GetLastError();
 
-		Array<std::unique_ptr<IpAddress>> ipAddresses;
+		Array<UniquePtr<IpAddress>> ipAddresses;
 		for (addrinfo* result = results; result; result = result->ai_next)
 		{
-			std::unique_ptr<IpAddress> ipAddress;
+			UniquePtr<IpAddress> ipAddress;
 			if (result->ai_family == AF_INET)
 			{
 				sockaddr_in* ipv4 = reinterpret_cast<sockaddr_in*>(result->ai_addr);
 
 				Uint8* bytes = reinterpret_cast<Uint8*>(&ipv4->sin_addr);
 
-				ipAddress = std::make_unique<IpAddressV4>(0, 0, 0, 0);
+				ipAddress = MakeUnique<IpAddressV4>(0, 0, 0, 0);
 				for (std::size_t i = 0; i < 4; i++)
 					ipAddress->SetByte(i, bytes[i]);
 			}
@@ -82,7 +82,7 @@ namespace Ck
 
 				Uint8* bytes = reinterpret_cast<Uint8*>(&ipv6->sin6_addr);
 
-				ipAddress = std::make_unique<IpAddressV6>();
+				ipAddress = MakeUnique<IpAddressV6>();
 				for (std::size_t i = 0; i < 16; i++)
 					ipAddress->SetByte(i, bytes[i]);
 			}

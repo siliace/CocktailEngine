@@ -186,7 +186,7 @@ namespace Ck::Detail::Win32
 			assert(iconFormat.GetLayout() == PixelFormat::Layout::RGBA);
 
 			std::size_t allocationSize = iconFormat.ComputeAllocationSize(icon->GetSize());
-			std::unique_ptr<unsigned char[]> bgraPixels = std::make_unique<unsigned char[]>(allocationSize);
+			UniquePtr<unsigned char[]> bgraPixels = MakeUnique<unsigned char[]>(allocationSize);
 
 			const unsigned char* pixels = icon->GetPixels().GetData();
 			for (std::size_t i = 0; i < allocationSize / 4; i++)
@@ -203,7 +203,7 @@ namespace Ck::Detail::Win32
 				1, 
 				32, 
 				nullptr, 
-				bgraPixels.get()
+				bgraPixels.Get()
 			);
 
 			if (!mIcon)

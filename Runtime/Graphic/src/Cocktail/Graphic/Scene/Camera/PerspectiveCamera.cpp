@@ -7,8 +7,8 @@ namespace Ck
 	{
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
 
-		std::unique_ptr<PerspectiveCamera> camera = std::make_unique<PerspectiveCamera>(std::move(transformationNode), fov, aspectRatio, zBounds);
-		PerspectiveCamera* cameraPtr = camera.get();
+		UniquePtr<PerspectiveCamera> camera = MakeUnique<PerspectiveCamera>(std::move(transformationNode), fov, aspectRatio, zBounds);
+		PerspectiveCamera* cameraPtr = camera.Get();
 		scene->AddCamera(std::move(camera));
 
 		return cameraPtr;

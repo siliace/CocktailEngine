@@ -59,8 +59,8 @@ namespace Ck
 	Scene::Scene(std::shared_ptr<GraphicEngine> graphicEngine) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
-		mTransformationGraph = std::make_unique<TransformationGraph>();
-		mSceneGraph = std::make_unique<SceneGraph>(this, mTransformationGraph->GetRoot());
+		mTransformationGraph = MakeUnique<TransformationGraph>();
+		mSceneGraph = MakeUnique<SceneGraph>(this, mTransformationGraph->GetRoot());
 	}
 
 	Scene::~Scene()
@@ -69,31 +69,31 @@ namespace Ck
 		mSceneGraph->Detach();
 	}
 
-	void Scene::AddCamera(std::unique_ptr<Camera> camera)
+	void Scene::AddCamera(UniquePtr<Camera> camera)
 	{
 		mOnCameraAdded.Emit(
-			mCameras.Emplace(std::move(camera)).get()
+			mCameras.Emplace(std::move(camera)).Get()
 		);
 	}
 
 	void Scene::RemoveCamera(const Camera* camera)
 	{
-		mCameras.FilterInPlace([&](const std::unique_ptr<Camera>& sceneCamera) {
-			return sceneCamera.get() == camera;
+		mCameras.FilterInPlace([&](const UniquePtr<Camera>& sceneCamera) {
+			return sceneCamera.Get() == camera;
 		});
 	}
 
-	void Scene::AddLight(std::unique_ptr<Light> light)
+	void Scene::AddLight(UniquePtr<Light> light)
 	{
 		mOnLightAdded.Emit(
-			mLights.Emplace(std::move(light)).get()
+			mLights.Emplace(std::move(light)).Get()
 		);
 	}
 
 	void Scene::RemoveLight(const Light* light)
 	{
-		mLights.FilterInPlace([&](const std::unique_ptr<Light>&sceneLight) {
-			return sceneLight.get() == light;
+		mLights.FilterInPlace([&](const UniquePtr<Light>&sceneLight) {
+			return sceneLight.Get() == light;
 		});
 	}
 
@@ -150,7 +150,7 @@ namespace Ck
 
 		for (unsigned int i = 0; i < mLights.GetSize(); i++)
 		{
-			Light* light = mLights[i].get();
+			Light* light = mLights[i].Get();
 
 			if (NearlyEqual(light->GetIntensity(), 0.f))
 				continue;

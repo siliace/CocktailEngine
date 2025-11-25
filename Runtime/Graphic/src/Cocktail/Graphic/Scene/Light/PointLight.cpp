@@ -8,8 +8,8 @@ namespace Ck
 		Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
 
-		std::unique_ptr<PointLight> pointLight = std::make_unique<PointLight>(std::move(transformationNode), color, intensity);
-		PointLight* lightPtr = pointLight.get();
+		UniquePtr<PointLight> pointLight = MakeUnique<PointLight>(std::move(transformationNode), color, intensity);
+		PointLight* lightPtr = pointLight.Get();
 		scene->AddLight(std::move(pointLight));
 
 		return lightPtr;

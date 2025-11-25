@@ -46,8 +46,8 @@ namespace Ck::Detail::Win32
 
 		application->Singleton<Ck::ConsoleService, ConsoleService>();
 
-		application->Singleton<Ck::KeyboardService>([](Application* app) -> std::unique_ptr<Ck::KeyboardService> {
-			return std::make_unique<KeyboardService>(app);
+		application->Singleton<Ck::KeyboardService>([](Application* app) -> UniquePtr<Ck::KeyboardService> {
+			return MakeUnique<KeyboardService>(app);
 		});
 
 		application->Singleton<Ck::LibraryService, LibraryService>();
@@ -57,16 +57,16 @@ namespace Ck::Detail::Win32
 
 		application->Singleton<Ck::MonitorService, MonitorService>();
 
-		application->Singleton<Ck::MouseService>([](Application* app) -> std::unique_ptr<Ck::MouseService> {
-			return std::make_unique<MouseService>(app);
+		application->Singleton<Ck::MouseService>([](Application* app) -> UniquePtr<Ck::MouseService> {
+			return MakeUnique<MouseService>(app);
 		});
 
 		application->Singleton<Ck::ThreadManager, ThreadManager>(false);
 
 		application->Singleton<WindowEventDispatcher>();
 
-		application->Singleton<Ck::WindowFactory>([&]() -> std::unique_ptr<Ck::WindowFactory> {
-			return std::make_unique<WindowFactory>(mInstanceHandle);
+		application->Singleton<Ck::WindowFactory>([&]() -> UniquePtr<Ck::WindowFactory> {
+			return MakeUnique<WindowFactory>(mInstanceHandle);
 		});
 
 		application->Singleton<WsaService>();

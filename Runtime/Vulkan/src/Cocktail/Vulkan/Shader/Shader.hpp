@@ -114,8 +114,8 @@ namespace Ck::Vulkan
 		Renderer::ShaderType mType;
 		Array<DescriptorSetInfo> mDescriptorSetInfo;
 		Array<PushConstantBlockInfo> mPushConstantBlockInfo;
-		Array<std::unique_ptr<VertexAttributeLocation>> mInputAttributeLocations;
-		Array<std::unique_ptr<VertexAttributeLocation>> mOutputAttributeLocations;
+		Array<UniquePtr<VertexAttributeLocation>> mInputAttributeLocations;
+		Array<UniquePtr<VertexAttributeLocation>> mOutputAttributeLocations;
 	};
 }
 

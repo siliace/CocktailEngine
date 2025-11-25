@@ -84,7 +84,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		EnumMap<Renderer::CommandQueueType, std::shared_ptr<CommandPool>> mCommandPools;
 		DescriptorSetAllocator mDescriptorSetAllocator;
-		std::unique_ptr<StagingAllocator> mStagingAllocator;
+		UniquePtr<StagingAllocator> mStagingAllocator;
 		bool mTransient;
 		bool mCommandListResetable;
 		Signal<> mOnReset;

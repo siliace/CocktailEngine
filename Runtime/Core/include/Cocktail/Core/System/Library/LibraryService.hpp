@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_LIBRARY_LIBRARYSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_LIBRARY_LIBRARYSERVICE_HPP
 
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/System/FileSystem/Path.hpp>
 
 namespace Ck
@@ -24,7 +25,7 @@ namespace Ck
 		 * \param name The name of the library to load
 		 * \return The loaded LibraryModule
 		 */
-		virtual std::unique_ptr<Library> LoadLibrary(StringView name) = 0;
+		virtual UniquePtr<Library> LoadLibrary(StringView name) = 0;
 
 		/**
 		 * \brief 

@@ -33,7 +33,7 @@ namespace Ck::Vulkan
 		}
 
 		Renderer::BufferUsageFlags bufferUsage;
-		mStagingAllocator = std::make_unique<StagingAllocator>(mRenderDevice, bufferUsage, 16 * 1024 * 1024);
+		mStagingAllocator = MakeUnique<StagingAllocator>(mRenderDevice, bufferUsage, 16 * 1024 * 1024);
 	}
 
 	CommandListPool::~CommandListPool()

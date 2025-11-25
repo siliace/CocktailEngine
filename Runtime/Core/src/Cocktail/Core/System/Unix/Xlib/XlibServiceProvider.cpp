@@ -31,14 +31,14 @@ namespace Ck::Detail::Xlib
     void XlibServiceProvider::DoRegister(Application* application)
 	{
 		application->Singleton<Xlib::AtomManager>([display = mDisplay]() {
-			return std::make_unique<AtomManager>(display);
+			return MakeUnique<AtomManager>(display);
 		});
 		
 		int version = 0;
 		if (XQueryExtension(mDisplay, "RANDR", &version, &version, &version))
 		{
-			application->Singleton<Ck::MonitorService>([display = mDisplay]() -> std::unique_ptr<Ck::MonitorService> {
-				return std::make_unique<MonitorService>(display);
+			application->Singleton<Ck::MonitorService>([display = mDisplay]() -> UniquePtr<Ck::MonitorService> {
+				return MakeUnique<MonitorService>(display);
 			});
 		}	
 		else
@@ -46,16 +46,16 @@ namespace Ck::Detail::Xlib
 			CK_LOG(XlibLogCategory, LogLevel::Warning, CK_TEXT("X11 extension RANDR is not supported, MonitorService will be disabled"));
 		}
 
-		application->Singleton<Ck::MouseService>([display = mDisplay](Application* app) -> std::unique_ptr<Ck::MouseService> {
-			return std::make_unique<MouseService>(display, app);
+		application->Singleton<Ck::MouseService>([display = mDisplay](Application* app) -> UniquePtr<Ck::MouseService> {
+			return MakeUnique<MouseService>(display, app);
 		});
 		
-        application->Singleton<Ck::KeyboardService>([display = mDisplay](Application* app) -> std::unique_ptr<Ck::KeyboardService> {
-			return std::make_unique<KeyboardService>(display, app);
+        application->Singleton<Ck::KeyboardService>([display = mDisplay](Application* app) -> UniquePtr<Ck::KeyboardService> {
+			return MakeUnique<KeyboardService>(display, app);
 		});
 		
-        application->Singleton<Ck::WindowFactory>([display = mDisplay]() -> std::unique_ptr<Ck::WindowFactory> {
-			return std::make_unique<WindowFactory>(display);
+        application->Singleton<Ck::WindowFactory>([display = mDisplay]() -> UniquePtr<Ck::WindowFactory> {
+			return MakeUnique<WindowFactory>(display);
 		});
 	}
 }

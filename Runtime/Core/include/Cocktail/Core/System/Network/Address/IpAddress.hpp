@@ -35,7 +35,7 @@ namespace Ck
          * \param hostname 
          * \return 
          */
-        static Array<std::unique_ptr<IpAddress>> Resolve(StringView hostname);
+        static Array<UniquePtr<IpAddress>> Resolve(StringView hostname);
 
         /**
          * \brief Destructor

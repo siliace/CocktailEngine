@@ -1,3 +1,5 @@
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
+
 #include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Win32/Win32Application.hpp>
 
@@ -11,11 +13,11 @@ int main(int argc, char* argv[])
 	PWSTR pCmdLine = GetCommandLineW();  
 	int nCmdShow = 0;
 
-	std::unique_ptr<Ck::Application> application = std::make_unique<Ck::Main::Win32::Win32Application>(
+	Ck::UniquePtr<Ck::Application> application = Ck::MakeUnique<Ck::Main::Win32::Win32Application>(
 		hInstance, hPrevInstance, pCmdLine, nCmdShow
 	);
 
-	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(application.get());
+	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(application.Get());
 
 	return static_cast<int>(exitCode);
 }

@@ -34,7 +34,7 @@ namespace Ck
 		 * \param logChannel
 		 * \return
 		 */
-		void RegisterChannel(const String& name, std::unique_ptr<LogChannel> logChannel);
+		void RegisterChannel(const String& name, UniquePtr<LogChannel> logChannel);
 
 		/**
 		 * \brief 
@@ -87,7 +87,7 @@ namespace Ck
 
 	private:
 
-		std::unordered_map<String, std::unique_ptr<LogChannel>> mChannels;
+		std::unordered_map<String, UniquePtr<LogChannel>> mChannels;
 		Array<LogEntry*> mEntries;
 		Signal<LogEntry*> mOnTraceEntry;
 		ObjectPool<LogEntry> mEntryPool;

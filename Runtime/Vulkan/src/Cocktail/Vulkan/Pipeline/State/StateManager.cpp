@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 			mDescriptorSetStateManagers.Emplace(mRenderDevice, mDescriptorSetAllocator);
 
 		mPipelineConstantStorageSize = physicalDeviceProperties.limits.maxPushConstantsSize;
-		mPipelineConstantStorage = std::make_unique<unsigned char[]>(mPipelineConstantStorageSize);
+		mPipelineConstantStorage = MakeUnique<unsigned char[]>(mPipelineConstantStorageSize);
 	}
 
 	void StateManager::SetShaderProgram(const ShaderProgram* shaderProgram)
@@ -101,7 +101,7 @@ namespace Ck::Vulkan
 				assert(offset + size < mPipelineConstantStorageSize);
 
 				mDirtyFlags |= DirtyFlagBits::PipelineConstant;
-				std::memcpy(mPipelineConstantStorage.get() + offset, data, size);
+				std::memcpy(mPipelineConstantStorage.Get() + offset, data, size);
 
 				PipelineConstantRangeState& range = mPipelineConstantRanges[shaderType];
 				if (range.Dirty)
@@ -138,7 +138,7 @@ namespace Ck::Vulkan
 		PipelineConstantRange pipelineConstantRange;
 		pipelineConstantRange.Offset = range.Offset;
 		pipelineConstantRange.Size = range.Size;
-		pipelineConstantRange.Data = mPipelineConstantStorage.get() + range.Offset;
+		pipelineConstantRange.Data = mPipelineConstantStorage.Get() + range.Offset;
 
 		return pipelineConstantRange;
 	}

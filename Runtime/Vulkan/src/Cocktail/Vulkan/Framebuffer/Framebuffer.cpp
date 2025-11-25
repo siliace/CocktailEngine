@@ -17,7 +17,7 @@ namespace Ck::Vulkan
 		mColorBufferCount = createInfo.ColorAttachmentCount;
 		for (unsigned int i = 0; i < mColorBufferCount; i++)
 		{
-			std::unique_ptr<AttachmentBuffer> buffer = std::make_unique<AttachmentBuffer>(
+			UniquePtr<AttachmentBuffer> buffer = MakeUnique<AttachmentBuffer>(
 				*mRenderDevice, 
 				std::static_pointer_cast<TextureView>(createInfo.ColorAttachments[i]), 
 				samples
@@ -33,7 +33,7 @@ namespace Ck::Vulkan
 
 		if (createInfo.DepthStencilAttachment)
 		{
-			mDepthStencilBuffer = std::make_unique<AttachmentBuffer>(
+			mDepthStencilBuffer = MakeUnique<AttachmentBuffer>(
 				*mRenderDevice, 
 				std::static_pointer_cast<TextureView>(createInfo.DepthStencilAttachment),
 				samples
@@ -49,7 +49,7 @@ namespace Ck::Vulkan
 		VkImageView attachments[(Renderer::Framebuffer::MaxColorAttachmentCount + 1) * 2];
 		for (unsigned int i = 0; i < mColorBufferCount; i++)
 		{
-			AttachmentBuffer* colorBuffer = mColorBuffers[i].get();
+			AttachmentBuffer* colorBuffer = mColorBuffers[i].Get();
 
 			if (colorBuffer->IsMultisample())
 				attachments[attachmentCount++] = colorBuffer->GetMultisampleAttachment()->GetHandle();

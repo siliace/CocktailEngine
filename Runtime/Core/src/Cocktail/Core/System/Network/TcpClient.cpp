@@ -46,7 +46,7 @@ namespace Ck
 
 	const IpAddress* TcpClient::GetRemoteAddress() const
 	{
-		return mRemoteAddress.get();
+		return mRemoteAddress.Get();
 	}
 
 	unsigned short TcpClient::GetRemotePort() const
@@ -54,7 +54,7 @@ namespace Ck
 		return mRemotePort;
 	}
 
-	TcpClient::TcpClient(Handle handle, std::unique_ptr<IpAddress> remoteAddress, unsigned short remotePort):
+	TcpClient::TcpClient(Handle handle, UniquePtr<IpAddress> remoteAddress, unsigned short remotePort):
 		Socket(handle),
 		mRemoteAddress(std::move(remoteAddress)),
 		mRemotePort(remotePort)

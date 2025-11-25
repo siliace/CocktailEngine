@@ -50,13 +50,13 @@ namespace Ck::Vulkan
 
 	void DeviceMemoryAllocator::GarbageCollect(bool compact)
 	{
-		mChunks.FilterInPlace([&](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
+		mChunks.FilterInPlace([&](const ObjectPool<DeviceMemoryChunk>::Unique& chunk) {
 			return chunk->IsFree();
 		});
 
 		if (compact)
 		{
-			mChunks.ForEach([](const ObjectPool<DeviceMemoryChunk>::UniquePtr& chunk) {
+			mChunks.ForEach([](const ObjectPool<DeviceMemoryChunk>::Unique& chunk) {
 				chunk->Compact();
 			});
 		}

@@ -38,7 +38,7 @@ namespace Ck
 		template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of_v<ServiceProvider, T>>>
 		void RegisterServiceProvider(Args&&... args)
 		{
-			RegisterServiceProvider(std::make_unique<T>(this, std::forward<Args>(args)...));
+			RegisterServiceProvider(MakeUnique<T>(this, std::forward<Args>(args)...));
 		}
 
 		/**
@@ -46,7 +46,7 @@ namespace Ck
 		 * \param serviceProvider The ServiceProvider to register
 		 * \return A pointer to the registered ServiceProvider
 		 */
-		void RegisterServiceProvider(std::unique_ptr<ServiceProvider> serviceProvider);
+		void RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider);
 
 		/**
 		 * \brief 
@@ -156,10 +156,10 @@ namespace Ck
 		template <typename T, typename = std::enable_if_t<std::is_base_of_v<ServiceProvider, T>>>
 		ServiceProvider* FindServiceProvider() const
 		{
-			for (const std::unique_ptr<ServiceProvider>& serviceProvider : mServiceProviders)
+			for (const UniquePtr<ServiceProvider>& serviceProvider : mServiceProviders)
 			{
 				if (typeid(*serviceProvider) == typeid(T))
-					return serviceProvider.get();
+					return serviceProvider.Get();
 			}
 			return nullptr;
 		}
@@ -167,7 +167,7 @@ namespace Ck
 	private:
 
 		bool mBooted;
-		Array<std::unique_ptr<ServiceProvider>> mServiceProviders;
+		Array<UniquePtr<ServiceProvider>> mServiceProviders;
 		Signal<Application*> mOnTerminate;
 		Instant mStart;
 	};

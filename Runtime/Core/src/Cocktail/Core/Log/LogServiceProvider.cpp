@@ -19,7 +19,7 @@ namespace Ck
 	void LogServiceProvider::DoBoot(Application* application)
 	{
 		application->Invoke([](LogManager* logManager, ConsoleService* console) {
-			logManager->RegisterChannel(CK_TEXT("console"), std::make_unique<ConsoleLogChannel>(console));
+			logManager->RegisterChannel(CK_TEXT("console"), MakeUnique<ConsoleLogChannel>(console));
 		});
 	}
 }

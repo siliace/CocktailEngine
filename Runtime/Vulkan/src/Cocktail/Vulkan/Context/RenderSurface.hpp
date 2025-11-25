@@ -137,7 +137,7 @@ namespace Ck::Vulkan
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSurfaceKHR mHandle;
 		PixelFormat mDepthStencilFormat;
-		std::unique_ptr<PresentationContext> mPresentationContext;
+		UniquePtr<PresentationContext> mPresentationContext;
 		std::shared_ptr<RenderPass> mRenderPass;
 		std::shared_ptr<Swapchain> mSwapchain;
 		std::shared_ptr<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];

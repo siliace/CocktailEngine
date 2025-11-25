@@ -19,7 +19,7 @@ namespace Ck::Detail::Pthread
 
     private:
 
-        std::unique_ptr<Thread> mMainThread;
+        UniquePtr<Thread> mMainThread;
         Array<Thread*> mThreads;
         std::mutex mThreadMutex;
         pthread_key_t mCurrentThreadKey;

@@ -32,7 +32,7 @@ namespace Ck
 		 * \param length
 		 * \return
 		 */
-		std::tuple<std::size_t, std::unique_ptr<IpAddress>, unsigned short> Receive(void* data, std::size_t length) const;
+		std::tuple<std::size_t, UniquePtr<IpAddress>, unsigned short> Receive(void* data, std::size_t length) const;
 
 		/**
 		 * \brief 

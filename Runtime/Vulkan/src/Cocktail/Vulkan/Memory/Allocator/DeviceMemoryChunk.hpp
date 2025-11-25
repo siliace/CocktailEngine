@@ -98,7 +98,7 @@ namespace Ck::Vulkan
 		bool mDedicated;
 		void* mPtr;
 		std::shared_ptr<DeviceMemory> mDeviceMemory;
-		Array<ObjectPool<DeviceMemoryBlock>::UniquePtr> mBlocks;
+		Array<ObjectPool<DeviceMemoryBlock>::Unique> mBlocks;
 	};
 }
 

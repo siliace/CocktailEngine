@@ -50,7 +50,7 @@ namespace Ck
 	        if (!Storage::IsFile(uri))
 	            return {};
 
-	        std::unique_ptr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+	        UniquePtr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 	        FileInputStream inputStream(*file);
 
 	        InputStreamReader<TEncoding> inputStreamReader(inputStream);
