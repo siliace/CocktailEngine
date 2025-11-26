@@ -5,7 +5,12 @@
 
 namespace Ck::Detail::Win32
 {
-	Path LocalFileSystemService::GetWorkingDirectory() const
+    LocalFileSystemService::LocalFileSystemService()
+    {
+        mRootDriver = LocalFileSystemService::CreateDriver(Path::Empty);
+    }
+
+    Path LocalFileSystemService::GetWorkingDirectory() const
 	{
 		DWORD size = GetCurrentDirectory(0, nullptr);
 		if (size == 0)
@@ -36,6 +41,11 @@ namespace Ck::Detail::Win32
 
 		return Path(buffer, size - 1);
 	}
+
+    Ck::LocalFileSystemDriver* LocalFileSystemService::GetRootDriver() const
+    {
+	    return mRootDriver.Get();
+    }
 
     UniquePtr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
     {

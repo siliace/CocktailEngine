@@ -6,6 +6,11 @@
 
 namespace Ck::Detail::Unix
 {
+    LocalFileSystemService::LocalFileSystemService()
+    {
+        mRootDriver = LocalFileSystemService::CreateDriver(Path::Empty);
+    }
+
 	Path LocalFileSystemService::GetWorkingDirectory() const
 	{
 		Utf8Char* buffer = reinterpret_cast<Utf8Char*>(getcwd(nullptr, 0));
@@ -27,6 +32,11 @@ namespace Ck::Detail::Unix
     Path LocalFileSystemService::GetTempDirectoryPath() const
     {
 		return CK_TEXT("/var/tmp");
+    }
+
+    Ck::LocalFileSystemDriver* LocalFileSystemService::GetRootDriver() const
+    {
+	    return mRootDriver.Get();
     }
 
     UniquePtr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)

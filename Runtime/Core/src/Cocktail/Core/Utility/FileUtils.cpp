@@ -1,32 +1,26 @@
-#include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
-#include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
-#include <Cocktail/Core/IO/Input/Reader/LineReader.hpp>
-#include <Cocktail/Core/IO/Input/Stream/FileInputStream.hpp>
-#include <Cocktail/Core/IO/Output/Stream/FileOutputStream.hpp>
-#include <Cocktail/Core/IO/Output/Writer/BufferedWriter.hpp>
 #include <Cocktail/Core/IO/Output/Writer/FileWriter.hpp>
+#include <Cocktail/Core/IO/Output/Writer/LineWriter.hpp>
 #include <Cocktail/Core/System/FileSystem/Storage.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
-#include <Cocktail/Core/Utility/Encoding/Encoders.hpp>
 
 namespace Ck
 {
-	void FileUtils::MakeDirectories(const URI& uri)
+	void FileUtils::MakeDirectories(const Path& path, FileSystemDriver* driver)
 	{
-		if (!Storage::IsDirectory(uri))
-		{
-			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
-			Storage::CreateDirectory(uri);
-		}
+		if (driver->IsDirectory(path))
+            return;
+
+		driver->CreateDirectory(path.GetParent());
+		driver->CreateDirectory(path);
 	}
 
-	ByteArray FileUtils::ReadFile(const URI& uri)
+	ByteArray FileUtils::ReadFile(const Path& path, FileSystemDriver* driver)
 	{
 		ByteArray content;
-		if (!Storage::IsFile(uri))
+		if (!driver->IsFile(path))
 			return content;
 
-		UniquePtr<File> file = Storage::OpenFile(uri, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
+		UniquePtr<File> file = driver->OpenFile(path, FileOpenFlagBits::Read | FileOpenFlagBits::Existing);
 
 		const std::size_t size = file->GetSize();
 		if (!size)
@@ -38,47 +32,15 @@ namespace Ck
 		return content;
 	}
 
-	String FileUtils::ReadFileText(const URI& uri)
+	void FileUtils::WriteFile(const Path& path, ByteArrayView content, bool append, FileSystemDriver* driver)
 	{
-		auto content = ReadFile(uri);
-		if (content.IsEmpty())
-			return String::Empty;
-
-		return Encoders::GetString<Encoders::Text, String>(content);
-	}
-
-	void FileUtils::WriteFile(const URI& uri, ByteArrayView content, bool append)
-	{
-		if (!Storage::IsFile(uri))
+		if (!driver->IsFile(path))
 		{
-			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
-			Storage::CreateFile(uri);
+			MakeDirectories(path.GetParent());
+			driver->CreateFile(path);
 		}
 
-		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
-		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
-
-		UniquePtr<File> file = Storage::OpenFile(uri, openFlags);
-		file->Write(content.GetData(), content.GetSize());
-	}
-
-	void FileUtils::WriteFileLines(const URI& uri, const Array<String>& lines, bool append)
-	{
-		if (!Storage::IsFile(uri))
-		{
-			MakeDirectories(URI(uri.GetScheme(), uri.GetPath().GetParent()));
-			Storage::CreateFile(uri);
-		}
-
-		FileOpenFlagBits openFlags = FileOpenFlagBits::Write;
-		openFlags |= append ? FileOpenFlagBits::Append : FileOpenFlagBits::Truncate;
-
-		UniquePtr<File> file = Storage::OpenFile(uri, openFlags);
-		FileWriter writer(*file);
-		BufferedWriter bufferedWriter(writer);
-
-		lines.ForEach([&](const String& line) {
-			bufferedWriter.Write(line.GetData(), line.GetLength());
-		});
+	    FileOutputStream<> fileOutputStream(path, !append);
+	    fileOutputStream.Write(content.GetData(), content.GetSize());
 	}
 }

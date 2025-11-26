@@ -16,6 +16,10 @@ namespace Ck
     {
 		return ResolveFacadeInstance()->GetTempDirectoryPath();
     }
+    LocalFileSystemDriver* LocalFileSystem::GetRootDriver()
+    {
+	    return ResolveFacadeInstance()->GetRootDriver();
+    }
 
     UniquePtr<LocalFileSystemDriver> LocalFileSystem::CreateDriver(const Path& base)
     {

@@ -12,6 +12,13 @@ namespace Ck::Detail::Unix
 	{
 	public:
 
+        /**
+         * \brief Default constructor
+         *
+         * Creates a new instance of LocalFileSystemService and initialize its root driver
+         */
+        LocalFileSystemService();
+
 		/**
 		 * \brief Get the path of the current working directory
 		 * \return The path of the working directory
@@ -30,12 +37,25 @@ namespace Ck::Detail::Unix
 		 */
 		Path GetTempDirectoryPath() const override;
 
-		/**
-		 * \brief
-		 * \param base
-		 * \return
-		 */
+	    /**
+         * \brief Get the default "root" driver to the local file system
+         *
+         * \return The root driver
+         */
+	    Ck::LocalFileSystemDriver* GetRootDriver() const override;
+
+	    /**
+         * \brief Create a new LocalFileSystemDriver
+         *
+         * \param base The base path where the driver to create should point
+         *
+         * \return The created driver
+         */
 		UniquePtr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
+
+	private:
+
+	    UniquePtr<Ck::LocalFileSystemDriver> mRootDriver;
 	};
 }
 

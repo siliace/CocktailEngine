@@ -715,6 +715,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ObjectPool.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Optional.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/ParameterPack.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StorageUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringFormater.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/StringUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/TranslatorCast.hpp
@@ -725,6 +726,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ExceptionUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/StorageUtils.cpp
 )
 
 cocktail_source_directory(CORE_FILES

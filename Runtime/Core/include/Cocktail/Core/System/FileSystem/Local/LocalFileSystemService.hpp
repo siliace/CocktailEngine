@@ -32,13 +32,24 @@ namespace Ck
 
 		/**
 		 * \brief
+		 *
 		 * \return
 		 */
 		virtual Path GetTempDirectoryPath() const = 0;
 
+        /**
+         * \brief Get the default "root" driver to the local file system
+         *
+         * \return The root driver
+         */
+	    virtual LocalFileSystemDriver* GetRootDriver() const = 0;
+
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief Create a new LocalFileSystemDriver
+		 *
+         * \param base The base path where the driver to create should point
+		 *
+		 * \return The created driver
 		 */
 		virtual UniquePtr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty) = 0;
 	};

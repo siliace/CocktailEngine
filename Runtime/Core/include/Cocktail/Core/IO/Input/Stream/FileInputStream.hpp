@@ -2,7 +2,8 @@
 #define COCKTAIL_CORE_IO_INPUT_STREAM_FILEINPUTSTREAM_HPP
 
 #include <Cocktail/Core/IO/Input/Stream/InputStream.hpp>
-#include <Cocktail/Core/System/FileSystem/File.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystem.hpp>
 
 namespace Ck
 {
@@ -15,8 +16,8 @@ namespace Ck
 
         using SizeType = typename InputStream<TAllocator>::SizeType;
 
-        explicit FileInputStream(File& file) :
-            mFile(&file)
+        explicit FileInputStream(const Path& path, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
+            mFile(driver->OpenFile(path, FileOpenFlagBits::Read))
         {
             /// Nothing
         }
@@ -56,9 +57,14 @@ namespace Ck
             return mFile->GetCursor() == mFile->GetSize();
         }
 
+        File* GetFile() const
+        {
+            return mFile.Get();
+        }
+
     private:
 
-        File* mFile;
+        UniquePtr<File> mFile;
     };
 }
 

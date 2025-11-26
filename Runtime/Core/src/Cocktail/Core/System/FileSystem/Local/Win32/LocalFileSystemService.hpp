@@ -12,14 +12,18 @@ namespace Ck::Detail::Win32
 	{
 	public:
 
+	    LocalFileSystemService();
+
 		/**
 		 * \brief Get the path of the process current working directory
+		 *
 		 * \return The path of the working directory
 		 */
 		Path GetWorkingDirectory() const override;
 
 		/**
 		 * \brief Set the path of the process current working directory
+		 *
 		 * \param workingDirectory 
 		 */
 		void SetWorkingDirectory(const Path& workingDirectory) override;
@@ -30,12 +34,25 @@ namespace Ck::Detail::Win32
 		 */
 		Path GetTempDirectoryPath() const override;
 
-		/**
-		 * \brief 
-		 * \param base 
-		 * \return 
-		 */
+        /**
+         * \brief
+         *
+         * \return
+         */
+        Ck::LocalFileSystemDriver* GetRootDriver() const override;
+
+        /**
+         * \brief
+         *
+         * \param base
+         *
+         * \return
+         */
 		UniquePtr<Ck::LocalFileSystemDriver> CreateDriver(const Path& base) override;
+
+	private:
+
+	    UniquePtr<Ck::LocalFileSystemDriver> mRootDriver;
 	};
 }
 

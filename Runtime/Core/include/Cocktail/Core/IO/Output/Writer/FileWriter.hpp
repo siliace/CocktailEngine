@@ -12,8 +12,8 @@ namespace Ck
     {
     public:
 
-        explicit FileWriter(File& file) :
-            mFileOutputStream(file),
+        explicit FileWriter(const Path& path, bool truncate = false, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
+            mFileOutputStream(path, truncate, driver),
             OutputStreamWriter<TEncoding>(mFileOutputStream)
         {
             /// Nothing

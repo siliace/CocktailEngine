@@ -43,8 +43,7 @@ namespace Ck
 		 */
 		virtual std::shared_ptr<T> LoadFromPath(const Path& path, const P& parameters = {})
 		{
-			UniquePtr<File> file = Storage::OpenFile(path, FileOpenFlagBits::Read);
-			FileInputStream inputStream(*file);
+			FileInputStream inputStream(path);
 			BufferedInputStream bufferedInputStream(inputStream);
 
 			return LoadFromStream(bufferedInputStream, parameters);

@@ -183,16 +183,16 @@ namespace Ck
 		 *
 		 * @return A constant reference to the string representing the default scheme
 		 */
-		const String& GetDefaultScheme() const;
+	    const String& GetDefaultScheme() const;
+
+	    /**
+         * \brief
+         * \param scheme
+         * \return
+         */
+	    FileSystemDriver* ResolveDriver(const String& scheme) const;
 
 	private:
-
-		/**
-		 * \brief 
-		 * \param scheme
-		 * \return 
-		 */
-		FileSystemDriver* ResolveDriver(const String& scheme) const;
 
 		String mDefaultScheme;
 		std::unordered_map<String, FileSystemDriver*> mDrivers;

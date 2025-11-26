@@ -1,16 +1,16 @@
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/Application/Application.hpp>
-#include <Cocktail/Core/Application/ServiceProvider.hpp>
 #include <Cocktail/Core/System/Clipboard/ClipboardService.hpp>
-#include <Cocktail/Core/System/Mouse/Mouse.hpp>
+#include <Cocktail/Core/System/FileSystem/URI.hpp>
 #include <Cocktail/Core/System/Window/WindowFactory.hpp>
 #include <Cocktail/Core/Utility/FileUtils.hpp>
+#include <Cocktail/Core/Utility/StorageUtils.hpp>
 
-#include <Cocktail/Renderer/RenderDevice.hpp>
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/Fence.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/FenceCreateInfo.hpp>
+#include <Cocktail/Renderer/RenderDevice.hpp>
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
@@ -86,7 +86,7 @@ ImGuiOverlay::ImGuiOverlay(Window& window, SceneViewer& sceneViewer, Renderer::R
 
 	{
 		auto loadShader = [&](Renderer::ShaderType shaderType, const URI& uri) {
-			ByteArray fileContent = FileUtils::ReadFile(uri);
+			ByteArray fileContent = StorageUtils::ReadFile(uri);
 
 			Renderer::ShaderCreateInfo shaderCreateInfo;
 			shaderCreateInfo.Type = shaderType;

@@ -22,7 +22,7 @@ namespace Ck
 	void SystemServiceProvider::DoBoot(Application* application)
 	{
 		application->Invoke([&](StorageService* storage, LocalFileSystemService* fileSystemService) {
-			storage->Mount(storage->GetDefaultScheme(), fileSystemService->CreateDriver());
+			storage->MountExternal(storage->GetDefaultScheme(), fileSystemService->GetRootDriver());
 		});
 
 		application->Invoke([](StorageService* storage, EmbeddedFileSystemDriver* embeddedFileSystemDriver) {

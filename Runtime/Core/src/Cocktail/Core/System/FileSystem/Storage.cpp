@@ -27,7 +27,7 @@ namespace Ck
 		return ResolveFacadeInstance()->OpenFile(uri, flags);
 	}
 
-	UniquePtr<Directory> Storage::OpenDirectory(const URI& uri)
+    UniquePtr<Directory> Storage::OpenDirectory(const URI& uri)
 	{
 		return ResolveFacadeInstance()->OpenDirectory(uri);
 	}
@@ -61,4 +61,8 @@ namespace Ck
 	{
 		ResolveFacadeInstance()->UnMount(protocol);
 	}
+    FileSystemDriver* Storage::ResolveDriver(const String& scheme)
+    {
+	    return ResolveFacadeInstance()->ResolveDriver(scheme);
+    }
 }

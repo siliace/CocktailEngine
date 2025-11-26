@@ -30,12 +30,22 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		static Path GetTempDirectoryPath();
+	    static Path GetTempDirectoryPath();
 
-		/**
-		 * \brief
-		 * \return
-		 */
+	    /**
+         * \brief Get the default "root" driver to the local file system
+         *
+         * \return The root driver
+         */
+	    static LocalFileSystemDriver* GetRootDriver();
+
+	    /**
+         * \brief Create a new LocalFileSystemDriver
+         *
+         * \param base The base path where the driver to create should point
+         *
+         * \return The created driver
+         */
 		static UniquePtr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty);
 	};
 }

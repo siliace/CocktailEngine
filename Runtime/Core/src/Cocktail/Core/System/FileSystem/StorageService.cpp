@@ -4,125 +4,110 @@
 
 namespace Ck
 {
-	StorageService::StorageService(String defaultScheme):
-		mDefaultScheme(std::move(defaultScheme))
-	{
-		assert(!mDefaultScheme.IsEmpty());
-	}
+    StorageService::StorageService(String defaultScheme) :
+        mDefaultScheme(std::move(defaultScheme))
+    {
+        assert(!mDefaultScheme.IsEmpty());
+    }
 
-	bool StorageService::IsFile(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->IsFile(uri.GetPath());
-	}
+    bool StorageService::IsFile(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->IsFile(uri.GetPath());
+    }
 
-	bool StorageService::IsDirectory(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->IsDirectory(uri.GetPath());
-	}
+    bool StorageService::IsDirectory(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->IsDirectory(uri.GetPath());
+    }
 
-	void StorageService::CreateFile(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->CreateFile(uri.GetPath());
-	}
+    void StorageService::CreateFile(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->CreateFile(uri.GetPath());
+    }
 
-	void StorageService::CreateDirectory(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->CreateDirectory(uri.GetPath());
-	}
+    void StorageService::CreateDirectory(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->CreateDirectory(uri.GetPath());
+    }
 
-	UniquePtr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
-	{
-		return ResolveDriver(uri.GetScheme())->OpenFile(uri.GetPath(), flags);
-	}
+    UniquePtr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
+    {
+        return ResolveDriver(uri.GetScheme())->OpenFile(uri.GetPath(), flags);
+    }
 
-	UniquePtr<Directory> StorageService::OpenDirectory(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->OpenDirectory(uri.GetPath());
-	}
+    UniquePtr<Directory> StorageService::OpenDirectory(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->OpenDirectory(uri.GetPath());
+    }
 
-	void StorageService::Copy(const URI& source, const URI& destination, bool failIfExists) const
-	{
-		FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
-		FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
+    void StorageService::Copy(const URI& source, const URI& destination, bool failIfExists) const
+    {
+        FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+        FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
-		if (sourceDriver == destinationDriver)
-		{
-			sourceDriver->Copy(source.GetPath(), destination.GetPath(), failIfExists);
-		}
-		else
-		{
-			UniquePtr<File> sourceFile = sourceDriver->OpenFile(source.GetPath(), FileOpenFlagBits::Read);
+        if (sourceDriver == destinationDriver)
+        {
+            sourceDriver->Copy(source.GetPath(), destination.GetPath(), failIfExists);
+        }
+        else
+        {
+            FileInputStream inputStream(source.GetPath(), sourceDriver);
+            FileOutputStream outputStream(destination.GetPath(), destinationDriver);
 
-			FileOpenFlags destinationOpenFlags = FileOpenFlagBits::Write | FileOpenFlagBits::Truncate;
-			if (failIfExists)
-				destinationOpenFlags |= FileOpenFlagBits::Existing;
+            inputStream.TransferTo(outputStream);
+        }
+    }
 
-			UniquePtr<File> destinationFile = destinationDriver->OpenFile(destination.GetPath(), destinationOpenFlags);
+    void StorageService::Move(const URI& source, const URI& destination) const
+    {
+        FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+        FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
-			const std::size_t bufferSize = 2048;
-			unsigned char buffer[bufferSize] = { 0 };
+        if (sourceDriver == destinationDriver)
+        {
+            sourceDriver->Move(source.GetPath(), destination.GetPath());
+        }
+        else
+        {
+            Copy(source, destination, false);
+            sourceDriver->Remove(source.GetPath());
+        }
+    }
 
-			FileInputStream inputStream(*sourceFile);
-			FileOutputStream outputStream(*destinationFile);
+    void StorageService::Remove(const URI& uri) const
+    {
+        return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
+    }
 
-			while (!inputStream.IsEof())
-			{
-				std::size_t read = inputStream.Read(buffer, bufferSize);
-				outputStream.Write(buffer, read);
-			}
-		}
-	}
+    void StorageService::Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver)
+    {
+        mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.Get());
+        mInternalDrivers.Add(std::move(fileSystemDriver));
+    }
 
-	void StorageService::Move(const URI& source, const URI& destination) const
-	{
-		FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
-		FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
+    void StorageService::MountExternal(String scheme, FileSystemDriver* fileSystemDriver)
+    {
+        mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver);
+    }
 
-		if (sourceDriver == destinationDriver)
-		{
-			sourceDriver->Move(source.GetPath(), destination.GetPath());
-		}
-		else
-		{
-			Copy(source, destination, false);
-			sourceDriver->Remove(source.GetPath());
-		}
-	}
+    void StorageService::UnMount(const String& scheme)
+    {
+        mDrivers.erase(scheme);
+    }
 
-	void StorageService::Remove(const URI& uri) const
-	{
-		return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
-	}
+    const String& StorageService::GetDefaultScheme() const
+    {
+        return mDefaultScheme;
+    }
 
-	void StorageService::Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver)
-	{
-		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.Get());
-		mInternalDrivers.Add(std::move(fileSystemDriver));
-	}
+    FileSystemDriver* StorageService::ResolveDriver(const String& scheme) const
+    {
+        if (scheme.IsEmpty())
+            return ResolveDriver(mDefaultScheme);
 
-	void StorageService::MountExternal(String scheme, FileSystemDriver* fileSystemDriver)
-	{
-		mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver);
-	}
+        if (auto it = mDrivers.find(scheme); it != mDrivers.end())
+            return it->second;
 
-	void StorageService::UnMount(const String& scheme)
-	{
-		mDrivers.erase(scheme);
-	}
-
-	const String& StorageService::GetDefaultScheme() const
-	{
-		return mDefaultScheme;
-	}
-
-	FileSystemDriver* StorageService::ResolveDriver(const String& scheme) const
-	{
-		if (scheme.IsEmpty())
-			return ResolveDriver(mDefaultScheme);
-
-		if (auto it = mDrivers.find(scheme); it != mDrivers.end())
-			return it->second;
-
-		return nullptr;
-	}
+        return nullptr;
+    }
 }

@@ -17,11 +17,16 @@ namespace Ck
 
         using EncodingType = typename InputStreamReader<TEncoding, FileInputStream<TAllocator>>::EncodingType;
 
-        explicit FileReader(File& file) :
-            mFileInputStream(file),
+        explicit FileReader(const Path& path, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
+            mFileInputStream(path, driver),
             InputStreamReader<TEncoding, FileInputStream<TAllocator>>(mFileInputStream)
         {
             /// Nothing
+        }
+
+        File* GetFile() const
+        {
+            return mFileInputStream->GetFile();
         }
 
     private:

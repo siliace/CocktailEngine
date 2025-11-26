@@ -47,6 +47,15 @@ namespace Ck
 		 */
 		static UniquePtr<File> OpenFile(const URI& uri, FileOpenFlags flags);
 
+        /**
+         * \brief
+         *
+         * \param uri
+         *
+         * \return
+         */
+	    static ByteArray ReadFile(const URI& uri);
+
 		/**
 		 * \brief
 		 * \param uri
@@ -94,6 +103,13 @@ namespace Ck
 		 * \param protocol
 		 */
 		static void UnMount(const String& protocol);
+
+	    /**
+         * \brief
+         * \param scheme
+         * \return
+         */
+	    static FileSystemDriver* ResolveDriver(const String& scheme);
 	};
 }
 

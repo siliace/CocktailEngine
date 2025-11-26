@@ -2,7 +2,8 @@
 #define COCKTAIL_CORE_IO_FILEOUTPUTSTREAM_HPP
 
 #include <Cocktail/Core/IO/Output/Stream/OutputStream.hpp>
-#include <Cocktail/Core/System/FileSystem/File.hpp>
+#include <Cocktail/Core/Memory/UniquePtr.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystem.hpp>
 
 namespace Ck
 {
@@ -15,8 +16,8 @@ namespace Ck
 
         using SizeType = typename AllocatorType::SizeType;
 
-        explicit FileOutputStream(File& file) :
-            mFile(&file)
+        explicit FileOutputStream(const Path& path, bool truncate = false, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
+            mFile(driver->OpenFile(path, truncate ? FileOpenFlagBits::Write | FileOpenFlagBits::Truncate : FileOpenFlagBits::Write))
         {
             /// Nothing
         }
@@ -31,9 +32,14 @@ namespace Ck
             mFile->Flush();
         }
 
+        File* GetFile() const
+        {
+            return mFile.Get();
+        }
+
     private:
 
-        File* mFile;
+        UniquePtr<File> mFile;
     };
 }
 
