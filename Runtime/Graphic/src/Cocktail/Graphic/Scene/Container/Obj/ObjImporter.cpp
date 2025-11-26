@@ -26,7 +26,7 @@ namespace Ck
 		CK_LOG(SceneLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading scene from %s"), path.ToString());
 		tinyobj::ObjReader reader;
 		if (!reader.ParseFromFile(reinterpret_cast<const char*>(p.GetData()), readerConfig))
-			throw ObjParseError(String::ConvertFrom<Encoders::Ascii>(reader.Error().c_str()));
+			throw ObjParseError(String::ConvertFrom<Encoders::Utf8>(reinterpret_cast<const Utf8Char*>(reader.Error().c_str())));
 
 		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}

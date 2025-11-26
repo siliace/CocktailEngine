@@ -93,7 +93,7 @@ namespace Ck
         AsciiString p = AsciiString::Convert(path.ToString());
         bool success = mLoader.LoadASCIIFromFile(&model, &errors, &warnings, p.GetData());
         if (!success)
-            throw GltfParseError(String::ConvertFrom<Encoders::Ascii>(errors.c_str()));
+            throw GltfParseError(String::ConvertFrom<Encoders::Utf8>(reinterpret_cast<const Utf8Char*>(errors.c_str())));
 
         if (!warnings.empty())
             CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %hs"), path.ToString(), warnings.c_str());
