@@ -18,6 +18,8 @@ namespace Ck
 	{
 	public:
 
+	    using ElementType = T;
+
 		using VectorType = TVector<T>;
 
 		static constexpr std::size_t Size = S;

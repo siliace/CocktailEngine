@@ -50,7 +50,7 @@ namespace Ck
 		std::memcpy(mVertices->GetData() + offset, value, dataType.GetSize() * elementCount);
 	}
 
-	void VertexRef::Set(VertexAttributeSemantic semantic, const LinearColor& color)
+	void VertexRef::SetColor(VertexAttributeSemantic semantic, const LinearColor& color)
 	{
 		float values[] = { color.R, color.G, color.B, color.A };
 		Set<float>(semantic, values, 4);

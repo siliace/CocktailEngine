@@ -23,7 +23,7 @@ namespace Ck::Detail::Win32
     void ConsoleWriter::Write(const TextChar* string, SizeType length)
     {
         if (WriteConsole(mHandle, string, length, nullptr, nullptr) == FALSE)
-            throw SystemError::GetLastError();
+            ;//throw SystemError::GetLastError();
     }
 
     void ConsoleWriter::Flush()

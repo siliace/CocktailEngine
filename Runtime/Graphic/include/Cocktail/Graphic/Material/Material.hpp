@@ -32,7 +32,7 @@ namespace Ck
 			BaseColor = Bit(1),
 			Specular = Bit(2),
 			SpecularHighlight = Bit(3),
-			Bump = Bit(4),
+			Normal = Bit(4),
 			Displacement = Bit(5),
 			Alpha = Bit(6),
 			Reflection = Bit(7),

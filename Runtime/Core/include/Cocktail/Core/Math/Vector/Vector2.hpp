@@ -14,6 +14,10 @@ namespace Ck
 	{
 	public:
 
+	    using ElementType = typename Vector<Vector2, T, 2>::ElementType;
+
+		static constexpr std::size_t Size = Vector<Vector2, T, 2>::Size;
+
 		/**
 		 * \brief
 		 */

@@ -25,14 +25,18 @@ layout (location = 0) in vec3 worldPosition;
 
 #ifdef COCKTAIL_VERTEX_HAS_NORMAL
 layout (location = 1) in vec3 normal;
+#ifdef COCKTAIL_VERTEX_HAS_TANGENT
+layout (location = 2) in vec3 tangent;
+layout (location = 3) in vec3 biTangent;
+#endif
 #endif
 
 #ifdef COCKTAIL_VERTEX_HAS_UV
-layout (location = 2) in vec2 texCoord;
+layout (location = 4) in vec2 texCoord;
 #endif
 
 #ifdef COCKTAIL_VERTEX_HAS_COLOR
-layout (location = 3) in vec4 color;
+layout (location = 5) in vec4 color;
 #endif
 
 layout (location = 0) out vec4 pixel;
@@ -60,6 +64,10 @@ layout (set = 2, binding = 1) uniform sampler2D ck_MaterialEmissive;
 
 #ifdef COCKTAIL_MATERIAL_HAS_ALPHA_TEXTURE
 layout (set = 2, binding = 2) uniform sampler2D ck_MaterialAlpha;
+#endif
+
+#ifdef COCKTAIL_MATERIAL_HAS_NORMAL_TEXTURE
+layout (set = 2, binding = 3) uniform sampler2D ck_MaterialNormal;
 #endif
 
 layout (push_constant) uniform MaterialInfo {
@@ -151,20 +159,29 @@ void main()
 	vec3 diffuseColor = vec3(0);
 	
 #ifdef COCKTAIL_VERTEX_HAS_NORMAL
+    vec3 fragmentNormal = normal;
+    #if defined(COCKTAIL_VERTEX_HAS_UV) && defined(COCKTAIL_VERTEX_HAS_TANGENT) && defined(COCKTAIL_MATERIAL_HAS_NORMAL_TEXTURE)
+    vec3 n = texture(ck_MaterialNormal, texCoord).xyz;
+    n = n * 2.0 - 1.0;
+
+    mat3 tbn = mat3(tangent, biTangent, fragmentNormal);
+    fragmentNormal = normalize(tbn * n);
+    #endif
+
 	for (uint i = 0; i < lightsInfo.lightInstances.length(); i++)
 	{
 		vec3 lightColor;
 	    if (lightsInfo.lightInstances[i].type == COCKTAIL_LIGHT_TYPE_DIRECTIONAL)
 		{
-			lightColor = DirectionalLight_ComputeLightColor(i, normal);
+			lightColor = DirectionalLight_ComputeLightColor(i, fragmentNormal);
 		}
 	    else if (lightsInfo.lightInstances[i].type == COCKTAIL_LIGHT_TYPE_POINT)
 		{
-			lightColor = PointLight_ComputeLightColor(i, normal, worldPosition, cameraInfo.viewDirection);
+			lightColor = PointLight_ComputeLightColor(i, fragmentNormal, worldPosition, cameraInfo.viewDirection);
 		}
 	    else if (lightsInfo.lightInstances[i].type == COCKTAIL_LIGHT_TYPE_SPOT)
 		{
-			lightColor = SpotLight_ComputeLightColor(i, normal, worldPosition, cameraInfo.viewDirection);
+			lightColor = SpotLight_ComputeLightColor(i, fragmentNormal, worldPosition, cameraInfo.viewDirection);
 		}
 		diffuseColor += lightColor * baseColor.rgb;
 	}

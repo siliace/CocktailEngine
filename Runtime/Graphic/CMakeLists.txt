@@ -323,6 +323,20 @@ cocktail_add_shader(GRAPHIC_FILES
 )
 
 cocktail_add_shader(GRAPHIC_FILES
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-tbn.vert.spv
+    TYPE vert
+    FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.vert
+    MACRO COCKTAIL_VERTEX_HAS_UV COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE COCKTAIL_VERTEX_HAS_NORMAL COCKTAIL_VERTEX_HAS_TANGENT COCKTAIL_MATERIAL_HAS_NORMAL_TEXTURE
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-tbn.frag.spv
+    TYPE frag
+    FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.frag
+    MACRO COCKTAIL_VERTEX_HAS_UV COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE COCKTAIL_VERTEX_HAS_NORMAL COCKTAIL_VERTEX_HAS_TANGENT COCKTAIL_MATERIAL_HAS_NORMAL_TEXTURE
+)
+
+cocktail_add_shader(GRAPHIC_FILES
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-blended.vert.spv
     TYPE vert
     FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.vert
@@ -367,6 +381,8 @@ cocktail_add_runtime_library(
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/colored.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured.frag.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured.vert.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-tbn.frag.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-tbn.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-blended.frag.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/textured-blended.vert.spv
 )

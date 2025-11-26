@@ -16,6 +16,35 @@ namespace Ck
 	{
 	public:
 
+	    template <typename TVector>
+	    TVector GetVector(VertexAttributeSemantic semantic) const
+	    {
+            using VectorElementType = typename TVector::ElementType;
+
+	        TVector vector;
+
+	        const VertexAttribute* vertexAttribute = mVertexLayout->FindAttribute(semantic);
+	        assert(vertexAttribute);
+	        assert(vertexAttribute->GetType() == DataType::Of<VectorElementType>());
+	        assert(vertexAttribute->GetElementCount() * vertexAttribute->GetArrayLength() == TVector::Size);
+
+	        std::size_t offset;
+	        if (mInterlaced)
+	        {
+	            offset = mIndex * mVertexLayout->GetStride() + vertexAttribute->GetOffset();
+	        }
+	        else
+	        {
+	            offset = vertexAttribute->GetOffset() * mVertexCount + vertexAttribute->GetStride() * mIndex;
+	        }
+
+	        const auto* data = reinterpret_cast<const VectorElementType*>(mVertices->GetData() + offset);
+	        for (std::size_t i = 0; i < TVector::Size; i++)
+	            vector.At(i) = data[i];
+
+	        return vector;
+	    }
+
 		/**
 		 * \brief
 		 * \param semantic
@@ -99,34 +128,10 @@ namespace Ck
 		 * \param semantic
 		 * \param vector
 		 */
-		template <typename T>
-		void Set(VertexAttributeSemantic semantic, const Vector2<T>& vector)
+		template <template <class> typename TVector, typename T, std::size_t S>
+		void SetVector(VertexAttributeSemantic semantic, const Vector<TVector, T, S>& vector)
 		{
-			Set<T>(semantic, static_cast<const T*>(vector), 2);
-		}
-
-		/**
-		 * \brief
-		 * \tparam T
-		 * \param semantic
-		 * \param vector
-		 */
-		template <typename T>
-		void Set(VertexAttributeSemantic semantic, const Vector3<T>& vector)
-		{
-			Set<T>(semantic, static_cast<const T*>(vector), 3);
-		}
-
-		/**
-		 * \brief
-		 * \tparam T
-		 * \param semantic
-		 * \param vector
-		 */
-		template <typename T>
-		void Set(VertexAttributeSemantic semantic, const Vector4<T>& vector)
-		{
-			Set<T>(semantic, static_cast<const T*>(vector), 4);
+			Set<T>(semantic, static_cast<const T*>(vector), S);
 		}
 
 		/**
@@ -135,7 +140,7 @@ namespace Ck
 		 * \param semantic
 		 * \param color
 		 */
-		void Set(VertexAttributeSemantic semantic, const LinearColor& color);
+		void SetColor(VertexAttributeSemantic semantic, const LinearColor& color);
 
 	private:
 

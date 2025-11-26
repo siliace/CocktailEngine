@@ -78,9 +78,9 @@ namespace Ck
 		for (std::size_t i = 0; i < vertexArray->GetVertexCount(); i++)
 		{
 			VertexRef vertex = vertexArray->At(i);
-			vertex.Set(VertexAttributeSemantic::Position, positions[i]);
-			vertex.Set(VertexAttributeSemantic::Normal, normals[i % 4]);
-			vertex.Set(VertexAttributeSemantic::Color, color);
+			vertex.SetVector(VertexAttributeSemantic::Position, positions[i]);
+			vertex.SetVector(VertexAttributeSemantic::Normal, normals[i % 4]);
+			vertex.SetColor(VertexAttributeSemantic::Color, color);
 		}
 
 		unsigned short indices[] = {

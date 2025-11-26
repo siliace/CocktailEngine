@@ -87,7 +87,7 @@ namespace Ck
 		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.diffuse_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_highlight_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Bump] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.bump_texname.c_str()));
+		materialInfo.Textures[Material::TextureType::Normal] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.bump_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.displacement_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.alpha_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Reflection] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.reflection_texname.c_str()));

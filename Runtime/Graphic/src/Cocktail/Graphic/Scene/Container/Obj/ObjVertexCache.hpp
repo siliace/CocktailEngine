@@ -24,9 +24,9 @@ namespace Ck
 
         void HydrateVertexRef(VertexRef vertexRef, const ObjVertex& vertex) const override
         {
-            vertexRef.Set(VertexAttributeSemantic::Position, vertex.Position);
-            vertexRef.Set(VertexAttributeSemantic::TexCoord, vertex.TexCoord);
-            vertexRef.Set(VertexAttributeSemantic::Normal, vertex.Normal);
+            vertexRef.SetVector(VertexAttributeSemantic::Position, vertex.Position);
+            vertexRef.SetVector(VertexAttributeSemantic::TexCoord, vertex.TexCoord);
+            vertexRef.SetVector(VertexAttributeSemantic::Normal, vertex.Normal);
         }
     };
 }
