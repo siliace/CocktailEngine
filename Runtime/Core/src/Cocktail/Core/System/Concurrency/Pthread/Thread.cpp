@@ -219,7 +219,7 @@ namespace Ck
             unsigned int processAffinityMask = GetProcessAffinityMask();
             if ((affinityMask | processAffinityMask) != processAffinityMask)
             {
-                CK_LOG(Detail::Unix::UnixLogCategory, LogLevel::Warning, CK_TEXT("Thread affinity mask {} must be a subset of process affinity mask {}"), affinityMask, processAffinityMask);
+                CK_LOG(Detail::Unix::UnixLogCategory, LogLevel::Warning, CK_TEXT("Thread affinity mask %d must be a subset of process affinity mask %d"), affinityMask, processAffinityMask);
                 affinityMask = processAffinityMask;
             }
 

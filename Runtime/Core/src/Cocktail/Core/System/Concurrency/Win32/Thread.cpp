@@ -181,7 +181,7 @@ namespace Ck
 
 			if ((affinityMask | processAffinityMask) != processAffinityMask)
 			{
-				CK_LOG(Detail::Win32::Win32LogCategory, LogLevel::Warning, CK_TEXT("Thread affinity mask {} must be a subset of process affinity mask {}"), affinityMask, processAffinityMask);
+				CK_LOG(Detail::Win32::Win32LogCategory, LogLevel::Warning, CK_TEXT("Thread affinity mask %d must be a subset of process affinity mask %d"), affinityMask, processAffinityMask);
 				affinityMask = static_cast<unsigned int>(processAffinityMask);
 			}
 

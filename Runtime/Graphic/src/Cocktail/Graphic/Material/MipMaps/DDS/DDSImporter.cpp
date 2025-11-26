@@ -36,10 +36,10 @@ namespace Ck
 					if (pixelFormat.FourCC == MakeFourCC('D', 'X', 'T', '5'))
 						return PixelFormat::Compressed(PixelFormat::CompressionScheme::Dxt5, false);
 
-					throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC {})"), pixelFormat.FourCC);
+					throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC %d)"), pixelFormat.FourCC);
 				}
 
-				throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC {})"), pixelFormat.FourCC);
+				throw DDSImportException(CK_TEXT("Unknown texture compression format (FourCC %d)"), pixelFormat.FourCC);
 			}
 
 			switch (pixelFormat.RGBBitCount)
@@ -147,7 +147,7 @@ namespace Ck
 
 						std::size_t levelPixelSize = inputStream.Read(pixels.GetData(), levelAllocationSize);
 						if (levelPixelSize != levelAllocationSize)
-							throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice {}, level {}"), slice, level);
+							throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice %d, level %d"), slice, level);
 
 						mipMapLevel.CopyPixels(pixels.GetData());
 					}
@@ -167,7 +167,7 @@ namespace Ck
 
 				std::size_t levelPixelSize = inputStream.Read(pixels.GetData(), levelAllocationSize);
 				if (levelPixelSize != levelAllocationSize)
-					throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice {}, level {}"), slice, level);
+					throw DDSImportException(CK_TEXT("Invalid pixel memory length at slice %d, level %d"), slice, level);
 
 				mipMapLevel.CopyPixels(pixels.GetData());
 			}

@@ -103,7 +103,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not an element"), path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node %s is not an element"), path.ToString());
 
             return static_cast<Element&>(node);
         }
@@ -117,7 +117,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a sequence"), path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node %s is not a sequence"), path.ToString());
 
             return static_cast<Sequence&>(node);
         }
@@ -131,7 +131,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node {} is not a value"), path.ToString());
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node %s is not a value"), path.ToString());
 
             return static_cast<Value&>(node);
         }
@@ -183,7 +183,7 @@ namespace Ck
         {
             Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Sequence {} child node at index {} is not an Element", this->mName, index);
+                throw InvalidPropertyPathException("Sequence %s child node at index %d is not an Element", this->mName, index);
 
             return static_cast<Element&>(child);
         }
@@ -197,7 +197,7 @@ namespace Ck
         {
             const Node& child = At(index);
             if (child.GetType() != Node::Type::Element)
-                throw InvalidPropertyPathException("Sequence {} child node at index {} is not an Element", this->mName, index);
+                throw InvalidPropertyPathException("Sequence %s child node at index %d is not an Element", this->mName, index);
 
             return static_cast<const Element&>(child);
         }
