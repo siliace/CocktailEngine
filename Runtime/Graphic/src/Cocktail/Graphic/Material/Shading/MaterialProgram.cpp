@@ -15,7 +15,7 @@ namespace Ck
 		template <typename E>
 		unsigned int EvaluateCompatibility(Flags<E> supported, Flags<E> requested)
 		{
-			unsigned int score = 0;
+			unsigned int score = 1;
 			for (E value : Enum<E>::Values)
 			{
 				/// No supported and not requeted, still compatible but does not impact the score
