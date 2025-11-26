@@ -222,22 +222,73 @@ namespace Ck
             return StringUtils<CharType, SizeType>::FindLast(mString, mLength, search, length, caseSensitive);
         }
 
-        BasicStringView SubStringView(SizeType codepointStart) const
+        /**
+         * \brief Get the number of UTF codepoint available in this String
+         * The number of codepoint may vary depending on the decoder used internally.
+         * If the String type does not support surrogates, this function is the same as calling GetLength.
+         *
+         * \return The number of code point
+         */
+        SizeType CodepointCount() const
         {
-            return SubStringView(codepointStart, GetCodepointLength() - codepointStart);
+            return IsEmpty() ? 0 : EncodingType::GetCharCount(GetData(), GetLength());
         }
 
-        BasicStringView SubStringView(SizeType codepointStart, SizeType codepointLength) const
+        Utf32Char CodepointAt(SizeType codepointIndex) const
         {
-            return CodepointToCharIndex(codepointStart)
-                .Map([&](SizeType start) {
-                    SizeType charCount = 0;
-                    for (SizeType i = 0; i < codepointLength; ++i)
-                        charCount += EncodingType::GetCharCount(GetData() + start + charCount);
+            if (auto codepoint = TryCodepointAt(codepointIndex); !codepoint.IsEmpty())
+                return codepoint.Get();
 
-                    return View(GetData() + start, charCount);
-                })
-                .GetOr(Empty);
+            ExceptionUtils::ThrowCodepointDecodingException(codepointIndex);
+        }
+
+        Optional<Utf32Char> TryCodepointAt(SizeType codepointIndex) const
+        {
+            if (IsEmpty())
+                return Optional<Utf32Char>::Empty();
+
+            Optional<SizeType> offset = TryOffsetByCodepoint(0, codepointIndex);
+            if (offset.IsEmpty())
+                return Optional<Utf32Char>::Empty();
+
+            Utf32Char out;
+            if (EncodingType::Decode(GetData() + offset.Get(), GetLength() - offset.Get(), out) == 0)
+                return Optional<Utf32Char>::Empty();
+
+            return Optional<Utf32Char>::Of(out);
+        }
+
+        SizeType OffsetByCodepoint(SizeType start, SizeType codepointCount) const
+        {
+            if (auto offset = TryOffsetByCodepoint(start, codepointCount); !offset.IsEmpty())
+                return offset.Get();
+
+            ExceptionUtils::ThrowOutOfRange(start, GetLength());
+        }
+
+        Optional<SizeType> TryOffsetByCodepoint(SizeType start, SizeType codepointCount) const
+        {
+            SizeType charOffset = start;
+            for (SizeType i = 0; i < codepointCount; ++i)
+            {
+                SizeType charCount = EncodingType::GetCharCount(GetData() + charOffset);
+                if (charCount == 0)
+                    Optional<SizeType>::Empty();
+
+                charOffset += charCount;
+            }
+
+            return Optional<SizeType>::Of(charOffset);
+        }
+
+        BasicStringView SubStringView(SizeType start) const
+        {
+            return SubStringView(start, GetLength() - start);
+        }
+
+        BasicStringView SubStringView(SizeType start, SizeType length) const
+        {
+            return View(GetData() + start, std::min(length, GetLength() - start));
         }
 
         int Compare(const BasicStringView& other, bool caseSensitive = true) const
@@ -320,18 +371,6 @@ namespace Ck
             return mLength;
         }
 
-        /**
-         * \brief Get the number of UTF codepoint available in this StringView
-         * The number of codepoint may vary depending on the decoder used internally.
-         * If the StringView type does not support surrogates, this function is the same as calling GetLength.
-         *
-         * \return The number of code point
-         */
-        SizeType GetCodepointLength() const
-        {
-            return EncodingType::GetCharCount(mString, mLength);
-        }
-
         const CharType* GetData() const
         {
             return mString;
@@ -343,47 +382,6 @@ namespace Ck
         }
 
     private:
-
-        CharType* FetchCodepoint(SizeType codepointIndex)
-        {
-            if (auto codepoint = TryFetchCodepoint(codepointIndex); !codepoint.IsEmpty())
-                return codepoint.Get();
-
-            ExceptionUtils::ThrowOutOfRange(codepointIndex, GetCodepointLength());
-        }
-
-        const CharType* FetchCodepoint(SizeType codepointIndex) const
-        {
-            if (auto codepoint = TryFetchCodepoint(codepointIndex); !codepoint.IsEmpty())
-                return codepoint.Get();
-
-            ExceptionUtils::ThrowOutOfRange(codepointIndex, GetCodepointLength());
-        }
-
-        Optional<CharType*> TryFetchCodepoint(SizeType codepointIndex)
-        {
-            return CodepointToCharIndex(codepointIndex).Map([&](SizeType index) {
-                return GetData() + index;
-            });
-        }
-
-        Optional<const CharType*> TryFetchCodepoint(SizeType codepointIndex) const
-        {
-            return CodepointToCharIndex(codepointIndex).Map([&](SizeType index) {
-                return GetData() + index;
-            });
-        }
-
-        Optional<SizeType> CodepointToCharIndex(SizeType codepointIndex) const
-        {
-            for (SizeType i = 0; i < GetLength(); i += EncodingType::GetCharCount(GetData() + i))
-            {
-                if (i == codepointIndex)
-                    return Optional<SizeType>::Of(i);
-            }
-
-            return Optional<SizeType>::Empty();
-        }
 
         const CharType* mString;
         SizeType mLength;
