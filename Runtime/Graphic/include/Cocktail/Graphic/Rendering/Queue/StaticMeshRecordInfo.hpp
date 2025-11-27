@@ -93,8 +93,9 @@ namespace Ck
 		Matrix4<float> Model;
 
 		LinearColor MaterialBaseColor;
-		LinearColor MaterialSpecularColor;
 		LinearColor MaterialEmissiveColor;
+        float MaterialRoughness;
+	    float MaterialMetallic;
 
 		/**
 		 * \brief 

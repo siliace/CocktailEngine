@@ -127,9 +127,10 @@ namespace Ck
 				recordInfo.AlphaMode = material->GetAlphaMode();
 				recordInfo.AlphaCutoff = material->GetAlphaCutoff();
 				recordInfo.DoubleSided = material->IsDoubleSided();
-				recordInfo.MaterialBaseColor = material->GetUniformColors().Base;
-				recordInfo.MaterialSpecularColor = material->GetUniformColors().Specular;
-				recordInfo.MaterialEmissiveColor = material->GetUniformColors().Emission;
+				recordInfo.MaterialBaseColor = material->GetParameters().Base;
+				recordInfo.MaterialEmissiveColor = material->GetParameters().Emission;
+			    recordInfo.MaterialMetallic = material->GetParameters().Metallic;
+			    recordInfo.MaterialRoughness = material->GetParameters().Roughness;
 				for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 				{
 					if (std::shared_ptr<TextureResource> texture = material->GetTexture(textureType))

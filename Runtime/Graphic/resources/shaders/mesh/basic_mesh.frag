@@ -70,12 +70,17 @@ layout (set = 2, binding = 2) uniform sampler2D ck_MaterialAlpha;
 layout (set = 2, binding = 3) uniform sampler2D ck_MaterialNormal;
 #endif
 
+#ifdef COCKTAIL_MATERIAL_HAS_PBR_TEXTURE
+layout (set = 2, binding = 4) uniform sampler2D ck_MaterialMetallicRoughness;
+#endif
+
 layout (push_constant) uniform MaterialInfo {
 	layout (offset = 112)
 	vec4 base;
-	vec3 specular;
-	int alphaMode;
 	vec3 emissive;
+    float roughness;
+    float metallic;
+    int alphaMode;
 	float alphaCutoff;
 } materialInfo;
 
@@ -167,6 +172,15 @@ void main()
     mat3 tbn = mat3(tangent, biTangent, fragmentNormal);
     fragmentNormal = normalize(tbn * n);
     #endif
+
+	#if defined(COCKTAIL_VERTEX_HAS_UV) && defined(COCKTAIL_MATERIAL_HAS_PBR_TEXTURE)
+	vec2 roughnessMetallic = texture(ck_MaterialMetallicRoughness, texCoord).gb;
+	float fragmentMetallic = materialInfo.metallic * roughnessMetallic.x;
+	float fragmentRoughness = materialInfo.roughness * roughnessMetallic.y;
+	#else
+	float fragmentMetallic = materialInfo.metallic;
+	float fragmentRoughness = materialInfo.roughness;
+	#endif
 
 	for (uint i = 0; i < lightsInfo.lightInstances.length(); i++)
 	{

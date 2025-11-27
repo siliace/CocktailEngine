@@ -30,20 +30,20 @@ namespace Ck
 		{
 			Ambient = Bit(0),
 			BaseColor = Bit(1),
-			Specular = Bit(2),
-			SpecularHighlight = Bit(3),
-			Normal = Bit(4),
-			Displacement = Bit(5),
-			Alpha = Bit(6),
-			Reflection = Bit(7),
-			Emission = Bit(8),
+			MetallicRoughness = Bit(2),
+			Normal = Bit(3),
+			Displacement = Bit(4),
+			Alpha = Bit(5),
+			Reflection = Bit(6),
+			Emission = Bit(7),
 		};
 
-		struct UniformColors
+		struct Parameters
 		{
 			LinearColor Base;
-			LinearColor Specular;
 			LinearColor Emission;
+			float Roughness = 0.f;
+		    float Metallic = 0.f;
 		};
 
 		enum class AlphaMode
@@ -71,13 +71,19 @@ namespace Ck
 		 * \brief
 		 * \param color
 		 */
-		void SetSpecularColor(const LinearColor& color);
-
-		/**
-		 * \brief
-		 * \param color
-		 */
 		void SetEmissiveColor(const LinearColor& color);
+
+        /**
+         * \brief
+         * \param metallic
+         */
+	    void SetMetallic(float metallic);
+
+        /**
+         * \brief
+         * \param roughness
+         */
+	    void SetRoughness(float roughness);
 
 		/**
 		 * \brief 
@@ -115,7 +121,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const UniformColors& GetUniformColors() const;
+		const Parameters& GetParameters() const;
 
 		/**
 		 * \brief 
@@ -133,7 +139,7 @@ namespace Ck
 
 		AsciiString mName;
 		ShadingMode mShadingMode;
-		UniformColors mUniformColors;
+		Parameters mParameters;
 		EnumMap<TextureType, std::shared_ptr<TextureResource>> mTextures;
 		bool mDoubleSided;
 		AlphaMode mAlphaMode;

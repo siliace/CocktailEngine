@@ -32,8 +32,9 @@ namespace Ck
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Tangent] = "ck_VertexTangent";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::BiTangent] = "ck_VertexBiTangent";
 				entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-				entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.Textures[Material::TextureType::MetallicRoughness] = { "ck_MaterialMetallicRoughness", Renderer::StaticSampler::TrilinearWrap };
 				entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
+				entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
 
 				{
 					ByteArray basicMeshVertexStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/default.vert.spv"));
@@ -80,8 +81,8 @@ namespace Ck
 				}
 
                 {
-                    ByteArray basicMeshVertexStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-tbn.vert.spv"));
-                    ByteArray basicMeshFragmentStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-tbn.frag.spv"));
+                    ByteArray basicMeshVertexStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-pbr.vert.spv"));
+                    ByteArray basicMeshFragmentStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/mesh/textured-pbr.frag.spv"));
 
                     EnumMap<Renderer::ShaderType, ByteArray> binaries;
                     binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);

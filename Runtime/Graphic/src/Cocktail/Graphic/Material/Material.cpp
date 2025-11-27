@@ -2,83 +2,88 @@
 
 namespace Ck
 {
-	Material::Material(AsciiString name, ShadingMode shadingMode, bool doubleSided) :
-		mName(std::move(name)),
-		mShadingMode(shadingMode),
-		mDoubleSided(doubleSided),
-		mAlphaMode(AlphaMode::Opaque),
-		mAlphaCutoff(0.f)
-	{
-		/// Nothing
-	}
+    Material::Material(AsciiString name, ShadingMode shadingMode, bool doubleSided) :
+        mName(std::move(name)),
+        mShadingMode(shadingMode),
+        mDoubleSided(doubleSided),
+        mAlphaMode(AlphaMode::Opaque),
+        mAlphaCutoff(0.f)
+    {
+        /// Nothing
+    }
 
-	void Material::SetBaseColor(const LinearColor& color)
-	{
-		mUniformColors.Base = color;
-	}
+    void Material::SetBaseColor(const LinearColor& color)
+    {
+        mParameters.Base = color;
+    }
 
-	void Material::SetSpecularColor(const LinearColor& color)
-	{
-		mUniformColors.Specular = color;
-	}
+    void Material::SetEmissiveColor(const LinearColor& color)
+    {
+        mParameters.Emission = color;
+    }
 
-	void Material::SetEmissiveColor(const LinearColor& color)
-	{
-		mUniformColors.Emission = color;
-	}
+    void Material::SetMetallic(float metallic)
+    {
+        mParameters.Metallic = metallic;
+    }
 
-	void Material::SetTexture(TextureType textureType, std::shared_ptr<TextureResource> textureResource)
-	{
-		mTextures[textureType] = std::move(textureResource);
-	}
+    void Material::SetRoughness(float roughness)
+    {
+        mParameters.Roughness = roughness;
+    }
 
-	std::shared_ptr<TextureResource> Material::GetTexture(TextureType textureType) const
-	{
-		return mTextures[textureType];
-	}
+    void Material::SetTexture(TextureType textureType, std::shared_ptr<TextureResource> textureResource)
+    {
+        mTextures[textureType] = std::move(textureResource);
+    }
 
-	bool Material::IsEmissive() const
-	{
-		return mUniformColors.Base != LinearColor{ 0.f, 0.f, 0.f, 1.f } || mTextures[TextureType::Emission] != nullptr;
-	}
+    std::shared_ptr<TextureResource> Material::GetTexture(TextureType textureType) const
+    {
+        return mTextures[textureType];
+    }
 
-	const AsciiString& Material::GetName() const
-	{
-		return mName;
-	}
+    bool Material::IsEmissive() const
+    {
+        return mParameters.Base != LinearColor{ 0.f, 0.f, 0.f, 1.f } || mTextures[TextureType::Emission] != nullptr;
+    }
 
-	Material::ShadingMode Material::GetShadingMode() const
-	{
-		return mShadingMode;
-	}
+    const AsciiString& Material::GetName() const
+    {
+        return mName;
+    }
 
-	const Material::UniformColors& Material::GetUniformColors() const
-	{
-		return mUniformColors;
-	}
+    Material::ShadingMode Material::GetShadingMode() const
+    {
+        return mShadingMode;
+    }
 
-	bool Material::IsDoubleSided() const
-	{
-		return mDoubleSided;
-	}
+    const Material::Parameters& Material::GetParameters() const
+    {
+        return mParameters;
+    }
 
-	Material::AlphaMode Material::GetAlphaMode() const
-	{
-		return mAlphaMode;
-	}
+    bool Material::IsDoubleSided() const
+    {
+        return mDoubleSided;
+    }
 
-	void Material::SetAlphaMode(AlphaMode alphaMode)
-	{
-		mAlphaMode = alphaMode;
-	}
+    Material::AlphaMode Material::GetAlphaMode() const
+    {
+        return mAlphaMode;
+    }
 
-	float Material::GetAlphaCutoff() const
-	{
-		return mAlphaCutoff;
-	}
+    void Material::SetAlphaMode(AlphaMode alphaMode)
+    {
+        mAlphaMode = alphaMode;
+    }
 
-	void Material::SetAlphaCutoff(float alphaCutoff)
-	{
-		mAlphaCutoff = alphaCutoff;
-	}
+    float Material::GetAlphaCutoff() const
+    {
+        return mAlphaCutoff;
+    }
+
+    void Material::SetAlphaCutoff(float alphaCutoff)
+    {
+        mAlphaCutoff = alphaCutoff;
+    }
 }

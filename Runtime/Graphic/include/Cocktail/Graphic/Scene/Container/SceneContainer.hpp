@@ -47,7 +47,7 @@ namespace Ck
 		struct MaterialInfo
 		{
 			AsciiString Name;
-			Material::UniformColors Colors;
+			Material::Parameters Parameters;
 			Material::ShadingMode ShadingMode;
 			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
 			bool DoubleSided = false;

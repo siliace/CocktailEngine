@@ -45,10 +45,11 @@ namespace Ck
 		
 		struct MaterialInfo
 		{
-			LinearColor BaseColor;
-			float SpecularColor[3];
-			int AlphaMode;
+			float BaseColor[4];
 			float EmissiveColor[3];
+		    float Roughness;
+		    float Metallic;
+			int AlphaMode;
 			float AlphaCutoff;
 		};
 

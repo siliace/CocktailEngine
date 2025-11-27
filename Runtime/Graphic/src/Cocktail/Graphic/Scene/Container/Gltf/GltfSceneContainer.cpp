@@ -72,10 +72,12 @@ namespace Ck
     {
         MaterialInfo materialInfo;
         materialInfo.Name = gltfMaterial.name.c_str();
-        materialInfo.Colors.Base = GltfUtils::ConvertLinearColor(gltfMaterial.pbrMetallicRoughness.baseColorFactor);
-        materialInfo.Colors.Emission = GltfUtils::ConvertLinearColor(gltfMaterial.emissiveFactor);
+        materialInfo.Parameters.Base = GltfUtils::ConvertLinearColor(gltfMaterial.pbrMetallicRoughness.baseColorFactor);
+        materialInfo.Parameters.Emission = GltfUtils::ConvertLinearColor(gltfMaterial.emissiveFactor);
         materialInfo.ShadingMode = Material::ShadingMode::Phong;
         materialInfo.DoubleSided = gltfMaterial.doubleSided;
+        materialInfo.Parameters.Roughness = static_cast<float>(gltfMaterial.pbrMetallicRoughness.roughnessFactor);
+        materialInfo.Parameters.Metallic = static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicFactor);
         materialInfo.AlphaMode = GltfUtils::ConvertAlphaMode(gltfMaterial.alphaMode.c_str());
         materialInfo.AlphaCutoff = static_cast<float>(gltfMaterial.alphaCutoff);
 
@@ -83,6 +85,12 @@ namespace Ck
         {
             const tinygltf::Texture& texture = model.textures[textureIndex];
             materialInfo.Textures[Material::TextureType::BaseColor] = mMipMaps[texture.source];
+        }
+
+        if (int textureIndex = gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture.index; textureIndex != -1)
+        {
+            const tinygltf::Texture& texture = model.textures[textureIndex];
+            materialInfo.Textures[Material::TextureType::MetallicRoughness] = mMipMaps[texture.source];
         }
 
         if (int textureIndex = gltfMaterial.normalTexture.index; textureIndex != -1)

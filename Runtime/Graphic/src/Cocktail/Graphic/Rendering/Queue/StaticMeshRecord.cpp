@@ -64,14 +64,16 @@ namespace Ck
 			vertexInfo.Normal[i] = Vector4<float>(normalMatrix.GetColumn(i).Normalized(), 0.f);
 
 		MaterialInfo materialInfo;
-		materialInfo.BaseColor = mRecordInfo.MaterialBaseColor;
-		materialInfo.SpecularColor[0] = mRecordInfo.MaterialSpecularColor.R;
-		materialInfo.SpecularColor[1] = mRecordInfo.MaterialSpecularColor.G;
-		materialInfo.SpecularColor[2] = mRecordInfo.MaterialSpecularColor.B;
+	    materialInfo.BaseColor[0] = mRecordInfo.MaterialBaseColor.R;
+	    materialInfo.BaseColor[1] = mRecordInfo.MaterialBaseColor.G;
+	    materialInfo.BaseColor[2] = mRecordInfo.MaterialBaseColor.B;
+	    materialInfo.BaseColor[3] = mRecordInfo.MaterialBaseColor.A;
+	    materialInfo.EmissiveColor[0] = mRecordInfo.MaterialEmissiveColor.R;
+	    materialInfo.EmissiveColor[1] = mRecordInfo.MaterialEmissiveColor.G;
+	    materialInfo.EmissiveColor[2] = mRecordInfo.MaterialEmissiveColor.B;
+	    materialInfo.Roughness = mRecordInfo.MaterialRoughness;
+	    materialInfo.Metallic = mRecordInfo.MaterialMetallic;
 		materialInfo.AlphaMode = static_cast<int>(mRecordInfo.AlphaMode);
-		materialInfo.EmissiveColor[0] = mRecordInfo.MaterialEmissiveColor.R;
-		materialInfo.EmissiveColor[1] = mRecordInfo.MaterialEmissiveColor.G;
-		materialInfo.EmissiveColor[2] = mRecordInfo.MaterialEmissiveColor.B;
 		materialInfo.AlphaCutoff = mRecordInfo.AlphaCutoff;
 
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);

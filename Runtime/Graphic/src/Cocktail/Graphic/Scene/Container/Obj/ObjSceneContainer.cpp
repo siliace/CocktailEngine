@@ -79,14 +79,11 @@ namespace Ck
 		MaterialInfo materialInfo;
 		materialInfo.Name = objMaterial.name.c_str();
 		materialInfo.ShadingMode = Material::ShadingMode::Phong;
-		materialInfo.Colors.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
-		materialInfo.Colors.Specular = { objMaterial.specular[0], objMaterial.specular[1], objMaterial.specular[2], 1.f };
-		materialInfo.Colors.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
+		materialInfo.Parameters.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
+		materialInfo.Parameters.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
 
 		materialInfo.Textures[Material::TextureType::Ambient] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.ambient_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::BaseColor] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.diffuse_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::Specular] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_texname.c_str()));
-		materialInfo.Textures[Material::TextureType::SpecularHighlight] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.specular_highlight_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Normal] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.bump_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Displacement] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.displacement_texname.c_str()));
 		materialInfo.Textures[Material::TextureType::Alpha] = LoadMipMaps(String::ConvertFrom<Encoders::Ascii>(objMaterial.alpha_texname.c_str()));

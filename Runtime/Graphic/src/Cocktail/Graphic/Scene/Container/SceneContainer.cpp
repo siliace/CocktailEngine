@@ -38,9 +38,10 @@ namespace Ck
 					const MaterialInfo& materialInfo = mMaterials[subMeshInfo.MaterialIndex];
 
 					std::shared_ptr<Material> material = std::make_shared<Material>(materialInfo.Name, materialInfo.ShadingMode, materialInfo.DoubleSided);
-					material->SetBaseColor(materialInfo.Colors.Base);
-					material->SetSpecularColor(materialInfo.Colors.Specular);
-					material->SetEmissiveColor(materialInfo.Colors.Emission);
+					material->SetBaseColor(materialInfo.Parameters.Base);
+					material->SetEmissiveColor(materialInfo.Parameters.Emission);
+                    material->SetRoughness(materialInfo.Parameters.Roughness);
+                    material->SetMetallic(materialInfo.Parameters.Metallic);
 
 					for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 					{
@@ -79,7 +80,7 @@ namespace Ck
 		MaterialInfo material;
 		material.Name = "Default";
 		material.ShadingMode = Material::ShadingMode::Phong;
-		material.Colors.Base = baseColor;
+		material.Parameters.Base = baseColor;
 		material.DoubleSided = true;
 		material.AlphaMode = Material::AlphaMode::Opaque;
 
