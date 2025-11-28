@@ -45,25 +45,40 @@ namespace Ck
          * \brief 
          * \return 
          */
-        virtual LinearColor GetColor() const = 0;
+        LinearColor GetColor() const;
 
         /**
          * \brief 
          * \param color 
          */
-        virtual void SetColor(LinearColor color) = 0;
+        void SetColor(LinearColor color);
 
         /**
          * \brief
          * \return
          */
-        virtual float GetIntensity() const = 0;
+        float GetIntensity() const;
 
         /**
          * \brief 
          * \param intensity 
          */
-        virtual void SetIntensity(float intensity) = 0;
+        void SetIntensity(float intensity);
+
+    protected:
+
+        /**
+         * \brief
+         *
+         * \param color
+         * \param intensity
+         */
+        Light(LinearColor color, float intensity);
+
+    private:
+
+        LinearColor mColor;
+        float mIntensity;
     };
 }
 

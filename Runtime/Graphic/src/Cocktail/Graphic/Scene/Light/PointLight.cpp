@@ -1,55 +1,39 @@
+#include <Cocktail/Core/Math/Volume/Sphere.hpp>
 #include <Cocktail/Graphic/Scene/Scene.hpp>
 #include <Cocktail/Graphic/Scene/Light/PointLight.hpp>
 
 namespace Ck
 {
-	PointLight* PointLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> position, float intensity)
-	{
-		Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
-		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
+    namespace
+    {
 
-		UniquePtr<PointLight> pointLight = MakeUnique<PointLight>(std::move(transformationNode), color, intensity);
-		PointLight* lightPtr = pointLight.Get();
-		scene->AddLight(std::move(pointLight));
+    }
 
-		return lightPtr;
-	}
+    PointLight* PointLight::Create(std::shared_ptr<Scene> scene, float range, LinearColor color, Vector3<float> position, float intensity)
+    {
+        Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
+        std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
 
-	PointLight::PointLight(std::shared_ptr<TransformationNode> transformationNode, LinearColor color, float intensity) :
-		Transformable(std::move(transformationNode)),
-		mColor(color),
-		mIntensity(intensity)
-	{
-		/// Nothing
-	}
+        UniquePtr<PointLight> pointLight = MakeUnique<PointLight>(std::move(transformationNode), range, color, intensity);
+        PointLight* lightPtr = pointLight.Get();
+        scene->AddLight(std::move(pointLight));
 
-	Intersection PointLight::FrustumCull(const Frustum<float>& frustum) const
-	{
-		return Intersection::Inside;
-	}
+        return lightPtr;
+    }
 
-	Light::Type PointLight::GetType() const
-	{
-		return Type::Point;
-	}
+    PointLight::PointLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity) :
+        PositionalLight(std::move(transformationNode), range, color, intensity)
+    {
+        /// Nothing
+    }
 
-	LinearColor PointLight::GetColor() const
-	{
-		return mColor;
-	}
+    Intersection PointLight::FrustumCull(const Frustum<float>& frustum) const
+    {
+        return Sphere(GetRange(), GetPosition()).Intersect(frustum);
+    }
 
-	void PointLight::SetColor(LinearColor color)
-	{
-		mColor = color;
-	}
-
-	float PointLight::GetIntensity() const
-	{
-		return mIntensity;
-	}
-
-	void PointLight::SetIntensity(float intensity)
-	{
-		mIntensity = intensity;
-	}
+    Light::Type PointLight::GetType() const
+    {
+        return Type::Point;
+    }
 }

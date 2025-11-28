@@ -3,55 +3,39 @@
 
 namespace Ck
 {
-	DirectionalLight* DirectionalLight::Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity)
-	{
-		UniquePtr<DirectionalLight> light = MakeUnique<DirectionalLight>(color, direction, intensity);
-		DirectionalLight* lightPtr = light.Get();
-		scene->AddLight(std::move(light));
+    DirectionalLight* DirectionalLight::Create(std::shared_ptr<Scene> scene, Vector3<float> direction, LinearColor color, float intensity)
+    {
+        UniquePtr<DirectionalLight> light = MakeUnique<DirectionalLight>(direction.Normalized(), color, intensity);
+        DirectionalLight* lightPtr = light.Get();
+        scene->AddLight(std::move(light));
 
-		return lightPtr;
-	}
+        return lightPtr;
+    }
 
-	DirectionalLight::DirectionalLight(LinearColor color, Vector3<float> direction, float intensity) :
-		mColor(color),
-		mDirection(direction),
-		mIntensity(intensity)
-	{
-		/// Nothing
-	}
+    DirectionalLight::DirectionalLight(Vector3<float> direction, LinearColor color, float intensity) :
+        Light(color, intensity),
+        mDirection(direction)
+    {
+        assert(NearlyEqual(mDirection.GetLength(), 1.f));
+    }
 
-	Intersection DirectionalLight::FrustumCull(const Frustum<float>& frustum) const
-	{
-		return Intersection::Inside;
-	}
+    Intersection DirectionalLight::FrustumCull(const Frustum<float>& frustum) const
+    {
+        return Intersection::Inside;
+    }
 
-	Light::Type DirectionalLight::GetType() const
-	{
-		return Type::Directional;
-	}
+    Light::Type DirectionalLight::GetType() const
+    {
+        return Type::Directional;
+    }
 
-	LinearColor DirectionalLight::GetColor() const
-	{
-		return mColor;
-	}
+    Vector3<float> DirectionalLight::GetDirection() const
+    {
+        return mDirection;
+    }
 
-	void DirectionalLight::SetColor(LinearColor color)
-	{
-		mColor = color;
-	}
-
-	float DirectionalLight::GetIntensity() const
-	{
-		return mIntensity;
-	}
-
-	void DirectionalLight::SetIntensity(float intensity)
-	{
-		mIntensity = intensity;
-	}
-
-	Vector3<float> DirectionalLight::GetDirection() const
-	{
-		return mDirection;
-	}
+    void DirectionalLight::SetDirection(Vector3<float> direction)
+    {
+        mDirection = direction.Normalized();
+    }
 }

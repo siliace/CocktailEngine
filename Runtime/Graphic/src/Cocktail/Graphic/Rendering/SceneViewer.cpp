@@ -87,19 +87,19 @@ namespace Ck
 						SpotLight* spotLight = static_cast<SpotLight*>(lights[i]);
 						lightInstance.Position = spotLight->GetWorldTransformation().GetTranslation();
 						lightInstance.Direction = -spotLight->GetFront();
-						lightInstance.Constants = 1.f;
-						lightInstance.Linear = 0.09f;
-						lightInstance.Quadratic = 0.032f;
-						lightInstance.CutOff.X() = std::cos(Angle<float>::Degree(12.5f));
-						lightInstance.CutOff.Y() = std::cos(Angle<float>::Degree(17.5f));
+						lightInstance.Constants = spotLight->GetConstantAttenuationFactor();
+						lightInstance.Linear = spotLight->GetLinearAttenuationFactor();
+						lightInstance.Quadratic = spotLight->GetQuadraticAttenuationFactor();
+						lightInstance.CutOff.X() = std::cos(spotLight->GetInnerCutoff());
+						lightInstance.CutOff.Y() = std::cos(spotLight->GetOuterCutoff());
 					}
 					else if (lights[i]->GetType() == Light::Type::Point)
 					{
 						PointLight* pointLight = static_cast<PointLight*>(lights[i]);
-						lightInstance.Position = pointLight->GetWorldTransformation().GetTranslation();
-						lightInstance.Constants = 1.f;
-						lightInstance.Linear = 0.09f;
-						lightInstance.Quadratic = 0.032f;
+					    lightInstance.Position = pointLight->GetWorldTransformation().GetTranslation();
+					    lightInstance.Constants = pointLight->GetConstantAttenuationFactor();
+					    lightInstance.Linear = pointLight->GetLinearAttenuationFactor();
+					    lightInstance.Quadratic = pointLight->GetQuadraticAttenuationFactor();
 					}
 				}
 				else

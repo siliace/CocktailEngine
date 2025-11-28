@@ -247,10 +247,13 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Light/DirectionalLight.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Light/Light.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Light/PointLight.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Light/PositionalLight.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Light/SpotLight.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Light/DirectionalLight.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Light/Light.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Light/PointLight.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Light/PositionalLight.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Light/SpotLight.cpp
 )
 

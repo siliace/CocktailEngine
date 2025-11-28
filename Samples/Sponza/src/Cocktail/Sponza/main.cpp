@@ -48,7 +48,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	});
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	DirectionalLight* directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
+	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor(1.f, 1.f, 1.f));
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 4500.f);

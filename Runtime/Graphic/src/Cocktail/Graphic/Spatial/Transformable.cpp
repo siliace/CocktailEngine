@@ -10,7 +10,16 @@ namespace Ck
 		mTransformationNode->SetLocalTransformation(transformation);
 	}
 
-	void Transformable::AttachTo(const Transformable& parent)
+    void Transformable::Rotate(Angle<float> angle, Vector3<float> axis)
+    {
+	    Transformation transformation = GetLocalTransformation();
+
+	    Quaternion<float> rotation = Quaternion<float>::FromAngleAxis(angle, axis);
+	    transformation.SetRotation(transformation.GetRotation().Compose(rotation));
+	    mTransformationNode->SetLocalTransformation(transformation);
+    }
+
+    void Transformable::AttachTo(const Transformable& parent)
 	{
 		std::shared_ptr<TransformationNode> transformationNode = parent.GetTransformationNode();
 		transformationNode->InsertChild(mTransformationNode);

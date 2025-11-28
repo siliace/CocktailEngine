@@ -23,6 +23,14 @@ namespace Ck
 		 */
 		void Move(Vector3<float> offset);
 
+        /**
+	     * \brief
+	     *
+	     * \param angle
+	     * \param axis
+	     */
+	    void Rotate(Angle<float> angle, Vector3<float> axis);
+
 		/**
 		 * \brief 
 		 * \param parent 

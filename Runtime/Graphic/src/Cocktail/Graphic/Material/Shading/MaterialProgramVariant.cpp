@@ -43,4 +43,28 @@ namespace Ck
 	{
 		return mShaderProgram;
 	}
+
+    Flags<VertexAttributeSemantic> MaterialProgramVariant::GetVertexAttributeUsage() const
+	{
+	    Flags<VertexAttributeSemantic> flags;
+	    for (VertexAttributeSemantic vertexAttribute : Enum<VertexAttributeSemantic>::Values)
+	    {
+	        if (mVertexAttributeLocations[vertexAttribute])
+	            flags |= vertexAttribute;
+	    }
+
+	    return flags;
+	}
+
+    Flags<Material::TextureType> MaterialProgramVariant::GetMaterialTextureUsage() const
+	{
+	    Flags<Material::TextureType> flags;
+	    for (Material::TextureType texture : Enum<Material::TextureType>::Values)
+	    {
+	        if (mTextureUniformSlots[texture])
+	            flags |= texture;
+	    }
+
+	    return flags;
+    }
 }

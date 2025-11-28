@@ -37,7 +37,19 @@ namespace Ck
 		 */
 		const std::shared_ptr<Renderer::ShaderProgram>& GetShaderProgram() const;
 
-	private:
+        /**
+	     * \brief
+	     * \return
+	     */
+	    Flags<VertexAttributeSemantic> GetVertexAttributeUsage() const;
+
+        /**
+         * \brief
+         * \return
+         */
+        Flags<Material::TextureType> GetMaterialTextureUsage() const;
+
+    private:
 
 		std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
 		EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;

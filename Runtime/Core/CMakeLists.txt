@@ -159,6 +159,8 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/BoxCorner.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Constants.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/EulerAngles.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Interpolation.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/InterpolationCurve.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Intersection.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Plane.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Math/Quaternion.hpp

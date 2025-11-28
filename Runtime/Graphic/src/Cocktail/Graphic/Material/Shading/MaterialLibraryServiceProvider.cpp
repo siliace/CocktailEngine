@@ -26,8 +26,8 @@ namespace Ck
 				entry.RenderableType = RenderableType::Mesh;
 				entry.ShadingMode = Material::ShadingMode::Phong;
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
+				entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::Tangent] = "ck_VertexTangent";
 				entry.Interface.VertexAttributes[VertexAttributeSemantic::BiTangent] = "ck_VertexBiTangent";

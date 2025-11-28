@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_SCENE_LIGHT_DIRECTIONALLIGHT_HPP
 #define COCKTAIL_GRAPHIC_SCENE_LIGHT_DIRECTIONALLIGHT_HPP
 
+#include <memory>
+
 #include <Cocktail/Graphic/Scene/Light/Light.hpp>
 
 namespace Ck
@@ -15,21 +17,24 @@ namespace Ck
 	public:
 
 		/**
-		 * \brief 
-		 * \param scene 
-		 * \param color 
+		 * \brief
+		 *
+		 * \param scene
 		 * \param direction
-		 * \param intensity 
+		 * \param color
+		 * \param intensity
+		 *
 		 * \return 
 		 */
-		static DirectionalLight* Create(std::shared_ptr<Scene> scene, LinearColor color, Vector3<float> direction, float intensity = 100.f);
+		static DirectionalLight* Create(std::shared_ptr<Scene> scene, Vector3<float> direction, LinearColor color,  float intensity = 100.f);
 
 		/**
 		 * \brief
-		 * \param color
 		 * \param direction
+		 * \param color
+		 * \param intensity
 		 */
-		DirectionalLight(LinearColor color, Vector3<float> direction, float intensity = 100.f);
+		DirectionalLight(Vector3<float> direction, LinearColor color, float intensity = 100.f);
 
 		/**
 		 * \brief 
@@ -48,37 +53,17 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		LinearColor GetColor() const override;
-
-		/**
-		 * \brief 
-		 * \param color 
-		 */
-		void SetColor(LinearColor color) override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		float GetIntensity() const override;
-
-		/**
-		 * \brief 
-		 * \param intensity 
-		 */
-		void SetIntensity(float intensity) override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
 		Vector3<float> GetDirection() const;
+
+        /**
+	     * \brief
+	     * \param direction
+	     */
+	    void SetDirection(Vector3<float> direction);
 
 	private:
 
-		LinearColor mColor;
 		Vector3<float> mDirection;
-		float mIntensity;
 	};
 }
 
