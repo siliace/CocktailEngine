@@ -84,21 +84,20 @@ namespace Ck::Vulkan
 
 	void GraphicStateManager::SetVertexInputAttributes(unsigned int binding, unsigned int attributeCount, const Renderer::VertexInputAttribute* attribute)
 	{
-		mDirtyFlags |= DirtyFlagBits::Pipeline;
-		if (CheckedAssign(mState.VertexInput.Bindings[binding].AttributeCount, attributeCount))
-		{
-			for (unsigned int i = 0; i < attributeCount; i++)
-			{
-				if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Location, attribute[i].Location))
-					mDirtyFlags |= DirtyFlagBits::Pipeline;
+	    if (CheckedAssign(mState.VertexInput.Bindings[binding].AttributeCount, attributeCount))
+	        mDirtyFlags |= DirtyFlagBits::Pipeline;
 
-				if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Format, attribute[i].Format))
-					mDirtyFlags |= DirtyFlagBits::Pipeline;
+        for (unsigned int i = 0; i < attributeCount; i++)
+        {
+        	if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Location, attribute[i].Location))
+        		mDirtyFlags |= DirtyFlagBits::Pipeline;
 
-				if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Offset, attribute[i].Offset))
-					mDirtyFlags |= DirtyFlagBits::Pipeline;
-			}
-		}
+        	if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Format, attribute[i].Format))
+        		mDirtyFlags |= DirtyFlagBits::Pipeline;
+
+        	if (CheckedAssign(mState.VertexInput.Bindings[binding].Attributes[i].Offset, attribute[i].Offset))
+        		mDirtyFlags |= DirtyFlagBits::Pipeline;
+        }
 	}
 
 	void GraphicStateManager::SetPrimitiveTopology(Renderer::PrimitiveTopology primitiveTopology)
