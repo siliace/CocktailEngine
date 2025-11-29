@@ -8,7 +8,7 @@
 namespace Ck::Vulkan
 {
 	Swapchain::Swapchain(RenderDevice* renderDevice, const SwapchainCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{
@@ -28,8 +28,7 @@ namespace Ck::Vulkan
 			vkCreateInfo.minImageCount = createInfo.MinImageCount;
 			vkCreateInfo.imageFormat = ToVkType(createInfo.Format);
 			vkCreateInfo.imageColorSpace = ToVkType(createInfo.ColorSpace);
-			vkCreateInfo.imageExtent.width = createInfo.Size.Width;
-			vkCreateInfo.imageExtent.height = createInfo.Size.Height;
+			vkCreateInfo.imageExtent = ToVkType(createInfo.Size);
 			vkCreateInfo.imageArrayLayers = 1;
 			vkCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -79,6 +78,8 @@ namespace Ck::Vulkan
 			for (unsigned int i = 0; i < mTextureCount; i++)
 				mTextures[i] = std::make_shared<SwapchainTexture>(mRenderDevice, createInfo.Format, createInfo.Size, swapchainImages[i]);
 		}
+
+	    mSize = createInfo.Size;
 	}
 
 	Swapchain::~Swapchain()
@@ -103,7 +104,12 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	unsigned int Swapchain::GetTextureCount() const
+    Extent2D<unsigned int> Swapchain::GetSize() const
+    {
+	    return mSize;
+    }
+
+    unsigned int Swapchain::GetTextureCount() const
 	{
 		return mTextureCount;
 	}

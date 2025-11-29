@@ -40,8 +40,6 @@ namespace Ck::Vulkan
 
 		// Recreate or destroy the swapchain where the window is resized
 		Connect(window.OnResizedEvent(), [&](const WindowResizedEvent& event) {
-			vkDeviceWaitIdle(mRenderDevice->GetHandle());
-
 			bool minimized = false;
 			minimized |= event.DisplayMode == WindowDisplayMode::Minimized;
 			minimized |= event.Size.Width == 0;
@@ -96,7 +94,7 @@ namespace Ck::Vulkan
 
 	Extent2D<unsigned int> RenderSurface::GetSize() const
 	{
-		return mSize;
+		return mSwapchain->GetSize();
 	}
 
 	PixelFormat RenderSurface::GetColorFormat() const
@@ -121,7 +119,7 @@ namespace Ck::Vulkan
 
 	void RenderSurface::EnableVSync(bool enable)
 	{
-		RecreateSwapchain(mSize, enable);
+		RecreateSwapchain(GetSize(), enable);
 	}
 
 	unsigned int RenderSurface::GetBufferCount() const
@@ -166,8 +164,6 @@ namespace Ck::Vulkan
 
 	void RenderSurface::RecreateSwapchain(const Extent2D<unsigned int>& size, bool enableVSync)
  	{
-		mSize = size;
-
 		VkPresentModeKHR presentMode;
 		if (enableVSync)
 		{
@@ -190,12 +186,14 @@ namespace Ck::Vulkan
 			}
 		}
 
+		mSwapchain = mPresentationContext->CreateSwapchain(size, presentMode, mSwapchain.get());
+
 		std::shared_ptr<TextureView> depthStencilTextureView;
 		if (mDepthStencilFormat != PixelFormat::Undefined())
 		{
 			RenderBufferCreateInfo renderBufferCreateInfo;
 			renderBufferCreateInfo.Format = mDepthStencilFormat;
-			renderBufferCreateInfo.Size = mSize;
+			renderBufferCreateInfo.Size = mSwapchain->GetSize();
 			renderBufferCreateInfo.Samples = Renderer::RasterizationSamples::e1;
 
 			std::shared_ptr<RenderBuffer> depthStencilTexture = mRenderDevice->CreateRenderBuffer(renderBufferCreateInfo);
@@ -208,8 +206,6 @@ namespace Ck::Vulkan
 				mRenderDevice->CreateTextureView(viewCreateInfo)
 			);
 		}
-
-		mSwapchain = mPresentationContext->CreateSwapchain(mSize, presentMode, mSwapchain.get());
 
 		for (unsigned int i = 0; i < mSwapchain->GetTextureCount(); i++)
 		{

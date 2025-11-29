@@ -44,6 +44,12 @@ namespace Ck::Vulkan
 		 */
 		Renderer::RenderDevice* GetRenderDevice() const override;
 
+        /**
+	     * \brief
+	     * \return
+	     */
+	    Extent2D<unsigned int> GetSize() const;
+
 		/**
 		 * \brief 
 		 * \return 
@@ -68,6 +74,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSwapchainKHR mHandle;
+	    Extent2D<unsigned int> mSize;
 		unsigned int mTextureCount;
 		std::shared_ptr<SwapchainTexture> mTextures[MaxSwapchainTexture];
 	};

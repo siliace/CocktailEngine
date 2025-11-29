@@ -141,7 +141,6 @@ namespace Ck::Vulkan
 		std::shared_ptr<RenderPass> mRenderPass;
 		std::shared_ptr<Swapchain> mSwapchain;
 		std::shared_ptr<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];
-		Extent2D<unsigned int> mSize;
 		bool mVSyncEnable;
 	};
 }
