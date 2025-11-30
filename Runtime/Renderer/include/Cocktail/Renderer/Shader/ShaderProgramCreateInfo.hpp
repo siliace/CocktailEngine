@@ -15,7 +15,7 @@ namespace Ck::Renderer
 	    /**
          * \brief 
          */
-        AnsiStringView Member;
+        AsciiStringView Member;
 
 	    /**
          * \brief 

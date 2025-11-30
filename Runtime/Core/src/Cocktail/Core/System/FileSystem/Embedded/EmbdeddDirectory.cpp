@@ -17,7 +17,7 @@ namespace Ck
 		children.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
 		{
-			AnsiStringView filename = (*it).filename().c_str();
+			AsciiStringView filename = (*it).filename().c_str();
 			children.Add(Path::Merge(mPath, String::Convert(filename)));
 		}
 

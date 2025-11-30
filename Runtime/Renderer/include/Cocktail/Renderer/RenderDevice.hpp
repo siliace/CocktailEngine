@@ -173,7 +173,7 @@ namespace Ck::Renderer
          * \brief Get the signal emitted when the underlying api get a debug message from the driver
          * \return The signal
          */
-        virtual Signal<LogLevel, MessageType, AnsiStringView>& OnDebugMessage() = 0;
+        virtual Signal<LogLevel, MessageType, AsciiStringView>& OnDebugMessage() = 0;
     };
 }
 

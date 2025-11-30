@@ -88,7 +88,7 @@ namespace Ck::Vulkan
 		return mShaders[type];
 	}
 
-	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(AnsiStringView name) const
+	Renderer::UniformSlot* ShaderProgram::FindUniformSlot(AsciiStringView name) const
 	{	
 		for (const UniquePtr<UniformSlot>& uniformSlot : mUniformSlots)
 		{

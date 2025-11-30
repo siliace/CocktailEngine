@@ -69,7 +69,7 @@ namespace Ck
 		 * \param size
 		 * \param data
 		 */
-		void BindData(Renderer::CommandList& commandList, AnsiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const;
+		void BindData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const;
 
 		/**
 		 * \brief
@@ -78,7 +78,7 @@ namespace Ck
 		 * \param size
 		 * \param data
 		 */
-		void BindPersistentData(Renderer::CommandList& commandList, AnsiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data);
+		void BindPersistentData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data);
 
 		/**
 		 * \brief 

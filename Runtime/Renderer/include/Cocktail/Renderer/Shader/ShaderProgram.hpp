@@ -34,7 +34,7 @@ namespace Ck::Renderer
          * \param name The name of the uniform
          * \return The UniformSlot if found, nullptr otherwise
          */
-        virtual UniformSlot* FindUniformSlot(AnsiStringView name) const = 0;
+        virtual UniformSlot* FindUniformSlot(AsciiStringView name) const = 0;
     };
 }
 

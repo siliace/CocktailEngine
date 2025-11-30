@@ -1398,7 +1398,7 @@ namespace Ck
     }
 
     using AsciiString = BasicString<Encoders::Ascii>;
-    using AnsiStringView = AsciiString::View;
+    using AsciiStringView = AsciiString::View;
 
     using Utf8String = BasicString<Encoders::Utf8>;
     using Utf8StringView = Utf8String::View;

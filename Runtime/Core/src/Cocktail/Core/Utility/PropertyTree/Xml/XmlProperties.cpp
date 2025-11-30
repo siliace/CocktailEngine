@@ -18,12 +18,12 @@ namespace Ck
 			XmlProperties::ElementType element;
 			for (const tinyxml2::XMLAttribute* xmlAttribute = xmlElement.FirstAttribute(); xmlAttribute; xmlAttribute = xmlAttribute->Next())
 			{
-				AnsiStringView nameAttribute = xmlAttribute->Name();
+				AsciiStringView nameAttribute = xmlAttribute->Name();
 				const bool isProtectedAttribute = StringUtils<AnsiChar, unsigned int>::StartsWith(nameAttribute.GetData(), "__");
 				if (isProtectedAttribute)
 					continue;
 
-				String xmlAttributeValue = String::Convert(AnsiStringView(xmlAttribute->Value()));
+				String xmlAttributeValue = String::Convert(AsciiStringView(xmlAttribute->Value()));
 				element.Insert(String::Convert(nameAttribute), XmlProperties::ValueType(xmlAttributeValue));
 			}
 
@@ -74,7 +74,7 @@ namespace Ck
 						const char* data = xmlChildText->Value();
 
 						String childName = CK_TEXT("CData");
-						if (AnsiStringView cdataName = xmlChildText->Parent()->ToElement()->Attribute("__cdata_name"); !cdataName.IsEmpty())
+						if (AsciiStringView cdataName = xmlChildText->Parent()->ToElement()->Attribute("__cdata_name"); !cdataName.IsEmpty())
 							childName = String::Convert(cdataName);
 
 						std::size_t length = xmlChildText->Parent()->ToElement()->Unsigned64Attribute("__cdata_length");
@@ -86,7 +86,7 @@ namespace Ck
 				}
 			}
 
-			AnsiStringView elementName = xmlElement.Value();
+			AsciiStringView elementName = xmlElement.Value();
 			return { String::Convert(elementName), std::move(element) };
 		}
 	}

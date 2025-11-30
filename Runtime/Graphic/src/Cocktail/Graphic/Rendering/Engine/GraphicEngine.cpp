@@ -48,7 +48,7 @@ namespace Ck
 			assert(false);
 		}
 
-		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, AnsiStringView message) {
+		Connect(mRenderDevice->OnDebugMessage(), [](LogLevel logLevel, Renderer::MessageType messageType, AsciiStringView message) {
 			CK_LOG(GraphicEngineLogCategory, logLevel, CK_TEXT("Debug message of type %hs from RenderDevice : %hs"), messageType, message);
 		});
 

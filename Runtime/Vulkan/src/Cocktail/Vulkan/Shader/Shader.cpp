@@ -317,7 +317,7 @@ namespace Ck::Vulkan
 		return mType;
 	}
 
-	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(AnsiStringView name) const
+	Renderer::VertexAttributeLocation* Shader::FindInputAttribute(AsciiStringView name) const
 	{
 		for (const UniquePtr<VertexAttributeLocation>& vertexAttributeLocation : mInputAttributeLocations)
 		{
@@ -328,7 +328,7 @@ namespace Ck::Vulkan
 		return nullptr;
 	}
 
-	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(AnsiStringView name) const
+	Renderer::VertexAttributeLocation* Shader::FindOutputAttribute(AsciiStringView name) const
 	{
 		for (const UniquePtr<VertexAttributeLocation>& vertexAttributeLocation : mOutputAttributeLocations)
 		{

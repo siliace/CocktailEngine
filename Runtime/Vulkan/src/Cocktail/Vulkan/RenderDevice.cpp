@@ -244,7 +244,7 @@ namespace Ck::Vulkan
 		return usage;
 	}
 
-	Signal<LogLevel, Renderer::MessageType, AnsiStringView>& RenderDevice::OnDebugMessage()
+	Signal<LogLevel, Renderer::MessageType, AsciiStringView>& RenderDevice::OnDebugMessage()
 	{
 		return mOnDebugMessage;
 	}
@@ -264,7 +264,7 @@ namespace Ck::Vulkan
 		return mHandle;
 	}
 
-	void RenderDevice::CreateInstance(AnsiStringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
+	void RenderDevice::CreateInstance(AsciiStringView applicationName, const VersionDescriptor& applicationVersion, ApiVersion apiVersion, bool enableValidationLayer)
 	{
 		VkApplicationInfo applicationInfo{ VK_STRUCTURE_TYPE_APPLICATION_INFO, nullptr };
 		{

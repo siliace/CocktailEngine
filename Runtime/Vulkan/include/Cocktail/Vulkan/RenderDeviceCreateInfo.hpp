@@ -16,7 +16,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		AnsiStringView ApplicationName;
+		AsciiStringView ApplicationName;
 
 		/**
 		 * \brief

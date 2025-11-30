@@ -50,7 +50,7 @@ namespace Ck
 		commandList.BindIndexBuffer(area.Buffer, area.BaseOffset, indexType);
 	}
 
-	void RecordDrawContext::BindData(Renderer::CommandList& commandList, AnsiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
+	void RecordDrawContext::BindData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
 	{
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
@@ -61,7 +61,7 @@ namespace Ck
 		commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
 	}
 
-	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, AnsiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
+	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
 	{
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
