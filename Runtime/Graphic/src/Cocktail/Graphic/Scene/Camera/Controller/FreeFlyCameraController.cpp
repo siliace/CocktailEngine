@@ -8,7 +8,7 @@ namespace Ck
 {
 	FreeFlyCameraViewController::FreeFlyCameraViewController(Camera* camera, Angle<float> pitchLimit) :
 		mCamera(camera),
-		mPitchLimit(pitchLimit)
+        mPitchLimit(pitchLimit)
 	{
 		assert(mPitchLimit > Angle<float>::Degree(0.f) && mPitchLimit <= Angle<float>::Degree(89.f));
 
@@ -25,10 +25,11 @@ namespace Ck
 	void FreeFlyCameraViewController::Update(const Duration& elapsedTime)
 	{
 		Vector3<float> position = mCamera->GetPosition();
-		Vector3<float> motionDirection;
-		motionDirection += mTranslations[TranslationAxis::Right] * mCamera->GetRight();
-		motionDirection += mTranslations[TranslationAxis::Up] * mCamera->GetUp();
-		motionDirection += mTranslations[TranslationAxis::Front] * mCamera->GetFront();
+
+	    Vector3<float> motionDirection;
+	    motionDirection += mTranslations[TranslationAxis::Right] * mCamera->GetRight();
+	    motionDirection += mTranslations[TranslationAxis::Up] * mCamera->GetUp();
+	    motionDirection += mTranslations[TranslationAxis::Front] * mCamera->GetFront();
 
 		float temporalFactor = static_cast<float>(elapsedTime.GetCount(TimeUnit::Milliseconds())) / 1000.f;
 		mCamera->SetPosition(position + motionDirection * temporalFactor);

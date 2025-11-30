@@ -11,6 +11,7 @@ namespace Ck::Detail::Xlib
 		mDisplay(display)
 	{
 		application->Connect(mOnKeyboardEvent, [&](const KeyboardEvent& event) {
+		    mOnKeyEvents[event.Key].Emit(event);
 			if (event.Pressed)
 			{
 				mOnKeyPressedEvents[event.Key].Emit(event);
@@ -35,28 +36,17 @@ namespace Ck::Detail::Xlib
 		return keycode;
     }
 
-    KeySym KeyboardService::KeyboardKeyToKeySym(KeyboardKey key) const
-    {
-        return KeySym();
-    }
-
-    bool KeyboardService::IsKeyPressed(KeyboardKey key) const
-    {
-		KeyCode keyCode = KeyboardKeyToKeyCode(key);
-		if (keyCode == InvalidKeyCode)
-			return false;
-		
-		std::array<char, 32> keys;
-		XQueryKeymap(mDisplay, keys.data());
-        return (keys[keyCode / 8] & (1 << (keyCode % 8))) != 0;
-	}
-
 	Signal<KeyboardEvent>& KeyboardService::OnKeyboardEvent()
 	{
 		return mOnKeyboardEvent;
 	}
 
-	Signal<KeyboardEvent>& KeyboardService::OnKeyPressed(KeyboardKey key)
+    Signal<KeyboardEvent>& KeyboardService::OnKey(KeyboardKey key)
+    {
+        return mOnKeyEvents[key];
+    }
+
+    Signal<KeyboardEvent>& KeyboardService::OnKeyPressed(KeyboardKey key)
 	{
 		return mOnKeyPressedEvents[key];
 	}
@@ -65,4 +55,20 @@ namespace Ck::Detail::Xlib
 	{
 		return mOnKeyReleasedEvents[key];
 	}
+
+    KeySym KeyboardService::KeyboardKeyToKeySym(KeyboardKey key) const
+    {
+        return KeySym();
+    }
+
+    bool KeyboardService::IsKeyPressed(KeyboardKey key) const
+    {
+        KeyCode keyCode = KeyboardKeyToKeyCode(key);
+        if (keyCode == InvalidKeyCode)
+            return false;
+
+        std::array<char, 32> keys;
+        XQueryKeymap(mDisplay, keys.data());
+        return (keys[keyCode / 8] & (1 << (keyCode % 8))) != 0;
+    }
 }

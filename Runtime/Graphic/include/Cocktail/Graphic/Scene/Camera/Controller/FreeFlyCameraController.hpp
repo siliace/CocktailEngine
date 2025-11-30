@@ -27,20 +27,24 @@ namespace Ck
 
 		/**
 		 * \brief Constructor
-		 * Create a new FreeFlyCameraViewController to move a camera
+		 *
+		 * Create a new instance of FreeFlyCameraViewController to move a camera
+		 *
 		 * \param camera The camera to move
 		 * \param pitchLimit The min and max values of pitch possible
 		 */
 		explicit FreeFlyCameraViewController(Camera* camera, Angle<float> pitchLimit = Angle<float>::Degree(89.f));
 
 		/**
-		 * \brief Perform updates on the transformation of the underlying cameras
+		 * \brief Perform updates on the transformation of the underlying camera
+		 *
 		 * \param elapsedTime The amount of time since the last update
 		 */
 		void Update(const Duration& elapsedTime) override;
 
 		/**
 		 * \brief Enable or disable a translation axis
+		 *
 		 * \param axis The axis to alter
 		 * \param enable True to enable the axis, false to disable it
 		 */
@@ -48,6 +52,7 @@ namespace Ck
 
 		/**
 		 * \brief Enable or disable a rotation axis
+		 *
 		 * \param axis The axis to alter
 		 * \param enable True to enable the axis, false to disable it
 		 */
@@ -55,6 +60,7 @@ namespace Ck
 
 		/**
 		 * \brief Apply translation along an axis
+		 *
 		 * \param axis The axis to translate on
 		 * \param amount The quantity of the translation to apply
 		 */
@@ -62,12 +68,13 @@ namespace Ck
 
 		/**
 		 * \brief Apply rotation along an axis
+		 *
 		 * \param axis The axis to rotate on
 		 * \param amount The quantity of the rotation to apply
 		 */
 		void Rotate(RotationAxis axis, Angle<float> amount);
 
-	private:
+    private:
 
 		Camera* mCamera;
 		Angle<float> mPitchLimit;
