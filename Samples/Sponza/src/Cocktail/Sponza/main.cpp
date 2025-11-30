@@ -57,32 +57,34 @@ Main::ExitCode ApplicationMain(Application* application)
 	FreeFlyCameraViewController cameraController(camera);
 
 	float move = 1.f;
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Q), [&](KeyboardEvent event)
+    float rightTranslation = 0.f;
+    float frontTranslation = 0.f;
+    application->Connect(Keyboard::OnKey(KeyboardKey::Q), [&](KeyboardEvent event)
 	{
-		cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Right, -move);
+        rightTranslation = event.Pressed ? -move : 0.f;
 	});
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::D), [&](KeyboardEvent event)
+	application->Connect(Keyboard::OnKey(KeyboardKey::D), [&](KeyboardEvent event)
 	{
-		cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Right, move);
+        rightTranslation = event.Pressed ? move : 0.f;
 	});
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Z), [&](KeyboardEvent event)
+	application->Connect(Keyboard::OnKey(KeyboardKey::Z), [&](KeyboardEvent event)
 	{
-		cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Front, -move);
+	    frontTranslation = event.Pressed ? -move : 0.f;
 	});
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::S), [&](KeyboardEvent event)
+	application->Connect(Keyboard::OnKey(KeyboardKey::S), [&](KeyboardEvent event)
 	{
-		cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Front, move);
+	    frontTranslation = event.Pressed ? move : 0.f;
 	});
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Add), [&](KeyboardEvent event)
+	application->Connect(Keyboard::OnKey(KeyboardKey::Add), [&](KeyboardEvent event)
 	{
 		move *= 2.f;
 	});
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Subtract), [&](KeyboardEvent event)
+	application->Connect(Keyboard::OnKey(KeyboardKey::Subtract), [&](KeyboardEvent event)
 	{
 		move /= 2.f;
 	});
@@ -122,6 +124,8 @@ Main::ExitCode ApplicationMain(Application* application)
 	{
 		Duration frameBegin = application->Uptime();
 
+	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Right, rightTranslation);
+	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Front, frontTranslation);
 		cameraController.Update(Duration::Between(lastFrameBegin, frameBegin));
 		overlay.Update();
 

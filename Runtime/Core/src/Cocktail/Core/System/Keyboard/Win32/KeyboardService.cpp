@@ -119,7 +119,8 @@ namespace Ck::Detail::Win32
 	KeyboardService::KeyboardService(Application* application)
 	{
 		application->Connect(KeyboardService::OnKeyboardEvent(), [&](const KeyboardEvent& event) {
-			if (event.Pressed)
+		    mOnKeyEvents[event.Key].Emit(event);
+		    if (event.Pressed)
 			{
 				OnKeyPressed(event.Key).Emit(event);
 			}
@@ -138,6 +139,11 @@ namespace Ck::Detail::Win32
 	Signal<KeyboardEvent>& KeyboardService::OnKeyboardEvent()
 	{
 		return mOnKeyboardEvent;
+	}
+
+    Signal<KeyboardEvent>& KeyboardService::OnKey(KeyboardKey key)
+	{
+	    return mOnKeyEvents[key];
 	}
 
 	Signal<KeyboardEvent>& KeyboardService::OnKeyPressed(KeyboardKey key)

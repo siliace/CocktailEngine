@@ -12,6 +12,11 @@ namespace Ck
         return ResolveFacadeInstance()->OnKeyboardEvent();
     }
 
+    Signal<KeyboardEvent>& Keyboard::OnKey(KeyboardKey key)
+    {
+        return ResolveFacadeInstance()->OnKey(key);
+    }
+
     Signal<KeyboardEvent>& Keyboard::OnKeyPressed(KeyboardKey key)
     {
         return ResolveFacadeInstance()->OnKeyPressed(key);
