@@ -20,7 +20,7 @@ namespace Ck
     public:
 
         /**
-         * \brief The decoder type used to convert raw string data from and to UTF Codepoints
+         * \brief
          */
         using EncodingType = TEncoding;
 
@@ -35,7 +35,7 @@ namespace Ck
         using SizeType = typename EncodingType::SizeType;
 
         /**
-         * \brief Utility constant value to return a reference/pointer to an empty StringView
+         * \brief
          */
         static const BasicStringView Empty;
 
@@ -234,12 +234,21 @@ namespace Ck
             return IsEmpty() ? 0 : EncodingType::GetCharCount(GetData(), GetLength());
         }
 
+        /**
+         * \brief Get the n-th codepoint encoded in this string
+         *
+         * \param codepointIndex The index of the codepoint to get
+         *
+         * \return The codepoint
+         *
+         * \throw OutOfRange if \c codepointIndex is greater than CodepointCount()
+         */
         Utf32Char CodepointAt(SizeType codepointIndex) const
         {
             if (auto codepoint = TryCodepointAt(codepointIndex); !codepoint.IsEmpty())
                 return codepoint.Get();
 
-            ExceptionUtils::ThrowCodepointDecodingException(codepointIndex);
+            ExceptionUtils::ThrowOutOfRange(0, CodepointCount());
         }
 
         Optional<Utf32Char> TryCodepointAt(SizeType codepointIndex) const
@@ -279,6 +288,25 @@ namespace Ck
             }
 
             return Optional<SizeType>::Of(charOffset);
+        }
+
+        /**
+         * \brief Get all codepoints of the string
+         *
+         * Construct an Array of filled by every codepoints encoded in this string.
+         *
+         * \return The array of codepoint
+         */
+        Array<Utf32Char> GetCodepoints() const
+        {
+            Array<Utf32Char> codepoints;
+            codepoints.Reserve(CodepointCount());
+
+            Utf32Char codepoint;
+            for (SizeType i = 0; i < GetLength(); i += EncodingType::Decode(GetData() + i, GetLength() - i, codepoint))
+                codepoints.Add(codepoint);
+
+            return codepoints;
         }
 
         BasicStringView SubStringView(SizeType start) const
@@ -723,122 +751,165 @@ namespace Ck
             return *this;
         }
 
-        /**
-         * \brief Appends a single character to the end of the string
-         *
-         * Adds the given character to the end of the string, extending its length by one.
-         * A null terminator is maintained automatically.
-         *
-         * \param string The character to append
-         *
-         * \return A reference to this BasicString after modification
-         */
-        BasicString& Append(CharType string)
-        {
-            return Append(&string, 1);
-        }
+		/**
+		 * \brief Appends a single character to this string
+		 *
+		 * Appends the character \p string to the end of this string.
+		 * This overload simply forwards to the range-based version with a length of 1.
+		 *
+		 * \param string The character to append
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Append(CharType string)
+		{
+			return Append(&string, 1);
+		}
 
-        /**
-         * \brief Appends the contents of a string view to this string
-         *
-         * If the provided view is not empty, its contents are appended to this string’s buffer.
-         * The operation does not modify the source view.
-         *
-         * \param string The string view to append
-         *
-         * \return A reference to this BasicString after modification
-         */
-        BasicString& Append(View string)
-        {
-            return string.IsEmpty() ? *this : Append(string.GetData(), string.GetLength());
-        }
+		/**
+		 * \brief Appends the contents of a string view to this string
+		 *
+		 * Appends all characters in \p string to the end of this string.
+		 * If the string view is empty, the function performs no modification.
+		 *
+		 * \param string The view whose contents will be appended
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Append(View string)
+		{
+			return string.IsEmpty() ? *this : Append(string.GetData(), string.GetLength());
+		}
 
-        /**
-         * \brief Appends the contents of another BasicString to this string
-         *
-         * If the source string is not empty, its character data is appended to the end of this
-         * string. A null terminator is maintained automatically.
-         *
-         * \param string The BasicString to append
-         *
-         * \return A reference to this BasicString after modification
-         */
-        BasicString& Append(const BasicString& string)
-        {
-            return string.IsEmpty() ? *this : Append(string.GetData(), string.GetLength());
-        }
+		/**
+		 * \brief Appends the contents of another BasicString to this string
+		 *
+		 * Appends all characters from \p string to this string.
+		 * If the provided string is empty, this string remains unchanged.
+		 *
+		 * \param string The BasicString whose contents will be appended
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Append(const BasicString& string)
+		{
+			return string.IsEmpty() ? *this : Append(string.GetData(), string.GetLength());
+		}
 
-        /**
-         * \brief Appends a null-terminated character array to this string
+		/**
+		 * \brief Appends a null-terminated character sequence to this string
+		 *
+		 * Appends the characters from the null-terminated sequence \p string.
+		 * The length of the sequence is automatically determined using StringUtils.
+		 *
+		 * \param string A pointer to a null-terminated character array to append
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Append(const CharType* string)
+		{
+			return Append(string, StringUtils<CharType, SizeType>::GetLength(string));
+		}
 
-         * Determines the length of the provided null-terminated string and appends its contents
-         * to this string. A null terminator is maintained automatically.
-         *
-         * \param string A pointer to the null-terminated character array to append
-         *
-         * \return A reference to this BasicString after modification
-         */
-        BasicString& Append(const CharType* string)
-        {
-            return Append(string, StringUtils<CharType, SizeType>::GetLength(string));
-        }
+		/**
+		 * \brief Appends a range of characters to this string
+		 *
+		 * Appends exactly \p length characters starting from \p string.
+		 * If the input range refers to a region inside this string’s internal buffer,
+		 * a temporary copy is created to avoid undefined behavior.
+		 *
+		 * When the string is non-empty, its trailing null-terminator is removed before appending
+		 * and a new null-terminator is added after the operation, ensuring that this string
+		 * remains properly null-terminated.
+		 *
+		 * \param string A pointer to the character data to append
+		 * \param length The number of characters to append
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Append(const CharType* string, SizeType length)
+		{
+			if (!IsEmpty())
+				mCharacters.PopLast();
 
-        /**
-         * \brief Appends a range of characters to this string
-         *
-         * Appends exactly \p length characters starting from \p string.
-         * If the input range refers to a region inside this string’s internal buffer,
-         * a temporary copy is created to avoid undefined behavior.
-         * The function ensures that the resulting string remains null-terminated.
-         *
-         * \param string A pointer to the character data to append
-         * \param length The number of characters to append
-         *
-         * \return A reference to this BasicString after modification
-         */
-        BasicString& Append(const CharType* string, SizeType length)
-        {
-            if (!IsEmpty())
-                mCharacters.PopLast();
+			const CharType* begin = mCharacters.GetData();
+			const CharType* end = begin + GetLength();
 
-            const CharType* begin = mCharacters.GetData();
-            const CharType* end = begin + GetLength();
+			if (string >= begin && string < end)
+			{
+				CharType* copy = COCKTAIL_STACK_ALLOC(CharType, length);
+				AllocatorUtils::CopyRange(length, copy, string);
 
-            if (string >= begin && string < end)
-            {
-                CharType* copy = COCKTAIL_STACK_ALLOC(CharType, length);
-                AllocatorUtils::CopyRange(length, copy, string);
+				mCharacters.Append(copy, length);
+			}
+			else
+			{
+				mCharacters.Append(string, length);
+			}
+			mCharacters.Add('\0');
 
-                mCharacters.Append(copy, length);
-            }
-            else
-            {
-                mCharacters.Append(string, length);
-            }
-            mCharacters.Add('\0');
+			return *this;
+		}
 
-            return *this;
-        }
+		/**
+		 * \brief Prepends a single character to this string
+		 *
+		 * Prepends the character \p string to the beginning of this string.
+		 * This overload simply forwards to the range-based version with a length of 1.
+		 *
+		 * \param string The character to prepend
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Prepend(CharType string)
+		{
+			return Prepend(&string, 1);
+		}
 
-        BasicString& Prepend(CharType string)
-        {
-            return Prepend(&string, 1);
-        }
+		/**
+		 * \brief Prepends the contents of a string view to this string
+		 *
+		 * Prepends all characters contained in \p string to the beginning of this string.
+		 * If the string view is empty, the function performs no modification.
+		 *
+		 * \param string The view whose contents will be prepended
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Prepend(View string)
+		{
+			return string.IsEmpty() ? *this : Prepend(string.GetData(), string.GetLength());
+		}
 
-        BasicString& Prepend(View string)
-        {
-            return string.IsEmpty() ? *this : Prepend(string.GetData(), string.GetLength());
-        }
+		/**
+		 * \brief Prepends the contents of another BasicString to this string
+		 *
+		 * Prepends all characters from \p string to this string.
+		 * If the provided string is empty, this string remains unchanged.
+		 *
+		 * \param string The BasicString whose contents will be prepended
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Prepend(const BasicString& string)
+		{
+			return string.IsEmpty() ? *this : Prepend(string.GetData(), string.GetLength());
+		}
 
-        BasicString& Prepend(const BasicString& string)
-        {
-            return string.IsEmpty() ? *this : Prepend(string.GetData(), string.GetLength());
-        }
-
-        BasicString& Prepend(const CharType* string)
-        {
-            return Prepend(string, StringUtils<CharType, SizeType>::GetLength(string));
-        }
+		/**
+		 * \brief Prepends a null-terminated character sequence to this string
+		 *
+		 * Prepends the characters from the null-terminated sequence \p string.
+		 * The length of the sequence is determined automatically using StringUtils.
+		 *
+		 * \param string A pointer to a null-terminated character array to prepend
+		 *
+		 * \return A reference to this BasicString after modification
+		 */
+		BasicString& Prepend(const CharType* string)
+		{
+			return Prepend(string, StringUtils<CharType, SizeType>::GetLength(string));
+		}
 
         /**
          * \brief Prepends a range of characters to this string
@@ -878,95 +949,224 @@ namespace Ck
             return *this;
         }
 
-        CharType& At(SizeType index)
-        {
-            return mCharacters.At(index);
-        }
+		/**
+		 * \brief Returns a reference to the character at the given index
+		 *
+		 * Provides direct access to the character at position \p index.
+		 * If \p index is out of range (i.e., greater than or equal to the string length),
+		 * an OutOfRange exception is thrown.
+		 *
+		 * \param index The zero-based index of the character to retrieve
+		 *
+		 * \return A reference to the character at the specified index
+		 *
+		 * \throws OutOfRange If \p index is outside the valid range
+		 */
+		CharType& At(SizeType index)
+		{
+			return mCharacters.At(index);
+		}
 
-        const CharType& At(SizeType index) const
-        {
-            return mCharacters.At(index);
-        }
+		/**
+		 * \brief Returns a const reference to the character at the given index
+		 *
+		 * Provides read-only access to the character at position \p index.
+		 * If \p index is out of range, an OutOfRange exception is thrown.
+		 *
+		 * \param index The zero-based index of the character to retrieve
+		 *
+		 * \return A const reference to the character at the specified index
+		 *
+		 * \throws OutOfRange If \p index is outside the valid range
+		 */
+		const CharType& At(SizeType index) const
+		{
+			return mCharacters.At(index);
+		}
 
-        Optional<CharType&> TryAt(SizeType index)
-        {
-            if (index >= GetLength())
-                return Optional<CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the character at the given index
+		 *
+		 * Returns an Optional containing a reference to the character at \p index if the index
+		 * is within bounds. If \p index is out of range, no exception is thrown and an empty
+		 * Optional is returned instead.
+		 *
+		 * This method is the safe counterpart of At(), guaranteeing that it never throws.
+		 *
+		 * \param index The zero-based index of the character to retrieve
+		 *
+		 * \return An Optional containing a reference to the character if valid,
+		 *         or an empty Optional otherwise
+		 */
+		Optional<CharType&> TryAt(SizeType index)
+		{
+			if (index >= GetLength())
+				return Optional<CharType&>::Empty();
 
-            return Optional<CharType&>::Of(mCharacters[index]);
-        }
+			return Optional<CharType&>::Of(mCharacters[index]);
+		}
 
-        Optional<const CharType&> TryAt(SizeType index) const
-        {
-            if (index >= GetLength())
-                return Optional<const CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the character at the given index
+		 *
+		 * Returns an Optional containing a const reference to the
+		 * character at \p index when valid. If \p index is out of bounds, an empty Optional
+		 * is returned and no exception is thrown.
+		 *
+		 * \param index The zero-based index of the character to retrieve
+		 *
+		 * \return An Optional containing a const reference to the character if valid,
+		 *         or an empty Optional otherwise
+		 */
+		Optional<const CharType&> TryAt(SizeType index) const
+		{
+			if (index >= GetLength())
+				return Optional<const CharType&>::Empty();
 
-            return Optional<const CharType&>::Of(mCharacters[index]);
-        }
+			return Optional<const CharType&>::Of(mCharacters[index]);
+		}
 
-        CharType& First()
-        {
-            if (Optional<CharType&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
+		/**
+		 * \brief Returns a reference to the first character in the string
+		 *
+		 * Provides direct access to the first character.
+		 * If the string is empty, an OutOfRange exception is thrown.
+		 *
+		 * \return A reference to the first character
+		 *
+		 * \throws Exception If the string is empty
+		 */
+		CharType& First()
+		{
+			if (Optional<CharType&> first = TryFirst(); !first.IsEmpty())
+				return first.Get();
 
-            ExceptionUtils::ThrowEmptyContainer();
-        }
+			ExceptionUtils::ThrowEmptyContainer();
+		}
 
-        const CharType& First() const
-        {
-            if (Optional<const CharType&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
+		/**
+		 * \brief Returns a const reference to the first character in the string
+		 *
+		 * Provides read-only access to the first character.
+		 * If the string is empty, an OutOfRange exception is thrown.
+		 *
+		 * \return A const reference to the first character
+		 *
+		 * \throws Exception If the string is empty
+		 */
+		const CharType& First() const
+		{
+			if (Optional<const CharType&> first = TryFirst(); !first.IsEmpty())
+				return first.Get();
 
-            ExceptionUtils::ThrowEmptyContainer();
-        }
+			ExceptionUtils::ThrowEmptyContainer();
+		}
 
-        Optional<CharType&> TryFirst()
-        {
-            if (IsEmpty())
-                return Optional<CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the first character
+		 *
+		 * Returns an Optional containing a reference to the first character if the string
+		 * is not empty. Returns an empty Optional if the string is empty.
+		 *
+		 * \return An Optional containing a reference to the first character,
+		 *         or empty if the string is empty
+		 */
+		Optional<CharType&> TryFirst()
+		{
+			if (IsEmpty())
+				return Optional<CharType&>::Empty();
 
-            return Optional<CharType&>::Of(At(0));
-        }
+			return Optional<CharType&>::Of(At(0));
+		}
 
-        Optional<const CharType&> TryFirst() const
-        {
-            if (IsEmpty())
-                return Optional<const CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the first character
+		 *
+		 * Returns an Optional containing a const reference
+		 * to the first character if the string is not empty. Returns an empty Optional
+		 * if the string is empty.
+		 *
+		 * \return An Optional containing a const reference to the first character,
+		 *         or empty if the string is empty
+		 */
+		Optional<const CharType&> TryFirst() const
+		{
+			if (IsEmpty())
+				return Optional<const CharType&>::Empty();
 
-            return Optional<const CharType&>::Of(At(0));
-        }
+			return Optional<const CharType&>::Of(At(0));
+		}
 
-        CharType& Last()
-        {
-            if (Optional<CharType&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
+		/**
+		 * \brief Returns a reference to the last character in the string
+		 *
+		 * Provides direct access to the last character.
+		 * If the string is empty, an OutOfRange exception is thrown.
+		 *
+		 * \return A reference to the last character
+		 *
+		 * \throws Exception If the string is empty
+		 */
+		CharType& Last()
+		{
+			if (Optional<CharType&> last = TryLast(); !last.IsEmpty())
+				return last.Get();
 
-            ExceptionUtils::ThrowEmptyContainer();
-        }
+			ExceptionUtils::ThrowEmptyContainer();
+		}
 
-        const CharType& Last() const
-        {
-            if (Optional<const CharType&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
+		/**
+		 * \brief Returns a const reference to the last character in the string
+		 *
+		 * Provides read-only access to the last character
+		 * If the string is empty, an OutOfRange exception is thrown.
+		 *
+		 * \return A const reference to the last character
+		 *
+		 * \throws Exception If the string is empty
+		 */
+		const CharType& Last() const
+		{
+			if (Optional<const CharType&> last = TryLast(); !last.IsEmpty())
+				return last.Get();
 
-            ExceptionUtils::ThrowEmptyContainer();
-        }
+			ExceptionUtils::ThrowEmptyContainer();
+		}
 
-        Optional<CharType&> TryLast()
-        {
-            if (IsEmpty())
-                return Optional<CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the last character
+		 *
+		 * Returns an Optional containing a reference to the last character if the string
+		 * is not empty. Returns an empty Optional if the string is empty.
+		 *
+		 * \return An Optional containing a reference to the last character,
+		 *         or empty if the string is empty
+		 */
+		Optional<CharType&> TryLast()
+		{
+			if (IsEmpty())
+				return Optional<CharType&>::Empty();
 
-            return Optional<CharType&>::Of(At(GetLength() - 1));
-        }
+			return Optional<CharType&>::Of(At(GetLength() - 1));
+		}
 
-        Optional<const CharType&> TryLast() const
-        {
-            if (IsEmpty())
-                return Optional<const CharType&>::Empty();
+		/**
+		 * \brief Attempts to access the last character
+		 *
+		 * Returns an Optional containing a const reference
+		 * to the last character if the string is not empty. Returns an empty Optional
+		 * if the string is empty.
+		 *
+		 * \return An Optional containing a const reference to the last character,
+		 *         or empty if the string is empty
+		 */
+		Optional<const CharType&> TryLast() const
+		{
+			if (IsEmpty())
+				return Optional<const CharType&>::Empty();
 
-            return Optional<const CharType&>::Of(At(GetLength() - 1));
-        }
+			return Optional<const CharType&>::Of(At(GetLength() - 1));
+		}
 
         Optional<SizeType> FindFirst(CharType search, SizeType startIndex = 0, bool caseSensitive = true) const
         {
@@ -1033,65 +1233,120 @@ namespace Ck
 
             return mCharacters.RemoveAt(GetLength() - 1);
         }
+        
+		/**
+		 * \brief Returns the number of UTF codepoints in the string
+		 *
+		 * Counts the number of Unicode codepoints available in this string.
+		 * The count may vary depending on the internal decoder used.
+		 * For string types that do not support surrogate pairs, this is equivalent
+		 * to calling GetLength().
+		 *
+		 * \return The number of Unicode codepoints in the string
+		 */
+		SizeType CodepointCount() const
+		{
+			return IsEmpty() ? 0 : EncodingType::GetCharCount(GetData(), GetLength());
+		}
 
-        /**
-         * \brief Get the number of UTF codepoint available in this String
-         * The number of codepoint may vary depending on the decoder used internally.
-         * If the String type does not support surrogates, this function is the same as calling GetLength.
-         *
-         * \return The number of code point
-         */
-        SizeType CodepointCount() const
-        {
-            return IsEmpty() ? 0 : EncodingType::GetCharCount(GetData(), GetLength());
-        }
+		/**
+		 * \brief Returns the UTF-32 codepoint at the specified index
+		 *
+		 * Provides direct access to the Unicode codepoint at position \p codepointIndex.
+		 * If the index is out of range or decoding fails, an exception is thrown.
+		 *
+		 * \param codepointIndex The zero-based index of the codepoint to retrieve
+		 *
+		 * \return The UTF-32 codepoint at the specified index
+		 *
+		 * \throws CodepointDecodingException if the codepoint cannot be decoded
+		 * \throws OutOfRange If the codepoint cannot be decoded or index is invalid
+		 */
+		Utf32Char CodepointAt(SizeType codepointIndex) const
+		{
+			if (auto codepoint = TryCodepointAt(codepointIndex); !codepoint.IsEmpty())
+				return codepoint.Get();
 
-        Utf32Char CodepointAt(SizeType codepointIndex) const
-        {
-            if (auto codepoint = TryCodepointAt(codepointIndex); !codepoint.IsEmpty())
-                return codepoint.Get();
+			ExceptionUtils::ThrowOutOfRange(0, CodepointCount());
+		}
 
-            ExceptionUtils::ThrowCodepointDecodingException(codepointIndex);
-        }
+		/**
+		 * \brief Attempts to retrieve the UTF-32 codepoint at the specified index
+		 *
+		 * Returns an Optional containing the codepoint at \p codepointIndex if it exists
+		 * and can be decoded. If the index is invalid, an empty Optional is returned.
+		 * If the codepoint cannot be decoded, an exception is thrown.
+		 *
+		 * \param codepointIndex The zero-based index of the codepoint to retrieve
+		 *
+		 * \return An Optional containing the UTF-32 codepoint if valid, or empty otherwise
+		 *
+		 * \throws CodepointDecodingException if the codepoint cannot be decoded
+		 */
+		Optional<Utf32Char> TryCodepointAt(SizeType codepointIndex) const
+		{
+			if (IsEmpty())
+				return Optional<Utf32Char>::Empty();
 
-        Optional<Utf32Char> TryCodepointAt(SizeType codepointIndex) const
-        {
-            if (IsEmpty())
-                return Optional<Utf32Char>::Empty();
+			Optional<SizeType> offset = TryOffsetByCodepoint(0, codepointIndex);
+			if (offset.IsEmpty())
+				return Optional<Utf32Char>::Empty();
 
-            Optional<SizeType> offset = TryOffsetByCodepoint(0, codepointIndex);
-            if (offset.IsEmpty())
-                return Optional<Utf32Char>::Empty();
+			Utf32Char out;
+			if (EncodingType::Decode(GetData() + offset.Get(), GetLength() - offset.Get(), out) == 0)
+				ExceptionUtils::ThrowCodepointDecodingException(codepointIndex);
 
-            Utf32Char out;
-            if (EncodingType::Decode(GetData() + offset.Get(), GetLength() - offset.Get(), out) == 0)
-                return Optional<Utf32Char>::Empty();
+			return Optional<Utf32Char>::Of(out);
+		}
 
-            return Optional<Utf32Char>::Of(out);
-        }
+		/**
+		 * \brief Returns the character offset corresponding to a number of codepoints
+		 *
+		 * Calculates the character offset in the string after moving \p codepointCount
+		 * codepoints starting from position \p start. If the resulting offset is invalid,
+		 * an exception is thrown.
+		 *
+		 * \param start The starting character index
+		 * \param codepointCount The number of codepoints to advance
+		 *
+		 * \return The character offset after advancing \p codepointCount codepoints
+		 *
+		 * \throws OutOfRange If the resulting offset is outside the valid range
+		 */
+		SizeType OffsetByCodepoint(SizeType start, SizeType codepointCount) const
+		{
+			if (auto offset = TryOffsetByCodepoint(start, codepointCount); !offset.IsEmpty())
+				return offset.Get();
 
-        SizeType OffsetByCodepoint(SizeType start, SizeType codepointCount) const
-        {
-            if (auto offset = TryOffsetByCodepoint(start, codepointCount); !offset.IsEmpty())
-                return offset.Get();
+			ExceptionUtils::ThrowOutOfRange(start, GetLength());
+		}
 
-            ExceptionUtils::ThrowOutOfRange(start, GetLength());
-        }
+		/**
+		 * \brief Attempts to compute the character offset after a number of codepoints
+		 *
+		 * Returns an Optional containing the character offset obtained by advancing
+		 * \p codepointCount codepoints starting from \p start. If an invalid codepoint
+		 * or end-of-string is reached, an empty Optional is returned.
+		 *
+		 * \param start The starting character index
+		 * \param codepointCount The number of codepoints to advance
+		 *
+		 * \return An Optional containing the resulting character offset, or empty if invalid
+		 */
+		Optional<SizeType> TryOffsetByCodepoint(SizeType start, SizeType codepointCount) const
+		{
+			SizeType charOffset = start;
+			for (SizeType i = 0; i < codepointCount; ++i)
+			{
+				SizeType charCount = EncodingType::GetCharCount(GetData() + charOffset);
+				if (charCount == 0)
+					return Optional<SizeType>::Empty();
 
-        Optional<SizeType> TryOffsetByCodepoint(SizeType start, SizeType codepointCount) const
-        {
-            SizeType charOffset = start;
-            for (SizeType i = 0; i < codepointCount; ++i)
-            {
-                SizeType charCount = EncodingType::GetCharCount(GetData() + charOffset);
-                if (charCount == 0)
-                    Optional<SizeType>::Empty();
+				charOffset += charCount;
+			}
 
-                charOffset += charCount;
-            }
-
-            return Optional<SizeType>::Of(charOffset);
-        }
+			return Optional<SizeType>::Of(charOffset);
+		}
 
         BasicString SubString(SizeType start) const
         {
