@@ -219,7 +219,7 @@ namespace Ck
         {
             /// Nothing
         }
-            
+
         /**
          * \brief
          * \param parent
@@ -227,8 +227,6 @@ namespace Ck
          * \return
          */
         virtual UniquePtr<PropertyTreeNode<Data>> Clone(PropertyTreeNode<Data>* parent, const String& name) const = 0;
-
-    private:
 
         PropertyTreeNode<Data>* mParent;
         String mName;

@@ -69,6 +69,7 @@ cocktail_source_directory(CORE_TEST_FILES
 cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Utility/PropertyTree"    
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Utility/PropertyTree/PropertyTreeElement.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/PropertyTree/PropertyTreeValue.cpp
 )
 

@@ -81,7 +81,7 @@ namespace Ck
          * \brief Insert a new node at the beginning of this element
          * \param name The name of the \p node to be inserted
          * \param node The node to be inserted
-         * \return A pointer to the inserted node�
+         * \return A pointer to the inserted node
          */
         template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
         NodeType<Data>* FrontInsert(const String& name, const NodeType<Data>& node)
@@ -104,8 +104,8 @@ namespace Ck
         template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
         NodeType<Data>* InsertBefore(Node* where, const String& name, const NodeType<Data>& node)
         {
-            if (this != where->GetParent())
-                throw std::invalid_argument("Cannot insert property node after a node that does not belongs to the same element");
+            assert(where != nullptr);
+            assert(this == where->GetParent());
 
             Remove(name);
 
@@ -116,11 +116,11 @@ namespace Ck
             }
         	else
             {
-                UniquePtr<Node> firstChild = static_cast<const Node&>(node).Clone(this, name);
-                firstChild->SetNextSibling(std::move(mFirstChild));
+                UniquePtr<Node> clone = static_cast<const Node&>(node).Clone(this, name);
+                inserted = clone.Get();
 
-                mFirstChild = std::move(firstChild);
-                inserted = mFirstChild.Get();
+                clone->SetNextSibling(std::move(mFirstChild));
+                mFirstChild = std::move(clone);
             }
 
             return static_cast<NodeType<Data>*>(inserted);
@@ -136,8 +136,8 @@ namespace Ck
         template <template<class> class NodeType, typename = std::enable_if_t<std::is_base_of_v<Node, NodeType<Data>>>>
         NodeType<Data>* InsertAfter(Node* where, const String& name, const NodeType<Data>& node)
         {
-            if (this != where->GetParent())
-                throw std::invalid_argument("Cannot insert property node after a node that does not belongs to the same element");
+            assert(where != nullptr);
+            assert(this == where->GetParent());
 
         	Remove(name);
 
@@ -169,10 +169,10 @@ namespace Ck
          * \brief 
          * \param node 
          */
-        void Remove(const Node* node)
+        void Remove(Node* node)
         {
-            if (this != node->GetParent())
-                throw RuntimeException(CK_TEXT("Cannot insert property node after a node that does not belongs to the same element"));
+            assert(node != nullptr);
+            assert(this == node->GetParent());
 
             if (mFirstChild.Get() == node)
             {
@@ -264,6 +264,20 @@ namespace Ck
         }
 
         /**
+         * \brief Count the number of child node in this element
+         *
+         * \return The number of child node
+         */
+        unsigned int GetChildCount() const
+        {
+            unsigned int count = 0;
+            for (auto child = mFirstChild.Get(); child; child = child->GetNextSibling())
+                ++count;
+
+            return count;
+        }
+
+        /**
          * \brief
          * \param path
          * \return
@@ -272,7 +286,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Element)
-                throw std::runtime_error("PropertyTreePath target node is not an element");
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node is not an element"));
 
             return static_cast<Element&>(node);
         }
@@ -286,7 +300,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Sequence)
-                throw std::runtime_error("PropertyTreePath target node is not a sequence");
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node is not a sequence"));
 
             return static_cast<Sequence&>(node);
         }
@@ -300,7 +314,7 @@ namespace Ck
         {
             Node& node = GetChild(path);
             if (node.GetType() != Node::Type::Value)
-                throw InvalidPropertyPathException("PropertyTreePath target node is not a value");
+                throw InvalidPropertyPathException(CK_TEXT("PropertyTreePath target node is not a value"));
 
             return static_cast<Value&>(node);
         }

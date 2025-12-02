@@ -29,12 +29,12 @@ namespace Ck
 		PropertyTreePath();
 
 		/**
-		 * \brief 
-		 * \tparam T 
-		 * \tparam Tr 
-		 * \param value 
-		 * \param separator 
-		 * \param translator 
+		 * \brief
+		 * \tparam T
+		 * \tparam Tr
+		 * \param value
+		 * \param separator
+		 * \param translator
 		 */
 		template <typename T, typename Tr = typename TranslatorBetween<T, String>::Type>
 		explicit PropertyTreePath(const T& value, TextChar separator = CK_CHAR('.'), const Tr& translator = Tr()) :
@@ -94,8 +94,10 @@ namespace Ck
 
 		/**
 		 * \brief Remove the front element of the path and return it
+		 *
 		 * Takes the front element of the path, removes it from the path and return it.
-		 * This function should not be called it the path is empty
+		 * This function should not be called it the path is empty.
+		 *
 		 * \return The front element
 		 */
 		template <typename T = String, typename Tr = typename TranslatorBetween<String, T>::Type>
@@ -103,9 +105,18 @@ namespace Ck
 		{
 			assert(!IsEmpty() && "Cannot reduce an empty path");
 
-			unsigned int separatorIndex = mPath.FindFirst(mSeparator).Get();
-			String frontSplit = mPath.SubString(0, separatorIndex);
-			mPath = mPath.SubString(separatorIndex + 1);
+		    String frontSplit;
+		    unsigned int separatorIndex =  mPath.FindFirst(mSeparator).GetOr(0);
+		    if (separatorIndex != 0)
+		    {
+		        frontSplit = mPath.SubString(0, separatorIndex);
+		        mPath = mPath.SubString(separatorIndex + 1);
+		    }
+		    else
+		    {
+		        frontSplit = std::move(mPath);
+		        mPath = String::Empty;
+		    }
 
 			return translator(frontSplit).Get();
 		}
