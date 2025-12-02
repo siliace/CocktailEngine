@@ -48,7 +48,7 @@ TEST_CASE("Service container can resolve bindings from other bindings callback",
 	Ck::ServiceContainer serviceContainer;
 	serviceContainer.Singleton<DummyService>();
 	serviceContainer.Singleton<DependencyService>([](DummyService* dummyService) {
-		return std::make_unique<DependencyService>(dummyService);
+		return Ck::MakeUnique<DependencyService>(dummyService);
 	});
 
 	auto dummy = serviceContainer.Resolve<DummyService>();

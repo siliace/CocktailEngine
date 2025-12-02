@@ -14,11 +14,17 @@ COCKTAIL_DEFINE_LOG_CATEGORY(Catch2);
 ExitCode ApplicationMain(Application* application)
 {
     Catch::Session session;
+#ifdef COCKTAIL_OS_WINDOWS
+    Array<const TextChar*> arguments = application->GetArgv().Transform([](const String& argument) {
+        return argument.GetData();
+    });
+#else
     Array<const AnsiChar*> arguments = application->GetArgv().Transform([](const String& argument) {
         return reinterpret_cast<const AnsiChar*>(argument.GetData());
     });
+#endif
 
-    int result = session.applyCommandLine(arguments.GetSize(), arguments.GetData());
+    int result = session.applyCommandLine(static_cast<int>(arguments.GetSize()), arguments.GetData());
     if (result != 0)
     {
         CK_LOG(Catch2, LogLevel::Error, CK_TEXT("Failed to parse application arguments"));
