@@ -54,7 +54,7 @@ MacroBlockEnd: ''
 NamespaceIndentation: All
 PointerAlignment: Left
 SpaceAfterCStyleCast: true
-SpaceBeforeRangeBasedForLoopColon: false
+SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
 SpacesInAngles: false
 SpacesInConditionalStatement: false
