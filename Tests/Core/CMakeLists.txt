@@ -3,6 +3,7 @@ project(CoreTest)
 cocktail_source_directory(CORE_TEST_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Array.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/LinkedList.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/String.cpp
 )
 
