@@ -44,6 +44,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Application/Detail/ServiceBindingBase.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Application/Detail/ServiceFacadeBase.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Application/Detail/SingletonServiceBinding.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Application/Detail/ThreadLocalSingletonServiceBinding.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Application/Detail/ServiceFacadeBase.cpp
 )
@@ -314,6 +315,8 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/Runnable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/SpinMutex.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/Thread.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/ThreadLocal.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/ThreadLocalStorage.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Concurrency/ThreadManager.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/AffinityMaskBuilder.cpp
@@ -328,6 +331,7 @@ if (WIN32)
         SRC
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/Thread.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/Thread.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadLocalStorage.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadManager.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Win32/ThreadManager.cpp
     )
@@ -339,6 +343,7 @@ elseif (LINUX)
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/PthreadErrorCategory.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/Thread.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/Thread.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/ThreadLocalStorage.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/ThreadManager.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Concurrency/Pthread/ThreadManager.cpp
     )

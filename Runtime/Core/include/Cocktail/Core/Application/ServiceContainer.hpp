@@ -8,6 +8,7 @@
 #include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/Application/Detail/InstanceServiceBinding.hpp>
 #include <Cocktail/Core/Application/Detail/SingletonServiceBinding.hpp>
+#include <Cocktail/Core/Application/Detail/ThreadLocalSingletonServiceBinding.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
 
 namespace Ck
@@ -74,6 +75,21 @@ namespace Ck
 				Alias<Concrete, Abstract>();
 		}
 
+	    /**
+         * \brief
+         * \tparam Abstract
+         * \tparam Concrete
+         */
+	    template <typename Abstract, typename Concrete = Abstract>
+        void ThreadLocalSingleton()
+		{
+		    ThreadLocalSingleton<Concrete>([]() -> UniquePtr<Concrete> {
+                return MakeUnique<Concrete>();
+            });
+
+		    Alias<Abstract, Concrete>();
+		}
+
 		/**
 		 * \brief
 		 * \tparam Abstract
@@ -93,6 +109,25 @@ namespace Ck
 					lazy
 				)
 			);
+		}
+
+	    /**
+         * \brief
+         * \tparam Abstract
+         * \tparam Callable
+         * \param callable
+         */
+	    template <typename Abstract, typename Callable>
+        void ThreadLocalSingleton(Callable&& callable)
+		{
+		    static_assert(std::is_same_v<UniquePtr<Abstract>, FunctionReturnType<Callable>>);
+
+		    RegisterBinding(
+                MakeUnique<Detail::ThreadLocalSingletonServiceBinding<Abstract>>(
+                    this,
+                    MakeResolver<Abstract>(std::forward<Callable>(callable))
+                )
+            );
 		}
 
 		/**
