@@ -1,4 +1,5 @@
 #include <Cocktail/Core/Application/Application.hpp>
+#include <Cocktail/Core/Memory/Allocator/MallocAllocator.hpp>
 #include <Cocktail/Core/System/SystemServiceProvider.hpp>
 #include <Cocktail/Core/System/SystemServiceProviderImpl.hpp>
 #include <Cocktail/Core/System/FileSystem/StorageService.hpp>
