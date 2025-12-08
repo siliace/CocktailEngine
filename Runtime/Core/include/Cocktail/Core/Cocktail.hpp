@@ -146,6 +146,13 @@ namespace Ck
 		return 0x1 << index;
 	}
 
+    inline Byte* AlignForward(Byte* ptr, std::size_t alignment)
+	{
+	    std::uintptr_t p = reinterpret_cast<std::uintptr_t>(ptr);
+	    std::uintptr_t aligned = (p + alignment - 1) & ~(alignment - 1);
+	    return reinterpret_cast<Byte*>(aligned);
+	}
+
 	/**
 	 * \brief Assign a value to a variable only if its new value is different of its current one
 	 * \tparam T 

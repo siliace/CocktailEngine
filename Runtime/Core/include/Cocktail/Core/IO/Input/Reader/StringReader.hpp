@@ -29,7 +29,7 @@ namespace Ck
             SizeType available = mString.GetLength() - mCursor;
             SizeType copyLength = std::min(available, length);
 
-            std::memcpy(text, mString.GetData() + mCursor, copyLength * sizeof(CharType));
+            Memory::Copy(text, mString.GetData() + mCursor, copyLength * sizeof(CharType));
 
             mCursor += copyLength;
 

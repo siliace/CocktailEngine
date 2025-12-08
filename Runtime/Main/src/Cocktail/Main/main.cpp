@@ -15,7 +15,7 @@ namespace Ck::Main
 {
 	COCKTAIL_DEFINE_LOG_CATEGORY(MainLogCategory);
 
-	ExitCode InvokeMain(Application* application)
+	ExitCode InvokeMain(UniquePtr<Application> application)
 	{
 #ifndef NDEBUG
 		const bool waitedForDebugger = application->GetEnvironmentVariable(CK_TEXT("COCKTAIL_WAIT_FOR_DEBUGGER")).Map([](const String& variable) {
@@ -30,7 +30,7 @@ namespace Ck::Main
 		}
 #endif
 
-		application->Instance(application);
+		application->Instance(application.Get());
 
 		application->RegisterServiceProvider<ImageServiceProvider>();
 		application->RegisterServiceProvider<LogServiceProvider>();
@@ -48,7 +48,7 @@ namespace Ck::Main
 
 		try
 		{
-			exitCode = ApplicationMain(application);
+			exitCode = ApplicationMain(application.Get());
 		}
 		catch (const Exception& e)
 		{
@@ -61,9 +61,10 @@ namespace Ck::Main
 			exitCode = ExitCode::GeneralError;
 		}
 
-		application->Terminate();
-
 		CK_LOG(MainLogCategory, exitCode == ExitCode::Success ? LogLevel::Info : LogLevel::Error, CK_TEXT("Application exited with code %hs"), exitCode);
+
+	    application->Terminate();
+	    application.Reset();
 
 		return exitCode;
 	}

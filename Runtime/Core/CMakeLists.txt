@@ -18,6 +18,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Color.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/DataType.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/New.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -207,15 +208,27 @@ cocktail_source_directory(CORE_FILES
 cocktail_source_directory(CORE_FILES
     FOLDER "Memory"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Memory.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/ObjectMemoryUtils.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/SizeType.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/UniquePtr.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Memory.cpp
 )
 
-cocktail_source_directory(CORE_FILES    
+cocktail_source_directory(CORE_FILES
     FOLDER "Memory/Allocator"
     INCLUDE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/BumpAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MallocAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MemoryAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/StlAdapter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/UseSystemAllocator.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/MallocAllocator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/UseSystemAllocator.cpp
 )
 
 cocktail_source_directory(CORE_FILES    
@@ -244,6 +257,7 @@ cocktail_source_directory(CORE_FILES
     FOLDER "System"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/SystemError.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/SystemMemory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/SystemServiceProvider.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/SystemServiceProvider.cpp
@@ -255,6 +269,7 @@ if (WIN32)
 		FOLDER "System/Win32"
 		SRC
 			${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Win32/SystemError.cpp
+			${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Win32/SystemMemory.cpp
 			${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Win32/Windows.hpp
 			${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Win32/WindowsServiceProvider.hpp
 			${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Win32/WindowsServiceProvider.cpp
@@ -266,6 +281,7 @@ if (UNIX)
         FOLDER "System/Unix"  
         SRC
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Unix/SystemError.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Unix/SystemMemory.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Unix/UnixServiceProvider.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Unix/UnixServiceProvider.cpp
     )

@@ -12,6 +12,7 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Renderer.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Format.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/New.cpp
 )
 
 cocktail_source_directory(RENDERER_FILES    

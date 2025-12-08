@@ -73,7 +73,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		const Optional<PushConstantBlockInfo>& GetPipelineConstantBlock(Renderer::ShaderType shaderType) const;
+		Optional<const PushConstantBlockInfo&> GetPipelineConstantBlock(Renderer::ShaderType shaderType) const;
 
 		/**
 		 * \brief 

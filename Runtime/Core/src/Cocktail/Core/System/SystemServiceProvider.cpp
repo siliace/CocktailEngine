@@ -1,10 +1,11 @@
 #include <Cocktail/Core/Application/Application.hpp>
+#include <Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp>
 #include <Cocktail/Core/Memory/Allocator/MallocAllocator.hpp>
-#include <Cocktail/Core/System/SystemServiceProvider.hpp>
-#include <Cocktail/Core/System/SystemServiceProviderImpl.hpp>
-#include <Cocktail/Core/System/FileSystem/StorageService.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/LocalFileSystemService.hpp>
+#include <Cocktail/Core/System/FileSystem/StorageService.hpp>
+#include <Cocktail/Core/System/SystemServiceProvider.hpp>
+#include <Cocktail/Core/System/SystemServiceProviderImpl.hpp>
 
 namespace Ck
 {
@@ -18,6 +19,7 @@ namespace Ck
 	{
 		application->Singleton<StorageService>();
 		application->Singleton<EmbeddedFileSystemDriver>();
+	    application->Singleton<MallocAllocator>();
 	}
 
 	void SystemServiceProvider::DoBoot(Application* application)

@@ -1540,7 +1540,7 @@ namespace Ck::Vulkan
 		{
 			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
 			{
-				Optional<PushConstantBlockInfo> pushConstantBlockInfo = pipelineLayout->GetPipelineConstantBlock(shaderType);
+				Optional<const PushConstantBlockInfo&> pushConstantBlockInfo = pipelineLayout->GetPipelineConstantBlock(shaderType);
 				if (pushConstantBlockInfo.IsEmpty() || !stateManager->IsDirtyPipelineConstants(shaderType))
 					continue;
 

@@ -3,6 +3,7 @@
 
 #include <cstring>
 
+#include <Cocktail/Core/Memory/Memory.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>

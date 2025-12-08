@@ -51,7 +51,7 @@ namespace Ck::Vulkan
 			}
 		}
 
-		COCKTAIL_VK_CHECK(vkCreateDescriptorUpdateTemplateKHR(mRenderDevice->GetHandle(), &vkCreateInfo, nullptr, &mHandle));
+		COCKTAIL_VK_CHECK(vkCreateDescriptorUpdateTemplateKHR(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
 	}
 
 	DescriptorUpdateTemplate::~DescriptorUpdateTemplate()

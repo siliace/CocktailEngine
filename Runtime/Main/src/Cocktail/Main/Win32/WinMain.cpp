@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 		hInstance, hPrevInstance, pCmdLine, nCmdShow
 	);
 
-	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(application.Get());
+	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(std::move(application));
 
 	return static_cast<int>(exitCode);
 }

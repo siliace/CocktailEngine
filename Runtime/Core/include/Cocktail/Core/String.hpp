@@ -464,7 +464,7 @@ namespace Ck
      * \tparam TEncoding The encoder template used to convert between raw string data and UTF codepoints
      * \tparam TAllocator The memory allocator used for internal storage
      */
-    template <typename TEncoding, typename TAllocator = SizedHeapAllocator<32>>
+    template <typename TEncoding, typename TAllocator = HeapAllocator>
     class BasicString
     {
         friend class Encoders;
@@ -710,6 +710,7 @@ namespace Ck
          * \param other The string to move
          */
         BasicString(BasicString&& other) noexcept = default;
+
         /**
          * \brief Copy assignment operator
          *
@@ -838,7 +839,7 @@ namespace Ck
 			if (string >= begin && string < end)
 			{
 				CharType* copy = COCKTAIL_STACK_ALLOC(CharType, length);
-				AllocatorUtils::CopyRange(length, copy, string);
+				ObjectMemoryUtils::CopyRange(length, copy, string);
 
 				mCharacters.Append(copy, length);
 			}
@@ -934,7 +935,7 @@ namespace Ck
             if (string >= begin && string < end)
             {
                 CharType* copy = COCKTAIL_STACK_ALLOC(CharType, length);
-                AllocatorUtils::CopyRange(length, copy, string);
+                ObjectMemoryUtils::CopyRange(length, copy, string);
 
                 mCharacters.Prepend(copy, length);
             }
@@ -1285,7 +1286,8 @@ namespace Ck
 		 */
 		Optional<Utf32Char> TryCodepointAt(SizeType codepointIndex) const
 		{
-			if (IsEmpty())
+            SizeType codepointCount = CodepointCount();
+			if (codepointIndex >= codepointCount)
 				return Optional<Utf32Char>::Empty();
 
 			Optional<SizeType> offset = TryOffsetByCodepoint(0, codepointIndex);
@@ -1438,15 +1440,15 @@ namespace Ck
             return StringUtils<CharType, SizeType>::EndsWith(mCharacters.GetData(), GetLength(), string, length, caseSensitive);
         }
 
-        Array<BasicString, TAllocator> Split(CharType separator) const
+        Array<BasicString, AllocatorType> Split(CharType separator) const
         {
-            Array<BasicString, TAllocator> splits;
+            Array<BasicString, AllocatorType> splits;
             Split(splits, separator);
 
             return splits;
         }
 
-        void Split(Array<BasicString, TAllocator>& splits, CharType separator) const
+        void Split(Array<BasicString, AllocatorType>& splits, CharType separator) const
         {
             splits.Clear();
 

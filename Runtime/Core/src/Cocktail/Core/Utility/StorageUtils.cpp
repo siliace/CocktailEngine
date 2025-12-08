@@ -11,6 +11,7 @@ namespace Ck
     {
         return FileUtils::ReadFile(uri.GetPath(), storage->ResolveDriver(uri.GetScheme()));
     }
+
     void StorageUtils::WriteFile(const URI& uri, ByteArrayView content, bool append, StorageService* storage)
     {
         return FileUtils::WriteFile(uri.GetPath(), content, append, storage->ResolveDriver(uri.GetScheme()));

@@ -9,21 +9,21 @@
 			<Item Name="[capacity]" ExcludeView="simple">mCapacity</Item>
 			<ArrayItems>
 				<Size>mSize</Size>
-				<ValuePointer>($T1*)mAllocator.mData</ValuePointer>
+				<ValuePointer>($T1*)mData</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>
 	<Type Name="Ck::String">
 		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity == 0">Empty</DisplayString>
 		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity &gt; 0">Empty, Capacity={mCharacters.mCapacity - 1}</DisplayString>
-		<DisplayString Condition="mCharacters.mSize &gt; 0">Content={(wchar_t*)mCharacters.mAllocator.mData}, Length={mCharacters.mSize - 1}, Capacity={mCharacters.mCapacity - 1}</DisplayString>
-		<StringView>(wchar_t*)mCharacters.mAllocator.mData</StringView>
+		<DisplayString Condition="mCharacters.mSize &gt; 0">Content={(wchar_t*)mCharacters.mData}, Length={mCharacters.mSize - 1}, Capacity={mCharacters.mCapacity - 1}</DisplayString>
+		<StringView>(wchar_t*)mCharacters.mData</StringView>
 		<Expand>
 			<Item Name="Length" ExcludeView="simple">mCharacters.mSize - 1</Item>
 			<Item Name="Capacity" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
 			<ArrayItems>
 				<Size>mCharacters.mSize - 1</Size>
-				<ValuePointer>(wchar_t*)mCharacters.mAllocator.mData</ValuePointer>
+				<ValuePointer>(wchar_t*)mCharacters.mData</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>

@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_ARRAY_HPP
 #define COCKTAIL_CORE_ARRAY_HPP
 
+#include <Cocktail/Core/Memory/ObjectMemoryUtils.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
@@ -12,7 +13,7 @@ namespace Ck
      * \tparam E The element type stored in the array.
      * \tparam TAllocator The allocator type used for memory management.
      */
-    template <typename E, typename TAllocator = SizedHeapAllocator<32>>
+    template <typename E, typename TAllocator = HeapAllocator>
     class Array
     {
         template <typename, typename>
@@ -20,7 +21,14 @@ namespace Ck
 
     public:
 
+        /**
+         * \brief
+         */
         using ElementType = E;
+
+        /**
+         * \brief
+         */
         using AllocatorType = TAllocator;
 
         /**
@@ -28,11 +36,10 @@ namespace Ck
          */
         using SizeType = typename TAllocator::SizeType;
 
-        using ElementAllocatorType = std::conditional_t<
-            TAllocator::IsTyped,
-            typename TAllocator::template Typed<E>,
-            typename TAllocator::Raw
-        >;
+        /**
+         * \brief
+         */
+        using AllocatorElementType = typename TAllocator::template ForType<E>;
 
         using Iterator = ElementType*;
         using ConstIterator = const ElementType*;
@@ -41,9 +48,11 @@ namespace Ck
          * \brief Default constructor. Creates an empty array.
          */
         Array() :
-            mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
+            /// Nothing
         }
 
         /**
@@ -51,9 +60,10 @@ namespace Ck
          * \param values The initializer list of elements to initialize the array.
          */
         Array(std::initializer_list<E> values) :
-            mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
             Append(values);
         }
 
@@ -63,9 +73,10 @@ namespace Ck
          * \param initialSize Number of elements initially allocated
          */
         explicit Array(SizeType initialSize) :
-            mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
             Resize(initialSize);
         }
 
@@ -76,9 +87,10 @@ namespace Ck
          */
         template <typename U, typename = std::enable_if_t<std::is_constructible_v<E, U>>>
         Array(SizeType initialSize, const U& initialContent) :
-            mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
             Resize(initialSize, initialContent);
         }
 
@@ -88,9 +100,10 @@ namespace Ck
          * \param elementCount Number of elements to copy.
          */
         Array(const E* elements, SizeType elementCount) :
-            mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
             Append(elements, elementCount);
         }
 
@@ -99,9 +112,10 @@ namespace Ck
          * \param other Array to copy from.
          */
         Array(const Array& other) :
-			mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mCapacity = mAllocator.GetInitialCapacity();
             Append(other);
         }
 
@@ -110,11 +124,11 @@ namespace Ck
          * \param other Array to move from.
          */
         Array(Array&& other) noexcept :
-			mSize(0)
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
         {
-            mSize = std::exchange(other.mSize, 0);
-            mCapacity = std::exchange(other.mCapacity, 0);
-            mAllocator = std::move(other.mAllocator);
+            *this = std::move(other);
         }
 
         /**
@@ -123,6 +137,7 @@ namespace Ck
         ~Array()
         {
             Clear();
+            Shrink();
         }
 
         /**
@@ -151,10 +166,26 @@ namespace Ck
             if (this == &other)
                 return *this;
 
-            Clear();
-            mSize = std::exchange(other.mSize, 0);
-            mCapacity = std::exchange(other.mCapacity, 0);
-            mAllocator = std::move(other.mAllocator);
+            if constexpr (AllocatorElementType::PropagateOnContainerMove)
+            {
+                Clear();
+
+                mSize = std::exchange(other.mSize, 0);
+                mCapacity = std::exchange(other.mCapacity, 0);
+                mData = std::exchange(other.mData, nullptr);
+                mAllocator = std::move(other.mAllocator);
+            }
+            else
+            {
+                if (!other.IsEmpty())
+                {
+                    if (mCapacity < other.GetSize())
+                        Reserve(other.GetSize() - mCapacity);
+
+                    mSize = other.GetSize();
+                    ObjectMemoryUtils::MoveRange(mSize, GetData(), other.GetData());
+                }
+            }
 
             return *this;
         }
@@ -205,10 +236,10 @@ namespace Ck
          * \param args Arguments forwarded to the element constructor.
          */
         template <typename... TArgs>
-    	E& Emplace(TArgs&&... args)
+        E& Emplace(TArgs&&... args)
         {
             E* availableElements = Allocate(1);
-            AllocatorUtils::Construct(availableElements, std::forward<TArgs>(args)...);
+            ObjectMemoryUtils::Construct(availableElements, std::forward<TArgs>(args)...);
             ++mSize;
 
             return availableElements[0];
@@ -222,7 +253,7 @@ namespace Ck
          * \param args Arguments forwarded to the element constructor.
          */
         template <typename... TArgs>
-    	E& EmplaceAt(SizeType index, TArgs&&... args)
+        E& EmplaceAt(SizeType index, TArgs&&... args)
         {
             if (index == mSize)
                 return Emplace(std::forward<TArgs>(args)...);
@@ -231,11 +262,10 @@ namespace Ck
 
             Allocate(1);
 
-            ElementType* data = GetData();
-            AllocatorUtils::MoveRange(mSize - index, data + index + 1, data + index);
+            ObjectMemoryUtils::MoveRange(mSize - index, mData + index + 1, mData + index);
 
-            ElementType& element = data[index];
-            AllocatorUtils::Construct(&element, std::forward<TArgs>(args)...);
+            ElementType& element = mData[index];
+            ObjectMemoryUtils::Construct(&element, std::forward<TArgs>(args)...);
             ++mSize;
 
             return element;
@@ -246,8 +276,7 @@ namespace Ck
          * \param other Array to Prepend.
          */
         template <typename TOtherElement, typename TOtherAllocator,
-            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-        >
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Prepend(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -260,7 +289,8 @@ namespace Ck
          * \brief Prepends elements from an initializer list.
          * \param values Initializer list of elements to Prepend.
          */
-        void Prepend(std::initializer_list<E> values)
+        template <typename TOtherElement, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        void Prepend(std::initializer_list<TOtherElement> values)
         {
             SizeType elementCount = static_cast<SizeType>(values.size());
             Reserve(elementCount);
@@ -275,18 +305,17 @@ namespace Ck
          * \param elementCount Number of elements to Prepend.
          */
         template <typename TOtherElement, typename TOtherSizeType,
-            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-        >
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Prepend(const TOtherElement* elements, TOtherSizeType elementCount)
         {
-            /// TODO: add static assert on size type conversion
+            assert(elementCount <= std::numeric_limits<SizeType>::max());
 
             Reserve(elementCount);
 
             ElementType* data = GetData();
 
-            AllocatorUtils::MoveRange(mSize, data + elementCount, data);
-            AllocatorUtils::CopyRange(elementCount, data, elements);
+            ObjectMemoryUtils::MoveRange(mSize, data + elementCount, data);
+            ObjectMemoryUtils::CopyRange(elementCount, data, elements);
 
             mSize += elementCount;
         }
@@ -297,8 +326,7 @@ namespace Ck
          * \param other Array to insert.
          */
         template <typename TOtherElement, typename TOtherAllocator,
-			typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-    	>
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Insert(SizeType index, const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -312,7 +340,8 @@ namespace Ck
          * \param index Position to insert at.
          * \param values Initializer list of elements to insert.
          */
-        void Insert(SizeType index, std::initializer_list<E> values)
+        template <typename TOtherElement, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        void Insert(SizeType index, std::initializer_list<TOtherElement> values)
         {
             CheckIndex(index);
 
@@ -322,14 +351,14 @@ namespace Ck
             ElementType* data = GetData();
 
             for (SizeType i = 0; i < elementCount; ++i)
-                AllocatorUtils::Construct(&data[mSize + i], std::move(data[index + i]));
+                ObjectMemoryUtils::Construct(&data[mSize + i], std::move(data[index + i]));
 
-            AllocatorUtils::DestroyRange(elementCount, data + index);
+            ObjectMemoryUtils::DestroyRange(elementCount, data + index);
 
             SizeType i = 0;
             for (auto it = values.begin(); it != values.end(); ++it)
             {
-                AllocatorUtils::Construct(&data[index + i], std::move(*it));
+                ObjectMemoryUtils::Construct(&data[index + i], std::move(*it));
                 ++i;
             }
 
@@ -343,8 +372,7 @@ namespace Ck
          * \param elementCount Number of elements to insert
          */
         template <typename TOtherElement, typename TOtherSizeType,
-            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-        >
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Insert(SizeType index, const TOtherElement* elements, TOtherSizeType elementCount)
         {
             /// TODO: add static assert on size type conversion
@@ -355,15 +383,15 @@ namespace Ck
 
             ElementType* data = GetData();
 
-            /// TODO: refactor here with AllocatorUtils::MoveRange and CopyRange
+            /// TODO: refactor here with ObjectMemoryUtils::MoveRange and CopyRange
 
             for (SizeType i = 0; i < elementCount; ++i)
-                AllocatorUtils::Construct(&data[mSize + i], std::move(data[index + i]));
+                ObjectMemoryUtils::Construct(&data[mSize + i], std::move(data[index + i]));
 
-            AllocatorUtils::DestroyRange(elementCount, data + index);
+            ObjectMemoryUtils::DestroyRange(elementCount, data + index);
 
-        	for (SizeType i = 0; i < elementCount; ++i)
-                AllocatorUtils::Construct(&data[index + i], std::move(elements[i]));
+            for (SizeType i = 0; i < elementCount; ++i)
+                ObjectMemoryUtils::Construct(&data[index + i], std::move(elements[i]));
 
             mSize += elementCount;
         }
@@ -373,8 +401,7 @@ namespace Ck
          * \param other Array to append.
          */
         template <typename TOtherElement, typename TOtherAllocator,
-            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-        >
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Append(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -402,8 +429,7 @@ namespace Ck
          * \param elementCount Number of elements to append.
          */
         template <typename TOtherElement, typename TOtherSizeType,
-            typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>
-        >
+                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Append(const TOtherElement* elements, TOtherSizeType elementCount)
         {
             /// TODO: add static assert on size type conversion
@@ -411,7 +437,7 @@ namespace Ck
             E* availableElements = Allocate(elementCount);
             for (SizeType i = 0; i < elementCount; ++i)
             {
-                AllocatorUtils::Construct(availableElements, elements[i]);
+                ObjectMemoryUtils::Construct(availableElements, elements[i]);
                 ++availableElements;
             }
 
@@ -427,7 +453,7 @@ namespace Ck
         E& At(SizeType index)
         {
             CheckIndex(index);
-            return UncheckAt(index);
+            return UncheckedAt(index);
         }
 
         /**
@@ -439,7 +465,7 @@ namespace Ck
         const E& At(SizeType index) const
         {
             CheckIndex(index);
-            return UncheckAt(index);
+            return UncheckedAt(index);
         }
 
         /**
@@ -452,7 +478,7 @@ namespace Ck
             if (index >= mSize)
                 return Optional<E&>::Empty();
 
-            return Optional<E&>::Of(UncheckAt(index));
+            return Optional<E&>::Of(UncheckedAt(index));
         }
 
         /**
@@ -465,7 +491,7 @@ namespace Ck
             if (index >= mSize)
                 return Optional<const E&>::Empty();
 
-            return Optional<const E&>::Of(UncheckAt(index));
+            return Optional<const E&>::Of(UncheckedAt(index));
         }
 
         /**
@@ -608,7 +634,7 @@ namespace Ck
          * \return true if any element satisfies predicate, false otherwise.
          */
         template <typename TPredicate>
-    	bool ContainsIf(TPredicate predicate) const
+        bool ContainsIf(TPredicate predicate) const
         {
             return !FindIndexIf(predicate).IsEmpty();
         }
@@ -735,7 +761,7 @@ namespace Ck
          * \return Pointer to element if found, nullptr otherwise
          */
         template <typename TPredicate>
-    	Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
+        Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
         {
             assert(start <= mSize);
 
@@ -757,9 +783,9 @@ namespace Ck
          * \return Pointer to element if found, nullptr otherwise
          */
         template <typename TPredicate>
-    	Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
+        Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
         {
-            return const_cast<Array<E, TAllocator>*>(this)->FindIf(predicate, start);
+            return const_cast<Array*>(this)->FindIf(predicate, start);
         }
 
         /**
@@ -769,7 +795,7 @@ namespace Ck
          * \return Pointer to element if found, nullptr otherwise.
          */
         template <typename TPredicate>
-    	E* FindLastIf(TPredicate predicate)
+        E* FindLastIf(TPredicate predicate)
         {
             for (SizeType i = mSize; i-- > 0;)
             {
@@ -788,28 +814,25 @@ namespace Ck
          * \return Pointer to element if found, nullptr otherwise.
          */
         template <typename TPredicate>
-    	const E* FindLastIf(TPredicate predicate) const
+        const E* FindLastIf(TPredicate predicate) const
         {
-            return const_cast<Array<E, TAllocator>*>(this)->FindLastIf(predicate);
+            return const_cast<Array*>(this)->FindLastIf(predicate);
         }
 
         /**
-         * \brief Removes and returns the first element.
-         * \return The removed element.
+         * \brief Removes and returns the first element
+         *
+         * \return The removed element
          */
         E PopFirst()
         {
             CheckSize();
 
-            ElementType* data = GetData();
-            ElementType& first = data[0];
+            E& first = mData[0];
+            E firstElement = std::move(first);
 
-            ElementType firstElement = std::move(first);
-            for (SizeType i = 1; i < mSize; ++i)
-                data[i - 1] = std::move(data[i]);
-
-            ElementType& last = data[mSize - 1];
-            AllocatorUtils::Destroy(&last);
+            ObjectMemoryUtils::Destroy(&first);
+            ObjectMemoryUtils::MoveRange(mSize - 1, mData, mData + 1);
 
             --mSize;
 
@@ -824,11 +847,10 @@ namespace Ck
         {
             CheckSize();
 
-            ElementType* data = GetData();
-            ElementType& last = data[mSize - 1];
-
+            ElementType& last = mData[mSize - 1];
             ElementType lastElement = std::move(last);
-            AllocatorUtils::Destroy(&last);
+
+            ObjectMemoryUtils::Destroy(&last);
 
             --mSize;
 
@@ -856,7 +878,7 @@ namespace Ck
                 for (SizeType i = index + 1; i < mSize; ++i)
                     At(i - 1) = std::move(At(i));
 
-                (mAllocator.GetAllocation() + mSize - 1)->~E();
+                (mData + mSize - 1)->~E();
 
                 --mSize;
 
@@ -890,9 +912,9 @@ namespace Ck
          * \return Filtered array.
          */
         template <typename TPredicate>
-    	Array<E, AllocatorType> Filter(TPredicate predicate) const
+        Array Filter(TPredicate predicate) const
         {
-            Array<E, AllocatorType> results(*this);
+            Array results(*this);
             results.FilterInPlace(predicate);
 
             return results;
@@ -905,7 +927,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TPredicate>
-    	Array<E, AllocatorType>& FilterInPlace(TPredicate predicate)
+        Array& FilterInPlace(TPredicate predicate)
         {
             SizeType writeIndex = 0;
             ElementType* data = GetData();
@@ -917,16 +939,16 @@ namespace Ck
 
                 if (!predicate(readElement))
                 {
-                    if (writeIndex != readIndex) 
+                    if (writeIndex != readIndex)
                     {
-                        AllocatorUtils::Construct(&writeElement, std::move(readElement));
-                        AllocatorUtils::Destroy(&readElement);
+                        ObjectMemoryUtils::Construct(&writeElement, std::move(readElement));
+                        ObjectMemoryUtils::Destroy(&readElement);
                     }
                     ++writeIndex;
                 }
                 else
                 {
-                    AllocatorUtils::Destroy(&readElement);
+                    ObjectMemoryUtils::Destroy(&readElement);
                 }
             }
 
@@ -942,7 +964,7 @@ namespace Ck
          * \return Transformed array.
          */
         template <typename TFunction>
-    	Array<typename FunctionTraits<TFunction>::Return> Transform(TFunction transformer) const
+        Array<typename FunctionTraits<TFunction>::Return> Transform(TFunction transformer) const
         {
             using T = typename FunctionTraits<TFunction>::Return;
             static_assert(FunctionTraits<TFunction>::Arity <= 2, "Transform function takes only 0, 1 or 2 parameters");
@@ -980,7 +1002,7 @@ namespace Ck
          * \return Reference to *this.
          */
         template <typename TFunction>
-    	Array<E, AllocatorType>& TransformInPlace(TFunction transformer)
+        Array& TransformInPlace(TFunction transformer)
         {
             for (SizeType i = 0; i < mSize; ++i)
             {
@@ -1003,7 +1025,7 @@ namespace Ck
          *          Any insertion/deletion of element will cause an unpredictable iteration behaviour.
          */
         template <typename TFunction>
-    	void ForEach(TFunction function) const
+        void ForEach(TFunction function) const
         {
             static_assert(FunctionTraits<TFunction>::Arity <= 2, "Transform function takes only 0, 1 or 2 parameters");
 
@@ -1068,9 +1090,9 @@ namespace Ck
          * \brief Returns a reversed copy of the array.
          * \return New reversed array.
          */
-        Array<E, AllocatorType> Reverse() const
+        Array Reverse() const
         {
-            Array<E, AllocatorType> copy = *this;
+            Array copy = *this;
             copy.ReverseInPlace();
             return copy;
         }
@@ -1079,7 +1101,7 @@ namespace Ck
          * \brief Reverses the array in place.
          * \return Reference to *this.
          */
-        Array<E, AllocatorType>& ReverseInPlace()
+        Array& ReverseInPlace()
         {
             const SizeType size = GetSize();
             if (size > 1)
@@ -1146,67 +1168,62 @@ namespace Ck
             slice.Reserve(count);
 
             for (SizeType i = 0; i < count; ++i)
-                slice.Add(UncheckAt(first + i));
+                slice.Add(UncheckedAt(first + i));
 
             return slice;
         }
 
         /**
-         * \brief 
-         * \param first 
-         * \return 
+         * \brief
+         * \param first
+         * \return
          */
-        Array<E, AllocatorType> Splice(SizeType first) const
+        Array Splice(SizeType first) const
         {
-            Array<E, AllocatorType> sliced(*this);
+            Array sliced(*this);
             sliced.SpliceInPlace(first);
 
             return sliced;
         }
 
         /**
-         * \brief 
-         * \param first 
-         * \return 
+         * \brief
+         * \param first
+         * \return
          */
-        Array<E, AllocatorType>& SpliceInPlace(SizeType first)
+        Array& SpliceInPlace(SizeType first)
         {
             return SpliceInPlace(first, mSize - first);
         }
 
         /**
-         * \brief 
-         * \param first 
-         * \param count 
-         * \return 
+         * \brief
+         * \param first
+         * \param count
+         * \return
          */
-        Array<E, AllocatorType> Splice(SizeType first, SizeType count) const
+        Array Splice(SizeType first, SizeType count) const
         {
-            Array<E, AllocatorType> sliced(*this);
+            Array sliced(*this);
             sliced.SpliceInPlace(first, count);
 
             return sliced;
         }
 
         /**
-         * \brief 
-         * \param first 
-         * \param count 
-         * \return 
+         * \brief
+         * \param first
+         * \param count
+         * \return
          */
-        Array<E, AllocatorType>& SpliceInPlace(SizeType first, SizeType count)
+        Array& SpliceInPlace(SizeType first, SizeType count)
         {
             CheckIndex(first + count - 1);
-            
+
             const SizeType firstKept = first + count;
 
-            AllocatorUtils::DestroyRange(count, GetData() + first);
-            for (SizeType i = 0; i < mSize - first; ++i)
-            {
-                E* element = GetData() + firstKept + i;
-                AllocatorUtils::Construct(GetData() + first + i, std::move(*element));
-                AllocatorUtils::Destroy(element);
-            }
+            ObjectMemoryUtils::DestroyRange(count, mData + first);
+            ObjectMemoryUtils::MoveRange(mSize - firstKept, mData + first, mData + firstKept);
 
             mSize -= count;
 
@@ -1226,14 +1243,14 @@ namespace Ck
                 SizeType allocateCount = size - mSize;
                 E* availableElements = Allocate(allocateCount);
                 for (SizeType i = 0; i < size; ++i)
-                    AllocatorUtils::ConstructRange(allocateCount, availableElements);
+                    ObjectMemoryUtils::ConstructRange(allocateCount, availableElements);
 
                 mSize += allocateCount;
             }
             else if (size < mSize)
             {
                 SizeType destroyCount = mSize - size;
-                AllocatorUtils::DestroyRange(destroyCount, GetData() + size);
+                ObjectMemoryUtils::DestroyRange(destroyCount, GetData() + size);
 
                 mSize -= destroyCount;
             }
@@ -1272,20 +1289,20 @@ namespace Ck
          */
         void Reserve(SizeType size)
         {
-            SizeType nextCapacity = NextPowerOfTwo(mCapacity + size);
-            mAllocator.ResizeAllocation(mSize, nextCapacity, sizeof(E));
+            SizeType nextCapacity = NextPowerOfTwo(mSize + size);
+            ResizeAllocation(nextCapacity);
 
             mCapacity = nextCapacity;
         }
 
         /**
-         * \brief Clears the array, removing all elements.
+         * \brief Clears the array, removing all elements
          */
         void Clear()
         {
             if (mSize > 0)
-                AllocatorUtils::DestroyRange(mSize, mAllocator.GetAllocation());
-                
+                ObjectMemoryUtils::DestroyRange(mSize, mData);
+
             mSize = 0;
         }
 
@@ -1294,8 +1311,7 @@ namespace Ck
          */
         void Shrink()
         {
-            mAllocator.ResizeAllocation(mSize, mSize, sizeof(E));
-            mCapacity = mSize;
+            ResizeAllocation(mSize);
         }
 
         /**
@@ -1331,7 +1347,7 @@ namespace Ck
          */
         E* GetData()
         {
-            return mAllocator.GetAllocation();
+            return mData;
         }
 
         /**
@@ -1340,7 +1356,7 @@ namespace Ck
          */
         const E* GetData() const
         {
-            return mAllocator.GetAllocation();
+            return mData;
         }
 
         E* begin()
@@ -1402,7 +1418,7 @@ namespace Ck
          */
         E& operator[](SizeType index)
         {
-            return UncheckAt(index);
+            return UncheckedAt(index);
         }
 
         /**
@@ -1412,18 +1428,18 @@ namespace Ck
          */
         const E& operator[](SizeType index) const
         {
-            return UncheckAt(index);
+            return UncheckedAt(index);
         }
 
     protected:
 
-        E& UncheckAt(SizeType index)
+        E& UncheckedAt(SizeType index)
         {
             E* element = GetData() + index;
             return *element;
         }
 
-        const E& UncheckAt(SizeType index) const
+        const E& UncheckedAt(SizeType index) const
         {
             const E* element = GetData() + index;
             return *element;
@@ -1438,8 +1454,8 @@ namespace Ck
         }
 
         /**
-         * \brief 
-         * \param index 
+         * \brief
+         * \param index
          */
         void CheckIndex(SizeType index) const
         {
@@ -1458,26 +1474,43 @@ namespace Ck
         {
             SizeType nextCapacity = NextPowerOfTwo(mSize + count);
             if (nextCapacity > mCapacity)
+                ResizeAllocation(nextCapacity);
+
+            return mData + mSize;
+        }
+
+        /**
+         * \brief
+         *
+         * \param nextCapacity
+         */
+        void ResizeAllocation(SizeType nextCapacity)
+        {
+            assert(nextCapacity >= mSize);
+
+            E* data = nullptr;
+            if (nextCapacity)
             {
-                mAllocator.ResizeAllocation(mSize, nextCapacity, sizeof(E));
-                mCapacity = nextCapacity;
+                data = mAllocator.Allocate(nextCapacity);
+                if (mData)
+                    ObjectMemoryUtils::MoveRange(mSize, data, mData);
             }
 
-            E* allocation = mAllocator.GetAllocation();
-            return allocation + mSize;
+            if (mData)
+                mAllocator.Deallocate(mData);
+
+            mData = data;
+            mCapacity = nextCapacity;
         }
 
         SizeType mSize;
         SizeType mCapacity;
-        ElementAllocatorType mAllocator;
+        E* mData;
+        AllocatorElementType mAllocator;
     };
 
-    /**
-     * \brief 
-     * \tparam E 
-     */
     template <typename E>
-    using Array64 = Array<E, SizedHeapAllocator<64>>;
+    using LargeArray = Array<E, LargeHeapAllocator>;
 }
 
 #endif // COCKTAIL_CORE_ARRAY_HPP

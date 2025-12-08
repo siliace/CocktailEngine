@@ -16,6 +16,8 @@ namespace Ck::Main::Win32
 		mArgv.Reserve(argc);
 		for (int i = 0; i < argc; i++)
 			mArgv.Emplace(arguments[i]);
+
+	    LocalFree(arguments);
 	}
 
 	void Win32Application::Exit(unsigned int exitCode, bool force, StringView callSite)

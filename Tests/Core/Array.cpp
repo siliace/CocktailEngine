@@ -2,13 +2,13 @@
 
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Exception.hpp>
-#include <Cocktail/Core/Memory/Allocator/BumpAllocator.hpp>
+#include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
 
-TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
 
-	array.Add(2);
+    array.Add(2);
     REQUIRE(array.GetSize() == 1);
     REQUIRE(array.GetCapacity() >= 1);
 
@@ -23,7 +23,7 @@ TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::SizedHeapAllocato
     REQUIRE(array == Ck::Array<int, TestType>{ 2, 4, 6 });
 }
 
-TEMPLATE_TEST_CASE("Add elements in the middle of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Add elements in the middle of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 1, 3, 5, 7 };
 
@@ -37,7 +37,7 @@ TEMPLATE_TEST_CASE("Add elements in the middle of an array", "[Array]", Ck::Size
     REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 4, 5, 6, 7 });
 }
 
-TEMPLATE_TEST_CASE("Prepend elements at the begining of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Prepend elements at the begining of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -54,7 +54,7 @@ TEMPLATE_TEST_CASE("Prepend elements at the begining of an array", "[Array]", Ck
     }
 }
 
-TEMPLATE_TEST_CASE("Insert elements in the middle of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Insert elements in the middle of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 10, 11, 12, 13, 14, 15 };
 
@@ -71,7 +71,7 @@ TEMPLATE_TEST_CASE("Insert elements in the middle of an array", "[Array]", Ck::S
     }
 }
 
-TEMPLATE_TEST_CASE("Append elements at the end of an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Append elements at the end of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
@@ -88,7 +88,7 @@ TEMPLATE_TEST_CASE("Append elements at the end of an array", "[Array]", Ck::Size
     }
 }
 
-TEMPLATE_TEST_CASE("Get an element from the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Get an element from the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -103,7 +103,7 @@ TEMPLATE_TEST_CASE("Get an element from the array", "[Array]", Ck::SizedHeapAllo
     }
 }
 
-TEMPLATE_TEST_CASE("Try to get an element from the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Try to get an element from the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -120,7 +120,7 @@ TEMPLATE_TEST_CASE("Try to get an element from the array", "[Array]", Ck::SizedH
     }
 }
 
-TEMPLATE_TEST_CASE("Test whether an array contains a value", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Test whether an array contains a value", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -128,26 +128,27 @@ TEMPLATE_TEST_CASE("Test whether an array contains a value", "[Array]", Ck::Size
     REQUIRE_FALSE(array.Contains(88));
 }
 
-TEMPLATE_TEST_CASE("Test whether an array contains a value matching a predicate", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Test whether an array contains a value matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     REQUIRE(array.ContainsIf([](int value) {
         return value == 5;
-    }));
+        }));
 
     REQUIRE_FALSE(array.ContainsIf([](int value) {
         return value == 88;
-    }));
+        }));
 }
 
-TEMPLATE_TEST_CASE("Find the index of a value", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Find the index of a value", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 3, 2, 1, 0 };
 
     SECTION("from the beginning")
     {
-	    Ck::Optional<typename TestType::SizeType> index = array.FindIndex(1);
+        Ck::Optional<typename TestType::SizeType> index = array.FindIndex(1);
         REQUIRE_FALSE(index.IsEmpty());
         REQUIRE(index.Get() == 1);
     }
@@ -166,44 +167,46 @@ TEMPLATE_TEST_CASE("Find the index of a value", "[Array]", Ck::SizedHeapAllocato
     }
 }
 
-TEMPLATE_TEST_CASE("Test whether an array contains at last one value matching a predicate", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Test whether an array contains at last one value matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     REQUIRE(array.AnyOf([](int value) {
         return value == 5;
-    }));
+        }));
 
     REQUIRE_FALSE(array.AnyOf([](int value) {
         return value == 88;
-    }));
+        }));
 }
 
-TEMPLATE_TEST_CASE("Test whether an array contains values matching a predicate", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Test whether an array contains values matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     REQUIRE(array.AllOf([](int value) {
         return value < 16;
-    }));
+        }));
 
     REQUIRE_FALSE(array.AllOf([](int value) {
         return value > 10;
-    }));
+        }));
 }
 
-TEMPLATE_TEST_CASE("Pop the first element of the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Pop the first element of the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
 
     SECTION("from an empty array")
     {
-	    REQUIRE_THROWS_AS(array.PopFirst(), Ck::ContainerEmpty);
+        REQUIRE_THROWS_AS(array.PopFirst(), Ck::ContainerEmpty);
     }
 
     SECTION("from a filled array")
     {
-       array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
         int value = array.PopFirst();
         REQUIRE(value == 0);
@@ -211,7 +214,7 @@ TEMPLATE_TEST_CASE("Pop the first element of the array", "[Array]", Ck::SizedHea
     }
 }
 
-TEMPLATE_TEST_CASE("Pop the last element of the array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Pop the last element of the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
 
@@ -230,15 +233,15 @@ TEMPLATE_TEST_CASE("Pop the last element of the array", "[Array]", Ck::SizedHeap
     }
 }
 
-TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::Array<int, TestType> array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     SECTION("To another array")
     {
-	    Ck::Array<int, TestType> results = array.Filter([](int i) {
-		    return i % 2 != 0;
-	    });
+        Ck::Array<int, TestType> results = array.Filter([](int i) {
+            return i % 2 != 0;
+        });
 
         REQUIRE(results.GetSize() == 8);
         REQUIRE(results == Ck::Array<int, TestType>{0, 2, 4, 6, 8, 10, 12, 14});
@@ -255,7 +258,7 @@ TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck:
     }
 }
 
-TEMPLATE_TEST_CASE("Reduce an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Reduce an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 1, 2, 3, 4 };
     int sum = array.Reduce(0, [](int current, int value) {
@@ -265,7 +268,7 @@ TEMPLATE_TEST_CASE("Reduce an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck:
     REQUIRE(sum == 10);
 }
 
-TEMPLATE_TEST_CASE("Reverse an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Reverse an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -282,7 +285,7 @@ TEMPLATE_TEST_CASE("Reverse an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck
     }
 }
 
-TEMPLATE_TEST_CASE("Slice an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Splice an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -303,13 +306,13 @@ TEMPLATE_TEST_CASE("Slice an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::
     }
 }
 
-TEMPLATE_TEST_CASE("Slice an array with range", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Splice an array with range", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::Array<int, TestType> array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
     SECTION("To another array")
     {
-	    Ck::Array<int, TestType> sliced = array.Splice(3, 5);
+        Ck::Array<int, TestType> sliced = array.Splice(3, 5);
 
         REQUIRE(sliced.GetSize() == 11);
         REQUIRE(sliced == Ck::Array<int, TestType>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
@@ -324,7 +327,7 @@ TEMPLATE_TEST_CASE("Slice an array with range", "[Array]", Ck::SizedHeapAllocato
     }
 }
 
-TEMPLATE_TEST_CASE("Resize an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Resize an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
 
@@ -349,7 +352,7 @@ TEMPLATE_TEST_CASE("Resize an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck:
     }
 }
 
-TEMPLATE_TEST_CASE("Reserve an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Reserve an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> arr;
     arr.Reserve(10);
@@ -358,7 +361,7 @@ TEMPLATE_TEST_CASE("Reserve an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck
     REQUIRE(arr.GetCapacity() >= 10);
 }
 
-TEMPLATE_TEST_CASE("Clear and Shrink an array", "[Array]", Ck::SizedHeapAllocator<32>, Ck::SizedHeapAllocator<64>, Ck::BumpAllocator<128>)
+TEMPLATE_TEST_CASE("Clear and Shrink an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 

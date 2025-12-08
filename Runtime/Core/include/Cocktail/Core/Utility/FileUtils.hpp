@@ -43,7 +43,7 @@ namespace Ck
 		 *
          * \return A String filled with the content of file
 		 */
-	    template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+	    template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
 		static BasicString<TEncoding, TAllocator> ReadFileText(const Path& path, FileSystemDriver* driver = LocalFileSystem::GetRootDriver())
 	    {
 	        ByteArray content = ReadFile(path, driver);
@@ -62,7 +62,7 @@ namespace Ck
 		 *
          * \return An array containing strings each filled with one line from the file
 		 */
-	    template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+	    template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
 	    static Array<BasicString<TEncoding, TAllocator>, TAllocator> ReadFileLines(const Path& path, bool ignoreEmptyLines = true, FileSystemDriver* driver = LocalFileSystem::GetRootDriver())
 	    {
 	        if (!driver->IsFile(path))
@@ -99,7 +99,7 @@ namespace Ck
 		 * \param append Flag indicating whether append or truncate the file to write before opening it
          * \param driver The file system driver where the file is accessible
 		 */
-	    template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+	    template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
 		static void WriteFileLines(const Path& path, const Array<BasicString<TEncoding, TAllocator>>& lines, bool append, FileSystemDriver* driver = LocalFileSystem::GetRootDriver())
 	    {
 	        if (!driver->IsFile(path))

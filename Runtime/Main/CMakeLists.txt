@@ -5,6 +5,7 @@ cocktail_source_directory(MAIN_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Main/ExitCode.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/New.cpp
 )
 
 if (WIN32)

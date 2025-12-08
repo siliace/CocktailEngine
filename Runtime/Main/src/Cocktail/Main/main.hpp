@@ -15,7 +15,7 @@ namespace Ck::Main
 	 * \param application 
 	 * \return 
 	 */
-	ExitCode InvokeMain(Ck::Application* application);
+	ExitCode InvokeMain(Ck::UniquePtr<Ck::Application> application);
 }
 
 #endif // COCKTAIL_MAIN_MAIN_HPP

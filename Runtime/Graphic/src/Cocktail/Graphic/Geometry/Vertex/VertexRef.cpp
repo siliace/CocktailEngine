@@ -47,7 +47,7 @@ namespace Ck
 			offset = vertexAttribute->GetOffset() * mVertexCount + vertexAttribute->GetStride() * mIndex;
 		}
 
-		std::memcpy(mVertices->GetData() + offset, value, dataType.GetSize() * elementCount);
+		Memory::Copy(mVertices->GetData() + offset, value, dataType.GetSize() * elementCount);
 	}
 
 	void VertexRef::SetColor(VertexAttributeSemantic semantic, const LinearColor& color)

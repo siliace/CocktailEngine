@@ -10,8 +10,13 @@ namespace Ck
     {
     public:
 
-        using AllocatorType = typename TAllocator::template Typed<T>;
-        using SizeType = typename TAllocator::SizeType;
+        using ElementType = T;
+
+        using AllocatorType = TAllocator;
+
+        using SizeType = typename AllocatorType::SizeType;
+
+        using ElementAllocatorType = typename AllocatorType::template ForType<ElementType>;
 
         explicit InputAccumulator(SizeType size) :
             mPos(0),
@@ -20,10 +25,13 @@ namespace Ck
         {
             assert(mSize > 0);
 
-            mAllocator.ResizeAllocation(0, mSize, sizeof(T));
+            mBuffer = mAllocator.Allocate(mSize);
         }
 
-        virtual ~InputAccumulator() = default;
+        virtual ~InputAccumulator()
+        {
+            mAllocator.Deallocate(mBuffer);
+        }
 
         bool Extract(T& e)
         {
@@ -49,7 +57,7 @@ namespace Ck
 
                 SizeType copyLength = std::min(validLength, length - accumulated);
 
-                std::memcpy(buffer + accumulated, mAllocator.GetAllocation() + mPos, copyLength * sizeof(T));
+                Memory::Copy(buffer + accumulated, mBuffer + mPos, copyLength * sizeof(T));
                 accumulated += copyLength;
                 mPos += copyLength;
             }
@@ -86,25 +94,26 @@ namespace Ck
             return mPos;
         }
 
-        T* GetData() const
+        ElementType* GetData() const
         {
-            return mAllocator.GetAllocation();
+            return mBuffer;
         }
 
-        T& GetDataAt(SizeType index) const
+        ElementType& GetDataAt(SizeType index) const
         {
             assert(index < mSize);
-            return *(mAllocator.GetAllocation() + index);
+            return *(mBuffer + index);
         }
 
     private:
 
-        virtual SizeType DoAdvance(T* buffer, SizeType bufferSize) = 0;
+        virtual SizeType DoAdvance(ElementType* buffer, SizeType bufferSize) = 0;
 
         SizeType mPos;
         SizeType mLimit;
         SizeType mSize;
-        AllocatorType mAllocator;
+        ElementType* mBuffer;
+        ElementAllocatorType mAllocator;
     };
 }
 

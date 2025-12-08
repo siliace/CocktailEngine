@@ -1,12 +1,11 @@
 #ifndef COCKTAIL_CORE_APPLICATION_APPLICATION_HPP
 #define COCKTAIL_CORE_APPLICATION_APPLICATION_HPP
 
-#include <string>
-
-#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
 #include <Cocktail/Core/Application/ServiceProvider.hpp>
+#include <Cocktail/Core/Memory/Allocator/UseSystemAllocator.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/FileSystem/Path.hpp>
 #include <Cocktail/Core/Utility/Time/Duration.hpp>
 #include <Cocktail/Core/Utility/Time/Instant.hpp>
@@ -19,7 +18,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_CORE_API Application : public ServiceContainer, public Observable
+	class COCKTAIL_CORE_API Application : public ServiceContainer, public Observable, public UseSystemAllocator
 	{
 	public:
 	

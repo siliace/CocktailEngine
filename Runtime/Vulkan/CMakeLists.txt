@@ -11,6 +11,7 @@ cocktail_source_directory(VULKAN_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/ExtensionManager.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/ExtensionManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/New.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/RenderDevice.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/RenderDevice.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Vulkan/Semaphore.hpp

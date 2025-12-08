@@ -183,6 +183,8 @@ namespace Ck
 			{
 				auto page = MakeUnique<Byte[]>(sizeof(T) * objectCount);
 				T* vacants = reinterpret_cast<T*>(page.Get());
+			    
+			    mVacants.Reserve(objectCount);
 				for (std::size_t i = 0; i < objectCount; i++)
 					mVacants.Add(&vacants[i]);
 

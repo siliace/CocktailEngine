@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_SIGNAL_DETAIL_SIGNALBASE_HPP
 #define COCKTAIL_CORE_SIGNAL_DETAIL_SIGNALBASE_HPP
 
-#include <memory>
 #include <map>
 
 #include <Cocktail/Core/Signal/Connection.hpp>

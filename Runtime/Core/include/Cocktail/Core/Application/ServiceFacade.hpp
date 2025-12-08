@@ -11,7 +11,7 @@ namespace Ck
 	 * \tparam T 
 	 */
 	template <typename T>
-	class ServiceFacade : Detail::ServiceFacadeBase
+	class ServiceFacade : public Detail::ServiceFacadeBase
 	{
 	public:
 
@@ -23,6 +23,8 @@ namespace Ck
 		 */
 		static T* ResolveFacadeInstance(bool force = false, bool cached = true)
 		{
+		    assert(GetApplicationFacade() != nullptr && "Trying to access to a facade before booting or after termination");
+
 			if (!force && sInstance)
 				return sInstance;
 

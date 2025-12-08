@@ -7,6 +7,7 @@ cocktail_source_directory(SPONZA_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiServiceProvider.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiServiceProvider.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/New.cpp
 )
 
 cocktail_source_directory(SPONZA_FILES

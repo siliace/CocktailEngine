@@ -1,5 +1,7 @@
 #include <cstring>
 
+#include <Cocktail/Core/Memory/Memory.hpp>
+
 #include <Cocktail/Vulkan/Buffer/BufferPool.hpp>
 
 namespace Ck::Vulkan
@@ -21,7 +23,7 @@ namespace Ck::Vulkan
 		offset += padding;
 
 		void* destination = Map(offset, length);
-		std::memcpy(destination, data, length);
+		Memory::Copy(destination, data, length);
 		Unmap();
 
 		mRemainingCapacity -= padding + length;

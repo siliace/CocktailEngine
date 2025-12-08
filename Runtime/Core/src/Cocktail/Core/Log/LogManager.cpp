@@ -6,6 +6,9 @@ namespace Ck
 	{
 		for (LogEntry* logEntry : mEntries)
 			mEntryPool.Recycle(logEntry);
+
+	    mEntries.Clear();
+	    mEntryPool.Clear();
 	}
 
 	void LogManager::RegisterChannel(const String& name, UniquePtr<LogChannel> logChannel)

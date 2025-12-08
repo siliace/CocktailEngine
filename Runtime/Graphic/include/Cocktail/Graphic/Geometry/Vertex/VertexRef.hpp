@@ -110,7 +110,7 @@ namespace Ck
 				offset = vertexAttribute->GetOffset() * mVertexCount + vertexAttribute->GetStride() * mIndex;
 			}
 
-			std::memcpy(reinterpret_cast<T*>(mVertices->GetData() + offset), value, sizeof(T) * elementCount);
+			Memory::Copy(reinterpret_cast<T*>(mVertices->GetData() + offset), value, sizeof(T) * elementCount);
 		}
 
 		/**

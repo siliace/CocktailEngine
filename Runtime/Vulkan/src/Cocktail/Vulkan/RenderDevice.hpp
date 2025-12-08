@@ -318,6 +318,7 @@ namespace Ck::Vulkan
 		void CreateDevice();
 
 		ExtensionManager mExtensionManager;
+		VkAllocationCallbacks mAllocationCallbacks;
 		VkInstance mInstance;
 		VkPhysicalDevice mPhysicalDevice;
 		UniquePtr<QueueFamilyContext> mQueueFamilyContext;

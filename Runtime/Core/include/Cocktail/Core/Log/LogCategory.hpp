@@ -39,7 +39,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        const String& GetName() const;
+        StringView GetName() const;
 
         /**
          * \brief 
@@ -67,11 +67,11 @@ namespace Ck
          * \param name
          * \param defaultLevel
          */
-        LogCategory(String name, LogLevel defaultLevel);
+        LogCategory(StringView name, LogLevel defaultLevel);
 
     private:
 
-        String mName;
+        StringView mName;
         LogLevel mDefaultLogLevel;
         LogLevel mLogLevel;
     };

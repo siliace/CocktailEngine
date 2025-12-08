@@ -1,155 +1,87 @@
 #ifndef COCKTAIL_CORE_MEMORY_ALLOCATOR_SIZEDHEAPALLOCATOR_HPP
 #define COCKTAIL_CORE_MEMORY_ALLOCATOR_SIZEDHEAPALLOCATOR_HPP
 
-#include <Cocktail/Core/Cocktail.hpp>
-#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
+#include <Cocktail/Core/Memory/Memory.hpp>
+#include <Cocktail/Core/Memory/SizeType.hpp>
 
 namespace Ck
 {
-	template <int IndexSize>
-	struct IndexSizeToSizeType {};
-
-	template <>	struct IndexSizeToSizeType<8> { using Type = Uint8; };
-	template <> struct IndexSizeToSizeType<16> { using Type = Uint16; };
-	template <>	struct IndexSizeToSizeType<32> { using Type = Uint32; };
-	template <>	struct IndexSizeToSizeType<64> { using Type = Uint64; };
-
-	template <int IndexSize>
+    /**
+     * \class SizedHeapAllocator
+     *
+     * \brief Typed heap allocator with configurable index size and allocation backend
+     *
+     * This allocator provides typed heap allocation for objects of type \p T or for raw memory,
+     * using a configurable integer size type based on \p IndexSize and a customizable
+     * memory allocation handler (defaulting to Memory).
+     *
+     * \tparam IndexSize Number of bits used to define the internal size type
+     * \tparam AllocationHandler Memory allocation backend providing Allocate/Free
+     */
+	template <Uint32 IndexSize, typename AllocationHandler = Memory>
 	class SizedHeapAllocator
 	{
 	public:
 
-		static constexpr bool IsTyped = true;
+	    /**
+         * \brief Integer type used to represent allocation sizes
+         */
+	    using SizeType = SizeTypeOf<IndexSize>;
 
-		using SizeType = typename IndexSizeToSizeType<IndexSize>::Type;
+        /**
+	     * \brief Specialized allocator for \p T type
+	     *
+	     * \tparam T The type of object allocated by this allocator
+	     */
+	    template <typename T>
+	    struct ForType
+	    {
+	        using ValueType = T;
 
-		class Raw
-		{
-		public:
+	        /**
+             * \brief Flag indicating whether the allocator can be moved from a container to another
+             *
+             * Heap allocators does not own any data so we allow the move to improve performances.
+             */
+            static constexpr bool PropagateOnContainerMove = true;
 
-			/**
-			 * \brief 
-			 */
-			Raw() :
-				mData(nullptr)
-			{
-				/// Nothing
-			}
+	        /**
+             * \brief Allocates a block of memory large enough to hold \p size elements of type T
+             *
+             * \param size Number of elements to allocate
+             *
+             * \return Pointer to the allocated memory, or nullptr on failure
+             */
+	        T* Allocate(SizeType size)
+	        {
+	            return static_cast<T*>(AllocationHandler::Allocate(size * sizeof(T)));
+	        }
 
-			/**
-			 * \brief 
-			 * \param other 
-			 */
-			Raw(const Raw& other) = delete;
-
-			/**
-			 * \brief 
-			 * \param other 
-			 */
-			Raw(Raw&& other) noexcept
-			{
-				mData = std::exchange(other.mData, nullptr);
-			}
-
-			/**
-			 * \brief
-			 */
-			virtual ~Raw()
-			{
-				std::free(mData);
-			}
-
-			/**
-			 * \brief 
-			 * \param other 
-			 * \return 
-			 */
-			Raw& operator=(const Raw& other) = delete;
-
-			/**
-			 * \brief 
-			 * \param other 
-			 * \return 
-			 */
-			Raw& operator=(Raw&& other) noexcept
-			{
-				if (this == &other)
-					return *this;
-
-				std::free(mData);
-				mData = std::exchange(other.mData, nullptr);
-
-				return *this;
-			}
-
-			/**
-			 * \brief 
-			 * \param currentSize
-			 * \param nextSize
-			 * \param elementSize
-			 */
-			void ResizeAllocation(SizeType currentSize, SizeType nextSize, std::size_t elementSize)
-			{
-				if (mData || nextSize)
-					mData = std::realloc(mData, nextSize * elementSize);
-			}
-
-			/**
-			 * \brief 
-			 * \return 
-			 */
-			SizeType GetInitialCapacity() const
-			{
-				return 0;
-			}
-
-			/**
-			 * \brief 
-			 * \return 
-			 */
-			void* GetAllocation() const
-			{
-				return mData;
-			}
-
-		protected:
-
-			void* mData;
-		};
-
-		template <typename T>
-		class Typed : public Raw
-		{
-		public:
-
-			Typed() = default;
-
-			/**
-			 * \brief
-			 * \param currentSize
-			 * \param nextSize
-			 * \param elementSize
-			 */
-			void ResizeAllocation(SizeType currentSize, SizeType nextSize, std::size_t elementSize)
-			{
-				T* block = static_cast<T*>(std::malloc(nextSize * elementSize));
-				if (T* currentBlock = GetAllocation(); currentBlock && currentSize > 0)
-					AllocatorUtils::MoveRange(currentSize, block, currentBlock);
-
-				std::free(Raw::mData);
-				Raw::mData = block;
-			}
-
-			/**
-			 * \brief 
-			 * \return 
-			 */
-			T* GetAllocation() const
-			{
-				return static_cast<T*>(Raw::GetAllocation());
-			}
-		};
+	        /**
+             * \brief Frees a previously allocated block of memory
+             *
+             * \param pointer Pointer to the memory block to free
+             */
+	        void Deallocate(T* pointer)
+	        {
+	            AllocationHandler::Free(pointer);
+	        }
+	    };
 	};
+
+    /**
+     * \brief Alias for a standard heap allocator using a 32-bit index size
+     *
+     * Suitable for most medium-scale allocations.
+     */
+    using HeapAllocator = SizedHeapAllocator<32>;
+
+    /**
+     * \brief Alias for a heap allocator using a 64-bit index size
+     *
+     * Suitable for very large allocations where a wider size type is needed.
+     */
+    using LargeHeapAllocator = SizedHeapAllocator<64>;
 }
 
 #endif // COCKTAIL_CORE_MEMORY_ALLOCATOR_SIZEDHEAPALLOCATOR_HPP
