@@ -49,7 +49,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	}
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	DirectionalLight* directionalLight = DirectionalLight::Create(scene, LinearColor(1.f, 1.f, 1.f), lightDirection);
+	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor(1.f, 1.f, 1.f));
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);
@@ -57,52 +57,54 @@ Main::ExitCode ApplicationMain(Application* application)
 	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
 	
-	std::shared_ptr<FreeFlyCameraViewController> cameraController = std::make_shared<FreeFlyCameraViewController>(camera);
+    FreeFlyCameraViewController cameraController(camera);
 
-	float move = 1.f;
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Q), [&](KeyboardEvent event)
-	{
-		cameraController->Translate(FreeFlyCameraViewController::TranslationAxis::Right, -move);
-	});
+    float move = 1.f;
+    float rightTranslation = 0.f;
+    float frontTranslation = 0.f;
+    application->Connect(Keyboard::OnKey(KeyboardKey::Q), [&](KeyboardEvent event)
+    {
+        rightTranslation = event.Pressed ? -move : 0.f;
+    });
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::D), [&](KeyboardEvent event)
-	{
-		cameraController->Translate(FreeFlyCameraViewController::TranslationAxis::Right, move);
-	});
+    application->Connect(Keyboard::OnKey(KeyboardKey::D), [&](KeyboardEvent event)
+    {
+        rightTranslation = event.Pressed ? move : 0.f;
+    });
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Z), [&](KeyboardEvent event)
-	{
-		cameraController->Translate(FreeFlyCameraViewController::TranslationAxis::Front, -move);
-	});
+    application->Connect(Keyboard::OnKey(KeyboardKey::Z), [&](KeyboardEvent event)
+    {
+        frontTranslation = event.Pressed ? -move : 0.f;
+    });
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::S), [&](KeyboardEvent event)
-	{
-		cameraController->Translate(FreeFlyCameraViewController::TranslationAxis::Front, move);
-	});
+    application->Connect(Keyboard::OnKey(KeyboardKey::S), [&](KeyboardEvent event)
+    {
+        frontTranslation = event.Pressed ? move : 0.f;
+    });
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Add), [&](KeyboardEvent event)
-	{
-		move *= 2.f;
-	});
+    application->Connect(Keyboard::OnKey(KeyboardKey::Add), [&](KeyboardEvent event)
+    {
+        move *= 2.f;
+    });
 
-	application->Connect(Keyboard::OnKeyPressed(KeyboardKey::Subtract), [&](KeyboardEvent event)
-	{
-		move /= 2.f;
-	});
+    application->Connect(Keyboard::OnKey(KeyboardKey::Subtract), [&](KeyboardEvent event)
+    {
+        move /= 2.f;
+    });
 
-	application->Connect(Mouse::OnMouseMovedEvent(), [&](MouseMovedEvent event)
-	{
-		if (!(event.Flags & MouseEventFlagBits::LeftButton))
-			return;
+    application->Connect(Mouse::OnMouseMovedEvent(), [&](MouseMovedEvent event)
+    {
+        if (!(event.Flags & MouseEventFlagBits::LeftButton))
+            return;
 
-		Vector2<float> offset;
-		offset.X() = static_cast<float>(event.RelativeDisplacement.Width);
-		offset.Y() = static_cast<float>(event.RelativeDisplacement.Height);
-		offset *= 0.1f;
+        Vector2<float> offset;
+        offset.X() = static_cast<float>(event.RelativeDisplacement.Width);
+        offset.Y() = static_cast<float>(event.RelativeDisplacement.Height);
+        offset *= 0.1f;
 
-		cameraController->Rotate(FreeFlyCameraViewController::RotationAxis::Yaw, Angle<float>::Degree(offset.X()));
-		cameraController->Rotate(FreeFlyCameraViewController::RotationAxis::Pitch, Angle<float>::Degree(offset.Y()));
-	});
+        cameraController.Rotate(FreeFlyCameraViewController::RotationAxis::Yaw, Angle<float>::Degree(offset.X()));
+        cameraController.Rotate(FreeFlyCameraViewController::RotationAxis::Pitch, Angle<float>::Degree(offset.Y()));
+    });
 
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
@@ -123,7 +125,9 @@ Main::ExitCode ApplicationMain(Application* application)
 	{
 		Duration frameBegin = application->Uptime();
 
-		cameraController->Update(Duration::Between(lastFrameBegin, frameBegin));
+	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Right, rightTranslation);
+	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Front, frontTranslation);
+		cameraController.Update(Duration::Between(lastFrameBegin, frameBegin));
 
 		viewer->Render();
 
