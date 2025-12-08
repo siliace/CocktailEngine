@@ -20,7 +20,7 @@ namespace Ck
 	{
 		unsigned int copySize = std::min(static_cast<unsigned int>(mHandle.cend() - mCursor), length);
 
-		std::memcpy(buffer, mCursor, copySize);
+		Memory::Copy(buffer, mCursor, copySize);
 
 		return copySize;
 	}

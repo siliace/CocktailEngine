@@ -10,9 +10,9 @@ namespace Ck
     {
     public:
 
-        using ElementAllocatorType = std::conditional_t<TAllocator::IsTyped, typename TAllocator::template Typed<E>, typename TAllocator::Raw>;
+        using AllocatorType = typename TAllocator::template ForType<E>;
 
-        using SizeType = typename TAllocator::SizeType;
+        using SizeType = typename AllocatorType::SizeType;
 
         explicit OutputAccumulator(SizeType size) :
             mPos(0),
@@ -20,16 +20,19 @@ namespace Ck
         {
             assert(mSize > 0);
 
-            mAllocator.ResizeAllocation(0, mSize, sizeof(E));
+            mBuffer = mAllocator.Allocate(0, mSize, sizeof(E));
         }
 
-        virtual ~OutputAccumulator() = default;
+        virtual ~OutputAccumulator()
+        {
+            mAllocator.Deallocate(mBuffer);
+        }
 
         void Append(const E* data, SizeType size)
         {
             if (mPos + size <= mSize)
             {
-                std::memcpy(mAllocator.GetAllocation() + mPos, data, size * sizeof(E));
+                Memory::Copy(mBuffer + mPos, data, size * sizeof(E));
                 mPos += size;
             }
             else
@@ -41,7 +44,7 @@ namespace Ck
                 }
                 else
                 {
-                    std::memcpy(mAllocator.GetAllocation() + mPos, data, size * sizeof(E));
+                    Memory::Copy(mBuffer + mPos, data, size * sizeof(E));
                     mPos += size;
                 }
             }
@@ -52,7 +55,7 @@ namespace Ck
             if (mPos == 0)
                 return;
 
-            DoCommit(mAllocator.GetAllocation(), mPos);
+            DoCommit(mBuffer, mPos);
 
             mPos = 0;
         }
@@ -63,7 +66,8 @@ namespace Ck
 
         SizeType mPos;
         SizeType mSize;
-        ElementAllocatorType mAllocator;
+        E* mBuffer;
+        TAllocator mAllocator;
     };
 }
 

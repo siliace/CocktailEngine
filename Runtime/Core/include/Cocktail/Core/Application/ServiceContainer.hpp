@@ -32,10 +32,11 @@ namespace Ck
 		 * \tparam Abstract 
 		 * \tparam Concrete 
 		 */
-		template <typename Abstract, typename Concrete>
+		template <typename Abstract, typename Concrete, typename = std::enable_if_t<std::is_base_of_v<Abstract, Concrete>>>
 		void Alias()
 		{
-			Alias(typeid(Abstract), typeid(Concrete));
+		    if constexpr (!std::is_same_v<Abstract, Concrete>)
+			    Alias(typeid(Abstract), typeid(Concrete));
 		}
 
 		/**
@@ -67,12 +68,11 @@ namespace Ck
 		template <typename Abstract, typename Concrete = Abstract>
 		void Singleton(bool lazy = true)
 		{
-			Singleton<Abstract>([]() -> UniquePtr<Abstract> {
+			Singleton<Concrete>([]() -> UniquePtr<Concrete> {
 				return MakeUnique<Concrete>();
 			}, lazy);
 
-			if constexpr (!std::is_same_v<Abstract, Concrete>)
-				Alias<Concrete, Abstract>();
+		    Alias<Abstract, Concrete>();
 		}
 
 	    /**

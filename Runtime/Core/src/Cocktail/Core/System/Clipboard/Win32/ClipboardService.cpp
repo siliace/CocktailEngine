@@ -1,9 +1,10 @@
 #include <algorithm>
-#include <cstring>
 
-#include <Cocktail/Core/System/SystemError.hpp>
+#include <Cocktail/Core/Memory/Memory.hpp>
 #include <Cocktail/Core/System/Clipboard/Win32/ClipboardService.hpp>
+#include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
+#include <Cocktail/Core/Utility/StringUtils.hpp>
 
 namespace Ck::Detail::Win32
 {
@@ -19,8 +20,9 @@ namespace Ck::Detail::Win32
 
 		char* clipboardData = static_cast<char*>(GlobalLock(clipboardHandle));
 
-		std::size_t read = std::min(std::strlen(clipboardData) - offset, length);
-        std::memcpy(data, clipboardData + offset, read);
+        Uint32 clipboardLength = StringUtils<AnsiChar, Uint32>::GetLength(clipboardData);
+		std::size_t read = std::min(clipboardLength - offset, length);
+        Memory::Copy(data, clipboardData + offset, read);
 
         GlobalUnlock(clipboardHandle);
         CloseClipboard();
@@ -39,7 +41,7 @@ namespace Ck::Detail::Win32
         HANDLE clipboardHandle = GetClipboardData(CF_TEXT);
 
         char* clipboardData = static_cast<char*>(GlobalLock(clipboardHandle));
-        return std::strlen(clipboardData);
+        return StringUtils<AnsiChar, Uint32>::GetLength(clipboardData);
     }
 
     void ClipboardService::Set(const void* data, std::size_t length)

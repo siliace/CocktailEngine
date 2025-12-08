@@ -73,7 +73,7 @@ namespace Ck
             const unsigned char* inPixels = inImage.GetPixels().GetData();
             std::size_t allocationSize = format.ComputeAllocationSize(size);
             outImage.image.resize(allocationSize, 0);
-            std::memcpy(outImage.image.data(), inPixels, allocationSize);
+            Memory::Copy(outImage.image.data(), inPixels, allocationSize);
         }
     }
 

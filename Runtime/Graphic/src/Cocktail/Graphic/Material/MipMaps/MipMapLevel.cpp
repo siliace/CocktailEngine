@@ -1,3 +1,5 @@
+#include <Cocktail/Core/Memory/Memory.hpp>
+
 #include <Cocktail/Graphic/Material/MipMaps/MipMapLevel.hpp>
 
 namespace Ck
@@ -5,7 +7,7 @@ namespace Ck
 	void MipMapLevel::CopyPixels(const void* pixels)
 	{
 		mComplete = true;
-		std::memcpy(mPixels.GetData(), pixels, mPixelFormat.ComputeAllocationSize(mSize));
+		Memory::Copy(mPixels.GetData(), pixels, mPixelFormat.ComputeAllocationSize(mSize));
 	}
 
 	void MipMapLevel::CopyPixels(Extent3D<unsigned int> offset, Extent3D<unsigned int> size, const void* pixels)
@@ -34,7 +36,7 @@ namespace Ck
 
 				std::size_t srcOffset = i * srcSliceAllocationSize + j * srcRowAllocationSize;
 
-				std::memcpy(mPixels.GetData() + dstOffset, (const Uint8*)pixels + srcOffset, srcRowAllocationSize);
+				Memory::Copy(mPixels.GetData() + dstOffset, static_cast<const Uint8*>(pixels) + srcOffset, srcRowAllocationSize);
 			}
 		}
 	}

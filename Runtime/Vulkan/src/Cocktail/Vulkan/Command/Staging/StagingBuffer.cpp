@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 		offset += padding;
 
 		void* destination = mBuffer->Map(offset, length);
-		std::memcpy(destination, data, length);
+		Memory::Copy(destination, data, length);
 		mBuffer->Unmap();
 
 		mRemainingCapacity -= padding + length;

@@ -2,11 +2,14 @@
 
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
 
-class DummyService
+class InterfaceDummyService
 {
+public:
+
+    virtual ~InterfaceDummyService() = default;
 };
 
-class AliasService
+class DummyService : public InterfaceDummyService
 {
 };
 
@@ -61,7 +64,7 @@ TEST_CASE("Service container can resolve aliases", "[ServiceContainer]")
 {
 	Ck::ServiceContainer serviceContainer;
 	serviceContainer.Singleton<DummyService>();
-	serviceContainer.Alias<AliasService, DummyService>();
+	serviceContainer.Alias<InterfaceDummyService, DummyService>();
 
-	REQUIRE(serviceContainer.Resolve<DummyService>());
+	REQUIRE(serviceContainer.Resolve<InterfaceDummyService>());
 }

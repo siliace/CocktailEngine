@@ -16,6 +16,7 @@ namespace Ck
     {
 		return ResolveFacadeInstance()->GetTempDirectoryPath();
     }
+
     LocalFileSystemDriver* LocalFileSystem::GetRootDriver()
     {
 	    return ResolveFacadeInstance()->GetRootDriver();

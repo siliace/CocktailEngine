@@ -38,7 +38,7 @@ namespace Ck
          *
          * \return A String filled with the content of file
          */
-        template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+        template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
         static BasicString<TEncoding, TAllocator> ReadFileText(const URI& uri, StorageService* storage = Storage::ResolveFacadeInstance())
         {
             return FileUtils::ReadFileText<TEncoding, TAllocator>(uri.GetPath(), storage->ResolveDriver(uri.GetScheme()));
@@ -53,7 +53,7 @@ namespace Ck
          *
          * \return An array containing strings each filled with one line from the file
          */
-        template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+        template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
         static Array<BasicString<TEncoding, TAllocator>, TAllocator> ReadFileLines(const URI& uri, bool ignoreEmptyLines = true, StorageService* storage = Storage::ResolveFacadeInstance())
         {
             return FileUtils::ReadFileLines<TEncoding, TAllocator>(uri.GetPath(), ignoreEmptyLines, storage->ResolveDriver(uri.GetScheme()));
@@ -77,7 +77,7 @@ namespace Ck
          * \param append Flag indicating whether append or truncate the file to write before opening it
          * \param storage The storage where the file is accessible
          */
-        template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
+        template <typename TEncoding = Encoders::Text, typename TAllocator = HeapAllocator>
         static void WriteFileLines(const URI& uri, const Array<BasicString<TEncoding, TAllocator>>& lines, bool append, StorageService* storage = Storage::ResolveFacadeInstance())
         {
             return FileUtils::WriteFileLines<TEncoding, TAllocator>(uri.GetPath(), lines, append, storage->ResolveDriver(uri.GetScheme()));

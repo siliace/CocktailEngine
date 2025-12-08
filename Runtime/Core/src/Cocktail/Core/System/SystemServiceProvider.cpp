@@ -18,6 +18,9 @@ namespace Ck
 	{
 		application->Singleton<StorageService>();
 		application->Singleton<EmbeddedFileSystemDriver>();
+	    application->Singleton<MallocAllocator>();
+
+	    application->Alias<MemoryAllocator, MallocAllocator>();
 	}
 
 	void SystemServiceProvider::DoBoot(Application* application)

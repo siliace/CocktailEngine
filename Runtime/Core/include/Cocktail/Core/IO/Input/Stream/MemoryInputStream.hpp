@@ -26,7 +26,7 @@ namespace Ck
             SizeType available = mSize - mCursor;
             SizeType copyLength = std::min(available, length);
 
-            std::memcpy(data, mData + mCursor, copyLength);
+            Memory::Copy(data, mData + mCursor, copyLength);
 
             mCursor += copyLength;
 

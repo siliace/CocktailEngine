@@ -241,7 +241,7 @@ namespace Ck
 
     private:
 
-        Array64<UniquePtr<Node>> mChildren;
+        LargeArray<UniquePtr<Node>> mChildren;
     };
 }
 

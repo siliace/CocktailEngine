@@ -101,7 +101,7 @@ namespace Ck::Vulkan
 				assert(offset + size < mPipelineConstantStorageSize);
 
 				mDirtyFlags |= DirtyFlagBits::PipelineConstant;
-				std::memcpy(mPipelineConstantStorage.Get() + offset, data, size);
+				Memory::Copy(mPipelineConstantStorage.Get() + offset, data, size);
 
 				PipelineConstantRangeState& range = mPipelineConstantRanges[shaderType];
 				if (range.Dirty)

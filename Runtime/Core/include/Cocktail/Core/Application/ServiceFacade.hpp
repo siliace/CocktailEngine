@@ -11,7 +11,7 @@ namespace Ck
 	 * \tparam T 
 	 */
 	template <typename T>
-	class ServiceFacade : Detail::ServiceFacadeBase
+	class ServiceFacade : public Detail::ServiceFacadeBase
 	{
 	public:
 
