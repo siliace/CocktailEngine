@@ -137,9 +137,7 @@ namespace Ck
         ~Array()
         {
             Clear();
-
-            if (mCapacity)
-                mAllocator.Deallocate(mData, mCapacity);
+            Shrink();
         }
 
         /**
@@ -1498,7 +1496,8 @@ namespace Ck
                     ObjectMemoryUtils::MoveRange(mSize, data, mData);
             }
 
-            mAllocator.Deallocate(mData, mCapacity);
+            if (mData)
+                mAllocator.Deallocate(mData);
 
             mData = data;
             mCapacity = nextCapacity;

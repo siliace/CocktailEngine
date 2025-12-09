@@ -95,15 +95,13 @@ namespace Ck
              * Otherwise, the request is forwarded to the secondary allocator.
              *
              * \param pointer Pointer to the memory block to deallocate
-             *
-             * \param size Number of elements that were allocated
              */
-            void Deallocate(T* pointer, SizeType size)
+            void Deallocate(T* pointer)
             {
                 if (pointer >= GetInlineBegin() && pointer < GetInlineEnd())
                     return;
 
-                mSecondaryAllocator.Deallocate(pointer, size);
+                mSecondaryAllocator.Deallocate(pointer);
             }
 
         private:

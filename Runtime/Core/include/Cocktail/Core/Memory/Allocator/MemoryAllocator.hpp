@@ -50,9 +50,8 @@ namespace Ck
          * \brief Frees a previously allocated memory block
          *
          * \param pointer Pointer to the memory block to free
-         * \param size Size of the block that was allocated
          */
-        virtual void Free(void* pointer, std::size_t size) = 0;
+        virtual void Free(void* pointer) = 0;
     };
 }
 

@@ -2,16 +2,11 @@
 
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
 #include <Cocktail/Core/Memory/Memory.hpp>
-#include <Cocktail/Core/Memory/Allocator/MallocAllocator.hpp>
+#include <Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp>
 
 void* operator new(std::size_t size)
 {
     return Ck::Memory::Allocate(size);
-}
-
-void operator delete(void* pointer) noexcept
-{
-    Ck::Memory::Free(pointer, 0);
 }
 
 void* operator new[](std::size_t size)
@@ -19,13 +14,60 @@ void* operator new[](std::size_t size)
     return Ck::Memory::Allocate(size);
 }
 
+void* operator new(std::size_t size, std::align_val_t alignment)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void* operator new[](std::size_t size, std::align_val_t alignment)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void* operator new(std::size_t size, const std::nothrow_t&)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void* operator new[](std::size_t size, const std::nothrow_t&)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void* operator new(std::size_t size, std::align_val_t alignment, const std::nothrow_t&)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void* operator new[](std::size_t size, std::align_val_t alignment, const std::nothrow_t&)
+{
+    return Ck::Memory::Allocate(size);
+}
+
+void operator delete(void* pointer) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete(void* pointer, std::size_t) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
 void operator delete[](void* pointer) noexcept
 {
-    Ck::Memory::Free(pointer, 0);
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete[](void* pointer, std::size_t) noexcept
+{
+    return Ck::Memory::Free(pointer);
 }
 
 namespace Ck
 {
+    thread_local MemoryAllocator* gAllocator;
+
     void Memory::Zero(void* destination, std::size_t size)
     {
         Set(destination, 0, size);
@@ -48,25 +90,38 @@ namespace Ck
 
     void* Memory::Allocate(std::size_t size)
     {
-        if (ServiceFacade<MemoryAllocator>::GetApplicationFacade() == nullptr)
-            return MallocAllocator().Allocate(size);
+        if (!gAllocator)
+        {
+            CreateGlobalAllocator();
+            assert(gAllocator != nullptr);
+        }
 
-        return ServiceFacade<MemoryAllocator>::ResolveFacadeInstance()->Allocate(size);
+        return gAllocator->Allocate(size);
     }
 
     void* Memory::Reallocate(void* pointer, std::size_t size)
     {
-        if (ServiceFacade<MemoryAllocator>::GetApplicationFacade() == nullptr)
-            return MallocAllocator().Reallocate(pointer, size);
+        if (!gAllocator)
+        {
+            CreateGlobalAllocator();
+            assert(gAllocator != nullptr);
+        }
 
-        return ServiceFacade<MemoryAllocator>::ResolveFacadeInstance()->Reallocate(pointer, size);
+        return gAllocator->Reallocate(pointer, size);
     }
 
-    void Memory::Free(void* pointer, std::size_t size)
+    void Memory::Free(void* pointer)
     {
-        if (ServiceFacade<MemoryAllocator>::GetApplicationFacade() == nullptr)
-            return MallocAllocator().Free(pointer, size);
+        if (!gAllocator)
+        {
+            CreateGlobalAllocator();
+            assert(gAllocator != nullptr);
+        }
 
-        ServiceFacade<MemoryAllocator>::ResolveFacadeInstance()->Free(pointer, size);
+        gAllocator->Free(pointer);
+    }
+    void Memory::CreateGlobalAllocator()
+    {
+        gAllocator = new BinnedAllocator<8, 32>();
     }
 }

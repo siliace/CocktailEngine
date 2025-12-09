@@ -12,7 +12,7 @@ namespace Ck
         return std::realloc(pointer, size);
     }
 
-    void MallocAllocator::Free(void* original, std::size_t)
+    void MallocAllocator::Free(void* original)
     {
         std::free(original);
     }
@@ -29,6 +29,6 @@ namespace Ck
 
     void MallocAllocationHandler::Free(void* pointer)
     {
-        ResolveFacadeInstance()->Free(pointer, 0);
+        ResolveFacadeInstance()->Free(pointer);
     }
 }

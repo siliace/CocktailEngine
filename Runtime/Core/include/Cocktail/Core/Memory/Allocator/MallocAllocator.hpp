@@ -46,9 +46,8 @@ namespace Ck
          * \brief Frees a memory block using free()
          *
          * \param original Pointer to the memory block to free
-         * \param size Size of the original block (ignored by malloc-based allocators)
          */
-        void Free(void* original, std::size_t size) override;
+        void Free(void* original);
     };
 
     /**

@@ -30,7 +30,7 @@ namespace Ck
 
         virtual ~InputAccumulator()
         {
-            mAllocator.Deallocate(mBuffer, mSize);
+            mAllocator.Deallocate(mBuffer);
         }
 
         bool Extract(T& e)

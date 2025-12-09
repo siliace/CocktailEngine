@@ -104,9 +104,12 @@ namespace Ck
          * to perform memory deallocation.
          *
          * \param pointer Pointer to the memory block to free
-         * \param size Size of the block that was allocated
          */
-        static void Free(void* pointer, std::size_t size);
+        static void Free(void* pointer);
+
+    private:
+
+        static void CreateGlobalAllocator();
     };
 }
 

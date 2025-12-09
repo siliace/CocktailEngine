@@ -59,11 +59,10 @@ namespace Ck
              * \brief Frees a previously allocated block of memory
              *
              * \param pointer Pointer to the memory block to free
-             * \param size Number of elements that were originally allocated
              */
-	        void Deallocate(T* pointer, SizeType size)
+	        void Deallocate(T* pointer)
 	        {
-	            AllocationHandler::Free(pointer, size * sizeof(T));
+	            AllocationHandler::Free(pointer);
 	        }
 	    };
 	};

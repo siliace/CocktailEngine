@@ -115,9 +115,12 @@ namespace Ck::Vulkan
 		return mUpdateTemplates[set];
 	}
 
-	const Optional<PushConstantBlockInfo>& PipelineLayout::GetPipelineConstantBlock(Renderer::ShaderType shaderType) const
+	Optional<const PushConstantBlockInfo&> PipelineLayout::GetPipelineConstantBlock(Renderer::ShaderType shaderType) const
 	{
-		return mPipelineConstantBlocks[shaderType];
+        if (mPipelineConstantBlocks[shaderType].IsEmpty())
+            return Optional<const PushConstantBlockInfo&>::Empty();
+
+		return Optional<const PushConstantBlockInfo&>::Of(mPipelineConstantBlocks[shaderType].Get());
 	}
 
 	VkPipelineBindPoint PipelineLayout::GetBindPoint() const
