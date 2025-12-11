@@ -23,10 +23,11 @@ namespace Ck
          * \brief Allocates a block of memory using malloc()
          *
          * \param size Size of the memory block to allocate, in bytes
+         * \param alignment
          *
          * \return Pointer to the allocated memory block, or nullptr on failure
          */
-        void* Allocate(std::size_t size) override;
+        void* Allocate(std::size_t size, std::size_t alignment) override;
 
         /**
          * \brief Resizes a memory block using realloc()
@@ -37,10 +38,11 @@ namespace Ck
          *
          * \param pointer Pointer to the previously allocated memory block
          * \param size New size of the block, in bytes
+         * \param alignment
          *
          * \return Pointer to the reallocated block, or nullptr on failure
          */
-        void* Reallocate(void* pointer, std::size_t size) override;
+        void* Reallocate(void* pointer, std::size_t size, std::size_t alignment) override;
 
         /**
          * \brief Frees a memory block using free()

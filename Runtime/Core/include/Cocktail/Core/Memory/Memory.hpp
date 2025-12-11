@@ -19,6 +19,8 @@ namespace Ck
     {
     public:
 
+        static constexpr std::size_t DefaultAlignment = 16;
+
         /**
          * \brief Fills a block of memory with zeros
          *
@@ -79,7 +81,7 @@ namespace Ck
          *
          * \return Pointer to the allocated memory block, or nullptr on failure
          */
-        static void* Allocate(std::size_t size);
+        static void* Allocate(std::size_t size, std::size_t alignment = DefaultAlignment);
 
         /**
          * \brief Resizes an existing memory block
@@ -95,7 +97,7 @@ namespace Ck
          *
          * \return Pointer to the reallocated memory block, or nullptr on failure
          */
-        static void* Reallocate(void* pointer, std::size_t size);
+        static void* Reallocate(void* pointer, std::size_t size, std::size_t alignment = DefaultAlignment);
 
         /**
          * \brief Frees a previously allocated memory block

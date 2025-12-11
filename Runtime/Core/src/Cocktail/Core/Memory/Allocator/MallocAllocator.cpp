@@ -2,12 +2,12 @@
 
 namespace Ck
 {
-    void* MallocAllocator::Allocate(std::size_t size)
+    void* MallocAllocator::Allocate(std::size_t size, std::size_t)
     {
         return std::malloc(size);
     }
 
-    void* MallocAllocator::Reallocate(void* pointer, std::size_t size)
+    void* MallocAllocator::Reallocate(void* pointer, std::size_t size, std::size_t)
     {
         return std::realloc(pointer, size);
     }
@@ -19,12 +19,12 @@ namespace Ck
 
     void* MallocAllocationHandler::Allocate(std::size_t size)
     {
-        return ResolveFacadeInstance()->Allocate(size);
+        return ResolveFacadeInstance()->Allocate(size, 0);
     }
 
     void* MallocAllocationHandler::Reallocate(void* pointer, std::size_t size)
     {
-        return ResolveFacadeInstance()->Reallocate(pointer, size);
+        return ResolveFacadeInstance()->Reallocate(pointer, size, 0);
     }
 
     void MallocAllocationHandler::Free(void* pointer)

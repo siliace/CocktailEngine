@@ -38,7 +38,7 @@ namespace Ck
             }
         }
 
-        void* Allocate(std::size_t size) override
+        void* Allocate(std::size_t size, std::size_t alignment) override
         {
             BlockHeader* allocatedBlock = nullptr;
 
@@ -89,12 +89,12 @@ namespace Ck
             return BlockToUser(allocatedBlock);
         }
 
-        void* Reallocate(void* pointer, std::size_t size) override
+        void* Reallocate(void* pointer, std::size_t size, std::size_t alignment) override
         {
             assert(pointer || size > 0);
 
             if (!pointer)
-                return Allocate(size);
+                return Allocate(size, alignment);
 
             if (size == 0)
             {
@@ -110,7 +110,7 @@ namespace Ck
                 return pointer;
             }
 
-            void* newBlock = Allocate(size);
+            void* newBlock = Allocate(size, alignment);
             Memory::Copy(newBlock, pointer, block->Size);
             Free(pointer);
 

@@ -49,17 +49,47 @@ void operator delete(void* pointer) noexcept
     return Ck::Memory::Free(pointer);
 }
 
-void operator delete(void* pointer, std::size_t) noexcept
-{
-    return Ck::Memory::Free(pointer);
-}
-
 void operator delete[](void* pointer) noexcept
 {
     return Ck::Memory::Free(pointer);
 }
 
-void operator delete[](void* pointer, std::size_t) noexcept
+void operator delete(void* pointer, std::size_t size) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete[](void* pointer, std::size_t size) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete(void* pointer, std::size_t size, std::align_val_t alignment) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete[](void* pointer, std::size_t size, std::align_val_t alignment) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete(void* pointer, std::align_val_t alignment) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete[](void* pointer, std::align_val_t alignment) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete(void* pointer, std::align_val_t alignment, const std::nothrow_t&) noexcept
+{
+    return Ck::Memory::Free(pointer);
+}
+
+void operator delete[](void* pointer, std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
     return Ck::Memory::Free(pointer);
 }
@@ -88,7 +118,7 @@ namespace Ck
         std::memmove(destination, source, size);
     }
 
-    void* Memory::Allocate(std::size_t size)
+    void* Memory::Allocate(std::size_t size, std::size_t alignment)
     {
         if (!gAllocator)
         {
@@ -96,10 +126,10 @@ namespace Ck
             assert(gAllocator != nullptr);
         }
 
-        return gAllocator->Allocate(size);
+        return gAllocator->Allocate(size, alignment);
     }
 
-    void* Memory::Reallocate(void* pointer, std::size_t size)
+    void* Memory::Reallocate(void* pointer, std::size_t size, std::size_t alignment)
     {
         if (!gAllocator)
         {
@@ -107,7 +137,7 @@ namespace Ck
             assert(gAllocator != nullptr);
         }
 
-        return gAllocator->Reallocate(pointer, size);
+        return gAllocator->Reallocate(pointer, size, alignment);
     }
 
     void Memory::Free(void* pointer)
@@ -120,6 +150,7 @@ namespace Ck
 
         gAllocator->Free(pointer);
     }
+
     void Memory::CreateGlobalAllocator()
     {
         gAllocator = new BinnedAllocator<8, 32>();
