@@ -56,7 +56,7 @@ namespace Ck
 		 *
 		 * \return A ByteArray containing the serialized asset content
 		 */
-		virtual ByteArray SaveToMemory(const T& asset, const P& parameters = {}) const = 0;
+		virtual ByteArray<> SaveToMemory(const T& asset, const P& parameters = {}) const = 0;
 
 		/**
 		 * \brief Checks whether this exporter supports exporting a given file extension

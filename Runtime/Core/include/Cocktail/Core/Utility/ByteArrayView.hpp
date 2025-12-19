@@ -5,117 +5,132 @@
 
 namespace Ck
 {
+    template <typename>
     class ByteArray;
 
     /**
      * \brief Utility class to access to a memory area
      */
+    template <typename TSizeType = SizeTypeOf<64>>
     class COCKTAIL_CORE_API ByteArrayView
     {
     public:
 
-        /**
-         * \brief Default constructor
-         */
-        ByteArrayView();
+        using SizeType = TSizeType;
 
-        /**
-         * \brief
-         * \param data
-         * \param size
-         */
-        ByteArrayView(const Byte* data, std::size_t size);
+        ByteArrayView() :
+            mSize(0),
+            mData(nullptr)
+        {
+            /// Nothing
+        }
 
-        /**
-         * \brief 
-         * \param byteArray 
-         * \param offset 
-         */
-        ByteArrayView(const ByteArray& byteArray, std::size_t offset = 0);
+        ByteArrayView(const Byte* data, SizeType size) :
+            mSize(size),
+            mData(data)
+        {
+            assert(mData != nullptr);
+        }
 
-        /**
-         * \brief 
-         * \param byteArray 
-         * \param offset 
-         * \param length 
-         */
-        ByteArrayView(const ByteArray& byteArray, std::size_t offset, std::size_t length);
+        template <typename TAllocator>
+        ByteArrayView(const ByteArray<TAllocator>& byteArray, SizeType offset) :
+            ByteArrayView(byteArray, offset, byteArray.GetSize() - offset)
+        {
+            /// Nothing
+        }
 
-        /**
-         * \brief 
-         * \param other 
-         */
-        ByteArrayView(const ByteArrayView& other) = default;
+        template <typename TAllocator>
+        ByteArrayView(const ByteArray<TAllocator>& byteArray, SizeType offset, SizeType length)
+        {
+            assert(offset + length <= byteArray.GetSize());
 
-        /**
-         * \brief 
-         * \param other 
-         */
-        ByteArrayView(ByteArrayView&& other) noexcept;
-        
-        /**
-         * \brief 
-         * \param other 
-         * \return 
-         */
-        ByteArrayView& operator=(const ByteArrayView& other) = default;
+            mSize = length;
+            mData = byteArray.GetData() + offset;
+        }
 
-        /**
-         * \brief 
-         * \param other 
-         * \return 
-         */
-        ByteArrayView& operator=(ByteArrayView&& other) noexcept;
+        ByteArrayView(ByteArrayView&& other) noexcept
+        {
+            *this = std::move(other);
+        }
 
-        /**
-         * \brief 
-         * \param offset 
-         * \return 
-         */
-        ByteArrayView Slice(std::size_t offset) const;
+        ByteArrayView& operator=(ByteArrayView&& other) noexcept
+        {
+            mSize = std::exchange(other.mSize, 0);
+            mData = std::exchange(other.mData, nullptr);
 
-        /**
-         * \brief 
-         * \param offset 
-         * \param length 
-         * \return 
-         */
-        ByteArrayView Slice(std::size_t offset, std::size_t length) const;
+            return *this;
+        }
 
-        /**
-    	 * \brief 
-    	 * \param index 
-    	 * \return 
-    	 */
-    	const Byte& At(std::size_t index) const;
+        ByteArrayView Slice(SizeType offset) const
+        {
+            return Slice(offset, mSize - offset);
+        }
 
-        /**
-         * \brief 
-         * \return 
-         */
-        bool IsEmpty() const;
+        ByteArrayView Slice(SizeType offset, SizeType length) const
+        {
+            assert(offset + length < mSize);
 
-        /**
-         * \brief 
-         * \return 
-         */
-        std::size_t GetSize() const;
+            ByteArrayView view;
+            view.mSize = length;
+            view.mData = mData + offset;
 
-        /**
-         * \brief 
-         * \return 
-         */
-        const Byte* GetData() const;
+            return view;
+        }
 
-        bool operator==(const ByteArray& rhs) const;
-        bool operator==(const ByteArrayView& rhs) const;
+        const Byte& At(SizeType index) const
+        {
+            assert(index < mSize);
+            return mData[index];
+        }
 
-        bool operator!=(const ByteArray& rhs) const;
-        bool operator!=(const ByteArrayView& rhs) const;
+        bool IsEmpty() const
+        {
+            return mSize == 0;
+        }
+
+        SizeType GetSize() const
+        {
+            return mSize;
+        }
+
+        const Byte* GetData() const
+        {
+            return mData;
+        }
+
+        template <typename TAllocator>
+        bool operator==(const ByteArray<TAllocator>& rhs) const
+        {
+            return *this == ByteArrayView(rhs);
+        }
+
+        bool operator==(const ByteArrayView& rhs) const
+        {
+            if (GetSize() != rhs.GetSize())
+                return false;
+
+            for (SizeType i = 0; i < GetSize(); i++)
+            {
+                if (At(i) != rhs.At(i))
+                    return false;
+            }
+
+            return true;
+        }
+        template <typename TAllocator>
+        bool operator!=(const ByteArray<TAllocator>& rhs) const
+        {
+            return !(*this == rhs);
+        }
+
+        bool operator!=(const ByteArrayView& rhs) const
+        {
+            return !(*this == rhs);
+        }
 
     private:
 
-        std::size_t mSize;
+        SizeType mSize;
         const Byte* mData;
     };
 }

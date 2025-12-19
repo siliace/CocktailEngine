@@ -745,8 +745,6 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/TranslatorCast.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Any.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArray.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ByteArrayView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/ExceptionUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/FileUtils.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Finder.cpp

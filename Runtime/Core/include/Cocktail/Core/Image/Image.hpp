@@ -70,7 +70,7 @@ namespace Ck
 		 * \param pixelFormat 
 		 * \param pixels 
 		 */
-		Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, ByteArray pixels);
+		Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, ByteArray<> pixels);
 
 		/**
 		 * \brief
@@ -96,13 +96,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const ByteArray& GetPixels() const;
+		const ByteArray<>& GetPixels() const;
 
 	private:
 
 		Extent2D<unsigned int> mSize;
 		PixelFormat mPixelFormat;
-		ByteArray mPixels;
+		ByteArray<> mPixels;
 	};
 }
 

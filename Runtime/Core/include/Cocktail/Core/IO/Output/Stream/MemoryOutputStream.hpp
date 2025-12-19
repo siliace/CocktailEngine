@@ -13,7 +13,7 @@ namespace Ck
 
         using SizeType = typename TAllocator::SizeType;
 
-        explicit MemoryOutputStream(ByteArray& output) :
+        explicit MemoryOutputStream(ByteArray<TAllocator>& output) :
             mOutput(output)
         {
             /// Nothing

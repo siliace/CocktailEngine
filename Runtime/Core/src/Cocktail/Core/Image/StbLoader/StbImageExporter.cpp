@@ -56,9 +56,9 @@ namespace Ck
 			throw StbExportError(CK_TEXT("Failed to export image"));
 	}
 
-	ByteArray StbImageExporter::SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const
+	ByteArray<> StbImageExporter::SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const
 	{
-		ByteArray byteArray;
+		ByteArray<> byteArray;
 		MemoryOutputStream outputStream(byteArray);
 		SaveToStream(asset, outputStream, parameters);
 

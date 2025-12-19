@@ -35,7 +35,7 @@ namespace Ck
 		 * \param parameters
 		 * \return
 		 */
-		ByteArray SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const override;
+		ByteArray<> SaveToMemory(const Image& asset, const ImageExportParameters& parameters) const override;
 
 		/**
 		 * \brief 

@@ -4,7 +4,7 @@
 
 namespace Ck
 {
-	Image::Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, ByteArray pixels) :
+	Image::Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, ByteArray<> pixels) :
 		mSize(size),
 		mPixelFormat(pixelFormat),
 		mPixels(std::move(pixels))
@@ -16,7 +16,7 @@ namespace Ck
 		mSize(size),
 		mPixelFormat(pixelFormat)
 	{
-		mPixels = ByteArray(pixels, mPixelFormat.ComputeAllocationSize(mSize));
+		mPixels = ByteArray<>(pixels, mPixelFormat.ComputeAllocationSize(mSize));
 	}
 
 	const Extent2D<unsigned int>& Image::GetSize() const
@@ -29,7 +29,7 @@ namespace Ck
 		return mPixelFormat;
 	}
 
-	const ByteArray& Image::GetPixels() const
+	const ByteArray<>& Image::GetPixels() const
 	{
 		return mPixels;
 	}
