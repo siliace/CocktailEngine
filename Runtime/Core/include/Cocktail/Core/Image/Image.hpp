@@ -65,10 +65,10 @@ namespace Ck
 	public:
 
 		/**
-		 * \brief 
+		 * \brief
 		 * \param size
-		 * \param pixelFormat 
-		 * \param pixels 
+		 * \param pixelFormat
+		 * \param pixels
 		 */
 		Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, ByteArray pixels);
 
@@ -78,23 +78,23 @@ namespace Ck
 		 * \param pixelFormat
 		 * \param pixels
 		 */
-		Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, const void* pixels);
+		Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, const Byte* pixels);
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		const Extent2D<unsigned int>& GetSize() const;
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		const PixelFormat& GetFormat() const;
 
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		const ByteArray& GetPixels() const;
 

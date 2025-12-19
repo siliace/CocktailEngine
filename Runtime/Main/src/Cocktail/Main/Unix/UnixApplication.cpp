@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include <Cocktail/Core/Log/Log.hpp>
@@ -46,7 +47,7 @@ namespace Ck::Main::Unix
         char line[256];
         while (fgets(line, sizeof(line), file))
         {
-            if (strncmp(line, "TracerPid:", 10) == 0)
+            if (std::strncmp(line, "TracerPid:", 10) == 0)
             {
                 int tracer = atoi(line + 10);
                 fclose(file);

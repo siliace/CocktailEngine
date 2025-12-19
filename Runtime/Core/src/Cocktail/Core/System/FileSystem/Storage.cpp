@@ -27,7 +27,7 @@ namespace Ck
 		return ResolveFacadeInstance()->OpenFile(uri, flags);
 	}
 
-    UniquePtr<Directory> Storage::OpenDirectory(const URI& uri)
+	UniquePtr<Directory> Storage::OpenDirectory(const URI& uri)
 	{
 		return ResolveFacadeInstance()->OpenDirectory(uri);
 	}

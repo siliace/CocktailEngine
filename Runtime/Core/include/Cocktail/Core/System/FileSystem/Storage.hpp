@@ -47,15 +47,6 @@ namespace Ck
 		 */
 		static UniquePtr<File> OpenFile(const URI& uri, FileOpenFlags flags);
 
-        /**
-         * \brief
-         *
-         * \param uri
-         *
-         * \return
-         */
-	    static ByteArray ReadFile(const URI& uri);
-
 		/**
 		 * \brief
 		 * \param uri

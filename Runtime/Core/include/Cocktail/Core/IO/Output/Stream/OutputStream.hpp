@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-    template <typename TAllocator = SizedHeapAllocator<32>>
+    template <typename TAllocator = HeapAllocator>
     class OutputStream
     {
     public:

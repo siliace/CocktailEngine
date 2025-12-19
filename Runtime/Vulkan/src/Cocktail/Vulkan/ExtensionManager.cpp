@@ -460,7 +460,7 @@ namespace Ck::Vulkan
 
 			for (const VkExtensionProperties& property : properties)
 			{
-				if (std::strcmp(extensionName, property.extensionName) == 0)
+				if (StringUtils<AnsiChar, Uint32>::Compare(extensionName, &property.extensionName[0]) == 0)
 					extensionSupported = true;
 			}
 

@@ -6,14 +6,14 @@
 
 namespace Ck
 {
-    template <typename TAllocator = SizedHeapAllocator<32>>
+    template <typename TAllocator = HeapAllocator>
     class MemoryOutputStream : public OutputStream<TAllocator>
     {
     public:
 
         using SizeType = typename TAllocator::SizeType;
 
-        explicit MemoryOutputStream(ByteArray& output) :
+        explicit MemoryOutputStream(BasicByteArray<TAllocator>& output) :
             mOutput(output)
         {
             /// Nothing
@@ -31,7 +31,7 @@ namespace Ck
 
     private:
 
-        ByteArray& mOutput;
+        BasicByteArray<TAllocator>& mOutput;
     };
 }
 

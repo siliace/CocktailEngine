@@ -54,6 +54,9 @@ namespace Ck
         {
             BlockHeader* allocatedBlock;
 
+            // We don't want to allocate 0 bytes even if it's a valid call
+            size = std::max(static_cast<std::size_t>(1), size);
+
             // We don't want to support too small allocations
             // We don't want either to create dedicated allocations of such small amount of memory
             std::size_t blockSize = std::max(ComputeBlockSize(size, alignment), alignof(std::max_align_t));

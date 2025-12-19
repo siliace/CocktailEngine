@@ -26,7 +26,7 @@ namespace
 	void SetClipboardText(ImGuiContext* context, const char* content)
 	{
 		ClipboardService* clipboard = static_cast<ClipboardService*>(context->PlatformIO.Platform_ClipboardUserData);
-		clipboard->Set(content, std::strlen(content));
+		clipboard->Set(content, StringUtils<AnsiChar, Uint32>::GetLength(content));
 	}
 
 	Optional<int> ToImguiButton(MouseButton button)

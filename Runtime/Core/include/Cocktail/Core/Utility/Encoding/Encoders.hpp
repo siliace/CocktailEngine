@@ -96,8 +96,8 @@ namespace Ck
          * \throws CodepointEncodingException if a codepoint cannot be encoded
          * \throws CodepointDecodingException if a codepoint cannot be decoded
          */
-        template <typename TSrc, typename TDst>
-        static ByteArray GetBytes(const CharType<TSrc>* characters, SizeType<TSrc> first, SizeType<TSrc> length)
+        template <typename TSrc, typename TDst, typename TAllocator = LargeHeapAllocator>
+        static BasicByteArray<TAllocator> GetBytes(const CharType<TSrc>* characters, SizeType<TSrc> first, SizeType<TSrc> length)
         {
             ByteArray bytes;
             for (SizeType<TSrc> i = first; i < length;)
@@ -128,10 +128,10 @@ namespace Ck
          * \throws CodepointEncodingException if a codepoint cannot be encoded
          * \throws CodepointDecodingException if a codepoint cannot be decoded
          */
-        template <typename TSrc, typename TDst>
-        static Array<CharType<TDst>> GetCharacters(ByteArrayView bytes)
+        template <typename TSrc, typename TDst, typename TAllocator>
+        static Array<CharType<TDst>, TAllocator> GetCharacters(BasicByteArrayView<typename TAllocator::SizeType> bytes)
         {
-            return GetCharacters<TSrc, TDst>(bytes.GetData(), bytes.GetSize());
+            return GetCharacters<TSrc, TDst, TAllocator>(bytes.GetData(), bytes.GetSize());
         }
 
         /**
@@ -183,7 +183,7 @@ namespace Ck
          * \throws CodepointDecodingException if a codepoint cannot be decoded
          */
         template <typename TSrc, typename TString>
-        static TString GetString(ByteArrayView bytes)
+        static TString GetString(BasicByteArrayView<typename TString::SizeType> bytes)
         {
             return GetString<TSrc, TString>(bytes.GetData(), bytes.GetSize());
         }

@@ -15,7 +15,7 @@ TEST_CASE("Create a ByteArray", "[ByteArray]")
 	SECTION("from a memory area")
 	{
 		const char* data = "Hello World";
-		const std::size_t length = std::strlen(data);
+		const unsigned int length = Ck::StringUtils<Ck::AnsiChar, unsigned int>::GetLength(data);
 
 		Ck::ByteArray byteArray(data, length);
 
@@ -25,7 +25,7 @@ TEST_CASE("Create a ByteArray", "[ByteArray]")
 	SECTION("by copying an existing one")
 	{
 		const char* data = "Hello World";
-		const std::size_t length = std::strlen(data);
+		const unsigned int length = Ck::StringUtils<Ck::AnsiChar, unsigned int>::GetLength(data);
 
 		Ck::ByteArray byteArray1(data, length);
 		Ck::ByteArray byteArray2 = byteArray1;
@@ -36,7 +36,7 @@ TEST_CASE("Create a ByteArray", "[ByteArray]")
 	SECTION("by copying an moving one")
 	{
 		const char* data = "Hello World";
-		const std::size_t length = std::strlen(data);
+		const unsigned int length = Ck::StringUtils<Ck::AnsiChar, unsigned int>::GetLength(data);
 
 		Ck::ByteArray byteArray1(data, length);
 		Ck::ByteArray byteArray2 = std::move(byteArray1);

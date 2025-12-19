@@ -1,178 +1,346 @@
-#ifndef COCKTAIL_CORE_UTILITY_BYTEARRAY_HPP
-#define COCKTAIL_CORE_UTILITY_BYTEARRAY_HPP
+#ifndef COCKTAIL_CORE_UTILITY_BasicByteArray_HPP
+#define COCKTAIL_CORE_UTILITY_BasicByteArray_HPP
 
-#include <cstring>
-
+#include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 #include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/Utility/ByteArrayView.hpp>
 
 namespace Ck
 {
-	/**
+    /**
      * \brief Utility class to own and manage a memory area
      */
-    class COCKTAIL_CORE_API ByteArray
+    template <typename TAllocator>
+    class BasicByteArray
     {
     public:
+
+        using SizeType = typename TAllocator::SizeType;
+        using ElementAllocator = typename TAllocator::template ForType<Byte>;
 
         /**
          * \brief Default constructor
          */
-        ByteArray();
+        BasicByteArray() :
+            mSize(0),
+            mData(nullptr)
+        {
+            /// Nothing
+        }
 
         /**
          * \brief Constructor
-         * Create a ByteArray by allocating and filling its own memory area
+         *
+         * Create a BasicByteArray by allocating and filling its own memory area.
+         *
          * \param size The size of the memory area to create
          * \param value The value to fill the memory with
          */
-        explicit ByteArray(std::size_t size, Uint8 value = 0);
+        explicit BasicByteArray(SizeType size, Byte value = 0) :
+            mSize(size)
+        {
+            assert(mSize);
+
+            mData = MakeUniqueWithAllocator<Byte[], ElementAllocator>(mAllocator, mSize);
+            Memory::Set(mData.Get(), value, mSize);
+        }
 
         /**
          * \brief Constructor
-         * Create a ByteArray by copying an existing memory area
+         *
+         * Create a BasicByteArray by copying an existing memory area.
+         *
          * \param data A pointer to the memory area to copy
          * \param length The length to copy
          */
         template <typename T>
-        ByteArray(const T* data, std::size_t length)
+        BasicByteArray(const T* data, SizeType length)
         {
             assert(data != nullptr);
             assert(length > 0);
 
-            mSize = length;
             if constexpr (!std::is_void_v<T>)
-                mSize *= sizeof(T);
+                length *= sizeof(T);
 
-            mData = MakeUnique<Uint8[]>(mSize);
-            std::memcpy(mData.Get(), data, mSize);
+            mSize = length;
+            mData = MakeUniqueWithAllocator<Byte[]>(mAllocator, mSize);
+
+            Memory::Copy(mData.Get(), data, mSize);
         }
 
         /**
          * \brief Copy constructor
-         * Create a ByteArray by copying ownership of the one of another ByteArray
-         * \param other The ByteArray to copy
+         *
+         * Create a BasicByteArray by copying ownership of the one of another BasicByteArray.
+         *
+         * \param other The BasicByteArray to copy
          */
-        ByteArray(const ByteArray& other);
+        BasicByteArray(const BasicByteArray& other) :
+            mSize(0)
+        {
+            *this = other;
+        }
 
-	    /**
+        /**
          * \brief Move constructor
-         * Create a ByteArray by taking ownership of the one of another ByteArray
-         * \param other The ByteArray to move
+         *
+         * Create a BasicByteArray by taking ownership of the one of another BasicByteArray.
+         *
+         * \param other The BasicByteArray to move
          */
-        ByteArray(ByteArray&& other) noexcept;
-        
-	    /**
-         * \brief Assignment operator
-         * Assign this ByteArray to a copy of another one
-         * \param other The ByteArray to copy
-         * \return This
-         */
-        ByteArray& operator=(const ByteArray& other);
+        BasicByteArray(BasicByteArray&& other) noexcept :
+            mSize(0)
+        {
+            *this = std::move(other);
+        }
 
         /**
          * \brief Assignment operator
-         * Assign this ByteArray to a move of another one
-         * \param other The ByteArray to move
+         *
+         * Assign this BasicByteArray to a copy of another one.
+         *
+         * \param other The BasicByteArray to copy
+         * 
          * \return This
          */
-        ByteArray& operator=(ByteArray&& other) noexcept;
+        BasicByteArray& operator=(const BasicByteArray& other)
+        {
+            if (this != &other)
+            {
+                mData.Reset();
+                mSize = other.mSize;
 
-        ByteArray& Append(const ByteArray& other);
-        ByteArray& Append(const ByteArrayView& other);
-        ByteArray& Append(const void* data, std::size_t length);
+                if (mSize)
+                {
+                    mData = MakeUniqueWithAllocator<Byte[], ElementAllocator>(mAllocator, mSize);
+                    Memory::Copy(mData.Get(), other.GetData(), mSize);
+                }
+            }
 
-        ByteArray& Prepend(const ByteArray& other);
-        ByteArray& Prepend(const ByteArrayView& other);
-        ByteArray& Prepend(const void* data, std::size_t length);
+            return *this;
+        }
 
-        ByteArray& Insert(std::size_t where, const ByteArray& other);
-        ByteArray& Insert(std::size_t where, const ByteArrayView& other);
-
-	    /**
-         * \brief Insert a copy of a memory area in the ByteArray
-         * \param where The index where copying the memory area
-         * \param data A pointer to the memory area to copy
-         * \param length The length to copy
+        /**
+         * \brief Assignment operator
+         * Assign this BasicByteArray to a move of another one
+         * \param other The BasicByteArray to move
          * \return This
          */
-        ByteArray& Insert(std::size_t where, const void* data, std::size_t length);
+        BasicByteArray& operator=(BasicByteArray&& other) noexcept
+        {
+            mSize = std::exchange(other.mSize, 0);
+            mData = std::move(other.mData);
 
-        /**
-         * \brief Get a chunk to data in the ByteArray
-         * \param offset The offset of the first byte to get
-         * \return The chunk
-         */
-        ByteArray Slice(std::size_t offset) const;
+            return *this;
+        }
+        BasicByteArray& Append(const BasicByteArray& other)
+        {
+            return Insert(mSize, other);
+        }
 
-        /**
-    	 * \brief Get a chunk to data in the ByteArray
-    	 * \param offset The offset of the first byte to get
-    	 * \param length The length of data to get
-    	 * \return The chunk
-    	 */
-    	ByteArray Slice(std::size_t offset, std::size_t length) const;
+        BasicByteArray& Append(const BasicByteArrayView<SizeType>& other)
+        {
+            return Insert(mSize, other);
+        }
 
-        /**
-         * \brief Remove a chunk of data
-         * \param offset The offset of the first byte to remove
-         * \return This
-         */
-        ByteArray& Remove(std::size_t offset);
+        BasicByteArray& Append(const Byte* data, SizeType length)
+        {
+            return Insert(mSize, data, length);
+        }
 
-        /**
-         * \brief Remove a chunk of data
-         * \param offset The offset of the first byte to remove
-         * \param length The length of data to remove
-         * \return This
-         */
-        ByteArray& Remove(std::size_t offset, std::size_t length);
+        BasicByteArray& Prepend(const BasicByteArray& other)
+        {
+            return Insert(0, other);
+        }
 
-        /**
-         * \brief Change the length of data
-         * If \p newSize is smaller than the current size, data will be truncated
-         * If \p newSize is bigger than the current size, the additional data will be filled with \p value
-         * \param newSize The new length of data
-         * \param value The value to use to init newly allocated memory
-         */
-        void Resize(std::size_t newSize, Uint8 value = 0);
+        BasicByteArray& Prepend(const BasicByteArrayView<SizeType>& other)
+        {
+            return Insert(0, other);
+        }
 
-	    /**
-         * \brief Access to the n-th byte of the array
-         * \param index The index of the byte
-         * \return The n-th byte
-         */
-        Uint8& At(std::size_t index);
+        BasicByteArray& Prepend(const Byte* data, SizeType length)
+        {
+            return Insert(0, data, length);
+        }
 
-        /**
-         * \brief Access to the n-th byte of the array
-         * \param index The index of the byte
-         * \return The n-th byte
-         */
-        const Uint8& At(std::size_t index) const;
+        BasicByteArray& Insert(SizeType where, const BasicByteArray& other)
+        {
+            return Insert(where, other.GetData(), other.GetSize());
+        }
 
-        /**
-         * \brief Tell whether the ByteArray is empty
-         * An empty ByteArray means its size is 0
-         * \return True if empty, false otherwise
-         */
-        bool IsEmpty() const;
+        BasicByteArray& Insert(SizeType where, const BasicByteArrayView<SizeType>& other)
+        {
+            return Insert(where, other.GetData(), other.GetSize());
+        }
 
-        std::size_t GetSize() const;
-        Uint8* GetData();
-        const Uint8* GetData() const;
+        BasicByteArray& Insert(SizeType where, const Byte* data, SizeType length)
+        {
+            assert(where <= mSize);
+            assert(data != nullptr);
+            assert(length > 0);
 
-        bool operator==(const ByteArray& rhs) const;
-        bool operator==(const ByteArrayView& rhs) const;
+            SizeType fullSize = mSize + length;
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocator>> fullData = MakeUniqueWithAllocator<Byte[], ElementAllocator>(mAllocator, fullSize);
 
-        bool operator!=(const ByteArray& rhs) const;
-        bool operator!=(const ByteArrayView& rhs) const;
+            if (mSize)
+            {
+                if (where == 0)
+                {
+                    Memory::Copy(fullData.Get(), data, length);
+                    Memory::Copy(fullData.Get() + length, mData.Get(), mSize);
+                }
+                else if (where == mSize)
+                {
+                    Memory::Copy(fullData.Get(), mData.Get(), mSize);
+                    Memory::Copy(fullData.Get() + mSize, data, length);
+                }
+                else
+                {
+                    SizeType offset = 0;
+                    Memory::Copy(fullData.Get() + offset, mData.Get(), where);
+
+                    offset += where;
+                    Memory::Copy(fullData.Get() + offset, data, length);
+
+                    offset += length;
+                    Memory::Copy(fullData.Get() + offset, mData.Get() + where, mSize - where);
+                }
+            }
+            else
+            {
+                Memory::Copy(fullData.Get(), data, fullSize);
+            }
+
+            mSize = fullSize;
+            mData = std::move(fullData);
+
+            return *this;
+        }
+
+        BasicByteArray Slice(SizeType offset) const
+        {
+            return Slice(offset, mSize - offset);
+        }
+
+        BasicByteArray Slice(SizeType offset, SizeType length) const
+        {
+            assert(offset + length < mSize);
+            return BasicByteArray(mData.Get() + offset, length);
+        }
+
+        BasicByteArray& Remove(SizeType offset)
+        {
+            return Remove(offset, mSize - offset);
+        }
+
+        BasicByteArray& Remove(SizeType offset, SizeType length)
+        {
+            assert(offset + length < mSize);
+
+            SizeType fullSize = mSize - length;
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocator>> fullData = MakeUniqueWithAllocator<Byte[], ElementAllocator>(fullSize);
+
+            if (offset == 0)
+            {
+                Memory::Copy(fullData.Get(), mData.Get() + length, fullSize);
+            }
+            else if (offset + length == mSize - 1)
+            {
+                Memory::Copy(fullData.Get(), mData.Get(), fullSize);
+            }
+            else
+            {
+                Memory::Copy(fullData.Get(), mData.Get(), offset);
+                Memory::Copy(fullData.Get() + offset, mData.Get() + offset + length, fullSize - offset);
+            }
+
+            mSize = fullSize;
+            mData = std::move(fullData);
+
+            return *this;
+        }
+
+        void Resize(SizeType newSize, Byte value = 0)
+        {
+            if (newSize == mSize)
+                return;
+
+            auto newData = MakeUniqueWithAllocator<Byte[], ElementAllocator>(mAllocator, newSize);
+            if (newSize > mSize)
+            {
+                Memory::Copy(newData.Get(), mData.Get(), mSize);
+                Memory::Set(newData.Get() + mSize, value, newSize - mSize);
+            }
+            else
+            {
+                Memory::Copy(newData.Get(), mData.Get(), newSize);
+            }
+
+            mSize = newSize;
+            mData = std::move(newData);
+        }
+
+        Byte& At(SizeType index)
+        {
+            assert(index < mSize);
+            return mData[index];
+        }
+
+        const Byte& At(SizeType index) const
+        {
+            assert(index < mSize);
+            return mData[index];
+        }
+
+        bool IsEmpty() const
+        {
+            return mSize == 0;
+        }
+
+        SizeType GetSize() const
+        {
+            return mSize;
+        }
+
+        Byte* GetData()
+        {
+            return mData.Get();
+        }
+
+        const Byte* GetData() const
+        {
+            return mData.Get();
+        }
+
+        bool operator==(const BasicByteArray& rhs) const
+        {
+            return *this == BasicByteArrayView(rhs);
+        }
+
+        bool operator==(const BasicByteArrayView<SizeType>& rhs) const
+        {
+            return BasicByteArrayView(*this) == BasicByteArrayView(rhs);
+        }
+
+        bool operator!=(const BasicByteArray& rhs) const
+        {
+            return !(*this == rhs);
+        }
+
+        bool operator!=(const BasicByteArrayView<SizeType>& rhs) const
+        {
+            return !(*this == rhs);
+        }
 
     private:
 
-        std::size_t mSize;
-        UniquePtr<Uint8[]> mData;
+        SizeType mSize;
+        UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocator>> mData;
+        ElementAllocator mAllocator;
     };
+
+    using ByteArray = BasicByteArray<HeapAllocator>;
+    using LargeByteArray = BasicByteArray<LargeHeapAllocator>;
 }
 
-#endif // COCKTAIL_CORE_UTILITY_BYTEARRAY_HPP
+#endif // COCKTAIL_CORE_UTILITY_BasicByteArray_HPP

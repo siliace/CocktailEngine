@@ -71,7 +71,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		ByteArray GetCacheData() const;
+		LargeByteArray GetCacheData() const;
 
 		/**
 		 * \brief 

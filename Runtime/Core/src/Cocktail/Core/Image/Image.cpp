@@ -12,7 +12,7 @@ namespace Ck
 		/// Nothing
 	}
 
-	Image::Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, const void* pixels) :
+	Image::Image(const Extent2D<unsigned int>& size, const PixelFormat& pixelFormat, const Byte* pixels) :
 		mSize(size),
 		mPixelFormat(pixelFormat)
 	{

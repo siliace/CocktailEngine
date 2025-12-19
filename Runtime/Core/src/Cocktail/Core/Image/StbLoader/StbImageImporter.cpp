@@ -109,7 +109,7 @@ namespace Ck
 		}
 
 		PixelFormat pixelFormat = PixelFormat::Color(pixelLayout, dataType, pixelEncoding);
-		std::shared_ptr<Image> image = std::make_shared<Image>(size, pixelFormat, pixels);
+		std::shared_ptr<Image> image = std::make_shared<Image>(size, pixelFormat, static_cast<Byte*>(pixels));
 
 		stbi_image_free(pixels);
 

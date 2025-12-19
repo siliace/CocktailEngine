@@ -44,8 +44,8 @@ namespace Ck
         /**
          * \brief Compares two character buffers for equality
          *
-         * \param lhs Pointer to the first buffer=
-         * \param rhs Pointer to the second buffer=
+         * \param lhs Pointer to the first buffer
+         * \param rhs Pointer to the second buffer
          * \param caseSensitive If false, case of letters is ignored
          *
          * \return True if both sequences are exactly equal

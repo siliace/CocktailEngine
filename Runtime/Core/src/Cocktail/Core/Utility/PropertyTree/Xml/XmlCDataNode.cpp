@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	XmlCDataNode::XmlCDataNode(std::size_t length, const void* data) :
+	XmlCDataNode::XmlCDataNode(std::size_t length, const Byte* data) :
 		mData(data, length)
 	{
 		/// Nothing

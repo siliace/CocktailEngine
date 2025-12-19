@@ -52,12 +52,12 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	ByteArray PipelineCache::GetCacheData() const
+	LargeByteArray PipelineCache::GetCacheData() const
 	{
-		std::size_t binarySize;
+		Uint64 binarySize;
 		COCKTAIL_VK_CHECK(vkGetPipelineCacheData(mRenderDevice->GetHandle(), mHandle, &binarySize, nullptr));
 
-		ByteArray binary(binarySize);
+		LargeByteArray binary(binarySize);
 		COCKTAIL_VK_CHECK(vkGetPipelineCacheData(mRenderDevice->GetHandle(), mHandle, &binarySize, binary.GetData()));
 
 		return binary;

@@ -81,7 +81,7 @@ namespace Ck
 						if (!length)
 							length = StringUtils<AnsiChar, unsigned int>::GetLength(data);
 
-						element.Insert(childName, XmlCDataNode(length, data));
+						element.Insert(childName, XmlCDataNode(length, reinterpret_cast<const Byte*>(data)));
 					}
 				}
 			}

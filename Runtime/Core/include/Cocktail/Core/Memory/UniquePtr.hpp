@@ -57,6 +57,34 @@ namespace Ck
         }
     };
 
+    template <typename T, typename TAllocator>
+    class AllocatorAwareDeleter
+    {
+    public:
+
+        AllocatorAwareDeleter() :
+            mAllocator(nullptr)
+        {
+            /// Nothing
+        }
+
+        explicit AllocatorAwareDeleter(TAllocator& allocator) :
+            mAllocator(&allocator)
+        {
+            /// Nothing
+        }
+
+        void operator()(T* ptr) noexcept
+        {
+            assert(mAllocator || !ptr);
+            mAllocator->Deallocate(ptr);
+        }
+
+    private:
+
+        TAllocator* mAllocator;
+    };
+
     /**
      * \brief Smart pointer that ensures unique ownership of a dynamically allocated object
      *
@@ -660,6 +688,32 @@ namespace Ck
     }
 
     /**
+     * \brief Creates a UniquePtr for non-array types using a custom allocator
+     *
+     * Allocates memory using the provided allocator and constructs the object
+     * in-place. The returned UniquePtr uses an allocator-aware deleter to ensure
+     * proper destruction and deallocation.
+     *
+     * \tparam T Object type
+     * \tparam TAllocator Allocator type
+     * \tparam TArgs Constructor argument types
+     *
+     * \param allocator Allocator used to allocate and deallocate memory
+     * \param args Arguments forwarded to the constructor of T
+     *
+     * \return A new UniquePtr managing the constructed object
+     */
+    template <typename T, typename TAllocator, typename... TArgs, typename = std::enable_if_t<!std::is_array_v<T>>>
+    UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>> MakeUniqueWithAllocator(TAllocator& allocator, TArgs&&... args)
+    {
+        T* pointer = allocator.Allocate(1);
+        return UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>>(
+            new (pointer) T(std::forward<TArgs>(args)...),
+            AllocatorAwareDeleter<T, TAllocator>(allocator)
+        );
+    }
+
+    /**
      * \brief Creates a UniquePtr for array types
      *
      * \tparam T Array type
@@ -673,6 +727,36 @@ namespace Ck
     {
         using ElementType = std::remove_extent_t<T>;
         return UniquePtr<T>(new ElementType[size]());
+    }
+
+    /**
+     * \brief Creates a UniquePtr for array types using a custom allocator
+     *
+     * Allocates memory for an array using the provided allocator and constructs
+     * each element using its default constructor. The returned UniquePtr uses
+     * an allocator-aware deleter to properly destroy and deallocate the array.
+     *
+     * \tparam T Array type
+     * \tparam TAllocator Allocator type
+     *
+     * \param allocator Allocator used to allocate and deallocate memory
+     * \param size Number of elements to allocate
+     *
+     * \return A new UniquePtr managing the allocated array
+     */
+    template <typename T, typename TAllocator, typename = std::enable_if_t<std::is_array_v<T>>>
+    UniquePtr<T, AllocatorAwareDeleter<std::remove_extent_t<T>, TAllocator>> MakeUniqueWithAllocator(TAllocator& allocator, Uint64 size)
+    {
+        using BaseType = std::remove_extent_t<T>;
+
+        BaseType* pointer = allocator.Allocate(size);
+        for (Uint64 i = 0; i < size; i++)
+            new (&pointer[i]) BaseType();
+
+        return UniquePtr<T, AllocatorAwareDeleter<BaseType, TAllocator>>(
+            pointer,
+            AllocatorAwareDeleter<BaseType, TAllocator>(allocator)
+        );
     }
 }
 

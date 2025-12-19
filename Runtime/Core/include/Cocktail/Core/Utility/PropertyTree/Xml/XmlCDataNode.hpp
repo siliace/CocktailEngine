@@ -10,7 +10,7 @@ namespace Ck
 	{
 	public:
 
-		XmlCDataNode(std::size_t length, const void* data);
+		XmlCDataNode(std::size_t length, const Byte* data);
 
 		const ByteArray& Data() const;
 

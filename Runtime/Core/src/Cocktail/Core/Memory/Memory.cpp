@@ -6,7 +6,8 @@
 
 namespace Ck
 {
-    static thread_local MemoryAllocator* gAllocator = nullptr;
+    std::mutex gAllocatorLock;
+    static MemoryAllocator* gAllocator = nullptr;
 
     void Memory::Zero(void* destination, std::size_t size)
     {
@@ -30,6 +31,7 @@ namespace Ck
 
     void* Memory::Allocate(std::size_t size, std::size_t alignment)
     {
+        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
             CreateGlobalAllocator();
@@ -41,6 +43,7 @@ namespace Ck
 
     void* Memory::Reallocate(void* pointer, std::size_t size, std::size_t alignment)
     {
+        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
             CreateGlobalAllocator();
@@ -52,6 +55,7 @@ namespace Ck
 
     void Memory::Free(void* pointer)
     {
+        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
             CreateGlobalAllocator();
