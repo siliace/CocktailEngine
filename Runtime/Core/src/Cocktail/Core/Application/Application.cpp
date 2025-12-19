@@ -6,7 +6,7 @@ namespace Ck
 {
 	Application::~Application()
 	{
-		Terminate();
+	    Terminate();
 	}
 	
 	void Application::RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider)
@@ -41,13 +41,26 @@ namespace Ck
 		mStart = Instant::Now();
 	}
 
-	void Application::Terminate()
+    void Application::Terminate()
 	{
-		mOnTerminate.Emit(this);
-		Detail::ServiceFacadeBase::Terminate();
+	    if (mBooted)
+	    {
+	        // Emit termination signals
+	        // After this point, calls to this instance of application is invalid
+	        mOnTerminate.Emit(this);
 
-		DisconnectAll();
-	}
+	        // Disconnect any signals managed by the application
+	        DisconnectAll();
+
+	        // Disconnect the application from facades classes
+	        Detail::ServiceFacadeBase::Terminate();
+
+            ServiceContainer::Clear();
+	        mServiceProviders.Clear();
+	        
+	        mBooted = false;
+	    }
+    }
 
 	Duration Application::Uptime() const
 	{

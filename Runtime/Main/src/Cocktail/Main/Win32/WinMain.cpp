@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 	HINSTANCE hPrevInstance = nullptr;
 	PWSTR pCmdLine = GetCommandLineW();  
 	int nCmdShow = 0;
-
+    
 	Ck::UniquePtr<Ck::Application> application = Ck::MakeUnique<Ck::Main::Win32::Win32Application>(
 		hInstance, hPrevInstance, pCmdLine, nCmdShow
 	);

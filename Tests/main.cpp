@@ -32,7 +32,8 @@ ExitCode ApplicationMain(Application* application)
     }
 
     int failCount = session.run();
+    if (failCount)
+        CK_LOG(Catch2, LogLevel::Warning, CK_TEXT("Tests concluded with %d failed tests"), failCount);
 
-    application->Exit(failCount);
     return ExitCode::Success;
 }

@@ -63,7 +63,6 @@ namespace Ck::Main
 
 		CK_LOG(MainLogCategory, exitCode == ExitCode::Success ? LogLevel::Info : LogLevel::Error, CK_TEXT("Application exited with code %hs"), exitCode);
 
-	    application->Terminate();
 	    application.Reset();
 
 		return exitCode;

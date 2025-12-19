@@ -23,12 +23,13 @@ namespace Ck
 		 */
 		static T* ResolveFacadeInstance(bool force = false, bool cached = true)
 		{
-		    assert(GetApplicationFacade() != nullptr && "Trying to access to a facade before booting or after termination");
+		    Application* application = GetApplicationFacade();
+		    assert(application != nullptr && "Trying to access to a facade before booting or after termination");
 
 			if (!force && sInstance)
 				return sInstance;
 
-			T* instance = GetApplicationFacade()->Resolve<T>();
+			T* instance = application->Resolve<T>();
 			if (cached)
 				sInstance = instance;
 
