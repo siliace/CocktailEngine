@@ -16,7 +16,7 @@ namespace Ck::Detail::Xlib
 	{
     	XInitThreads();
 		mDisplay = ::XOpenDisplay(nullptr);
-		XSetErrorHandler([](::Display* display, XErrorEvent* errorEvent) {
+		mPreviousErrorHandler = XSetErrorHandler([](::Display* display, XErrorEvent* errorEvent) {
 			return 0;
 		});
 	}
