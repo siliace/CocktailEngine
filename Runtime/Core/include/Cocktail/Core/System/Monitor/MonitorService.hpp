@@ -27,27 +27,27 @@ namespace Ck
 		 * On Linux, the primary monitor is usually chosen by the window manager
 		 * \return The primary monitor
 		 */
-		virtual std::shared_ptr<Monitor> GetPrimaryMonitor() const = 0;
+		virtual Monitor* GetPrimaryMonitor() const = 0;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::size_t GetMonitorCount() const = 0;
+		virtual unsigned int GetMonitorCount() const = 0;
 
 		/**
 		 * \brief 
 		 * \param index 
 		 * \return 
 		 */
-		virtual std::shared_ptr<Monitor> GetMonitor(std::size_t index) const = 0;
+		virtual Monitor* GetMonitor(unsigned int index) const = 0;
 
 		/**
 		 * \brief 
 		 * \param window 
 		 * \return 
 		 */
-		virtual std::shared_ptr<Monitor> GetWindowMonitor(const Window& window) const = 0;
+		virtual Monitor* GetWindowMonitor(const Window& window) const = 0;
 	};
 }
 

@@ -25,9 +25,9 @@ namespace Ck::Detail::Xlib
 				XRROutputInfo* outputInfo = XRRGetOutputInfo(mDisplay, screenResources, crtcInfo->outputs[j]);
 				if (outputInfo->connection == RR_Connected)
 				{
-					std::shared_ptr<Monitor> monitor = std::make_shared<Monitor>(mDisplay, outputInfo->crtc, crtcInfo->outputs[j]);
+					UniquePtr<Monitor> monitor = MakeUnique<Monitor>(mDisplay, outputInfo->crtc, crtcInfo->outputs[j]);
 					if (monitor->IsPrimary())
-						mPrimaryMonitor = monitor;
+						mPrimaryMonitor = monitor.Get();
 
 					mMonitors.Add(std::move(monitor));
 				}
@@ -41,22 +41,22 @@ namespace Ck::Detail::Xlib
 		XRRFreeScreenResources(screenResources);
 	}
 
-    std::shared_ptr<Ck::Monitor> MonitorService::GetPrimaryMonitor() const
+    Ck::Monitor* MonitorService::GetPrimaryMonitor() const
     {
 		return mPrimaryMonitor;
 	}
 
-	std::size_t MonitorService::GetMonitorCount() const
+	unsigned int MonitorService::GetMonitorCount() const
 	{
 		return mMonitors.GetSize();
 	}
 
-	std::shared_ptr<Ck::Monitor> MonitorService::GetMonitor(std::size_t index) const
+	Ck::Monitor* MonitorService::GetMonitor(unsigned int index) const
 	{
-		return mMonitors.At(index);
+		return mMonitors.At(index).Get();
 	}
 
-	std::shared_ptr<Ck::Monitor> MonitorService::GetWindowMonitor(const Window& window) const
+	Ck::Monitor* MonitorService::GetWindowMonitor(const Window& window) const
 	{
 		return nullptr;
 	}
