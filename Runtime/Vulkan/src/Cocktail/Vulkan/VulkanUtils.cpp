@@ -934,4 +934,28 @@ namespace Ck::Vulkan
 		COCKTAIL_UNREACHABLE();
 		return {};
 	}
+
+    VkFragmentShadingRateCombinerOpKHR ToVkType(Renderer::ShadingRateCombiner combiner)
+    {
+	    switch (combiner)
+	    {
+            case Renderer::ShadingRateCombiner::Keep:
+			    return VK_FRAGMENT_SHADING_RATE_COMBINER_OP_KEEP_KHR;
+
+            case Renderer::ShadingRateCombiner::Replace:
+			    return VK_FRAGMENT_SHADING_RATE_COMBINER_OP_REPLACE_KHR;
+
+            case Renderer::ShadingRateCombiner::Min:
+			    return VK_FRAGMENT_SHADING_RATE_COMBINER_OP_MIN_KHR;
+
+            case Renderer::ShadingRateCombiner::Max:
+			    return VK_FRAGMENT_SHADING_RATE_COMBINER_OP_MAX_KHR;
+
+            case Renderer::ShadingRateCombiner::Multiply:
+			    return VK_FRAGMENT_SHADING_RATE_COMBINER_OP_MUL_KHR;
+	    }
+
+	    COCKTAIL_UNREACHABLE();
+	    return {};
+    }
 }

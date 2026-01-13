@@ -3,39 +3,59 @@
 
 namespace Ck::Renderer
 {
-	/**
-     * \brief Enumeration of possible extensions supported by a RenderDevice
+    /**
+     * \brief Enumeration of optional extensions supported by a RenderDevice
+     *
+     * Extensions expose additional or non-core features that may or may not be
+     * available depending on the underlying graphics backend or hardware.
+     *
      * \see RenderDevice::IsSupportedExtension
      */
     enum class RenderDeviceExtension
     {
-	    /**
-	     * \brief Extension allowing to create RenderSurface
+        /**
+         * \brief Allows creation of RenderSurface objects
+         *
+         * This extension is required to create surfaces used for presentation
+         * (e.g. window or swapchain surfaces).
+         *
          * \see RenderSurfaceCreateInfo
          * \see RenderDevice::CreateRenderSurface
-	     */
-	    RenderSurface,
+         */
+        RenderSurface,
 
-	    /**
-         * \brief Extension allowing to create a RenderSurface with another ColorSpace than ColorSpace::Srgb
+        /**
+         * \brief Allows creation of a RenderSurface using a color space other than ColorSpace::Srgb
+         *
+         * Enables support for alternative color spaces such as HDR formats.
+         *
          * \see RenderSurfaceCreateInfo::ColorSpace
          * \see RenderDevice::CreateRenderSurface
          */
         RenderSurfaceColorSpace,
 
-	    /**
-         * \brief Extension allowing reporting debug messages from the driver
+        /**
+         * \brief Enables reporting of debug and validation messages from the driver
+         *
+         * Useful for development and debugging purposes.
+         *
          * \see RenderDevice::OnDebugMessage
          */
         Debug,
 
-	    /**
-         * \brief 
+        /**
+         * \brief Enables per-instance attribute divisors in vertex input
+         *
+         * Allows vertex attributes to advance at a rate different from per-vertex,
+         * which is commonly used for hardware instancing.
          */
         InstanceDivisor,
 
-	    /**
-         * \brief Extension allowing to create TextureView with a Format that differ from the source Texture
+        /**
+         * \brief Allows creation of TextureView objects with a format different from the source Texture
+         *
+         * Requires the source texture to be created with compatible formats.
+         *
          * \see TextureViewCreateInfo::Format
          * \see TextureCreateFlagBits::MutableFormat
          * \see TextureCreateInfo::CompatibleFormats
@@ -43,21 +63,38 @@ namespace Ck::Renderer
          */
         MutableTextureFormat,
 
-	    /**
-         * \brief Extension allowing to create a TextureView with the type e2DArray form a level of a Texture with type e3D
+        /**
+         * \brief Allows creation of a 2D array TextureView from a single mip level
+         *        of a 3D texture
+         *
+         * This is useful for techniques that reinterpret 3D textures as layered 2D arrays.
          */
         TextureView2DArrayCompatible,
 
         /**
-         * \brief Extension allowing to create index buffers with an index size of 1 byte
+         * \brief Allows index buffers using 1-byte (8-bit) indices
+         *
+         * Useful for very small meshes to reduce memory usage.
+         *
          * \see IndexType::Byte
          */
         ByteIndexType,
 
-	    /**
-         * \brief 
+        /**
+         * \brief Enables timeline-based synchronization primitives
+         *
+         * Provides synchronization mechanisms based on monotonically increasing
+         * counters instead of binary fences or semaphores.
          */
         TimelineSynchronization,
+
+        /**
+         * \brief Enables variable shading rate rendering
+         *
+         * Allows the GPU to vary fragment shading frequency across the framebuffer
+         * to improve performance.
+         */
+        VariableShadingRate,
     };
 }
 

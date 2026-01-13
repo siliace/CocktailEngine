@@ -76,7 +76,8 @@ namespace Ck::Vulkan
 		void EnableDepthBias(bool enable) override;
 		void SetDepthBias(float constantFactor, float clamp, float slopeFactor) override;
 		void SetLineWidth(float lineWidth) override;
-		void EnableSampleShading(bool enable) override;
+        void SetShadingRate(Extent2D<unsigned int> sampleSize, Renderer::ShadingRateCombiner pipelineCombineOp, Renderer::ShadingRateCombiner primitiveCombineOp) override;
+        void EnableSampleShading(bool enable) override;
 		void SetMinSampleShading(float minSampleShading) override;
 		void EnableAlphaToCoverage(bool enable) override;
 		void EnableAlphaToOne(bool enable) override;

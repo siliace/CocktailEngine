@@ -272,6 +272,14 @@ namespace Ck::Vulkan
 		 */
 		Renderer::TextureUsageFlags GetTextureFormatSupport(const PixelFormat& format, Renderer::MemoryType memoryType) const override;
 
+        /**
+         * \brief
+         * \param fragmentSize
+         * \param samples
+         * \return
+         */
+	    bool IsShadingRateSupported(Extent2D<unsigned int> fragmentSize, Renderer::RasterizationSamples samples) override;
+
 		/**
 		 * \brief 
 		 * \return 

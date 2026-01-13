@@ -202,6 +202,8 @@ namespace Ck::Renderer
 		virtual void SetDepthBias(float constantFactor, float clamp, float slopeFactor) = 0;
 		virtual void SetLineWidth(float lineWidth) = 0;
 
+	    virtual void SetShadingRate(Extent2D<unsigned int> fragmentSize, ShadingRateCombiner pipelineCombineOp, ShadingRateCombiner primitiveCombineOp) = 0;
+
 		virtual void EnableSampleShading(bool enable) = 0;
 		virtual void SetMinSampleShading(float minSampleShading) = 0;
 		virtual void EnableAlphaToCoverage(bool enable) = 0;

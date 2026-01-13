@@ -1,3 +1,5 @@
+#include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
+
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Framebuffer/RenderPass.hpp>
@@ -212,19 +214,21 @@ namespace Ck::Vulkan
 			vkPipelineColorBlendState.blendConstants[3] = colorBlendState.BlendConstants.A;
 		}
 
-		VkDynamicState vkDynamicStates[Enum<Renderer::CommandListDynamicStateBits>::ValueCount];
+	    Array<VkDynamicState, LinearAllocator<32>> vkDynamicStates;
 		VkPipelineDynamicStateCreateInfo vkPipelineDynamicState{ VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO, nullptr };
 		{
-			unsigned dynamicStateCount = 0;
 			for (Renderer::CommandListDynamicStateBits dynamicState : Enum<Renderer::CommandListDynamicStateBits>::Values)
 			{
 				if (dynamicState & createInfo.DynamicState)
-					vkDynamicStates[dynamicStateCount++] = ToVkType(dynamicState);
+					vkDynamicStates.Add(ToVkType(dynamicState));
 			}
 
+		    if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::VariableShadingRate))
+		        vkDynamicStates.Add(VK_DYNAMIC_STATE_FRAGMENT_SHADING_RATE_KHR);
+
 			vkPipelineDynamicState.flags = 0;
-			vkPipelineDynamicState.dynamicStateCount = dynamicStateCount;
-			vkPipelineDynamicState.pDynamicStates = vkDynamicStates;
+			vkPipelineDynamicState.dynamicStateCount = vkDynamicStates.GetSize();
+			vkPipelineDynamicState.pDynamicStates = vkDynamicStates.GetData();
 		}
 
 		VkGraphicsPipelineCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO, nullptr };

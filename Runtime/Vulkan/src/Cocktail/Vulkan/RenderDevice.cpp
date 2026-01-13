@@ -263,7 +263,39 @@ namespace Ck::Vulkan
 		return usage;
 	}
 
-	Signal<LogLevel, Renderer::MessageType, AsciiStringView>& RenderDevice::OnDebugMessage()
+    bool RenderDevice::IsShadingRateSupported(Extent2D<unsigned int> fragmentSize, Renderer::RasterizationSamples samples)
+    {
+	    if (!mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate])
+	        return false;
+
+	    unsigned int fragmentShadingRateCount = 0;
+	    vkGetPhysicalDeviceFragmentShadingRatesKHR(mPhysicalDevice, &fragmentShadingRateCount, nullptr);
+
+	    VkPhysicalDeviceFragmentShadingRateKHR* fragmentShadingRates = COCKTAIL_STACK_ALLOC(VkPhysicalDeviceFragmentShadingRateKHR, fragmentShadingRateCount);
+	    vkGetPhysicalDeviceFragmentShadingRatesKHR(mPhysicalDevice, &fragmentShadingRateCount, fragmentShadingRates);
+
+        VkExtent2D vkFragmentSize = ToVkType(fragmentSize);
+        VkSampleCountFlagBits vkSamples = ToVkType(samples);
+	    for (unsigned int i = 0; i < fragmentShadingRateCount; i++)
+	    {
+            const VkPhysicalDeviceFragmentShadingRateKHR& shadingRate = fragmentShadingRates[i];
+
+	        if (vkFragmentSize.width != shadingRate.fragmentSize.width)
+	            continue;
+
+	        if (vkFragmentSize.height != shadingRate.fragmentSize.height)
+	            continue;
+
+            if (!(shadingRate.sampleCounts & vkSamples))
+                continue;
+
+	        return true;
+	    }
+
+	    return false;
+    }
+
+    Signal<LogLevel, Renderer::MessageType, AsciiStringView>& RenderDevice::OnDebugMessage()
 	{
 		return mOnDebugMessage;
 	}
@@ -435,6 +467,7 @@ namespace Ck::Vulkan
 		VkPhysicalDeviceFeatures2KHR physicalDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
 		VkPhysicalDeviceSynchronization2FeaturesKHR synchronization2Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, nullptr };
 		VkPhysicalDeviceTimelineSemaphoreFeaturesKHR timelineSemaphoreFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR, nullptr };
+	    VkPhysicalDeviceFragmentShadingRateFeaturesKHR fragmentShadingRateFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR, nullptr };
 		if (hasPhysicalDeviceFeatures2)
 		{
 			if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME))
@@ -443,10 +476,16 @@ namespace Ck::Vulkan
 			if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME))
 				Chain(physicalDeviceFeatures, synchronization2Features);
 
+		    if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME))
+		        Chain(physicalDeviceFeatures, fragmentShadingRateFeatures);
+
 			vkGetPhysicalDeviceFeatures2KHR(mPhysicalDevice, &physicalDeviceFeatures);
 
 			if (timelineSemaphoreFeatures.timelineSemaphore == VK_FALSE)
 				mSupportedExtensions[Renderer::RenderDeviceExtension::TimelineSynchronization] = false;
+
+		    if (!fragmentShadingRateFeatures.primitiveFragmentShadingRate || !fragmentShadingRateFeatures.attachmentFragmentShadingRate || !fragmentShadingRateFeatures.pipelineFragmentShadingRate)
+		        mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate];
 
 			if (synchronization2Features.synchronization2 == VK_FALSE)
 				mSupportedFeatures[RenderDeviceFeature::Synchronization2] = false;

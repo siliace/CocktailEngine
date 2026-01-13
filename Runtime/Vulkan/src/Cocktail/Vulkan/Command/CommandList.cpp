@@ -847,7 +847,7 @@ namespace Ck::Vulkan
 		const std::size_t alignment = format.GetBlockSize();
 
 		// Use undefined on purpose, why should be upload framebuffers attachments?
-		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined()); 
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined());
 
 		unsigned int regionCount = 0;
 		VkBufferImageCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferImageCopy, uploadCount);
@@ -1239,7 +1239,22 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void CommandList::EnableSampleShading(bool enable)
+    void CommandList::SetShadingRate(Extent2D<unsigned int> fragmentSize, Renderer::ShadingRateCombiner pipelineCombineOp, Renderer::ShadingRateCombiner primitiveCombineOp)
+	{
+	    if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::VariableShadingRate))
+	    {
+	        VkExtent2D vkSampleSize = ToVkType(fragmentSize);
+
+	        VkFragmentShadingRateCombinerOpKHR combiner[] = {
+	            ToVkType(pipelineCombineOp),
+                ToVkType(primitiveCombineOp),
+            };
+
+	        vkCmdSetFragmentShadingRateKHR(mHandle, &vkSampleSize, combiner);
+	    }
+    }
+
+    void CommandList::EnableSampleShading(bool enable)
 	{
 		GetGraphicStateManager()->EnableSampleShading(enable);
 	}

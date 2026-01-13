@@ -94,6 +94,15 @@ namespace Ck::Renderer
 		Always
 	};
 
+    enum class ShadingRateCombiner
+    {
+        Keep,
+        Replace,
+        Min,
+        Max,
+        Multiply,
+    };
+
 	struct StencilOpState
 	{
 		// StencilOp FailOp;

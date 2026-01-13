@@ -266,6 +266,13 @@ namespace Ck::Vulkan
 	 * \return 
 	 */
 	VkResolveModeFlagBitsKHR ToVkType(Renderer::ResolveMode resolveMode);
+
+    /**
+     * \brief
+     * \param combiner
+     * \return
+     */
+    VkFragmentShadingRateCombinerOpKHR ToVkType(Renderer::ShadingRateCombiner combiner);
 }
 
 #endif // COCKTAIL_VULKAN_VULKANUTILS_HPP
