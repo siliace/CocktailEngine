@@ -8,17 +8,8 @@ namespace Ck::Vulkan
 		mRenderDevice(std::move(renderDevice)),
 		mAllocationCallbacks(allocationCallbacks)
 	{
-		VkSemaphoreTypeCreateInfoKHR vkTypeCreateInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO_KHR, nullptr };
-		{
-			vkTypeCreateInfo.semaphoreType = createInfo.Binary ? VK_SEMAPHORE_TYPE_BINARY_KHR : VK_SEMAPHORE_TYPE_TIMELINE_KHR;
-			vkTypeCreateInfo.initialValue = createInfo.InitialValue;
-		}
-
 		VkSemaphoreCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, nullptr };
 		{
-			if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::TimelineSynchronization))
-				Chain(vkCreateInfo, vkTypeCreateInfo);
-
 			vkCreateInfo.flags = 0;
 		}
 

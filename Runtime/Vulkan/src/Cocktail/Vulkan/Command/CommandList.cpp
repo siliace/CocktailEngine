@@ -367,7 +367,6 @@ namespace Ck::Vulkan
 		mSecondary(createInfo.Secondary),
 		mState(Renderer::CommandListState::Initial),
 		mUsage(createInfo.Usage),
-		mDynamicState(createInfo.DynamicState),
 		mCurrentFramebuffer(nullptr),
 		mDescriptorSetAllocator(nullptr)
 	{
@@ -387,7 +386,7 @@ namespace Ck::Vulkan
 			mStateManagers[Renderer::ShaderProgramType::Compute] = MakeUnique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
 
 			if (mUsage == Renderer::CommandListUsageBits::Graphic)
-				mStateManagers[Renderer::ShaderProgramType::Graphic] = MakeUnique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator, mDynamicState);
+				mStateManagers[Renderer::ShaderProgramType::Graphic] = MakeUnique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator);
 		}
 
 		mOneShot = mAllocator->IsTransient();
@@ -1170,28 +1169,14 @@ namespace Ck::Vulkan
 
 	void CommandList::SetViewport(const Renderer::Viewport& viewport)
 	{
-		if (mDynamicState & Renderer::CommandListDynamicStateBits::Viewport)
-		{
-			VkViewport vkViewport = ToVkType(viewport);
-			vkCmdSetViewport(mHandle, 0, 1, &vkViewport);
-		}
-		else
-		{
-			GetGraphicStateManager()->SetViewport(0, viewport);
-		}
+		VkViewport vkViewport = ToVkType(viewport);
+		vkCmdSetViewport(mHandle, 0, 1, &vkViewport);
 	}
 
 	void CommandList::SetScissor(const Renderer::Scissor& scissor)
 	{
-		if (mDynamicState & Renderer::CommandListDynamicStateBits::Viewport)
-		{
-			VkRect2D vkScissor = ToVkType(scissor);
-			vkCmdSetScissor(mHandle, 0, 1, &vkScissor);
-		}
-		else
-		{
-			GetGraphicStateManager()->SetScissor(0, scissor);
-		}
+		VkRect2D vkScissor = ToVkType(scissor);
+		vkCmdSetScissor(mHandle, 0, 1, &vkScissor);
 	}
 
 	void CommandList::EnableRasterizerDiscard(bool enable)
@@ -1206,7 +1191,7 @@ namespace Ck::Vulkan
 
 	void CommandList::SetCullMode(Renderer::CullMode cullMode)
 	{
-			GetGraphicStateManager()->SetCullMode(cullMode);
+		GetGraphicStateManager()->SetCullMode(cullMode);
 	}
 
 	void CommandList::SetFrontFace(Renderer::FrontFace frontFace)
@@ -1227,16 +1212,7 @@ namespace Ck::Vulkan
 	void CommandList::SetLineWidth(float lineWidth)
 	{
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::WideLine))
-		{
-			if (mDynamicState & Renderer::CommandListDynamicStateBits::LineWidth)
-			{
-				vkCmdSetLineWidth(mHandle, lineWidth);
-			}
-			else
-			{
-				GetGraphicStateManager()->SetLineWidth(lineWidth);
-			}
-		}
+			GetGraphicStateManager()->SetLineWidth(lineWidth);
 	}
 
     void CommandList::SetShadingRate(Extent2D<unsigned int> fragmentSize, Renderer::ShadingRateCombiner pipelineCombineOp, Renderer::ShadingRateCombiner primitiveCombineOp)
@@ -1387,11 +1363,6 @@ namespace Ck::Vulkan
 	Renderer::CommandListUsageBits CommandList::GetUsage() const
 	{
 		return mUsage;
-	}
-
-	Renderer::CommandListDynamicState CommandList::GetDynamicState() const
-	{
-		return mDynamicState;
 	}
 
 	bool CommandList::IsSecondary() const

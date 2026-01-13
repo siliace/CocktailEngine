@@ -58,13 +58,14 @@ namespace Ck::Vulkan
 			IndexBuffer = Bit(1),
 		};
 
+		static bool IsStripTopology(Renderer::PrimitiveTopology primitiveTopology);
+
 		/**
 		 * \brief 
 		 * \param renderDevice
 		 * \param descriptorSetAllocator
-		 * \param dynamicState 
 		 */
-		GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState);
+		GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
 
 		void SetShaderProgram(const ShaderProgram* shaderProgram) override;
 		void SetEntryPoint(Renderer::ShaderType shaderType, const char* name) override;
@@ -72,8 +73,6 @@ namespace Ck::Vulkan
 		void SetVertexInputBinding(unsigned int binding, unsigned int stride, bool instanced, unsigned int divisor);
 		void SetVertexInputAttributes(unsigned int binding, unsigned int attributeCount, const Renderer::VertexInputAttribute* attribute);
 		void SetPrimitiveTopology(Renderer::PrimitiveTopology primitiveTopology);
-		void SetViewport(unsigned int index, const Renderer::Viewport& viewport);
-		void SetScissor(unsigned int index, const Renderer::Scissor& scissor);
 		void EnableRasterizerDiscard(bool enable);
 		void SetPolygonMode(Renderer::PolygonMode polygonMode);
 		void SetCullMode(Renderer::CullMode cullMode);
@@ -110,7 +109,6 @@ namespace Ck::Vulkan
 
 	private:
 
-		Renderer::CommandListDynamicState mDynamicState;
 		GraphicState mState;
 		const ShaderProgram* mShaderProgram;
 		std::shared_ptr<RenderPass> mRenderPass;

@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_COMMAND_COMMANDLISTUSAGE_HPP
 #define COCKTAIL_RENDERER_COMMAND_COMMANDLISTUSAGE_HPP
 
-#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Flags.hpp>
 
 namespace Ck::Renderer
 {

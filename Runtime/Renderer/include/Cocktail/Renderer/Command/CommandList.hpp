@@ -4,7 +4,6 @@
 #include <Cocktail/Renderer/Renderer.hpp>
 #include <Cocktail/Renderer/Buffer/IndexType.hpp>
 #include <Cocktail/Renderer/Command/BufferUploadInfo.hpp>
-#include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Command/CommandListState.hpp>
 #include <Cocktail/Renderer/Command/CommandListUsage.hpp>
 #include <Cocktail/Renderer/Command/GpuBarrier.hpp>
@@ -290,12 +289,6 @@ namespace Ck::Renderer
 		 * \return 
 		 */
 		virtual CommandListUsageBits GetUsage() const = 0;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual CommandListDynamicState GetDynamicState() const = 0;
 
 		/**
 		 * \brief 

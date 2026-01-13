@@ -893,24 +893,6 @@ namespace Ck::Vulkan
 		return {};
 	}
 
-	VkDynamicState ToVkType(Renderer::CommandListDynamicStateBits dynamicState)
-	{
-		switch (dynamicState)
-		{
-		case Renderer::CommandListDynamicStateBits::Viewport: 
-			return VK_DYNAMIC_STATE_VIEWPORT;
-
-		case Renderer::CommandListDynamicStateBits::Scissor:
-			return VK_DYNAMIC_STATE_SCISSOR;
-
-		case Renderer::CommandListDynamicStateBits::LineWidth:
-			return VK_DYNAMIC_STATE_LINE_WIDTH;
-		}
-
-		COCKTAIL_UNREACHABLE();
-		return {};
-	}
-
 	VkResolveModeFlagBitsKHR ToVkType(Renderer::ResolveMode resolveMode)
 	{
 		switch (resolveMode)

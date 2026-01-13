@@ -73,9 +73,6 @@ namespace Ck::Vulkan
 			if (commandList->GetUsage() != createInfo.Usage)
 				return false;
 
-			if (commandList->GetDynamicState() != createInfo.DynamicState)
-				return false;
-
 			if (commandList->IsSecondary() != createInfo.Secondary)
 				return false;
 

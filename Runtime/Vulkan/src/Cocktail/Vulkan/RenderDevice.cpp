@@ -466,13 +466,9 @@ namespace Ck::Vulkan
 
 		VkPhysicalDeviceFeatures2KHR physicalDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
 		VkPhysicalDeviceSynchronization2FeaturesKHR synchronization2Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, nullptr };
-		VkPhysicalDeviceTimelineSemaphoreFeaturesKHR timelineSemaphoreFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES_KHR, nullptr };
 	    VkPhysicalDeviceFragmentShadingRateFeaturesKHR fragmentShadingRateFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR, nullptr };
 		if (hasPhysicalDeviceFeatures2)
 		{
-			if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME))
-				Chain(physicalDeviceFeatures, timelineSemaphoreFeatures);
-
 			if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME))
 				Chain(physicalDeviceFeatures, synchronization2Features);
 
@@ -480,9 +476,6 @@ namespace Ck::Vulkan
 		        Chain(physicalDeviceFeatures, fragmentShadingRateFeatures);
 
 			vkGetPhysicalDeviceFeatures2KHR(mPhysicalDevice, &physicalDeviceFeatures);
-
-			if (timelineSemaphoreFeatures.timelineSemaphore == VK_FALSE)
-				mSupportedExtensions[Renderer::RenderDeviceExtension::TimelineSynchronization] = false;
 
 		    if (!fragmentShadingRateFeatures.primitiveFragmentShadingRate || !fragmentShadingRateFeatures.attachmentFragmentShadingRate || !fragmentShadingRateFeatures.pipelineFragmentShadingRate)
 		        mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate];

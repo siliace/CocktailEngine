@@ -102,33 +102,19 @@ namespace Ck::Vulkan
 	};
 
 	template <>
-	struct ExtensionRequirement<Renderer::RenderDeviceExtension::TimelineSynchronization>
+	struct ExtensionRequirement<Renderer::RenderDeviceExtension::VariableShadingRate>
 	{
 		inline static unsigned int InstanceExtensionCount = 1;
 		inline static const AnsiChar* InstanceExtensions[] = {
 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
 		};
 
-		inline static unsigned int DeviceExtensionCount = 1;
+		inline static unsigned int DeviceExtensionCount = 2;
 		inline static const AnsiChar* DeviceExtensions[] = {
-			VK_KHR_TIMELINE_SEMAPHORE_EXTENSION_NAME,
+			VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
+			VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME,
 		};
 	};
-
-    template <>
-    struct ExtensionRequirement<Renderer::RenderDeviceExtension::VariableShadingRate>
-    {
-        inline static unsigned int InstanceExtensionCount = 1;
-        inline static const AnsiChar* InstanceExtensions[] = {
-            VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
-        };
-
-        inline static unsigned int DeviceExtensionCount = 2;
-        inline static const AnsiChar* DeviceExtensions[] = {
-			VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME,
-            VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME,
-        };
-    };
 
 	template <RenderDeviceFeature>
 	struct FeatureRequirement
@@ -322,7 +308,6 @@ namespace Ck::Vulkan
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::MutableTextureFormat)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::TextureView2DArrayCompatible)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::ByteIndexType)
-		CASE_EXTENSION(Renderer::RenderDeviceExtension::TimelineSynchronization)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::VariableShadingRate)
 		}
 #undef CASE_EXTENSION
@@ -400,7 +385,6 @@ namespace Ck::Vulkan
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::MutableTextureFormat)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::TextureView2DArrayCompatible)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::ByteIndexType)
-		CASE_EXTENSION(Renderer::RenderDeviceExtension::TimelineSynchronization)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::VariableShadingRate)
 		}
 #undef CASE_EXTENSION

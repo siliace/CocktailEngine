@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_RENDERER_COMMNAD_COMMANDLISTCREATEINFO_HPP
 #define COCKTAIL_RENDERER_COMMNAD_COMMANDLISTCREATEINFO_HPP
 
-#include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Command/CommandListUsage.hpp>
 
 namespace Ck::Renderer
@@ -17,12 +16,6 @@ namespace Ck::Renderer
 		 * \brief The usage of the CommandList to create
 		 */
 		CommandListUsageBits Usage = CommandListUsageBits::Graphic;
-
-		/**
-		 * \brief Specifies which states are likely to change frequently
-		 * This parameter might be ignored by some implementations and should be set only if needed.
-		 */
-		CommandListDynamicState DynamicState = {};
 
 		/**
 		 * \brief Specifies whether the CommandList to create will be submitted as a secondary CommandList

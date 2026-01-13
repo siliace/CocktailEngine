@@ -7,7 +7,6 @@
 #include <Cocktail/Core/Utility/StorageUtils.hpp>
 
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
-#include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/Fence.hpp>
 #include <Cocktail/Renderer/Command/Synchronization/FenceCreateInfo.hpp>
 #include <Cocktail/Renderer/RenderDevice.hpp>
@@ -239,7 +238,7 @@ void ImGuiOverlay::Render(Renderer::RenderContext& renderContext, Renderer::Fram
 	if (framebufferSize.Width <= 0.f || framebufferSize.Height <= 0.f)
 		return;
 
-	Renderer::CommandList* commandList = renderContext.CreateCommandList({ Renderer::CommandListUsageBits::Graphic, Renderer::CommandListDynamicStateBits::Scissor | Renderer::CommandListDynamicStateBits::Viewport });
+	Renderer::CommandList* commandList = renderContext.CreateCommandList({ Renderer::CommandListUsageBits::Graphic });
 
 	commandList->Begin(nullptr);
 	commandList->BeginRenderPass({ Renderer::RenderPassMode::Load, &framebuffer });

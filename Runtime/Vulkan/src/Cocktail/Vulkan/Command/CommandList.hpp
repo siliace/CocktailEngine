@@ -103,7 +103,6 @@ namespace Ck::Vulkan
 
 		Renderer::CommandListState GetState() const override;
 		Renderer::CommandListUsageBits GetUsage() const override;
-		Renderer::CommandListDynamicState GetDynamicState() const override;
 		bool IsSecondary() const override;
 
 		void MarkInitial();
@@ -130,7 +129,6 @@ namespace Ck::Vulkan
 		bool mSecondary;
 		Renderer::CommandListState mState;
 		Renderer::CommandListUsageBits mUsage;
-		Renderer::CommandListDynamicState mDynamicState;
 		const Framebuffer* mCurrentFramebuffer;
 		Optional<Renderer::RenderPassMode> mCurrentRenderPassMode;
 		EnumMap<Renderer::ShaderProgramType, std::shared_ptr<Pipeline>> mCurrentPipelines;

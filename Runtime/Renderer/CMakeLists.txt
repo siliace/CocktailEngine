@@ -37,7 +37,6 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/BufferUploadInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandList.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandListCreateInfo.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandListDynamicState.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandListUsage.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandListState.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Command/CommandQueueType.hpp

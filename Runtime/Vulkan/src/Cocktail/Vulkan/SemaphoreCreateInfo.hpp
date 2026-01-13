@@ -10,15 +10,6 @@ namespace Ck::Vulkan
 	 */
 	struct SemaphoreCreateInfo
 	{
-		/**
-		 * \brief
-		 */
-		bool Binary = true;
-
-		/**
-		 * \brief
-		 */
-		Uint64 InitialValue = 0;
 
 		/**
 		 * \brief

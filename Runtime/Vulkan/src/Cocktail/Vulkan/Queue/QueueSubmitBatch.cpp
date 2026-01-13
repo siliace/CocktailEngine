@@ -31,7 +31,6 @@ namespace Ck::Vulkan
 			return { nullptr, 0 };
 
 		SemaphoreCreateInfo semaphoreCreateInfo;
-		semaphoreCreateInfo.Binary = true;
 
 		std::shared_ptr<Semaphore> semaphore = mRenderDevice->CreateSemaphore(semaphoreCreateInfo);
 		mSubmits[mSubmitCount - 1].SignalSemaphore(semaphore);

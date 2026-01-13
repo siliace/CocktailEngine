@@ -10,35 +10,26 @@
 
 namespace Ck::Vulkan
 {
-	namespace
+	bool GraphicStateManager::IsStripTopology(Renderer::PrimitiveTopology primitiveTopology)
 	{
-		bool IsStripTopology(Renderer::PrimitiveTopology primitiveTopology)
+		switch (primitiveTopology)
 		{
-			if (primitiveTopology == Renderer::PrimitiveTopology::LineStrip)
-				return true;
-
-			if (primitiveTopology == Renderer::PrimitiveTopology::TriangleStrip)
-				return true;
-
-			if (primitiveTopology == Renderer::PrimitiveTopology::TriangleFan)
-				return true;
-
-			return false;
+		case Renderer::PrimitiveTopology::LineStrip:
+		case Renderer::PrimitiveTopology::TriangleStrip:
+		case Renderer::PrimitiveTopology::TriangleFan:
+			return true;
 		}
+
+		return false;
 	}
 
-	GraphicStateManager::GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator, Renderer::CommandListDynamicState dynamicState) :
-		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
-		mDynamicState(dynamicState),
+	GraphicStateManager::GraphicStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
+		StateManager(renderDevice, descriptorSetAllocator),
 		mShaderProgram(nullptr),
 		mRenderPass(nullptr),
 		mVertexBufferDirtyFlags(0)
 	{
-		if (!(mDynamicState & Renderer::CommandListDynamicStateBits::Viewport))
-			mState.Viewport.ViewportCount = 1;
-
-		if (!(mDynamicState & Renderer::CommandListDynamicStateBits::Scissor))
-			mState.Viewport.ScissorCount = 1;
+		/// Nothing
 	}
 
 	void GraphicStateManager::SetShaderProgram(const ShaderProgram* shaderProgram)
@@ -107,24 +98,6 @@ namespace Ck::Vulkan
 
 		if (CheckedAssign(mState.InputAssembly.PrimitiveRestartEnable, IsStripTopology(primitiveTopology)))
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
-	}
-
-	void GraphicStateManager::SetViewport(unsigned int index, const Renderer::Viewport& viewport)
-	{
-		if (!(mDynamicState & Renderer::CommandListDynamicStateBits::Viewport))
-		{
-			if (CheckedAssign(mState.Viewport.Viewports[index], viewport))
-				mDirtyFlags |= DirtyFlagBits::Pipeline;
-		}
-	}
-
-	void GraphicStateManager::SetScissor(unsigned int index, const Renderer::Scissor& scissor)
-	{
-		if (!(mDynamicState & Renderer::CommandListDynamicStateBits::Scissor))
-		{
-			if (CheckedAssign(mState.Viewport.Scissors[index], scissor))
-				mDirtyFlags |= DirtyFlagBits::Pipeline;
-		}
 	}
 
 	void GraphicStateManager::EnableRasterizerDiscard(bool enable)
@@ -320,7 +293,6 @@ namespace Ck::Vulkan
 		assert(mRenderPass);
 
 		GraphicPipelineCreateInfo createInfo;
-		createInfo.DynamicState = mDynamicState;
 		createInfo.PipelineLayout = mShaderProgram->GetPipelineLayout();
 		createInfo.GraphicState = mState;
 		createInfo.RenderPass = mRenderPass;

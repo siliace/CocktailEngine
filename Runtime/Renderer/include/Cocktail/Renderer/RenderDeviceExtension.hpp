@@ -81,14 +81,6 @@ namespace Ck::Renderer
         ByteIndexType,
 
         /**
-         * \brief Enables timeline-based synchronization primitives
-         *
-         * Provides synchronization mechanisms based on monotonically increasing
-         * counters instead of binary fences or semaphores.
-         */
-        TimelineSynchronization,
-
-        /**
          * \brief Enables variable shading rate rendering
          *
          * Allows the GPU to vary fragment shading frequency across the framebuffer

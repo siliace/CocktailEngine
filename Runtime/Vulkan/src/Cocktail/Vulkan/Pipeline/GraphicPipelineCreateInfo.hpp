@@ -16,11 +16,6 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 */
-		Renderer::CommandListDynamicState DynamicState;
-
-		/**
-		 * \brief 
-		 */
 		GraphicState GraphicState;
 
 		/**

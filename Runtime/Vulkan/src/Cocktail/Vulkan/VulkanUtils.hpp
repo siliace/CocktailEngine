@@ -6,7 +6,6 @@
 #include <Cocktail/Renderer/Renderer.hpp>
 #include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
 #include <Cocktail/Renderer/Buffer/IndexType.hpp>
-#include <Cocktail/Renderer/Command/CommandListDynamicState.hpp>
 #include <Cocktail/Renderer/Framebuffer/FramebufferCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/DescriptorType.hpp>
 #include <Cocktail/Renderer/Shader/ShaderType.hpp>
@@ -252,13 +251,6 @@ namespace Ck::Vulkan
 	 * \return 
 	 */
 	VkSamplerAddressMode ToVkType(Renderer::SamplerAddressMode addressMode);
-
-	/**
-	 * \brief 
-	 * \param dynamicState 
-	 * \return 
-	 */
-	VkDynamicState ToVkType(Renderer::CommandListDynamicStateBits dynamicState);
 
 	/**
 	 * \brief 
