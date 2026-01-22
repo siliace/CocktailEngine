@@ -91,6 +91,10 @@ namespace Ck::Vulkan
 		void SetBlendingEquation(unsigned attachmentIndex, Renderer::BlendOp colorBlendingOp, Renderer::BlendOp alphaBlendingOp) override;
 		void SetBlendingFunction(unsigned attachmentIndex, Renderer::BlendFactor sourceColor, Renderer::BlendFactor destinationColor, Renderer::BlendFactor sourceAlpha, Renderer::BlendFactor destinationAlpha) override;
 
+		void BeginDebugLabel(const AnsiChar* labelName, LinearColor color) override;
+		void InsertDebugLabel(const AnsiChar* labelName, LinearColor color) override;
+		void EndDebugLabel() override;
+
 		void Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) override;
 		void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) override;
 		void DrawIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride) override;

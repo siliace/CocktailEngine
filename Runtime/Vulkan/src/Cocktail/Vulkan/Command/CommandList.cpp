@@ -1295,6 +1295,46 @@ namespace Ck::Vulkan
 		GetGraphicStateManager()->SetBlendingFunction(attachmentIndex, sourceColor, destinationColor, sourceAlpha, destinationAlpha);
 	}
 
+	void CommandList::BeginDebugLabel(const AnsiChar* labelName, LinearColor color)
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+		{
+			VkDebugUtilsLabelEXT debugUtilLabel{ VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT, nullptr };
+			{
+				debugUtilLabel.pLabelName = labelName;
+				debugUtilLabel.color[0] = color.R;
+				debugUtilLabel.color[1] = color.G;
+				debugUtilLabel.color[2] = color.B;
+				debugUtilLabel.color[3] = color.A;
+			}
+
+			vkCmdBeginDebugUtilsLabelEXT(mHandle, &debugUtilLabel);
+		}
+	}
+
+	void CommandList::InsertDebugLabel(const AnsiChar* labelName, LinearColor color)
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+		{
+			VkDebugUtilsLabelEXT debugUtilLabel{ VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT, nullptr };
+			{
+				debugUtilLabel.pLabelName = labelName;
+				debugUtilLabel.color[0] = color.R;
+				debugUtilLabel.color[1] = color.G;
+				debugUtilLabel.color[2] = color.B;
+				debugUtilLabel.color[3] = color.A;
+			}
+
+			vkCmdInsertDebugUtilsLabelEXT(mHandle, &debugUtilLabel);
+		}
+	}
+
+	void CommandList::EndDebugLabel()
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+			vkCmdEndDebugUtilsLabelEXT(mHandle);
+	}
+
 	void CommandList::Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance)
 	{
 		assert(mState == Renderer::CommandListState::RecordingRenderPass);

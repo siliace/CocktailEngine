@@ -219,6 +219,10 @@ namespace Ck::Renderer
 		virtual void SetBlendingEquation(unsigned int attachmentIndex, BlendOp colorBlendingOp, BlendOp alphaBlendingOp) = 0;
 		virtual void SetBlendingFunction(unsigned int attachmentIndex, BlendFactor sourceColor, BlendFactor destinationColor, BlendFactor sourceAlpha, BlendFactor destinationAlpha) = 0;
 
+		virtual void BeginDebugLabel(const AnsiChar* labelName, LinearColor color) = 0;
+		virtual void InsertDebugLabel(const AnsiChar* labelName, LinearColor color) = 0;
+		virtual void EndDebugLabel() = 0;
+
 		/**
 		 * \brief Issue a draw call in the CommandList
 		 * The current state of the CommandList must be RecordingRenderPass.
