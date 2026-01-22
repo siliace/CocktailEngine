@@ -1,8 +1,30 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Editor-based HTTP Client requests
-/httpRequests/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# Ignore all of .idea folder by default
+*
+!.gitignore
+
+# Allow some project-specific settings
+!codeStyles/
+!deployment.xml
+!modules.xml
+!vcs.xml
+!workspace.xml
+
+# Ignore user-specific or OS-specific settings
+workspace.xml
+tasks.xml
+dictionaries
+libraries
+assetWizardSettings.xml
+jsLibraryMappings.xml
+shelf
+
+# Ignore IDE caches
+dataSources/
+dataSources.ids
+dataSources.local.xml
+sqlDataSources.xml
+dynamic.xml
+uiDesigner.xml
+httpRequests
+inspectionProfiles
+runConfigurations/
