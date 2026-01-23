@@ -43,14 +43,8 @@ namespace Ck::Vulkan
 			const QueueFamily& family = GetFamily(queueFamilyType);
 			unsigned int queueFamilyIndex = family.GetIndex();
 
-			if (unique)
-			{
-				auto it = std::find(queueIndexes.begin(), queueIndexes.end(), queueFamilyIndex);
-				if (it != queueIndexes.end())
-					continue;
-			}
-
-			queueIndexes.Add(queueFamilyIndex);
+			if (!unique || !queueIndexes.Contains(queueFamilyIndex))
+				queueIndexes.Add(queueFamilyIndex);
 		}
 
 		return queueIndexes;

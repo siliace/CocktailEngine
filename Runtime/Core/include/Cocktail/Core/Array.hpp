@@ -1,17 +1,21 @@
 #ifndef COCKTAIL_CORE_ARRAY_HPP
 #define COCKTAIL_CORE_ARRAY_HPP
 
-#include <Cocktail/Core/Memory/ObjectMemoryUtils.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
+#include <Cocktail/Core/Memory/ObjectMemoryUtils.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
 #include <Cocktail/Core/Utility/Optional.hpp>
 
 namespace Ck
 {
     /**
-     * \brief Template class implementing a dynamic array similar to std::vector.
-     * \tparam E The element type stored in the array.
-     * \tparam TAllocator The allocator type used for memory management.
+     * \brief Template class implementing a dynamic contiguous array
+     *
+     * This container owns its memory, grows dynamically, and provides
+     * value semantics (copyable and movable).
+     *
+     * \tparam E Element type stored in the array
+     * \tparam TAllocator Allocator used for memory management
      */
     template <typename E, typename TAllocator = HeapAllocator>
     class Array
@@ -22,30 +26,745 @@ namespace Ck
     public:
 
         /**
-         * \brief
+         * \brief Type of elements stored in the array.
          */
         using ElementType = E;
 
         /**
-         * \brief
+         * \brief Allocator type used by this array.
          */
         using AllocatorType = TAllocator;
 
         /**
-         * \brief Type used for size and indices, defined by the allocator.
+         * \brief Type used for sizes and indices.
          */
         using SizeType = typename TAllocator::SizeType;
 
         /**
-         * \brief
+         * \brief Allocator rebound to the element type.
          */
         using AllocatorElementType = typename TAllocator::template ForType<E>;
 
-        using Iterator = ElementType*;
-        using ConstIterator = const ElementType*;
+        /**
+         * \brief Iterator used to traverse an Array instance
+         *
+         * This iterator provides read-only access to the elements of an Array.
+         * It internally stores a pointer to an index and allows forward
+         * and backward navigation within the Array.
+         */
+        class Iterator
+        {
+        public:
+
+            using value_type = E;
+            using difference_type = std::make_signed_t<SizeType>;
+            using pointer = E*;
+            using reference = E&;
+            using iterator_category = std::random_access_iterator_tag;
+
+            /**
+             * \brief Constructor
+             *
+             * Creates an iterator positioned at the element located at the given index
+             * from the head of the array. If \p firstIndex exceeds the array boundaries,
+             * the iterator becomes invalid.
+             *
+             * \param owner The list to iterate through
+             * \param firstIndex Number of steps to advance from the head
+             */
+            explicit Iterator(Array& owner, SizeType firstIndex = 0) :
+                mOwner(&owner),
+                mValue(owner.GetData())
+            {
+                Advance(firstIndex);
+            }
+
+            /**
+             * \brief Copy constructor
+             *
+             * \param other Iterator to copy
+             */
+            Iterator(const Iterator& other) = default;
+
+            /**
+             * \brief Copy assignment operator
+             *
+             * \param other Iterator to copy
+             *
+             * \return Reference to this iterator
+             */
+            Iterator& operator=(const Iterator& other) noexcept = default;
+
+            /**
+             * \brief Move the iterator backward
+             *
+             * Moves the iterator to the previous index \p count times. If the beginning
+             * of the list is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move backward
+             *
+             * \return A reference to this iterator after rewinding
+             */
+            Iterator& Rewind(unsigned int count = 1)
+            {
+                mValue -= count;
+
+                return *this;
+            }
+
+            /**
+             * \brief Move the iterator forward
+             *
+             * Moves the iterator to the next index \p count times. If the end of the
+             * array is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move forward
+             *
+             * \return A reference to this iterator after advancing
+             */
+            Iterator& Advance(unsigned int count = 1)
+            {
+                mValue += count;
+
+                return *this;
+            }
+
+            /**
+             * \brief Check whether the iterator points to a valid element
+             *
+             * \return \c true if the iterator is valid, \c false otherwise
+             */
+            bool IsValid() const
+            {
+                return mValue <= mOwner->GetData() && mValue <= mOwner->GetData() + mOwner->GetSize();
+            }
+
+            /**
+             * \brief Get the value referenced by the iterator
+             *
+             * \return A reference to the stored value
+             */
+            E& GetValue()
+            {
+                return *mValue;
+            }
+
+            /**
+             * \brief Get the value referenced by the iterator
+             *
+             * \return A constant reference to the stored value
+             */
+            const E& GetValue() const
+            {
+                return *mValue;
+            }
+
+            /**
+             * \brief Create a new iterator pointing to the previous index
+             *
+             * \return A new iterator positioned on the previous element
+             */
+            Iterator Previous() const
+            {
+                Iterator previous(*this);
+                previous.Rewind();
+
+                return previous;
+            }
+
+            /**
+             * \brief Create a new iterator pointing to the next index
+             *
+             * \return A new iterator positioned on the next element
+             */
+            Iterator Next() const
+            {
+                Iterator next(*this);
+                next.Advance();
+
+                return next;
+            }
+
+            /**
+             * \brief Equality comparison operator
+             *
+             * Two iterators are considered equal if they both point to the same index
+             * in the Array.
+             *
+             * \param other The iterator to compare with
+             *
+             * \return \c true if both iterators reference the same index, otherwise \c false
+             */
+            bool operator==(const Iterator& other) const
+            {
+                return mValue == other.mValue;
+            }
+
+            /**
+             * \brief Inequality comparison operator
+             *
+             * This operator returns the logical negation of operator==. Two iterators
+             * are considered different if they reference different indexes in the Array,
+             * or if one is valid while the other represents the end iterator.
+             *
+             * \param other The iterator to compare with
+             *
+             * \return \c true if the iterators do not reference the same index, otherwise \c false
+             */
+            bool operator!=(const Iterator& other) const
+            {
+                return !(*this == other);
+            }
+
+            bool operator<(const Iterator& rhs)
+            {
+                return mValue < rhs.mValue;
+            }
+
+            bool operator<=(const Iterator& rhs)
+            {
+                return !(rhs < *this);
+            }
+
+            bool operator>(const Iterator& rhs)
+            {
+                return rhs < *this;
+            }
+
+            bool operator>=(const Iterator& rhs)
+            {
+                return !(*this < rhs);
+            }
+
+            /**
+             * \brief Returns a new iterator advanced by \p count positions
+             *
+             * The iterator is copied and moved forward \p count times using the
+             * increment operation. If the end of the list is reached before completing
+             * all steps, the resulting iterator becomes invalid.
+             *
+             * \param count Number of positions to advance
+             *
+             * \return A new iterator moved forward by \p count steps
+             */
+            Iterator operator+(unsigned int count) const
+            {
+                Iterator it(*this);
+                it.Advance(count);
+
+                return it;
+            }
+
+            Iterator operator+(Iterator rhs) const
+            {
+                Iterator result(*this);
+                result.Advance();
+
+                return result;
+            }
+
+            /**
+             * \brief Returns a new iterator moved backward by \p count positions.
+             *
+             * The iterator is copied and moved backward \p count times using the
+             * decrement operation. If the beginning of the list is exceeded, the
+             * resulting iterator becomes invalid.
+             *
+             * \param count Number of positions to rewind
+             *
+             * \return A new iterator moved backward by \p count steps
+             */
+            Iterator operator-(unsigned int count) const
+            {
+                Iterator it(*this);
+                it.Rewind(count);
+
+                return it;
+            }
+
+            difference_type operator-(Iterator rhs) const
+            {
+                assert(mOwner == rhs.mOwner);
+
+                return mValue - rhs.mValue;
+            }
+
+            /**
+             * \brief Advances the iterator to the next element
+             *
+             * Moves the iterator to the next index in the Array. If the iterator is
+             * already invalid (i.e., at the end), it remains invalid. The updated iterator
+             * is returned, matching standard forward-iterator semantics.
+             *
+             * \return A reference to this iterator after incrementing
+             */
+            Iterator& operator++()
+            {
+                Advance(1);
+                return *this;
+            }
+
+            /**
+             * \brief Advances the iterator to the next index
+             *
+             * Returns a copy of the iterator before it was incremented, then moves this
+             * iterator to the next index. This follows the usual semantics of the postfix
+             * increment operator.
+             *
+             * \return A copy of the iterator prior to incrementing
+             */
+            Iterator operator++(int)
+            {
+                return Next();
+            }
+
+            /**
+             * \brief Moves the iterator to the previous element
+             *
+             * Decrements the iterator by moving it to the previous index. If the iterator
+             * is invalid or already at the beginning, the result is implementation-defined,
+             * but generally the iterator becomes invalid. This operation is only valid if
+             * the iterator type supports backward navigation.
+             *
+             * \return A reference to this iterator after decrementing
+             */
+            Iterator& operator--()
+            {
+                Rewind(1);
+                return *this;
+            }
+
+            /**
+             * \brief Moves the iterator to the previous element
+             *
+             * Returns a copy of the iterator before it was decremented, then moves this
+             * iterator to the previous index. Follows standard postfix decrement semantics.
+             *
+             * \return A copy of the iterator prior to decrementing
+             */
+            Iterator operator--(int)
+            {
+                return Previous();
+            }
+
+            /**
+             * \brief Provides pointer access to the stored value
+             *
+             * This operator enables pointer-style access to the element referenced by the
+             * iterator.
+             *
+             * Calling this operator on an invalid iterator (i.e., when the iterator does not
+             * reference an index) results in undefined behavior.
+             *
+             * \return A pointer to the constant value stored in the current index
+             */
+            E* operator->()
+            {
+                return mValue;
+            }
+
+            /**
+             * \brief Provides read-only pointer access to the stored value
+             *
+             * This operator enables pointer-style access to the element referenced by the
+             * iterator.
+             *
+             * Calling this operator on an invalid iterator (i.e., when the iterator does not
+             * reference an index) results in undefined behavior.
+             *
+             * \return A pointer to the constant value stored in the current index
+             */
+            const E* operator->() const
+            {
+                return mValue;
+            }
+
+            /**
+             * \brief Dereferences the iterator and returns a reference to the value
+             *
+             * This operator provides access to the value stored in the index pointed to by the
+             * iterator. Calling this operator on an invalid iterator (i.e., when \ref IsValid
+             * returns false) results in undefined behavior.
+             *
+             * \return A constant reference to the value of the current index
+             */
+            E& operator*()
+            {
+                return *mValue;
+            }
+
+            /**
+             * \brief Dereferences the iterator and returns a read-only reference to the value
+             *
+             * This operator provides access to the value stored in the index pointed to by the
+             * iterator. Calling this operator on an invalid iterator (i.e., when \ref IsValid
+             * returns false) results in undefined behavior.
+             *
+             * \return A constant reference to the value of the current index
+             */
+            const E& operator*() const
+            {
+                return *mValue;
+            }
+
+        private:
+
+            template <typename, typename>
+            friend class ConstIterator;
+
+            Array* mOwner;
+            E* mValue;
+        };
 
         /**
-         * \brief Default constructor. Creates an empty array.
+         * \brief Constant iterator used to traverse an Array instance
+         *
+         * This iterator provides read-only access to the elements of an Array.
+         * It internally stores a pointer to an index and allows forward
+         * and backward navigation within the Array.
+         */
+        class ConstIterator
+        {
+        public:
+
+            using value_type = E;
+            using difference_type = SizeType;
+            using pointer = const E*;
+            using reference = const E&;
+            using iterator_category = std::random_access_iterator_tag;
+
+            /**
+             * \brief Constructor
+             *
+             * Creates an iterator positioned at the element located at the given index
+             * from the head of the array. If \p firstIndex exceeds the array boundaries,
+             * the iterator becomes invalid.
+             *
+             * \param owner The list to iterate through
+             * \param firstIndex Number of steps to advance from the head
+             */
+            explicit ConstIterator(const Array& owner, SizeType firstIndex = 0) :
+                mOwner(&owner),
+                mValue(owner.GetData())
+            {
+                Advance(firstIndex);
+            }
+
+            /**
+             * \brief Construct from non-const iterator
+             *
+             * \param other Non-const iterator to copy
+             */
+            ConstIterator(Iterator other) :
+                mOwner(other.mOwner),
+                mValue(other.mValue)
+            {
+                /// Nothing
+            }
+
+            /**
+             * \brief Copy constructor
+             *
+             * \param other Iterator to copy
+             */
+            ConstIterator(const ConstIterator& other) = default;
+
+            /**
+             * \brief Copy assignment from non-const iterator
+             *
+             * \param other Non-const iterator to copy
+             *
+             * \return Reference to this iterator
+             */
+            ConstIterator& operator=(const Iterator& other) noexcept
+            {
+                mOwner = other.mOwner;
+                mValue = other.mValue;
+
+                return *this;
+            }
+
+            /**
+             * \brief Copy assignment operator
+             *
+             * \param other Iterator to copy
+             *
+             * \return Reference to this iterator
+             */
+            ConstIterator& operator=(const ConstIterator& other) noexcept = default;
+
+            /**
+             * \brief Move the iterator backward
+             *
+             * Moves the iterator to the previous index \p count times. If the beginning
+             * of the list is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move backward
+             *
+             * \return A reference to this iterator after rewinding
+             */
+            ConstIterator& Rewind(unsigned int count = 1)
+            {
+                mValue -= count;
+
+                return *this;
+            }
+
+            /**
+             * \brief Move the iterator forward
+             *
+             * Moves the iterator to the next index \p count times. If the end of the
+             * array is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move forward
+             *
+             * \return A reference to this iterator after advancing
+             */
+            ConstIterator& Advance(unsigned int count = 1)
+            {
+                mValue += count;
+
+                return *this;
+            }
+
+            /**
+             * \brief Check whether the iterator points to a valid element
+             *
+             * \return \c true if the iterator is valid, \c false otherwise
+             */
+            bool IsValid() const
+            {
+                return mValue <= mOwner->GetData() && mValue <= mOwner->GetData() + mOwner->GetSize();
+            }
+
+            /**
+             * \brief Get the value referenced by the iterator
+             *
+             * \return A constant reference to the stored value
+             */
+            const E& GetValue() const
+            {
+                return *mValue;
+            }
+
+            /**
+             * \brief Create a new iterator pointing to the previous index
+             *
+             * \return A new iterator positioned on the previous element
+             */
+            ConstIterator Previous() const
+            {
+                ConstIterator previous(*this);
+                previous.Rewind();
+
+                return previous;
+            }
+
+            /**
+             * \brief Create a new iterator pointing to the next index
+             *
+             * \return A new iterator positioned on the next element
+             */
+            ConstIterator Next() const
+            {
+                ConstIterator next(*this);
+                next.Advance();
+
+                return next;
+            }
+
+            /**
+             * \brief Equality comparison operator
+             *
+             * Two iterators are considered equal if they both point to the same index
+             * in the Array.
+             *
+             * \param rhs The iterator to compare with
+             *
+             * \return \c true if both iterators reference the same index, otherwise \c false
+             */
+            bool operator==(const ConstIterator& rhs) const
+            {
+                return mValue == rhs.mValue;
+            }
+
+            /**
+             * \brief Inequality comparison operator
+             *
+             * This operator returns the logical negation of operator==. Two iterators
+             * are considered different if they reference different indexes in the Array,
+             * or if one is valid while the other represents the end iterator.
+             *
+             * \param rhs The iterator to compare with
+             *
+             * \return \c true if the iterators do not reference the same index, otherwise \c false
+             */
+            bool operator!=(const ConstIterator& rhs) const
+            {
+                return !(*this == rhs);
+            }
+
+            bool operator<(const ConstIterator& rhs)
+            {
+                return mValue < rhs.mValue;
+            }
+
+            bool operator<=(const ConstIterator& rhs)
+            {
+                return !(rhs < *this);
+            }
+
+            bool operator>(const ConstIterator& rhs)
+            {
+                return rhs < *this;
+            }
+
+            bool operator>=(const ConstIterator& rhs)
+            {
+                return !(*this < rhs);
+            }
+
+            /**
+             * \brief Returns a new iterator advanced by \p count positions
+             *
+             * The iterator is copied and moved forward \p count times using the
+             * increment operation. If the end of the list is reached before completing
+             * all steps, the resulting iterator becomes invalid.
+             *
+             * \param count Number of positions to advance
+             *
+             * \return A new iterator moved forward by \p count steps
+             */
+            ConstIterator operator+(unsigned int count) const
+            {
+                ConstIterator it(*this);
+                it.Advance(count);
+
+                return it;
+            }
+
+            /**
+             * \brief Returns a new iterator moved backward by \p count positions.
+             *
+             * The iterator is copied and moved backward \p count times using the
+             * decrement operation. If the beginning of the list is exceeded, the
+             * resulting iterator becomes invalid.
+             *
+             * \param count Number of positions to rewind
+             *
+             * \return A new iterator moved backward by \p count steps
+             */
+            ConstIterator operator-(unsigned int count) const
+            {
+                ConstIterator it(*this);
+                it.Rewind(count);
+
+                return it;
+            }
+
+            difference_type operator-(ConstIterator rhs) const
+            {
+                assert(mOwner == rhs.mOwner);
+
+                return mValue - rhs.mValue;
+            }
+
+            /**
+             * \brief Advances the iterator to the next element
+             *
+             * Moves the iterator to the next index in the Array. If the iterator is
+             * already invalid (i.e., at the end), it remains invalid. The updated iterator
+             * is returned, matching standard forward-iterator semantics.
+             *
+             * \return A reference to this iterator after incrementing
+             */
+            ConstIterator& operator++()
+            {
+                Advance(1);
+                return *this;
+            }
+
+            /**
+             * \brief Advances the iterator to the next index
+             *
+             * Returns a copy of the iterator before it was incremented, then moves this
+             * iterator to the next index. This follows the usual semantics of the postfix
+             * increment operator.
+             *
+             * \return A copy of the iterator prior to incrementing
+             */
+            ConstIterator operator++(int)
+            {
+                return Next();
+            }
+
+            /**
+             * \brief Moves the iterator to the previous element
+             *
+             * Decrements the iterator by moving it to the previous index. If the iterator
+             * is invalid or already at the beginning, the result is implementation-defined,
+             * but generally the iterator becomes invalid. This operation is only valid if
+             * the iterator type supports backward navigation.
+             *
+             * \return A reference to this iterator after decrementing
+             */
+            ConstIterator& operator--()
+            {
+                Rewind(1);
+                return *this;
+            }
+
+            /**
+             * \brief Moves the iterator to the previous element
+             *
+             * Returns a copy of the iterator before it was decremented, then moves this
+             * iterator to the previous index. Follows standard postfix decrement semantics.
+             *
+             * \return A copy of the iterator prior to decrementing
+             */
+            ConstIterator operator--(int)
+            {
+                return Previous();
+            }
+
+            /**
+             * \brief Provides read-only pointer access to the stored value
+             *
+             * This operator enables pointer-style access to the element referenced by the
+             * iterator.
+             *
+             * Calling this operator on an invalid iterator (i.e., when the iterator does not
+             * reference an index) results in undefined behavior.
+             *
+             * \return A pointer to the constant value stored in the current index
+             */
+            const E* operator->() const
+            {
+                return mValue;
+            }
+
+            /**
+             * \brief Dereferences the iterator and returns a read-only reference to the value
+             *
+             * This operator provides access to the value stored in the index pointed to by the
+             * iterator. Calling this operator on an invalid iterator (i.e., when \ref IsValid
+             * returns false) results in undefined behavior.
+             *
+             * \return A constant reference to the value of the current index
+             */
+            const E& operator*() const
+            {
+                return *mValue;
+            }
+
+        private:
+
+            const Array* mOwner;
+            const E* mValue;
+        };
+
+        /**
+         * \brief Default constructor. Creates an empty array
          */
         Array() :
             mSize(0),
@@ -56,8 +775,9 @@ namespace Ck
         }
 
         /**
-         * \brief Constructs the array with an initializer list.
-         * \param values The initializer list of elements to initialize the array.
+         * \brief Constructs the array with an initializer list
+         *
+         * \param values The initializer list of elements to initialize the array
          */
         Array(std::initializer_list<E> values) :
             mSize(0),
@@ -69,7 +789,9 @@ namespace Ck
 
         /**
          * \brief Constructs the array with an initial size
+         *
          * Initializing elements are default constructed.
+         *
          * \param initialSize Number of elements initially allocated
          */
         explicit Array(SizeType initialSize) :
@@ -81,9 +803,11 @@ namespace Ck
         }
 
         /**
-         * \brief Constructs the array with an initial size, initializing elements with a given value.
-         * \param initialSize Number of elements initially allocated.
-         * \param initialContent Value to initialize each element with (default constructed if omitted).
+         * \brief Constructs the array with an initial size, initializing elements with a given value
+         *
+         * \param initialSize Number of elements initially allocated
+         *
+         * \param initialContent Value to initialize each element with (default constructed if omitted)
          */
         template <typename U, typename = std::enable_if_t<std::is_constructible_v<E, U>>>
         Array(SizeType initialSize, const U& initialContent) :
@@ -95,9 +819,11 @@ namespace Ck
         }
 
         /**
-         * \brief Constructs the array from a raw pointer and element count.
-         * \param elements Pointer to the array of elements.
-         * \param elementCount Number of elements to copy.
+         * \brief Constructs the array from a raw pointer and element count
+         *
+         * \param elements Pointer to the array of elements
+         *
+         * \param elementCount Number of elements to copy
          */
         Array(const E* elements, SizeType elementCount) :
             mSize(0),
@@ -108,8 +834,9 @@ namespace Ck
         }
 
         /**
-         * \brief Copy constructor.
-         * \param other Array to copy from.
+         * \brief Copy constructor
+         *
+         * \param other Array to copy from
          */
         Array(const Array& other) :
             mSize(0),
@@ -120,8 +847,9 @@ namespace Ck
         }
 
         /**
-         * \brief Move constructor.
-         * \param other Array to move from.
+         * \brief Move constructor
+         *
+         * \param other Array to move from
          */
         Array(Array&& other) noexcept :
             mSize(0),
@@ -132,7 +860,7 @@ namespace Ck
         }
 
         /**
-         * \brief Destructor. Releases allocated resources.
+         * \brief Destructor. Releases allocated resources
          */
         ~Array()
         {
@@ -141,9 +869,11 @@ namespace Ck
         }
 
         /**
-         * \brief Copy assignment operator.
-         * \param other Array to copy from.
-         * \return Reference to *this.
+         * \brief Copy assignment operator
+         *
+         * \param other Array to copy from
+         *
+         * \return Reference to *this
          */
         Array& operator=(const Array& other)
         {
@@ -157,9 +887,11 @@ namespace Ck
         }
 
         /**
-         * \brief Move assignment operator.
-         * \param other Array to move from.
-         * \return Reference to *this.
+         * \brief Move assignment operator
+         *
+         * \param other Array to move from
+         *
+         * \return Reference to *this
          */
         Array& operator=(Array&& other) noexcept
         {
@@ -191,8 +923,9 @@ namespace Ck
         }
 
         /**
-         * \brief Adds an element to the end of the array (copy).
-         * \param element Element to add.
+         * \brief Adds an element to the end of the array (copy)
+         *
+         * \param element Element to add
          */
         void Add(const E& element)
         {
@@ -200,8 +933,9 @@ namespace Ck
         }
 
         /**
-         * \brief Adds an element to the end of the array (move).
-         * \param element Element to move and add.
+         * \brief Adds an element to the end of the array (move)
+         *
+         * \param element Element to move and add
          */
         void Add(E&& element)
         {
@@ -209,10 +943,12 @@ namespace Ck
         }
 
         /**
-         * \brief Inserts an element at the specified index (copy).
+         * \brief Inserts an element at the specified index (copy)
+         *
          * Elements from the index onward are shifted.
-         * \param index Position to insert at.
-         * \param element Element to insert.
+         *
+         * \param index Position to insert at
+         * \param element Element to insert
          */
         void AddAt(SizeType index, const E& element)
         {
@@ -220,10 +956,12 @@ namespace Ck
         }
 
         /**
-         * \brief Inserts an element at the specified index (move).
+         * \brief Inserts an element at the specified index (move)
+         *
          * Elements from the index onward are shifted.
-         * \param index Position to insert at.
-         * \param element Element to move and insert.
+         *
+         * \param index Position to insert at
+         * \param element Element to move and insert
          */
         void AddAt(SizeType index, E&& element)
         {
@@ -231,9 +969,11 @@ namespace Ck
         }
 
         /**
-         * \brief Constructs an element in place at the end of the array.
-         * \tparam TArgs Types of constructor arguments.
-         * \param args Arguments forwarded to the element constructor.
+         * \brief Constructs an element in place at the end of the array
+         *
+         * \tparam TArgs Types of constructor arguments
+         *
+         * \param args Arguments forwarded to the element constructor
          */
         template <typename... TArgs>
         E& Emplace(TArgs&&... args)
@@ -246,11 +986,14 @@ namespace Ck
         }
 
         /**
-         * \brief Constructs an element in place at the specified index.
+         * \brief Constructs an element in place at the specified index
+         *
          * Elements from the index onward are shifted.
-         * \tparam TArgs Types of constructor arguments.
-         * \param index Position to emplace at.
-         * \param args Arguments forwarded to the element constructor.
+         *
+         * \tparam TArgs Types of constructor arguments
+         *
+         * \param index Position to emplace at
+         * \param args Arguments forwarded to the element constructor
          */
         template <typename... TArgs>
         E& EmplaceAt(SizeType index, TArgs&&... args)
@@ -272,11 +1015,11 @@ namespace Ck
         }
 
         /**
-         * \brief Prepends elements from another array (copy).
-         * \param other Array to Prepend.
+         * \brief Prepends elements from another array (copy)
+         *
+         * \param other Array to Prepend
          */
-        template <typename TOtherElement, typename TOtherAllocator,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherAllocator, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Prepend(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -286,8 +1029,9 @@ namespace Ck
         }
 
         /**
-         * \brief Prepends elements from an initializer list.
-         * \param values Initializer list of elements to Prepend.
+         * \brief Prepends elements from an initializer list
+         *
+         * \param values Initializer list of elements to Prepend
          */
         template <typename TOtherElement, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Prepend(std::initializer_list<TOtherElement> values)
@@ -300,12 +1044,12 @@ namespace Ck
         }
 
         /**
-         * \brief Prepends elements from a raw pointer.
-         * \param elements Pointer to elements to Prepend.
-         * \param elementCount Number of elements to Prepend.
+         * \brief Prepends elements from a raw pointer
+         *
+         * \param elements Pointer to the elements to Prepend
+         * \param elementCount Number of elements to Prepend
          */
-        template <typename TOtherElement, typename TOtherSizeType,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherSizeType, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Prepend(const TOtherElement* elements, TOtherSizeType elementCount)
         {
             assert(elementCount <= std::numeric_limits<SizeType>::max());
@@ -321,12 +1065,12 @@ namespace Ck
         }
 
         /**
-         * \brief Inserts elements from another array at the specified index (copy).
-         * \param index Position to insert at.
-         * \param other Array to insert.
+         * \brief Inserts elements from another array at the specified index (copy)
+         *
+         * \param index Position to insert at
+         * \param other Array to insert
          */
-        template <typename TOtherElement, typename TOtherAllocator,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherAllocator, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Insert(SizeType index, const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -336,9 +1080,10 @@ namespace Ck
         }
 
         /**
-         * \brief Inserts elements from an initializer list at the specified index.
-         * \param index Position to insert at.
-         * \param values Initializer list of elements to insert.
+         * \brief Inserts elements from an initializer list at the specified index
+         *
+         * \param index Position to insert at
+         * \param values Initializer list of elements to insert
          */
         template <typename TOtherElement, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Insert(SizeType index, std::initializer_list<TOtherElement> values)
@@ -367,12 +1112,12 @@ namespace Ck
 
         /**
          * \brief Inserts elements from a raw pointer at the specified index
+         *
          * \param index Position to insert at
-         * \param elements Pointer to elements to insert
+         * \param elements Pointer to the elements to insert
          * \param elementCount Number of elements to insert
          */
-        template <typename TOtherElement, typename TOtherSizeType,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherSizeType, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Insert(SizeType index, const TOtherElement* elements, TOtherSizeType elementCount)
         {
             /// TODO: add static assert on size type conversion
@@ -397,11 +1142,11 @@ namespace Ck
         }
 
         /**
-         * \brief Appends elements from another array (copy).
-         * \param other Array to append.
+         * \brief Appends elements from another array (copy)
+         *
+         * \param other Array to append
          */
-        template <typename TOtherElement, typename TOtherAllocator,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherAllocator, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Append(const Array<TOtherElement, TOtherAllocator>& other)
         {
             if (other.IsEmpty())
@@ -411,8 +1156,9 @@ namespace Ck
         }
 
         /**
-         * \brief Appends elements from an initializer list.
-         * \param values Initializer list of elements to append.
+         * \brief Appends elements from an initializer list
+         *
+         * \param values Initializer list of elements to append
          */
         void Append(std::initializer_list<E> values)
         {
@@ -424,12 +1170,12 @@ namespace Ck
         }
 
         /**
-         * \brief Appends elements from a raw pointer.
-         * \param elements Pointer to elements to append.
-         * \param elementCount Number of elements to append.
+         * \brief Appends elements from a raw pointer
+         *
+         * \param elements Pointer to the elements to append
+         * \param elementCount Number of elements to append
          */
-        template <typename TOtherElement, typename TOtherSizeType,
-                  typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
+        template <typename TOtherElement, typename TOtherSizeType, typename = std::enable_if_t<std::is_constructible_v<ElementType, TOtherElement>>>
         void Append(const TOtherElement* elements, TOtherSizeType elementCount)
         {
             /// TODO: add static assert on size type conversion
@@ -445,9 +1191,12 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a reference to the element at the given index.
+         * \brief Returns a reference to the element at the given index
+         *
          * Throws if out of bounds.
-         * \param index Index of the element.
+         *
+         * \param index Index of the element
+         *
          * \return Reference to the element.
          */
         E& At(SizeType index)
@@ -457,10 +1206,13 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a const reference to the element at the given index.
+         * \brief Returns a const reference to the element at the given index
+         *
          * Throws if out of bounds.
-         * \param index Index of the element.
-         * \return Const reference to the element.
+         *
+         * \param index Index of the element
+         *
+         * \return Const reference to the element
          */
         const E& At(SizeType index) const
         {
@@ -469,9 +1221,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional reference to the element at the given index if valid.
-         * \param index Index of the element.
-         * \return Optional reference to the element or empty if out of bounds.
+         * \brief Returns an Optional reference to the element at the given index if valid
+         *
+         * \param index Index of the element
+         *
+         * \return Optional reference to the element or empty if out of bounds
          */
         Optional<E&> TryAt(SizeType index)
         {
@@ -482,9 +1236,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional const reference to the element at the given index if valid.
-         * \param index Index of the element.
-         * \return Optional const reference or empty if out of bounds.
+         * \brief Returns an Optional const reference to the element at the given index if valid
+         *
+         * \param index Index of the element
+         *
+         * \return Optional const reference or empty if out of bounds
          */
         Optional<const E&> TryAt(SizeType index) const
         {
@@ -495,9 +1251,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a reference to the first element.
+         * \brief Returns a reference to the first element
+         *
          * Throws if empty.
-         * \return Reference to the first element.
+         *
+         * \return Reference to the first element
          */
         E& First()
         {
@@ -508,9 +1266,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a const reference to the first element.
+         * \brief Returns a const reference to the first element
+         *
          * Throws if empty.
-         * \return Const reference to the first element.
+         *
+         * \return Const reference to the first element
          */
         const E& First() const
         {
@@ -521,8 +1281,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional reference to the first element if the array is not empty.
-         * \return Optional reference or empty if empty.
+         * \brief Returns an Optional reference to the first element if the array is not empty
+         *
+         * \return Optional reference or empty if empty
          */
         Optional<E&> TryFirst()
         {
@@ -533,8 +1294,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional const reference to the first element if the array is not empty.
-         * \return Optional const reference or empty if empty.
+         * \brief Returns an Optional const reference to the first element if the array is not empty
+         *
+         * \return Optional const reference or empty if empty
          */
         Optional<const E&> TryFirst() const
         {
@@ -545,9 +1307,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a reference to the last element.
+         * \brief Returns a reference to the last element
+         *
          * Throws if empty.
-         * \return Reference to the last element.
+         *
+         * \return Reference to the last element
          */
         E& Last()
         {
@@ -558,9 +1322,11 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a const reference to the last element.
+         * \brief Returns a const reference to the last element
+         *
          * Throws if empty.
-         * \return Const reference to the last element.
+         *
+         * \return Const reference to the last element
          */
         const E& Last() const
         {
@@ -571,8 +1337,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional reference to the last element if the array is not empty.
-         * \return Optional reference or empty if empty.
+         * \brief Returns an Optional reference to the last element if the array is not empty
+         *
+         * \return Optional reference or empty if empty
          */
         Optional<E&> TryLast()
         {
@@ -583,8 +1350,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an Optional const reference to the last element if the array is not empty.
-         * \return Optional const reference or empty if empty.
+         * \brief Returns an Optional const reference to the last element if the array is not empty
+         *
+         * \return Optional const reference or empty if empty
          */
         Optional<const E&> TryLast() const
         {
@@ -595,8 +1363,9 @@ namespace Ck
         }
 
         /**
-         * \brief Swaps the contents of this array with another.
-         * \param other Array to swap with.
+         * \brief Swaps the contents of this array with another
+         *
+         * \param other Array to swap with
          */
         void Swap(Array& other)
         {
@@ -606,9 +1375,10 @@ namespace Ck
         }
 
         /**
-         * \brief Swaps two elements in the array at the specified indices.
-         * \param lhsIndex Index of the first element.
-         * \param rhsIndex Index of the second element.
+         * \brief Swaps two elements in the array at the specified indices
+         *
+         * \param lhsIndex Index of the first element
+         * \param rhsIndex Index of the second element
          */
         void Swap(SizeType lhsIndex, SizeType rhsIndex)
         {
@@ -618,9 +1388,11 @@ namespace Ck
         }
 
         /**
-         * \brief Checks if the array contains the specified element.
-         * \param element Element to search for.
-         * \return true if found, false otherwise.
+         * \brief Checks if the array contains the specified element
+         *
+         * \param element Element to search for
+         *
+         * \return true if found, false otherwise
          */
         bool Contains(const E& element) const
         {
@@ -628,10 +1400,13 @@ namespace Ck
         }
 
         /**
-         * \brief Checks if any element satisfies the predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply to elements.
-         * \return true if any element satisfies predicate, false otherwise.
+         * \brief Checks if any element satisfies the predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to apply to the elements
+         *
+         * \return true if any element satisfies predicate, false otherwise
          */
         template <typename TPredicate>
         bool ContainsIf(TPredicate predicate) const
@@ -640,10 +1415,13 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Checks if any element satisfies the predicate
+         *
          * \tparam TPredicate
+         *
          * \param predicate
-         * \return
+         *
+         * \return true if any element matches, false otherwise
          */
         template <typename TPredicate>
         bool AnyOf(TPredicate predicate) const
@@ -659,10 +1437,13 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Checks if all elements satisfy the predicate
+         *
          * \tparam TPredicate
+         *
          * \param predicate
-         * \return
+         *
+         * \return true if all elements match, false otherwise
          */
         template <typename TPredicate>
         bool AllOf(TPredicate predicate) const
@@ -679,8 +1460,10 @@ namespace Ck
 
         /**
          * \brief Finds the index of the first occurrence of the element
+         *
          * \param element Element to find
          * \param start The first index to start to search
+         *
          * \return Optional index if found, empty otherwise
          */
         Optional<SizeType> FindIndex(const E& element, SizeType start = 0) const
@@ -697,9 +1480,11 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the last occurrence of the element.
-         * \param element Element to find.
-         * \return Optional index if found, empty otherwise.
+         * \brief Finds the index of the last occurrence of the element
+         *
+         * \param element Element to find
+         *
+         * \return Optional index if found, empty otherwise
          */
         Optional<SizeType> FindLastIndex(const E& element) const
         {
@@ -714,9 +1499,12 @@ namespace Ck
 
         /**
          * \brief Finds the index of the first occurrence of the element
+         *
          * \tparam TPredicate Type of the predicate function
+         *
          * \param predicate Predicate to apply
          * \param start The first index to start to search
+         *
          * \return Optional index if found, empty otherwise
          */
         template <typename TPredicate>
@@ -735,9 +1523,12 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the index of the last occurrence of the element.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
+         * \brief Finds the index of the last occurrence of the element
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to apply
+         *
          * \return Optional index if found, empty otherwise.
          */
         template <typename TPredicate>
@@ -755,10 +1546,13 @@ namespace Ck
 
         /**
          * \brief Finds the pointer to the first element satisfying a predicate
+         *
          * \tparam TPredicate Type of the predicate function
+         *
          * \param predicate Predicate to apply
          * \param start The first index to start to search
-         * \return Pointer to element if found, nullptr otherwise
+         *
+         * \return Pointer to the element if found, nullptr otherwise
          */
         template <typename TPredicate>
         Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
@@ -777,10 +1571,13 @@ namespace Ck
 
         /**
          * \brief Finds the pointer to the first element satisfying a predicate
+         *
          * \tparam TPredicate Type of the predicate function
+         *
          * \param predicate Predicate to apply
          * \param start The first index to start to search
-         * \return Pointer to element if found, nullptr otherwise
+         *
+         * \return Pointer to the element if found, nullptr otherwise
          */
         template <typename TPredicate>
         Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
@@ -789,10 +1586,12 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the pointer to the last element satisfying a predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Pointer to element if found, nullptr otherwise.
+         * \brief Finds the pointer to the last element satisfying a predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         * \param predicate Predicate to apply
+         *
+         * \return Pointer to an element if found, nullptr otherwise
          */
         template <typename TPredicate>
         E* FindLastIf(TPredicate predicate)
@@ -808,10 +1607,13 @@ namespace Ck
         }
 
         /**
-         * \brief Finds the pointer to the last element satisfying a predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to apply.
-         * \return Pointer to element if found, nullptr otherwise.
+         * \brief Finds the pointer to the last element satisfying a predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to apply
+         *
+         * \return Pointer to the element if found, nullptr otherwise
          */
         template <typename TPredicate>
         const E* FindLastIf(TPredicate predicate) const
@@ -840,8 +1642,9 @@ namespace Ck
         }
 
         /**
-         * \brief Removes and returns the last element.
-         * \return The removed element.
+         * \brief Removes and returns the last element
+         *
+         * \return The removed element
          */
         E PopLast()
         {
@@ -858,9 +1661,11 @@ namespace Ck
         }
 
         /**
-         * \brief Removes the element at the specified index.
-         * \param index Index of the element to remove.
-         * \return The removed element.
+         * \brief Removes the element at the specified index
+         *
+         * \param index Index of the element to remove
+         *
+         * \return The removed element
          */
         E RemoveAt(SizeType index)
         {
@@ -887,9 +1692,11 @@ namespace Ck
         }
 
         /**
-         * \brief Removes all occurrences of the specified element.
-         * \param toRemove Element to remove.
-         * \return Number of elements removed.
+         * \brief Removes all occurrences of the specified element
+         *
+         * \param toRemove Element to remove
+         *
+         * \return Number of elements removed
          */
         SizeType Remove(const E& toRemove)
         {
@@ -906,10 +1713,13 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a new array containing elements satisfying the predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to test elements.
-         * \return Filtered array.
+         * \brief Returns a new array containing elements satisfying the predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to test elements
+         *
+         * \return Filtered array
          */
         template <typename TPredicate>
         Array Filter(TPredicate predicate) const
@@ -921,10 +1731,13 @@ namespace Ck
         }
 
         /**
-         * \brief Filters the array in place, keeping only elements satisfying the predicate.
-         * \tparam TPredicate Type of the predicate function.
-         * \param predicate Predicate to test elements.
-         * \return Reference to *this.
+         * \brief Filters the array in place, keeping only elements satisfying the predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to test elements
+         *
+         * \return Reference to *this
          */
         template <typename TPredicate>
         Array& FilterInPlace(TPredicate predicate)
@@ -958,10 +1771,13 @@ namespace Ck
         }
 
         /**
-         * \brief Applies a transformation function to each element and returns a new array.
-         * \tparam TFunction Type of the transformer function.
-         * \param transformer Function to apply to each element.
-         * \return Transformed array.
+         * \brief Applies a transformation function to each element and returns a new array
+         *
+         * \tparam TFunction Type of the transformer function
+         *
+         * \param transformer Function to apply to each element
+         *
+         * \return Transformed array
          */
         template <typename TFunction>
         Array<typename FunctionTraits<TFunction>::Return> Transform(TFunction transformer) const
@@ -996,10 +1812,13 @@ namespace Ck
         }
 
         /**
-         * \brief Applies a transformation function to each element in place.
-         * \tparam TFunction Type of the transformer function.
-         * \param transformer Function to apply to each element.
-         * \return Reference to *this.
+         * \brief Applies a transformation function to each element in place
+         *
+         * \tparam TFunction Type of the transformer function
+         *
+         * \param transformer Function to apply to each element
+         *
+         * \return Reference to *this
          */
         template <typename TFunction>
         Array& TransformInPlace(TFunction transformer)
@@ -1022,7 +1841,7 @@ namespace Ck
          * \note The iteration order is the same as the element order in the array.
          *
          * \warning The \p function should be read-only.
-         *          Any insertion/deletion of element will cause an unpredictable iteration behaviour.
+         *          Any insertion/deletion of an element will cause an unpredictable iteration behavior.
          */
         template <typename TFunction>
         void ForEach(TFunction function) const
@@ -1054,20 +1873,20 @@ namespace Ck
          * This method accumulates a value by successively applying a binary function
          * to each element of the array, starting from an initial value.
          *
-         * \tparam T The type of the accumulated value (the result).
-         * \tparam TFunction The type of the reduction function.
+         * \tparam T The type of the accumulated value (the result)
+         * \tparam TFunction The type of the reduction function
          *         It must be callable with the signature:
          *         (T accumulated, const ElementType& current) -> T
          *
          * \param initialValue The starting value for the reduction process.
          * \param function A binary function that combines the accumulated value with each
-         *        array element. It must return the updated accumulated value.
+         *        array element. It must return the updated accumulated value
          *
-         * \return The final accumulated result after applying the reduction function to all elements.
+         * \return The final accumulated result after applying the reduction function to all elements
          *
-         * \note The iteration order is the same as the element order in the array.
+         * \note The iteration order is the same as the element order in the array
          *
-         * \warning The \p function should ideally be associative and side-effect free to ensure predictable behavior.
+         * \warning The \p function should ideally be associative and side effect free to ensure predictable behavior
          *
          * \example
          * Array<int> array = {1, 2, 3, 4};
@@ -1087,8 +1906,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a reversed copy of the array.
-         * \return New reversed array.
+         * \brief Returns a reversed copy of the array
+         *
+         * \return New reversed array
          */
         Array Reverse() const
         {
@@ -1098,8 +1918,9 @@ namespace Ck
         }
 
         /**
-         * \brief Reverses the array in place.
-         * \return Reference to *this.
+         * \brief Reverses the array in place
+         *
+         * \return Reference to *this
          */
         Array& ReverseInPlace()
         {
@@ -1115,13 +1936,14 @@ namespace Ck
         }
 
         /**
-         * \brief Creates a sub-array containing a slice of the current array
+         * \brief Creates a subarray containing a slice of the current array
          *
          * This method extracts a contiguous range of elements starting from
          * the specified index \p first to the end of the array
          * The resulting slice is stored in a new Array instance.
          *
-         * \tparam E Type of elements stored in the array.
+         * \tparam E Type of elements stored in the array
+         *
          * \param first The starting index of the slice. Must be within the bounds of the array
          *
          * \return A new Array<E> containing the selected subrange of elements
@@ -1140,13 +1962,14 @@ namespace Ck
         }
 
         /**
-         * \brief Creates a sub-array containing a slice of the current array
+         * \brief Creates a subarray containing a slice of the current array
          *
          * This method extracts a contiguous range of elements starting from
          * the specified index \p first and spanning \p count elements.
          * The resulting slice is stored in a new Array instance.
          *
-         * \tparam E Type of elements stored in the array.
+         * \tparam E Type of elements stored in the array
+         *
          * \param first The starting index of the slice. Must be within the bounds of the array
          * \param count The number of elements to include in the slice
          *              The range [first, first + count) must be valid and not exceed the array size
@@ -1174,9 +1997,11 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Creates a copy of the array and removes the \p first elements
+         *
          * \param first
-         * \return
+         *
+         * \return New array with the prefix removed
          */
         Array Splice(SizeType first) const
         {
@@ -1187,9 +2012,11 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Removes the \p first elements in place
+         *
          * \param first
-         * \return
+         *
+         * \return Reference to *this
          */
         Array& SpliceInPlace(SizeType first)
         {
@@ -1197,10 +2024,12 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Creates a copy of the array and removes \p count elements from \p first
+         *
          * \param first
          * \param count
-         * \return
+         *
+         * \return New array with the range removed
          */
         Array Splice(SizeType first, SizeType count) const
         {
@@ -1211,10 +2040,12 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Removes \p count elements starting at \p first in place
+         *
          * \param first
          * \param count
-         * \return
+         *
+         * \return Reference to *this
          */
         Array& SpliceInPlace(SizeType first, SizeType count)
         {
@@ -1232,8 +2063,10 @@ namespace Ck
 
         /**
          * \brief Resizes the array to the given size
+         *
          * New elements are default constructed.
          * If the new size is lower than the current size, right most elements will be destroyed.
+         *
          * \param size New size of the array
          */
         void Resize(SizeType size)
@@ -1258,7 +2091,9 @@ namespace Ck
 
         /**
          * \brief Resizes the array to the given size
+         *
          * New elements are constructed by copying \p element.
+         *
          * \param size New size of the array
          * \param element Element to initialize new elements with
          */
@@ -1285,6 +2120,7 @@ namespace Ck
 
         /**
          * \brief Reserves additional capacity for at least the specified size
+         *
          * \param size Capacity to reserve
          */
         void Reserve(SizeType size)
@@ -1315,8 +2151,57 @@ namespace Ck
         }
 
         /**
-         * \brief Returns the number of elements in the array.
-         * \return Number of elements.
+         * \brief Get an Iterator on the first element of the array
+         *
+         * If the array is empty, this Iterator will be invalid.
+         *
+         * \return The Iterator
+         */
+        Iterator GetIterator()
+        {
+            return Iterator(*this, 0);
+        }
+
+        /**
+         * \brief Get a ConstIterator on the first element of the array
+         *
+         * If the array is empty, this Iterator will be invalid.
+         *
+         * \return The ConstIterator
+         */
+        ConstIterator GetIterator() const
+        {
+            return ConstIterator(*this, 0);
+        }
+
+        /**
+         * \brief Get an Iterator on the last element of the array
+         *
+         * If the array is empty, this Iterator will be invalid.
+         *
+         * \return The Iterator
+         */
+        Iterator GetLastIterator()
+        {
+            return Iterator(*this, GetSize() - 1);
+        }
+
+        /**
+         * \brief Get a ConstIterator on the last element of the array
+         *
+         * If the array is empty, this Iterator will be invalid.
+         *
+         * \return The ConstIterator
+         */
+        ConstIterator GetLastIterator() const
+        {
+            return ConstIterator(*this, GetSize() - 1);
+        }
+
+        /**
+         * \brief Returns the number of elements in the array
+         *
+         * \return Number of elements
          */
         SizeType GetSize() const
         {
@@ -1324,8 +2209,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns the current capacity of the array.
-         * \return Capacity.
+         * \brief Returns the current capacity of the array
+         *
+         * \return Capacity
          */
         SizeType GetCapacity() const
         {
@@ -1333,8 +2219,9 @@ namespace Ck
         }
 
         /**
-         * \brief Checks if the array is empty.
-         * \return true if empty, false otherwise.
+         * \brief Checks if the array is empty
+         *
+         * \return true if empty, false otherwise
          */
         bool IsEmpty() const
         {
@@ -1342,8 +2229,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a pointer to the underlying data.
-         * \return Pointer to data.
+         * \brief Returns a pointer to the underlying data
+         *
+         * \return Pointer to data
          */
         E* GetData()
         {
@@ -1351,38 +2239,21 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a const pointer to the underlying data.
-         * \return Const pointer to data.
+         * \brief Returns a const pointer to the underlying data
+         *
+         * \return Const pointer to data
          */
         const E* GetData() const
         {
             return mData;
         }
 
-        E* begin()
-        {
-            return GetData();
-        }
-
-        const E* begin() const
-        {
-            return GetData();
-        }
-
-        E* end()
-        {
-            return GetData() + GetSize();
-        }
-
-        const E* end() const
-        {
-            return GetData() + GetSize();
-        }
-
         /**
-         * \brief Equality comparison.
-         * \param other Array to compare with.
-         * \return true if equal, false otherwise.
+         * \brief Equality comparison
+         *
+         * \param other Array to compare with
+         *
+         * \return true if equal, false otherwise
          */
         bool operator==(const Array& other) const
         {
@@ -1402,9 +2273,11 @@ namespace Ck
         }
 
         /**
-         * \brief Inequality comparison.
-         * \param other Array to compare with.
-         * \return true if different, false otherwise.
+         * \brief Inequality comparison
+         *
+         * \param other Array to compare with
+         *
+         * \return true if different, false otherwise
          */
         bool operator!=(const Array& other) const
         {
@@ -1412,9 +2285,11 @@ namespace Ck
         }
 
         /**
-         * \brief
-         * \param
-         * \return
+         * \brief Unchecked element access (non-const)
+         *
+         * \param index Index of the element
+         *
+         * \return Reference to the element
          */
         E& operator[](SizeType index)
         {
@@ -1422,9 +2297,11 @@ namespace Ck
         }
 
         /**
-         * \brief
-         * \param
-         * \return
+         * \brief Unchecked element access (const)
+         *
+         * \param index Index of the element
+         *
+         * \return Const reference to the element
          */
         const E& operator[](SizeType index) const
         {
@@ -1433,12 +2310,26 @@ namespace Ck
 
     protected:
 
+        /**
+         * \brief Unchecked element access (non-const)
+         *
+         * \param index Index of the element
+         *
+         * \return Reference to the element
+         */
         E& UncheckedAt(SizeType index)
         {
             E* element = GetData() + index;
             return *element;
         }
 
+        /**
+         * \brief Unchecked element access (const)
+         *
+         * \param index Index of the element
+         *
+         * \return Const reference to the element
+         */
         const E& UncheckedAt(SizeType index) const
         {
             const E* element = GetData() + index;
@@ -1447,6 +2338,9 @@ namespace Ck
 
     private:
 
+        /**
+         * \brief Throws if this array is empty
+         */
         void CheckSize() const
         {
             if (mSize == 0)
@@ -1454,8 +2348,9 @@ namespace Ck
         }
 
         /**
-         * \brief
-         * \param index
+         * \brief Throws if \p index is out of range
+         *
+         * \param index Index in array to check
          */
         void CheckIndex(SizeType index) const
         {
@@ -1467,7 +2362,9 @@ namespace Ck
 
         /**
          * \brief Allocate memory to fit at least \p count elements
+         *
          * \param count The number of new elements that should fit in the Array
+         *
          * \return A pointer to the first element available
          */
         E* Allocate(SizeType count)
@@ -1480,9 +2377,9 @@ namespace Ck
         }
 
         /**
-         * \brief
+         * \brief Reallocates storage to the requested capacity
          *
-         * \param nextCapacity
+         * \param nextCapacity The new capacity of the array
          */
         void ResizeAllocation(SizeType nextCapacity)
         {
@@ -1508,6 +2405,30 @@ namespace Ck
         E* mData;
         AllocatorElementType mAllocator;
     };
+
+    template <typename E, typename TAllocator>
+    typename Array<E, TAllocator>::Iterator begin(Array<E, TAllocator>& array)
+    {
+        return array.GetIterator();
+    }
+
+    template <typename E, typename TAllocator>
+    typename Array<E, TAllocator>::ConstIterator begin(const Array<E, TAllocator>& array)
+    {
+        return array.GetIterator();
+    }
+
+    template <typename E, typename TAllocator>
+    typename Array<E, TAllocator>::Iterator end(Array<E, TAllocator>& array)
+    {
+        return typename Array<E, TAllocator>::Iterator(array, array.GetSize());
+    }
+
+    template <typename E, typename TAllocator>
+    typename Array<E, TAllocator>::ConstIterator end(const Array<E, TAllocator>& array)
+    {
+        return typename Array<E, TAllocator>::ConstIterator(array, array.GetSize());
+    }
 
     template <typename E>
     using LargeArray = Array<E, LargeHeapAllocator>;

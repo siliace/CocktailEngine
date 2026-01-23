@@ -61,7 +61,7 @@ namespace Ck
 
 	void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)
 	{
-		std::sort(mRecords.begin(), mRecords.end(), [](const RecordInfo& lhs, const RecordInfo& rhs) {
+		std::sort(begin(mRecords), end(mRecords), [](const RecordInfo& lhs, const RecordInfo& rhs) {
 			return lhs.SortingKey < rhs.SortingKey;
 		});
 

@@ -57,14 +57,8 @@ namespace Ck::Vulkan
 				if (!callable(family))
 					continue;
 
-				if (unique)
-				{
-					auto it = std::find(queueIndexes.begin(), queueIndexes.end(), queueFamilyIndex);
-					if (it != queueIndexes.end())
-						continue;
-				}
-					
-				queueIndexes.Add(queueFamilyIndex);
+				if (!unique || !queueIndexes.Contains(queueFamilyIndex))
+					queueIndexes.Add(queueFamilyIndex);
 			}
 
 			return queueIndexes;

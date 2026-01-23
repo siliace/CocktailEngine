@@ -257,9 +257,9 @@ namespace Ck
             }
         }
 
-        for (auto it = primitiveMeshes.begin(); it != primitiveMeshes.end(); ++it)
+        for (MeshInfo& primitiveMesh : primitiveMeshes)
         {
-            mMeshes.Add(std::move(*it));
+            mMeshes.Add(std::move(primitiveMesh));
             mMeshIndirections[meshIndex].Add(mMeshes.GetSize() - 1);
         }
     }

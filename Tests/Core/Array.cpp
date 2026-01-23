@@ -382,3 +382,36 @@ TEMPLATE_TEST_CASE("Clear and Shrink an array", "[Array]", Ck::HeapAllocator, Ck
         REQUIRE(array.GetCapacity() == 0);
     }
 }
+
+TEST_CASE("Iterate over elements of an Array", "[Array]")
+{
+    Ck::Array<int> list;
+
+    list.Add(1);
+    list.Add(2);
+    list.Add(3);
+    list.Add(4);
+    list.Add(5);
+
+    SECTION("In normal order")
+    {
+        int previous = 0;
+        for (Ck::Array<int>::Iterator it = list.GetIterator(); it.IsValid(); it = it.Next())
+        {
+            REQUIRE(previous + 1 == *it);
+
+            previous = *it;
+        }
+    }
+
+    SECTION("In revered order")
+    {
+        int previous = 6;
+        for (Ck::Array<int>::Iterator it = list.GetLastIterator(); it.IsValid(); it = it.Previous())
+        {
+            REQUIRE(previous - 1 == *it);
+
+            previous = *it;
+        }
+    }
+}
