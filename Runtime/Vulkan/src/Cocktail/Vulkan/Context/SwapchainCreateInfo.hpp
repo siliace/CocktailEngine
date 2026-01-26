@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_CONTEXT_SWAPCHAINCREATEINFO_HPP
 #define COCKTAIL_VULKAN_CONTEXT_SWAPCHAINCREATEINFO_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/ColorSpace.hpp>
 

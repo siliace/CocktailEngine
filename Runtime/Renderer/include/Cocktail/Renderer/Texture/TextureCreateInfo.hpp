@@ -3,7 +3,7 @@
 
 #include <Cocktail/Core/Extent3D.hpp>
 #include <Cocktail/Core/Flags.hpp>
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/Memory/MemoryType.hpp>
 

@@ -2,7 +2,7 @@
 #define COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPLEVEL_HPP
 
 #include <Cocktail/Core/Extent3D.hpp>
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 #include <Cocktail/Core/Utility/ByteArray.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>

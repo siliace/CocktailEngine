@@ -13,8 +13,8 @@ namespace Ck::Detail::Xlib
 		cursorImage->xhot = mHotSpot.Width;
 		cursorImage->yhot = mHotSpot.Height;
 
-		PixelFormat imageFormat = image.GetFormat();
-		std::size_t allocationSize = imageFormat.ComputeAllocationSize(image.GetSize());
+		ImageRawFormat::Type imageFormat = image.GetRawFormat();
+		std::size_t allocationSize = ImageRawFormat::ComputeAllocationSize(size, imageFormat);
 		UniquePtr<unsigned char[]> bgraPixels = MakeUnique<unsigned char[]>(allocationSize);
 
 		const Uint8* pixelOffset = image.GetPixels().GetData();

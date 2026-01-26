@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_BUFFER_BUFFERVIEWCREATEINFO_HPP
 #define COCKTAIL_RENDERER_BUFFER_BUFFERVIEWCREATEINFO_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 namespace Ck::Renderer
 {

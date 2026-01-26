@@ -182,10 +182,10 @@ namespace Ck::Detail::Win32
 		if (icon)
 		{
 			Extent2D<unsigned int> size = icon->GetSize();
-			PixelFormat iconFormat = icon->GetFormat();
-			assert(iconFormat.GetLayout() == PixelFormat::Layout::RGBA);
+			ImageRawFormat::Type imageRawFormat = icon->GetRawFormat();
+			assert(imageRawFormat == ImageRawFormat::Type::RedGreenBlueAlpha8);
 
-			std::size_t allocationSize = iconFormat.ComputeAllocationSize(icon->GetSize());
+			std::size_t allocationSize = ImageRawFormat::ComputeAllocationSize(size, imageRawFormat);
 			UniquePtr<unsigned char[]> bgraPixels = MakeUnique<unsigned char[]>(allocationSize);
 
 			const unsigned char* pixels = icon->GetPixels().GetData();

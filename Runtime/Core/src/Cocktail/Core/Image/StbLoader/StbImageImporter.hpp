@@ -5,6 +5,7 @@
 
 #include <Cocktail/Core/Asset/AssetImporter.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
+#include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
 
 namespace Ck
 {
@@ -51,7 +52,9 @@ namespace Ck
 		bool SupportParameters(const ImageImportParameters& parameters) const override;
 
 	private:
-		
+
+	    static const Array<String, LinearAllocator<16>> SupportedExtensions;
+
 		/**
 		 * \brief Callback implementation of read internally used by stb_image
 		 * Read \p data with \p size bytes from a \p user InputStream

@@ -1,4 +1,4 @@
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>

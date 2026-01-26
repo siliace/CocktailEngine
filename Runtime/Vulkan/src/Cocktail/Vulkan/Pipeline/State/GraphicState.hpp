@@ -94,7 +94,7 @@ namespace Ck::Vulkan
 		Renderer::LogicOp LogicOp = Renderer::LogicOp::OpClear;
 		unsigned int ColorBlendAttachmentCount = 0;
 		ColorBlendAttachmentState ColorBlendAttachments[MaxColorAttachments] = {};
-		LinearColor BlendConstants = { 0.f, 0.f, 0.f, 0.f };
+		LinearColor BlendConstants = LinearColor::Transparent;
 	};
 
 	struct GraphicState

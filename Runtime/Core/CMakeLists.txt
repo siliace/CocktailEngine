@@ -61,15 +61,22 @@ cocktail_source_directory(CORE_FILES
 cocktail_source_directory(CORE_FILES
     FOLDER "Image"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/GammaSpace.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/Image.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageArray.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageLoader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageRawFormat.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageServiceProvider.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/PixelFormat.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Image/ImageView.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/Image.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageArray.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageInfo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageLoader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageRawFormat.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageServiceProvider.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/PixelFormat.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Image/ImageView.cpp
 )
 
 cocktail_source_directory(CORE_FILES    

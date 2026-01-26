@@ -1,5 +1,4 @@
 #include <Cocktail/Core/Exception.hpp>
-#include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/IO/Input/Reader/BufferedReader.hpp>
 #include <Cocktail/Core/IO/Input/Reader/InputStreamReader.hpp>
 #include <Cocktail/Core/IO/Output/Writer/StringWriter.hpp>
@@ -16,7 +15,7 @@ namespace Ck
     {
         void ToGltfImage(const Image& inImage, tinygltf::Image& outImage)
         {
-            const PixelFormat& format = inImage.GetFormat();
+            PixelFormat format = PixelFormat::FromImageRawFormat(inImage.GetRawFormat(), inImage.GetGammaSpace());
             outImage.component = static_cast<int>(format.GetChannelCount());
 
             const PixelFormat::Channel* channel = format.GetChannel(0);
@@ -145,7 +144,7 @@ namespace Ck
         std::shared_ptr<Image> image;
         try 
         {
-            image = self->mImageLoader->LoadFromMemory(data, size, { ImageImportParameters::Format::RedGreenBlueAlpha });
+            image = self->mImageLoader->LoadFromMemory(data, size);
         }
         catch (const std::exception& exception)
         {

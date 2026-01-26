@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_FORMAT_HPP
 #define COCKTAIL_RENDERER_FORMAT_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 #include <Cocktail/Core/System/Monitor/VideoMode.hpp>
 
 #include <Cocktail/Renderer/ColorSpace.hpp>

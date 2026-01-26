@@ -2,5 +2,5 @@
 
 namespace Ck
 {
-	COCKTAIL_DEFINE_LOG_CATEGORY(ImageLoaderLogCategory);
+    COCKTAIL_DEFINE_LOG_CATEGORY(ImageLoaderLogCategory);
 }

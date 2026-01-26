@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_FRAMEBUFFER_FRAMEBUFFERLAYOUT_HPP
 #define COCKTAIL_RENDERER_FRAMEBUFFER_FRAMEBUFFERLAYOUT_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/Export.hpp>
 #include <Cocktail/Renderer/RasterizationSamples.hpp>

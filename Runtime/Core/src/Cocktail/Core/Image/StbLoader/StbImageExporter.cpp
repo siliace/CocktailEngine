@@ -31,7 +31,7 @@ namespace Ck
 	void StbImageExporter::SaveToStream(const Image& asset, OutputStream<>& outputStream, const ImageExportParameters& parameters) const
 	{
 		Extent2D<unsigned int> size = asset.GetSize();
-		unsigned int channelCount = asset.GetFormat().GetChannelCount();
+		unsigned int channelCount = ImageRawFormat::GetChannelCount(asset.GetRawFormat());
 		const void* pixels = asset.GetPixels().GetData();
 
 		int err = 0;

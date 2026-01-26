@@ -6,6 +6,7 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Export.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Format.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/GraphicApi.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/PixelFormat.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RasterizationSamples.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDevice.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/RenderDeviceExtension.hpp
@@ -14,6 +15,7 @@ cocktail_source_directory(RENDERER_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/Format.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/New.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Renderer/PixelFormat.cpp
 )
 
 cocktail_source_directory(RENDERER_FILES    

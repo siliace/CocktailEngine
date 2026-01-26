@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_FRAMEBUFFER_RENDERBUFFERCREATEINFO_HPP
 #define COCKTAIL_VULKAN_FRAMEBUFFER_RENDERBUFFERCREATEINFO_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 

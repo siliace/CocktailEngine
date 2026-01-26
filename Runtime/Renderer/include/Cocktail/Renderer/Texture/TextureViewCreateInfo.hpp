@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_TEXTURE_TEXTUREVIEWCREATEINFO_HPP
 #define COCKTAIL_RENDERER_TEXTURE_TEXTUREVIEWCREATEINFO_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/Texture/TextureSubResource.hpp>
 #include <Cocktail/Renderer/Texture/TextureSwizzle.hpp>

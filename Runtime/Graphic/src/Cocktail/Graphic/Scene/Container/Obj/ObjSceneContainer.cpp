@@ -60,7 +60,7 @@ namespace Ck
         }
         else if (imageLoader->SupportExtensionImport(extension))
         {
-			std::shared_ptr<Image> image = imageLoader->LoadFromPath(fullpath, { ImageImportParameters::Format::RedGreenBlueAlpha });
+			std::shared_ptr<Image> image = imageLoader->LoadFromPath(fullpath);
 			mipMaps = MipMaps::FromImage(*image);
         }
 		else

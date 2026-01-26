@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_RENDERER_BUFFER_BUFFERVIEW_HPP
 #define COCKTAIL_RENDERER_BUFFER_BUFFERVIEW_HPP
 
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
 

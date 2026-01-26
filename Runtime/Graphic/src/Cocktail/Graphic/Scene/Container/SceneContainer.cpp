@@ -72,7 +72,7 @@ namespace Ck
 
 	SceneContainer::SceneContainer()
 	{
-		mMaterials.Add(CreateDefaultMaterial(LinearColor(0.f, 0.f, 0.f)));
+		mMaterials.Add(CreateDefaultMaterial(LinearColor::Black));
 	}
 
 	SceneContainer::MaterialInfo SceneContainer::CreateDefaultMaterial(LinearColor baseColor)

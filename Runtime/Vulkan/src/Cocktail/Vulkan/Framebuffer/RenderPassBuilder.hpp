@@ -2,7 +2,7 @@
 #define COCKTAIL_VULKAN_FRAMEBUFFER_RENDERPASSBUILDER_HPP
 
 #include <Cocktail/Core/Array.hpp>
-#include <Cocktail/Core/Image/PixelFormat.hpp>
+#include <Cocktail/Renderer/PixelFormat.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 

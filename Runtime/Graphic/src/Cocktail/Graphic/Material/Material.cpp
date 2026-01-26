@@ -44,7 +44,7 @@ namespace Ck
 
     bool Material::IsEmissive() const
     {
-        return mParameters.Base != LinearColor{ 0.f, 0.f, 0.f, 1.f } || mTextures[TextureType::Emission] != nullptr;
+        return mParameters.Base != LinearColor::Black || mTextures[TextureType::Emission] != nullptr;
     }
 
     const AsciiString& Material::GetName() const

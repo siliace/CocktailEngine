@@ -1,9 +1,6 @@
-#include <algorithm>
-#include <cmath>
-
 #include <Cocktail/Graphic/Material/MipMaps/MipMaps.hpp>
 
-#include "Cocktail/Renderer/Texture/Texture.hpp"
+#include <Cocktail/Renderer/Texture/Texture.hpp>
 
 namespace Ck
 {
@@ -13,13 +10,28 @@ namespace Ck
 
 		unsigned int levelCount = Renderer::ComputeTextureLevelCount(baseLevelSize);
 
-		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, image.GetFormat(), 1, levelCount);
+	    PixelFormat pixelFormat = PixelFormat::FromImageRawFormat(image.GetRawFormat(), image.GetGammaSpace());
+		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, pixelFormat, 1, levelCount);
 		mipMaps->GetLevel(0, 0).CopyPixels(image.GetPixels().GetData());
 
 		return mipMaps;
 	}
 
-	MipMaps::MipMaps(const Extent3D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int mipMapCount) :
+    std::shared_ptr<MipMaps> MipMaps::FromImageArray(const ImageArray& imageArray)
+	{
+	    Extent3D<unsigned int> baseLevelSize = MakeExtent(imageArray.GetSize(), 1u);
+
+	    unsigned int levelCount = Renderer::ComputeTextureLevelCount(baseLevelSize);
+
+	    PixelFormat pixelFormat = PixelFormat::FromImageRawFormat(imageArray.GetRawFormat(), imageArray.GetGammaSpace());
+	    std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, pixelFormat, imageArray.GetSliceCount(), levelCount);
+	    for (unsigned int slice = 0; slice < imageArray.GetSliceCount(); slice++)
+	        mipMaps->GetLevel(slice, 0).CopyPixels(imageArray.GetSlice(slice).GetPixels().GetData());
+
+	    return mipMaps;
+    }
+
+    MipMaps::MipMaps(const Extent3D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int mipMapCount) :
 		mBaseSize(baseSize),
 		mPixelFormat(pixelFormat),
 		mArrayLayerCount(arrayLayerCount),

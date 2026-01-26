@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <Cocktail/Core/Array.hpp>
-#include <Cocktail/Core/Image/Image.hpp>
+#include <Cocktail/Core/Image/ImageArray.hpp>
 
 #include <Cocktail/Graphic/Material/MipMaps/MipMapLevel.hpp>
 
@@ -36,12 +36,19 @@ namespace Ck
 		 */
 		static std::shared_ptr<MipMaps> FromImage(const Image& image);
 
+        /**
+         * \brief
+         * \param imageArray
+         * \return
+         */
+	    static std::shared_ptr<MipMaps> FromImageArray(const ImageArray& imageArray);
+
 		/**
-		 * \brief 
-		 * \param baseSize 
-		 * \param pixelFormat 
-		 * \param arrayLayerCount 
-		 * \param mipMapCount 
+		 * \brief
+		 * \param baseSize
+		 * \param pixelFormat
+		 * \param arrayLayerCount
+		 * \param mipMapCount
 		 */
 		MipMaps(const Extent3D<unsigned int>& baseSize, const PixelFormat& pixelFormat, unsigned int arrayLayerCount, unsigned int mipMapCount);
 

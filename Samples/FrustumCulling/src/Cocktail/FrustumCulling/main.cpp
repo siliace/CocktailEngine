@@ -33,9 +33,9 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
-	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor(1.f, 1.f, 1.f));
+	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
 	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Phong, true);
-	material->SetEmissiveColor(LinearColor(1.f, 1.f, 1.f));
+	material->SetEmissiveColor(LinearColor::White);
 	std::shared_ptr<Shape> shape = std::make_shared<Shape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
 
 	for (unsigned int i = 0; i < 30; i++)
@@ -49,7 +49,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	}
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor(1.f, 1.f, 1.f));
+	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor::White);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);

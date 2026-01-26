@@ -7,9 +7,7 @@ namespace Ck::Detail::Win32
 		mHotspot(hotspot)
 	{
 		Extent2D<unsigned int> size = image.GetSize();
-		PixelFormat format = image.GetFormat();
-
-		assert(format.GetLayout() == PixelFormat::Layout::RGBA);
+		assert(image.GetRawFormat() == ImageRawFormat::Type::RedGreenBlueAlpha8);
 
 		BITMAPV5HEADER bitmapHeader;
 		bitmapHeader.bV5Size = sizeof(BITMAPV5HEADER);

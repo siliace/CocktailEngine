@@ -9,22 +9,13 @@ namespace Ck
         {
             Extent2D<unsigned int> size = MakeExtent<unsigned int>(gltfImage.width, gltfImage.height);
 
-            PixelFormat::Layout pixelFormatLayout = {};
-            switch (gltfImage.component)
-            {
-                case 1: pixelFormatLayout = PixelFormat::Layout::R; break;
-
-                case 2: pixelFormatLayout = PixelFormat::Layout::RG; break;
-
-                case 3: pixelFormatLayout = PixelFormat::Layout::RGB; break;
-
-                case 4: pixelFormatLayout = PixelFormat::Layout::RGBA; break;
-            }
-
             DataType dataType = GltfUtils::ConvertComponentType(gltfImage.pixel_type);
-            std::shared_ptr<Image> image = std::make_shared<Image>(size, PixelFormat::Color(pixelFormatLayout, dataType), gltfImage.image.data());
+            ImageRawFormat::Type imageRawFormat = ImageRawFormat::Of(gltfImage.component, dataType);
 
-            mMipMaps.Add(MipMaps::FromImage(*image));
+            LargeByteArray pixels(gltfImage.image.data(), ImageRawFormat::ComputeAllocationSize(size, imageRawFormat));
+            Image image(size, imageRawFormat, GammaSpace::Linear, std::move(pixels));
+
+            mMipMaps.Add(MipMaps::FromImage(image));
         }
 
         for (const tinygltf::Camera& gltfCamera: model.cameras)
