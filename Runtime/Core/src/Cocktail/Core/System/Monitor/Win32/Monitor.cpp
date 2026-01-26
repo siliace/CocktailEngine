@@ -108,7 +108,7 @@ namespace Ck::Detail::Win32
 		for (DWORD i = 0; EnumDisplaySettings(mMonitorInfo.szDevice, i, &devMode); i++)
 		{
 			VideoMode videoMode = DevModeToVideoMode(devMode);
-			if (std::find(videoModes.begin(), videoModes.end(), videoMode) == videoModes.end())
+			if (!videoModes.Contains(videoMode))
 				videoModes.Add(videoMode);
 		}
 

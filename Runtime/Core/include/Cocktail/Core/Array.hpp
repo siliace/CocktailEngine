@@ -216,21 +216,51 @@ namespace Ck
                 return !(*this == other);
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is strictly before another iterator
+             *
+             * This operator allows comparison of positions within the same array.
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element before \p rhs, otherwise \c false
+             */
             bool operator<(const Iterator& rhs)
             {
                 return mValue < rhs.mValue;
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is before or equal to another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element before or at the same position as \p rhs, otherwise \c false
+             */
             bool operator<=(const Iterator& rhs)
             {
                 return !(rhs < *this);
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is strictly after another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element after \p rhs, otherwise \c false
+             */
             bool operator>(const Iterator& rhs)
             {
                 return rhs < *this;
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is after or equal to another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element after or at the same position as \p rhs, otherwise \c false
+             */
             bool operator>=(const Iterator& rhs)
             {
                 return !(*this < rhs);
@@ -247,20 +277,43 @@ namespace Ck
              *
              * \return A new iterator moved forward by \p count steps
              */
-            Iterator operator+(unsigned int count) const
+            Iterator operator+(difference_type count) const
             {
                 Iterator it(*this);
-                it.Advance(count);
+                it.mValue += count;
 
                 return it;
             }
 
-            Iterator operator+(Iterator rhs) const
+            /**
+             * \brief Advances the iterator by a given offset
+             *
+             * Moves the current iterator forward by \p count positions.
+             *
+             * \param count Number of positions to advance
+             *
+             * \return A reference to this iterator after advancing
+             */
+            Iterator& operator+=(difference_type count)
             {
-                Iterator result(*this);
-                result.Advance();
+                mValue += count;
 
-                return result;
+                return *this;
+            }
+
+            /**
+             * \brief Adds an offset to an iterator (friend function)
+             *
+             * This allows expressions like \c 5 + it.
+             *
+             * \param count Number of positions to advance
+             * \param lhs The iterator to advance
+             *
+             * \return A new iterator advanced by \p count positions
+             */
+            friend Iterator operator+(difference_type count, Iterator lhs)
+            {
+                return lhs + count;
             }
 
             /**
@@ -274,19 +327,43 @@ namespace Ck
              *
              * \return A new iterator moved backward by \p count steps
              */
-            Iterator operator-(unsigned int count) const
+            Iterator operator-(difference_type count) const
             {
                 Iterator it(*this);
-                it.Rewind(count);
+                it.mValue -= count;
 
                 return it;
             }
 
-            difference_type operator-(Iterator rhs) const
+            /**
+             * \brief Moves the iterator backward by a given offset
+             *
+             * Decrements the current iterator by \p count positions.
+             *
+             * \param count Number of positions to rewind
+             *
+             * \return A reference to this iterator after rewinding
+             */
+            Iterator& operator-=(difference_type count) const
             {
-                assert(mOwner == rhs.mOwner);
+                mValue -= count;
 
-                return mValue - rhs.mValue;
+                return *this;
+            }
+
+            /**
+             * \brief Computes the distance between two iterators
+             *
+             * Returns the number of elements between \c this and \p other. The result is positive
+             * if \c this comes after \p other, negative otherwise.
+             *
+             * \param other The iterator to compute the distance from
+             *
+             * \return The signed distance between the two iterators
+             */
+            difference_type operator-(const Iterator& other) const
+            {
+                return mValue - other.mValue;
             }
 
             /**
@@ -348,22 +425,6 @@ namespace Ck
             }
 
             /**
-             * \brief Provides pointer access to the stored value
-             *
-             * This operator enables pointer-style access to the element referenced by the
-             * iterator.
-             *
-             * Calling this operator on an invalid iterator (i.e., when the iterator does not
-             * reference an index) results in undefined behavior.
-             *
-             * \return A pointer to the constant value stored in the current index
-             */
-            E* operator->()
-            {
-                return mValue;
-            }
-
-            /**
              * \brief Provides read-only pointer access to the stored value
              *
              * This operator enables pointer-style access to the element referenced by the
@@ -374,23 +435,9 @@ namespace Ck
              *
              * \return A pointer to the constant value stored in the current index
              */
-            const E* operator->() const
+            E* operator->() const
             {
                 return mValue;
-            }
-
-            /**
-             * \brief Dereferences the iterator and returns a reference to the value
-             *
-             * This operator provides access to the value stored in the index pointed to by the
-             * iterator. Calling this operator on an invalid iterator (i.e., when \ref IsValid
-             * returns false) results in undefined behavior.
-             *
-             * \return A constant reference to the value of the current index
-             */
-            E& operator*()
-            {
-                return *mValue;
             }
 
             /**
@@ -402,7 +449,7 @@ namespace Ck
              *
              * \return A constant reference to the value of the current index
              */
-            const E& operator*() const
+            E& operator*() const
             {
                 return *mValue;
             }
@@ -604,21 +651,51 @@ namespace Ck
                 return !(*this == rhs);
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is strictly before another iterator
+             *
+             * This operator allows comparison of positions within the same array.
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element before \p rhs, otherwise \c false
+             */
             bool operator<(const ConstIterator& rhs)
             {
                 return mValue < rhs.mValue;
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is before or equal to another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element before or at the same position as \p rhs, otherwise \c false
+             */
             bool operator<=(const ConstIterator& rhs)
             {
                 return !(rhs < *this);
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is strictly after another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element after \p rhs, otherwise \c false
+             */
             bool operator>(const ConstIterator& rhs)
             {
                 return rhs < *this;
             }
 
+            /**
+             * \brief Checks if the iterator points to an element that is after or equal to another iterator
+             *
+             * \param rhs The iterator to compare against
+             *
+             * \return \c true if this iterator points to an element after or at the same position as \p rhs, otherwise \c false
+             */
             bool operator>=(const ConstIterator& rhs)
             {
                 return !(*this < rhs);
@@ -635,12 +712,43 @@ namespace Ck
              *
              * \return A new iterator moved forward by \p count steps
              */
-            ConstIterator operator+(unsigned int count) const
+            ConstIterator operator+(difference_type count) const
             {
                 ConstIterator it(*this);
-                it.Advance(count);
+                it.mValue += count;
 
                 return it;
+            }
+
+            /**
+             * \brief Advances the iterator by a given offset
+             *
+             * Moves the current iterator forward by \p count positions.
+             *
+             * \param count Number of positions to advance
+             *
+             * \return A reference to this iterator after advancing
+             */
+            ConstIterator& operator+=(difference_type count)
+            {
+                mValue += count;
+
+                return *this;
+            }
+
+            /**
+             * \brief Adds an offset to an iterator (friend function)
+             *
+             * This allows expressions like \c 5 + it.
+             *
+             * \param count Number of positions to advance
+             * \param lhs The iterator to advance
+             *
+             * \return A new iterator advanced by \p count positions
+             */
+            friend ConstIterator operator+(difference_type count, ConstIterator lhs)
+            {
+                return lhs + count;
             }
 
             /**
@@ -654,19 +762,43 @@ namespace Ck
              *
              * \return A new iterator moved backward by \p count steps
              */
-            ConstIterator operator-(unsigned int count) const
+            ConstIterator operator-(difference_type count) const
             {
-                ConstIterator it(*this);
-                it.Rewind(count);
+                Iterator it(*this);
+                it.mValue -= count;
 
                 return it;
             }
 
-            difference_type operator-(ConstIterator rhs) const
+            /**
+             * \brief Moves the iterator backward by a given offset
+             *
+             * Decrements the current iterator by \p count positions.
+             *
+             * \param count Number of positions to rewind
+             *
+             * \return A reference to this iterator after rewinding
+             */
+            ConstIterator& operator-=(difference_type count) const
             {
-                assert(mOwner == rhs.mOwner);
+                mValue -= count;
 
-                return mValue - rhs.mValue;
+                return *this;
+            }
+
+            /**
+             * \brief Computes the distance between two iterators
+             *
+             * Returns the number of elements between \c this and \p other. The result is positive
+             * if \c this comes after \p other, negative otherwise.
+             *
+             * \param other The iterator to compute the distance from
+             *
+             * \return The signed distance between the two iterators
+             */
+            difference_type operator-(const ConstIterator& other) const
+            {
+                return mValue - other.mValue;
             }
 
             /**
