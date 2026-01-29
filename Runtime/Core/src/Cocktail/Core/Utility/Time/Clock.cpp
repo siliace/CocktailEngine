@@ -38,8 +38,18 @@ namespace Ck
 		return mStarted;
 	}
 
-	Duration Clock::GetElapsedDuration() const
+    Duration Clock::GetElapsedDuration() const
 	{
 		return Duration::Between(mStarted ? Instant::Now() : mStop, mStart).As(mTimeUnit);
 	}
+
+    Instant Clock::GetStart() const
+    {
+	    return mStart;
+    }
+
+    TimeUnit Clock::GetTimeUnit() const
+    {
+	    return mTimeUnit;
+    }
 }

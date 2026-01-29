@@ -795,11 +795,13 @@ cocktail_source_directory(CORE_FILES
 cocktail_source_directory(CORE_FILES    
     FOLDER "Utility/Time"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Time/Chronometer.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Time/Clock.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Time/Duration.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Time/Instant.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Utility/Time/TimeUnit.hpp
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Time/Chronometer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Time/Clock.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Time/Duration.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Utility/Time/Instant.cpp

@@ -48,7 +48,18 @@ namespace Ck
 		assert(mRatioDenominator != 0);
 	}
 
-	bool TimeUnit::IsBigger(const TimeUnit& other) const
+    bool TimeUnit::IsMultipleOf(const TimeUnit& other) const
+    {
+        if (other.mRatioNumerator == 0 || other.mRatioDenominator == 0)
+            return false;
+
+        const Uint64 lhs = mRatioNumerator * other.mRatioDenominator;
+        const Uint64 rhs = mRatioDenominator * other.mRatioNumerator;
+
+        return lhs % rhs == 0;
+    }
+
+    bool TimeUnit::IsBigger(const TimeUnit& other) const
 	{
 		if (mRatioDenominator < other.mRatioDenominator)
 			return true;
