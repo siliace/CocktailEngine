@@ -16,6 +16,8 @@
 #include <Cocktail/Vulkan/Texture/Texture.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>
 
+#include "Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp"
+
 namespace Ck::Vulkan
 {
 	namespace
@@ -725,69 +727,51 @@ namespace Ck::Vulkan
 		assert(mState == Renderer::CommandListState::RecordingRenderPass);
 		assert(firstColorAttachment + colorAttachmentCount < mCurrentFramebuffer->GetColorAttachmentCount());
 
-		unsigned int attachmentCount = colorAttachmentCount;
-
 		const bool hasDepthStencil = mCurrentFramebuffer->GetDepthStencilAttachment() != nullptr;
-		if (hasDepthStencil)
-			attachmentCount += 1;
-
 		const bool isMultisample = mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1;
-		if (isMultisample)
-			attachmentCount *= 2;
 
-		unsigned int clearAttachmentIndex = 0;
-		VkClearAttachment* clearAttachments = COCKTAIL_STACK_ALLOC(VkClearAttachment, attachmentCount);
-
+	    Array<VkClearAttachment, LinearAllocator<MaxAttachmentClearCount>> clearAttachments;
 		if (colorAttachmentCount)
 		{
 			for (unsigned int i = firstColorAttachment; i < mCurrentFramebuffer->GetColorAttachmentCount(); i++)
 			{
-				clearAttachments[clearAttachmentIndex].aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-				clearAttachments[clearAttachmentIndex].colorAttachment = i;
-				clearAttachments[clearAttachmentIndex].clearValue.color.float32[0] = colorClearValue.R;
-				clearAttachments[clearAttachmentIndex].clearValue.color.float32[1] = colorClearValue.G;
-				clearAttachments[clearAttachmentIndex].clearValue.color.float32[2] = colorClearValue.B;
-				clearAttachments[clearAttachmentIndex].clearValue.color.float32[3] = colorClearValue.A;
+			    VkClearAttachment& clearAttachment = clearAttachments.Emplace();
+				clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				clearAttachment.colorAttachment = i;
+				clearAttachment.clearValue.color.float32[0] = colorClearValue.R;
+				clearAttachment.clearValue.color.float32[1] = colorClearValue.G;
+				clearAttachment.clearValue.color.float32[2] = colorClearValue.B;
+				clearAttachment.clearValue.color.float32[3] = colorClearValue.A;
 
 				if (isMultisample)
-				{
-					clearAttachments[clearAttachmentIndex + 1] = clearAttachments[clearAttachmentIndex];
-
-					++clearAttachmentIndex;
-				}
-
-				++clearAttachmentIndex;
+				    clearAttachments.Add(clearAttachment);
 			}
 		}
 
 		if (hasDepthStencil)
 		{
-			clearAttachments[clearAttachmentIndex].aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-			clearAttachments[clearAttachmentIndex].colorAttachment = -1;
-			clearAttachments[clearAttachmentIndex].clearValue.depthStencil.depth = depthClearValue;
-			clearAttachments[clearAttachmentIndex].clearValue.depthStencil.stencil = stencilCleanValue;
+		    VkClearAttachment& clearAttachment = clearAttachments.Emplace();
+			clearAttachment.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			clearAttachment.colorAttachment = -1;
+			clearAttachment.clearValue.depthStencil.depth = depthClearValue;
+		    clearAttachment.clearValue.depthStencil.stencil = stencilCleanValue;
 
-			if (isMultisample)
-			{
-				clearAttachments[clearAttachmentIndex + 1] = clearAttachments[clearAttachmentIndex];
-
-				++clearAttachmentIndex;
-			}
-
-			++clearAttachmentIndex;
+		    if (isMultisample)
+		        clearAttachments.Add(clearAttachment);
 		}
 
-		VkClearRect* clearRects = COCKTAIL_STACK_ALLOC(VkClearRect, attachmentCount);
-		for (unsigned int i = 0; i < attachmentCount; i++)
+	    Array<VkClearRect, LinearAllocator<(Framebuffer::MaxColorAttachmentCount + 1) * 2>> clearRects;
+		for (unsigned int i = 0; i < clearAttachments.GetSize(); i++)
 		{
-			clearRects[i].rect.offset = { 0, 0 };
-			clearRects[i].rect.extent.width = mCurrentFramebuffer->GetSize().Width;
-			clearRects[i].rect.extent.height = mCurrentFramebuffer->GetSize().Height;
-			clearRects[i].baseArrayLayer = 0;
-			clearRects[i].layerCount = 1;
+		    VkClearRect& clearRect = clearRects.Emplace();
+			clearRect.rect.offset = { 0, 0 };
+			clearRect.rect.extent.width = mCurrentFramebuffer->GetSize().Width;
+			clearRect.rect.extent.height = mCurrentFramebuffer->GetSize().Height;
+			clearRect.baseArrayLayer = 0;
+			clearRect.layerCount = 1;
 		}
 
-		vkCmdClearAttachments(mHandle, attachmentCount, clearAttachments, attachmentCount, clearRects);
+		vkCmdClearAttachments(mHandle, clearAttachments.GetSize(), clearAttachments.GetData(), clearRects.GetSize(), clearRects.GetData());
 	}
 
 	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, unsigned int uploadCount, const Renderer::BufferUploadInfo* uploads)
@@ -937,8 +921,7 @@ namespace Ck::Vulkan
 		Extent3D<unsigned int> size = mCurrentFramebuffer->GetSize();
 
 		// Color attachments + DepthStencil attachment with resolve attachments
-		unsigned int clearValueCount = 0;
-		VkClearValue clearValues[(Renderer::Framebuffer::MaxColorAttachmentCount + 1) * 2];
+		Array<VkClearValue, LinearAllocator<MaxAttachmentClearCount>> clearValues;
 		VkRenderPassBeginInfo beginInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, nullptr };
 		{
 			beginInfo.renderPass = mCurrentFramebuffer->GetRenderPass()->GetHandle(begin.Mode);
@@ -950,32 +933,28 @@ namespace Ck::Vulkan
 			{
 				for (unsigned int i = 0; i < mCurrentFramebuffer->GetColorAttachmentCount(); i++)
 				{
-					VkClearValue clearValue;
+					VkClearValue& clearValue = clearValues.Emplace();
 					clearValue.color.float32[0] = begin.ColorClearValue[i].R;
 					clearValue.color.float32[1] = begin.ColorClearValue[i].G;
 					clearValue.color.float32[2] = begin.ColorClearValue[i].B;
 					clearValue.color.float32[3] = begin.ColorClearValue[i].A;
 
 					if (mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1)
-						clearValues[clearValueCount++] = clearValue;
-
-					clearValues[clearValueCount++] = clearValue;
+					    clearValues.Add(clearValue);
 				}
 
 				if (mCurrentFramebuffer->GetDepthStencilAttachment())
 				{
-					VkClearValue clearValue;
+					VkClearValue& clearValue = clearValues.Emplace();;
 					clearValue.depthStencil.depth = begin.DepthClearValue;
 					clearValue.depthStencil.stencil = begin.StencilClearValue;
 
 					if (mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1)
-						clearValues[clearValueCount++] = clearValue;
-
-					clearValues[clearValueCount++] = clearValue;
+					    clearValues.Add(clearValue);
 				}
 
-				beginInfo.clearValueCount = clearValueCount;
-				beginInfo.pClearValues = clearValues;
+				beginInfo.clearValueCount = clearValues.GetSize();
+				beginInfo.pClearValues = clearValues.GetData();
 			}
 			else
 			{

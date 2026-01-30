@@ -117,6 +117,8 @@ namespace Ck::Vulkan
 
 	private:
 
+	    static constexpr unsigned int MaxAttachmentClearCount = (Renderer::Framebuffer::MaxColorAttachmentCount + 1) * 2;
+
 		ComputeStateManager* GetComputeStateManager() const;
 		GraphicStateManager* GetGraphicStateManager() const;
 		StateManager* GetStateManager(Renderer::ShaderProgramType programType) const;
