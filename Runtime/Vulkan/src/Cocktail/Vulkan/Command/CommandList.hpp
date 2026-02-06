@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 		void ExecuteCommandLists(unsigned int commandListCount, Renderer::CommandList** commandLists) override;
 
 		void ClearColorTexture(const Renderer::Texture* texture, Renderer::ResourceState state, LinearColor colorClearValue, const Renderer::TextureSubResource& subResource) override;
-		void ClearDepthStencilTexture(const Renderer::Texture* texture, Renderer::ResourceState state, float depthClearValue, unsigned int stencilCleanValue, const Renderer::TextureSubResource& subResource);
+		void ClearDepthStencilTexture(const Renderer::Texture* texture, Renderer::ResourceState state, float depthClearValue, unsigned int stencilCleanValue, const Renderer::TextureSubResource& subResource) override;
 		void ClearAttachments(unsigned int firstColorAttachment, unsigned int colorAttachmentCount, LinearColor colorClearValue, float depthClearValue, unsigned int stencilCleanValue) override;
 
 		void UploadBuffer(const Renderer::Buffer* buffer, unsigned int uploadCount, const Renderer::BufferUploadInfo* uploads) override;

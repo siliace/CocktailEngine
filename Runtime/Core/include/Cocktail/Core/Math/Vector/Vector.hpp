@@ -33,6 +33,15 @@ namespace Ck
 			return VectorType();
 		}
 
+        /**
+         * \brief
+         * \return
+         */
+	    static VectorType Epsilon()
+		{
+		    return VectorType(std::numeric_limits<float>::epsilon());
+		}
+
 		/**
 		 * \brief
 		 * \return

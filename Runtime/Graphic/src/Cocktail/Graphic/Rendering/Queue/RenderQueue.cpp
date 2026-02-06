@@ -1,6 +1,7 @@
 #include <Cocktail/Core/Log/Log.hpp>
 
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecord.hpp>
+#include <Cocktail/Graphic/Rendering/Queue/LineRecord.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp>
 
@@ -59,7 +60,23 @@ namespace Ck
 		Emplace(StaticMeshRecord::New(recordInfo, materialProgramVariant.get()), sortingKey);
 	}
 
-	void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)
+    void RenderQueue::PushLine(const LineRecordInfo& recordInfo, Uint64 sortingKey)
+    {
+	    Flags<VertexAttributeSemantic> vertexAttributes = VertexAttributeSemantic::Position;
+	    if (recordInfo.HasVertexColor)
+	        vertexAttributes |= VertexAttributeSemantic::Color;
+
+		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Line)->GetVariant(vertexAttributes, {});
+	    if (!materialProgramVariant)
+	    {
+	        CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No MaterialProgram found for Material"));
+	        return;
+	    }
+
+	    Emplace(LineRecord::New(recordInfo, materialProgramVariant.get()), sortingKey);
+    }
+
+    void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)
 	{
 		std::sort(begin(mRecords), end(mRecords), [](const RecordInfo& lhs, const RecordInfo& rhs) {
 			return lhs.SortingKey < rhs.SortingKey;

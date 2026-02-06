@@ -32,6 +32,7 @@ namespace Ck::Vulkan
 		unsigned int Binding = 0;
 		unsigned int ArrayElement = 0;
 		Renderer::DescriptorType Type = Renderer::DescriptorType::Texture;
+	    Flags<Renderer::ShaderType> ShaderStages;
 		ImageStateInfo ImageInfo;
 		BufferStateInfo BufferInfo;
 		bool Dirty = false;
@@ -86,7 +87,7 @@ namespace Ck::Vulkan
 		 * \param sampler
 		 * \return
 		 */
-		bool BindSampler(unsigned int binding, unsigned int arrayIndex, const Sampler* sampler);
+		bool BindSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler);
 
 		/**
 		 * \brief 
@@ -96,7 +97,7 @@ namespace Ck::Vulkan
 		 * \param sampler
 		 * \return
 		 */
-		bool BindTextureSampler(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler);
+		bool BindTextureSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler);
 
 		/**
 		 * \brief
@@ -105,7 +106,7 @@ namespace Ck::Vulkan
 		 * \param textureView
 		 * \return
 		 */
-		bool BindTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView);
+		bool BindTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
 
 		/**
 		 * \brief
@@ -114,7 +115,7 @@ namespace Ck::Vulkan
 		 * \param textureView
 		 * \return
 		 */
-		bool BindStorageTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView);
+		bool BindStorageTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
 
 		/**
 		 * \brief 
@@ -125,7 +126,7 @@ namespace Ck::Vulkan
 		 * \param range 
 		 * \return
 		 */
-		bool BindUniformBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
+		bool BindUniformBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief
@@ -136,7 +137,7 @@ namespace Ck::Vulkan
 		 * \param range
 		 * \return
 		 */
-		bool BindStorageBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
+		bool BindStorageBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief 
@@ -193,7 +194,7 @@ namespace Ck::Vulkan
 		 * \param sampler
 		 * \return
 		 */
-		static bool FillImageState(DescriptorState& state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler);
+		static bool FillImageState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler);
 
 		/**
 		 * \brief 
@@ -204,7 +205,7 @@ namespace Ck::Vulkan
 		 * \param range 
 		 * \return 
 		 */
-		static bool FillBufferState(DescriptorState& state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range);
+		static bool FillBufferState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief

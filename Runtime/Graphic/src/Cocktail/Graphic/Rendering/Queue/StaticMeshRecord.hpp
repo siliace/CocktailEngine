@@ -45,7 +45,7 @@ namespace Ck
 		
 		struct MaterialInfo
 		{
-			float BaseColor[4];
+			LinearColor BaseColor;
 			float EmissiveColor[3];
 		    float Roughness;
 		    float Metallic;

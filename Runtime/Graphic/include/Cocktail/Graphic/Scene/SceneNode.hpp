@@ -3,9 +3,8 @@
 
 #include <Cocktail/Core/Math/Volume/Box.hpp>
 
-#include <Cocktail/Graphic/Material/Material.hpp>
-#include <Cocktail/Graphic/Mesh/Mesh.hpp>
 #include <Cocktail/Graphic/Rendering/Renderable.hpp>
+#include <Cocktail/Graphic/Scene/Shape/Shape.hpp>
 #include <Cocktail/Graphic/Spatial/Transformable.hpp>
 
 namespace Ck
@@ -13,57 +12,6 @@ namespace Ck
 	class IndexBuffer;
 	class Scene;
 	class VertexBuffer;
-
-	class COCKTAIL_GRAPHIC_API Shape
-	{
-	public:
-
-		/**
-		 * \brief 
-		 */
-		struct Geometry
-		{
-			/**
-			 * \brief 
-			 */
-			unsigned int Count = 0;
-
-			/**
-			 * \brief 
-			 */
-			unsigned int FirstVertex = 0;
-
-			/**
-			 * \brief 
-			 */
-			unsigned int FirstIndex = 0;
-
-			/**
-			 * \brief 
-			 */
-			Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
-		};
-
-		Shape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials);
-
-		const std::shared_ptr<Mesh>& GetMesh() const;
-
-		const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const;
-
-		const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const;
-
-		const std::unordered_set<std::shared_ptr<Material>>& GetMaterials() const;
-
-		const Array<Geometry>& GetGeometries(const Material* material) const;
-
-	private:
-
-		std::shared_ptr<Mesh> mMesh;
-		std::shared_ptr<VertexBuffer> mVertexBuffer;
-		std::shared_ptr<IndexBuffer> mIndexBuffer;
-		std::unordered_set<std::shared_ptr<Material>> mMaterials;
-		std::unordered_map<const Material*, Array<Geometry>> mGeometries;
-	};
 
 	class COCKTAIL_GRAPHIC_API SceneNode : public AcyclicGraphNode<SceneNode>, public Renderable, public Transformable
 	{

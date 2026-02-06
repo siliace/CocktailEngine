@@ -1,6 +1,7 @@
 #include <Cocktail/Graphic/Scene/Camera/OrhtographicCamera.hpp>
 #include <Cocktail/Graphic/Scene/Camera/PerspectiveCamera.hpp>
 #include <Cocktail/Graphic/Scene/Container/SceneContainer.hpp>
+#include <Cocktail/Graphic/Scene/Shape/StaticMeshShape.hpp>
 
 namespace Ck
 {
@@ -100,7 +101,7 @@ namespace Ck
 		sceneNode->SetLocalTransformation(nodeInfo.LocalTransformation);
 
 		for (unsigned int meshIndex : nodeInfo.MeshIndices)
-			sceneNode->AddShape(std::make_shared<Shape>(*graphicEngine, meshes[meshIndex], materials));
+			sceneNode->AddShape(std::make_shared<StaticMeshShape>(*graphicEngine, meshes[meshIndex], materials));
 
 		for (NodeInfo& childNodeInfo : nodeInfo.Children)
 			ProcessNode(scene, sceneNode, childNodeInfo, meshes, materials);

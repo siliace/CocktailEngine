@@ -1026,16 +1026,18 @@ namespace Ck::Vulkan
 		std::shared_ptr<Pipeline> pipeline = mCurrentPipelines[programType];
 		if (pipeline)
 		{
-			std::shared_ptr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
-			std::shared_ptr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
-			for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
-			{
-				std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
-				std::shared_ptr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
-
-				if (!nextDescriptorSetLayout || !nextDescriptorSetLayout->IsCompatibleWith(*descriptorSetLayout))
-					stateManager->ResetBindings(set);
-			}
+		    std::shared_ptr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
+		    std::shared_ptr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
+		    for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
+		    {
+		        std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
+		        std::shared_ptr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
+		        if (!nextDescriptorSetLayout || !descriptorSetLayout->IsCompatibleWith(*nextDescriptorSetLayout))
+		        {
+		            stateManager->ResetBindings(set);
+		            break;
+		        }
+		    }
 		}
 
 		stateManager->SetShaderProgram(shaderProgram);
@@ -1067,7 +1069,7 @@ namespace Ck::Vulkan
 		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
-		mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, arrayIndex, static_cast<const Sampler*>(sampler));
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Sampler*>(sampler));
 	}
 
 	void CommandList::BindTextureSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler)
@@ -1078,7 +1080,7 @@ namespace Ck::Vulkan
 		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
-		mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, arrayIndex, static_cast<const TextureView*>(textureView), static_cast<const Sampler*>(sampler));
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const TextureView*>(textureView), static_cast<const Sampler*>(sampler));
 	}
 
 	void CommandList::BindTexture(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
@@ -1093,11 +1095,11 @@ namespace Ck::Vulkan
 
 		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::Texture)
 		{
-			stateManager->BindTexture(set, binding, arrayIndex, textureView);
+			stateManager->BindTexture(set, binding, descriptorSetSlot->GetShaderStages(),arrayIndex, textureView);
 		}
 		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageTexture)
 		{
-			stateManager->BindStorageTexture(set, binding, arrayIndex, textureView);
+			stateManager->BindStorageTexture(set, binding, descriptorSetSlot->GetShaderStages(),arrayIndex, textureView);
 		}
 	}
 
@@ -1113,12 +1115,12 @@ namespace Ck::Vulkan
 		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::UniformBuffer)
 		{
 			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Uniform);
-			stateManager->BindUniformBuffer(set, binding, arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
+			stateManager->BindUniformBuffer(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
 		}
 		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageBuffer)
 		{
 			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Storage);
-			stateManager->BindStorageBuffer(set, binding, arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
+			stateManager->BindStorageBuffer(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
 		}
 	}
 

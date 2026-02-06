@@ -21,6 +21,7 @@ namespace Ck::Vulkan
 				HashCombine(localHash, descriptorState.Binding);
 				HashCombine(localHash, descriptorState.ArrayElement);
 				HashCombine(localHash, descriptorState.Type);
+				HashCombine(localHash, descriptorState.ShaderStages);
 
 				if (descriptorState.Type == Renderer::DescriptorType::UniformBuffer || descriptorState.Type == Renderer::DescriptorType::StorageBuffer)
 				{
@@ -49,10 +50,10 @@ namespace Ck::Vulkan
 		/// Nothing
 	}
 
-	bool DescriptorSetStateManager::BindSampler(unsigned int binding, unsigned int arrayIndex, const Sampler* sampler)
+	bool DescriptorSetStateManager::BindSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillImageState(state, Renderer::DescriptorType::Sampler, nullptr, sampler);
+		bool dirty = FillImageState(state, shaderStages, Renderer::DescriptorType::Sampler, nullptr, sampler);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -60,10 +61,10 @@ namespace Ck::Vulkan
 		return dirty;
 	}
 
-	bool DescriptorSetStateManager::BindTextureSampler(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
+	bool DescriptorSetStateManager::BindTextureSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
- 		bool dirty = FillImageState(state, Renderer::DescriptorType::TextureSampler, textureView, sampler);
+ 		bool dirty = FillImageState(state, shaderStages, Renderer::DescriptorType::TextureSampler, textureView, sampler);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -71,10 +72,10 @@ namespace Ck::Vulkan
 		return dirty;
 	}
 
-	bool DescriptorSetStateManager::BindTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
+	bool DescriptorSetStateManager::BindTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillImageState(state, Renderer::DescriptorType::Texture, textureView, nullptr);
+		bool dirty = FillImageState(state, shaderStages, Renderer::DescriptorType::Texture, textureView, nullptr);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -82,10 +83,10 @@ namespace Ck::Vulkan
 		return dirty;
 	}
 
-	bool DescriptorSetStateManager::BindStorageTexture(unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
+	bool DescriptorSetStateManager::BindStorageTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillImageState(state, Renderer::DescriptorType::StorageTexture, textureView, nullptr);
+		bool dirty = FillImageState(state, shaderStages, Renderer::DescriptorType::StorageTexture, textureView, nullptr);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -93,10 +94,10 @@ namespace Ck::Vulkan
 		return dirty;
 	}
 
-	bool DescriptorSetStateManager::BindUniformBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
+	bool DescriptorSetStateManager::BindUniformBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillBufferState(state, Renderer::DescriptorType::UniformBuffer, buffer, offset, range);
+		bool dirty = FillBufferState(state, shaderStages, Renderer::DescriptorType::UniformBuffer, buffer, offset, range);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -104,10 +105,10 @@ namespace Ck::Vulkan
 		return dirty;
 	}
 
-	bool DescriptorSetStateManager::BindStorageBuffer(unsigned int binding, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
+	bool DescriptorSetStateManager::BindStorageBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
 		DescriptorState& state = FindOrCreateDescriptorState(binding, arrayIndex);
-		bool dirty = FillBufferState(state, Renderer::DescriptorType::StorageBuffer, buffer, offset, range);
+		bool dirty = FillBufferState(state, shaderStages, Renderer::DescriptorType::StorageBuffer, buffer, offset, range);
 
 		if (dirty)
 			mBindingDirtyFlags |= Bit(binding);
@@ -399,11 +400,12 @@ namespace Ck::Vulkan
 		return mBindingDirtyFlags & Bit(binding);
 	}
 
-	bool DescriptorSetStateManager::FillImageState(DescriptorState& state, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler)
+	bool DescriptorSetStateManager::FillImageState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler)
 	{
 		bool changed = false;
 
 		changed |= CheckedAssign(state.Type, type);
+	    changed |= CheckedAssign(state.ShaderStages, shaderStages);
 		changed |= CheckedAssign(state.ImageInfo.TextureView, textureView);
 		changed |= CheckedAssign(state.ImageInfo.Sampler, sampler);
 		state.Dirty = changed;
@@ -411,11 +413,12 @@ namespace Ck::Vulkan
 		return changed;
 	}
 
-	bool DescriptorSetStateManager::FillBufferState(DescriptorState& state, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range)
+	bool DescriptorSetStateManager::FillBufferState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range)
 	{
 		bool changed = false;
 
 		changed |= CheckedAssign(state.Type, type);
+	    changed |= CheckedAssign(state.ShaderStages, shaderStages);
 		changed |= CheckedAssign(state.BufferInfo.Buffer, buffer);
 		changed |= CheckedAssign(state.BufferInfo.Offset, offset);
 		changed |= CheckedAssign(state.BufferInfo.Range, range);

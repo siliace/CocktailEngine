@@ -5,12 +5,12 @@
 
 #include <Cocktail/Graphic/Mesh/MeshFactory.hpp>
 #include <Cocktail/Graphic/Rendering/WindowSceneViewer.hpp>
-#include <Cocktail/Graphic/Scene/Scene.hpp>
-#include <Cocktail/Graphic/Scene/SceneLoader.hpp>
-#include <Cocktail/Graphic/Scene/Camera/PerspectiveCamera.hpp>
 #include <Cocktail/Graphic/Scene/Camera/Controller/FreeFlyCameraController.hpp>
+#include <Cocktail/Graphic/Scene/Camera/PerspectiveCamera.hpp>
 #include <Cocktail/Graphic/Scene/Light/DirectionalLight.hpp>
 #include <Cocktail/Graphic/Scene/Light/PointLight.hpp>
+#include <Cocktail/Graphic/Scene/Scene.hpp>
+#include <Cocktail/Graphic/Scene/Shape/StaticMeshShape.hpp>
 
 #include <Cocktail/Main/ExitCode.hpp>
 
@@ -36,7 +36,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
 	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Phong, true);
 	material->SetEmissiveColor(LinearColor::White);
-	std::shared_ptr<Shape> shape = std::make_shared<Shape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
+	std::shared_ptr<Shape> shape = std::make_shared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
 
 	for (unsigned int i = 0; i < 30; i++)
 	{

@@ -5,6 +5,7 @@
 
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp>
+#include <Cocktail/Graphic/Rendering/Queue/LineRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecordInfo.hpp>
 
@@ -41,6 +42,8 @@ namespace Ck
 		 * \param recordInfo 
 		 */
 		void PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Uint64 sortingKey);
+
+	    void PushLine(const LineRecordInfo& recordInfo, Uint64 sortingKey);
 
 		/**
 		 * \brief 

@@ -8,6 +8,11 @@ namespace Ck
 	 */
 	enum class RenderableType
 	{
+        /**
+         * \brief
+         */
+	    Line,
+
 		/**
 		 * \brief 
 		 */

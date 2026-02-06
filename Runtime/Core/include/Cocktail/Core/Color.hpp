@@ -279,6 +279,27 @@ namespace Ck
         }
 
         /**
+         * \brief Indicates whether the color is fully opaque
+         *
+         * \return \c true if alpha equals 1, \c false otherwise
+         */
+        bool IsOpaque() const;
+
+        /**
+         * \brief Indicates whether the color has any transparency
+         *
+         * \return \c true if alpha is less than 1, \c false otherwise
+         */
+        bool IsTransparent() const;
+
+        /**
+         * \brief Indicates whether the color is fully transparent
+         *
+         * \return \c true if alpha equals 0, \c false otherwise
+         */
+        bool IsFullyTransparent() const;
+
+        /**
          * \brief Computes the luminance of the color
          *
          * Uses standard luminance coefficients to compute perceived brightness.

@@ -64,10 +64,7 @@ namespace Ck
 			vertexInfo.Normal[i] = Vector4<float>(normalMatrix.GetColumn(i).Normalized(), 0.f);
 
 		MaterialInfo materialInfo;
-	    materialInfo.BaseColor[0] = mRecordInfo.MaterialBaseColor.R;
-	    materialInfo.BaseColor[1] = mRecordInfo.MaterialBaseColor.G;
-	    materialInfo.BaseColor[2] = mRecordInfo.MaterialBaseColor.B;
-	    materialInfo.BaseColor[3] = mRecordInfo.MaterialBaseColor.A;
+	    materialInfo.BaseColor = mRecordInfo.MaterialBaseColor;
 	    materialInfo.EmissiveColor[0] = mRecordInfo.MaterialEmissiveColor.R;
 	    materialInfo.EmissiveColor[1] = mRecordInfo.MaterialEmissiveColor.G;
 	    materialInfo.EmissiveColor[2] = mRecordInfo.MaterialEmissiveColor.B;

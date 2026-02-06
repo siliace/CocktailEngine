@@ -75,12 +75,11 @@ namespace Ck::Vulkan
 
 		for (unsigned int i = 0; i < mBindings.GetSize(); i++)
 		{
-			const DescriptorSetLayoutBinding* otherBinding = nullptr;
-			for (unsigned int j = 0; j < mBindings.GetSize() && !otherBinding; j++)
-			{
-				if (mBindings[i].Binding == other.mBindings[j].Binding)
-					otherBinding = &other.mBindings[j];
-			}
+			const DescriptorSetLayoutBinding* otherBinding = other.mBindings.FindIf([&](const DescriptorSetLayoutBinding& binding) {
+			    return mBindings[i].Binding == binding.Binding;
+			}).Map([](const DescriptorSetLayoutBinding& binding) {
+			    return &binding;
+			}).GetOr(nullptr);
 
 			if (!otherBinding)
 				return false;

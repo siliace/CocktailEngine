@@ -86,7 +86,7 @@ namespace Ck::Vulkan
 		 * \param arrayIndex
 		 * \param sampler
 		 */
-		void BindSampler(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Sampler* sampler);
+		void BindSampler(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler);
 
 		/**
 		 * \brief 
@@ -96,7 +96,7 @@ namespace Ck::Vulkan
 		 * \param textureView 
 		 * \param sampler 
 		 */
-		void BindTextureSampler(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler);
+		void BindTextureSampler(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler);
 
 		/**
 		 * \brief
@@ -105,7 +105,7 @@ namespace Ck::Vulkan
 		 * \param arrayIndex
 		 * \param textureView
 		 */
-		void BindTexture(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView);
+		void BindTexture(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
 
 		/**
 		 * \brief
@@ -114,7 +114,7 @@ namespace Ck::Vulkan
 		 * \param arrayIndex
 		 * \param textureView
 		 */
-		void BindStorageTexture(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView);
+		void BindStorageTexture(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
 
 		/**
 		 * \brief 
@@ -125,7 +125,7 @@ namespace Ck::Vulkan
 		 * \param offset 
 		 * \param range 
 		 */
-		void BindUniformBuffer(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range);
+		void BindUniformBuffer(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief
@@ -136,7 +136,7 @@ namespace Ck::Vulkan
 		 * \param offset
 		 * \param range
 		 */
-		void BindStorageBuffer(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range);
+		void BindStorageBuffer(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range);
 
 		/**
 		 * \brief 
@@ -149,9 +149,9 @@ namespace Ck::Vulkan
 
 		/**
 		 * \brief 
-		 * \param set 
+		 * \param firstSet
 		 */
-		void ResetBindings(unsigned int set);
+		void ResetBindings(unsigned int firstSet);
 
 		/**
 		 * \brief 

@@ -142,6 +142,7 @@ cocktail_source_directory(GRAPHIC_FILES
     FOLDER "Rendering/Queue"  
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/LineRecordInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp
@@ -149,6 +150,8 @@ cocktail_source_directory(GRAPHIC_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/CustomRecord.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/CustomRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/LineRecord.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/LineRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/RecordDrawContext.cpp
@@ -259,6 +262,17 @@ cocktail_source_directory(GRAPHIC_FILES
 )
 
 cocktail_source_directory(GRAPHIC_FILES
+    FOLDER "Scene/Shape"
+    INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Shape/Shape.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Shape/LineShape.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/Shape/StaticMeshShape.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Shape/LineShape.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Shape/StaticMeshShape.cpp
+)
+
+cocktail_source_directory(GRAPHIC_FILES
     FOLDER "Spatial"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Spatial/Transformable.hpp
@@ -270,6 +284,32 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Spatial/Transformation.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Spatial/TransformationGraph.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Spatial/TransformationNode.cpp
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/default.vert.spv
+        TYPE vert
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.vert
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/default.frag.spv
+        TYPE frag
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.frag
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/colored.vert.spv
+        TYPE vert
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.vert
+        MACRO COCKTAIL_VERTEX_HAS_COLOR
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/colored.frag.spv
+        TYPE frag
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.frag
+        MACRO COCKTAIL_VERTEX_HAS_COLOR
 )
 
 cocktail_add_shader(GRAPHIC_FILES
@@ -357,6 +397,8 @@ cocktail_add_shader(GRAPHIC_FILES
 cocktail_resource_directory(GRAPHIC_FILES
     FOLDER "shaders/mesh"
     RESOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.frag
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/basic_line.vert
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.frag
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/basic_mesh.vert
 )
@@ -377,6 +419,10 @@ cocktail_add_runtime_library(
     SOURCES 
         ${GRAPHIC_FILES}
     RESOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/default.frag.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/default.vert.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/colored.frag.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/line/colored.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/default.frag.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/default.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/default-no-normal.frag.spv

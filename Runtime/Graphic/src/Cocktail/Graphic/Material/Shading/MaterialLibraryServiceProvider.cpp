@@ -20,6 +20,39 @@ namespace Ck
 		application->Singleton<MaterialProgramLibrary>();
 
 		application->AfterBooted<SystemServiceProvider>([](Application* application, ServiceProvider* systemServiceProvider) {
+		    application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+                MaterialProgramLibrary::Entry entry;
+                entry.Name = CK_TEXT("basic_line");
+                entry.RenderableType = RenderableType::Line;
+                entry.ShadingMode = Material::ShadingMode::Phong;
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
+		        entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+
+                {
+                    ByteArray basicMeshVertexStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/line/default.vert.spv"));
+                    ByteArray basicMeshFragmentStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/line/default.frag.spv"));
+
+                    EnumMap<Renderer::ShaderType, ByteArray> binaries;
+                    binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
+                    binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
+
+                    entry.VariantsBinaries.Add(std::move(binaries));
+                }
+
+                {
+                    ByteArray basicMeshVertexStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/line/colored.vert.spv"));
+                    ByteArray basicMeshFragmentStage = StorageUtils::ReadFile(CK_TEXT("builtin://graphic/resources/shaders/line/colored.frag.spv"));
+
+                    EnumMap<Renderer::ShaderType, ByteArray> binaries;
+                    binaries[Renderer::ShaderType::Vertex] = std::move(basicMeshVertexStage);
+                    binaries[Renderer::ShaderType::Fragment] = std::move(basicMeshFragmentStage);
+
+                    entry.VariantsBinaries.Add(std::move(binaries));
+                }
+
+				materialProgramLibrary->Register(entry);
+		    });
+
 			application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
 				MaterialProgramLibrary::Entry entry;
 				entry.Name = CK_TEXT("basic_mesh");

@@ -31,9 +31,9 @@ namespace Ck::Vulkan
 			mShaderStages[shaderType] = std::static_pointer_cast<Shader>(shaderProgram->GetStage(shaderType));
 	}
 
-	void StateManager::BindSampler(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Sampler* sampler)
+	void StateManager::BindSampler(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindSampler(binding, arrayIndex, sampler);
+		bool dirty = mDescriptorSetStateManagers[set].BindSampler(binding, shaderStages, arrayIndex, sampler);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -41,9 +41,9 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::BindTextureSampler(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
+	void StateManager::BindTextureSampler(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindTextureSampler(binding, arrayIndex, textureView, sampler);
+		bool dirty = mDescriptorSetStateManagers[set].BindTextureSampler(binding, shaderStages, arrayIndex, textureView, sampler);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -51,9 +51,9 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::BindTexture(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
+	void StateManager::BindTexture(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindTexture(binding, arrayIndex, textureView);
+		bool dirty = mDescriptorSetStateManagers[set].BindTexture(binding, shaderStages, arrayIndex, textureView);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -61,9 +61,9 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::BindStorageTexture(unsigned int set, unsigned int binding, unsigned int arrayIndex, const TextureView* textureView)
+	void StateManager::BindStorageTexture(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindStorageTexture(binding, arrayIndex, textureView);
+		bool dirty = mDescriptorSetStateManagers[set].BindStorageTexture(binding, shaderStages, arrayIndex, textureView);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -71,9 +71,9 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::BindUniformBuffer(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range)
+	void StateManager::BindUniformBuffer(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindUniformBuffer(binding, arrayIndex, uniformBuffer, offset, range);
+		bool dirty = mDescriptorSetStateManagers[set].BindUniformBuffer(binding, shaderStages, arrayIndex, uniformBuffer, offset, range);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -81,9 +81,9 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::BindStorageBuffer(unsigned int set, unsigned int binding, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range)
+	void StateManager::BindStorageBuffer(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range)
 	{
-		bool dirty = mDescriptorSetStateManagers[set].BindStorageBuffer(binding, arrayIndex, uniformBuffer, offset, range);
+		bool dirty = mDescriptorSetStateManagers[set].BindStorageBuffer(binding, shaderStages, arrayIndex, uniformBuffer, offset, range);
 		if (dirty)
 		{
 			mDescriptorSetDirtyFlags |= Bit(set);
@@ -119,9 +119,10 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void StateManager::ResetBindings(unsigned int set)
+	void StateManager::ResetBindings(unsigned int firstSet)
 	{
-		mDescriptorSetStateManagers[set].ResetBindings();
+	    for (unsigned int i = firstSet; i < mDescriptorSetStateManagers.GetSize(); i++)
+		    mDescriptorSetStateManagers[i].ResetBindings();
 	}
 
 	void StateManager::ResetBindings()

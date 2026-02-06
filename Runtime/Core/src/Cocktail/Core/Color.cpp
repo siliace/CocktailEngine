@@ -100,6 +100,22 @@ namespace Ck
         B(ColorConversion::SrgbColorToLinear(color.B / 255.f)),
         A(ColorConversion::FloatColorToByte(color.A / 255.f))
     {
+        /// Nothing
+    }
+
+    bool LinearColor::IsOpaque() const
+    {
+        return NearlyEqual(A, 1.f);
+    }
+
+    bool LinearColor::IsTransparent() const
+    {
+        return !IsOpaque();
+    }
+
+    bool LinearColor::IsFullyTransparent() const
+    {
+        return NearlyEqual(A, 0.f);
     }
 
     float LinearColor::GetLuminance() const
