@@ -128,7 +128,7 @@ namespace Ck
          * \brief Default constructor
          * Creates an empty path
          */
-        Path() = default;
+        Path();
 
         /**
          * \brief Constructor
@@ -232,6 +232,24 @@ namespace Ck
         Path& Join(const TextChar* other, SizeType length);
 
         /**
+         * \brief Changes the format of this path
+         *
+         * \param format The new format of the path
+         *
+         * \return This
+         */
+        Path& ToFormatInPlace(Format format);
+
+        /**
+         * \brief Creates a new path copying this one with another format
+         *
+         * \param format The new format of the path
+         *
+         * \return The new path
+         */
+        Path ToFormat(Format format) const;
+
+        /**
          * \brief Checks whether the path is empty
          *
          * \return True if the path contains no root or elements; false otherwise
@@ -244,6 +262,15 @@ namespace Ck
          * \return True if the path contains a root component (is absolute); false for relative paths
          */
         bool IsAbsolute() const;
+
+        /**
+         * \brief Tell whether the filename of the path has a given extension
+         *
+         * \param extension The extension to test
+         *
+         * \return True if the filename has the \p extension, false otherise
+         */
+        bool HasExtension(StringView extension) const;
 
         /**
          * \brief Retrieves the root of this path

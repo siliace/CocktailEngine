@@ -34,7 +34,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
 	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
-	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Phong, true);
+	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Unlit, true);
 	material->SetEmissiveColor(LinearColor::White);
 	std::shared_ptr<Shape> shape = std::make_shared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
 
@@ -47,9 +47,6 @@ Main::ExitCode ApplicationMain(Application* application)
 			sceneNode->AddShape(shape);
 		}
 	}
-
-	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor::White);
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);

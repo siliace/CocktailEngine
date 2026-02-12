@@ -133,8 +133,8 @@ namespace Ck
 	SceneViewer::SceneViewer(std::shared_ptr<Scene> scene) :
 		mScene(std::move(scene))
 	{
-		mOpaqueRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Opaque);
-		mBlendingRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), Material::ShadingMode::Phong, RenderQueue::BlendingMode::Transparent);
+		mOpaqueRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), RenderQueue::BlendingMode::Opaque);
+		mBlendingRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), RenderQueue::BlendingMode::Transparent);
 	}
 
 	std::shared_ptr<Scene> SceneViewer::GetScene() const

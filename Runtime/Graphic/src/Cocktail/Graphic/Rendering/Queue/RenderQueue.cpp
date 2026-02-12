@@ -9,11 +9,10 @@ namespace Ck
 {
 	COCKTAIL_DEFINE_LOG_CATEGORY(RenderQueueLogCategory);
 
-	RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode, BlendingMode blendingMode) :
-		mShadingMode(shadingMode),
+	RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, BlendingMode blendingMode) :
 		mBlendingMode(blendingMode)
 	{
-		mMaterialProgramSet = std::make_shared<MaterialProgramSet>(materialProgramManager, mShadingMode);
+		mMaterialProgramSet = std::make_shared<MaterialProgramSet>(materialProgramManager);
 	}
 
 	void RenderQueue::PushCustom(const CustomRecordInfo& recordInfo, Uint64 sortingKey)
@@ -21,7 +20,7 @@ namespace Ck
 		Emplace(CustomRecord::New(recordInfo), sortingKey);
 	}
 
-	void RenderQueue::PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Uint64 sortingKey)
+	void RenderQueue::PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey)
 	{
 		// Todo: move this outside of RenderQueue class
 		Flags<VertexAttributeSemantic> vertexAttributes;
@@ -50,30 +49,18 @@ namespace Ck
 			materialTextures |= textureType;
 		}
 
-		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Mesh)->GetVariant(vertexAttributes, materialTextures);
-		if (!materialProgramVariant)
-		{
-			CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No MaterialProgram found for Material"));
-			return;
-		}
-
-		Emplace(StaticMeshRecord::New(recordInfo, materialProgramVariant.get()), sortingKey);
+	    if (MaterialProgramVariant* variant = FindMaterialProgramVariant(RenderableType::Mesh, shadingMode, vertexAttributes, materialTextures))
+		    Emplace(StaticMeshRecord::New(recordInfo, variant), sortingKey);
 	}
 
-    void RenderQueue::PushLine(const LineRecordInfo& recordInfo, Uint64 sortingKey)
+    void RenderQueue::PushLine(const LineRecordInfo& recordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey)
     {
 	    Flags<VertexAttributeSemantic> vertexAttributes = VertexAttributeSemantic::Position;
 	    if (recordInfo.HasVertexColor)
 	        vertexAttributes |= VertexAttributeSemantic::Color;
 
-		std::shared_ptr<MaterialProgramVariant> materialProgramVariant = mMaterialProgramSet->GetMaterialProgram(RenderableType::Line)->GetVariant(vertexAttributes, {});
-	    if (!materialProgramVariant)
-	    {
-	        CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No MaterialProgram found for Material"));
-	        return;
-	    }
-
-	    Emplace(LineRecord::New(recordInfo, materialProgramVariant.get()), sortingKey);
+	    if (MaterialProgramVariant* variant = FindMaterialProgramVariant(RenderableType::Line, shadingMode, vertexAttributes, {}))
+	        Emplace(LineRecord::New(recordInfo, variant), sortingKey);
     }
 
     void RenderQueue::Flush(Renderer::CommandList& commandList, RecordDrawContext& drawContext)
@@ -98,13 +85,27 @@ namespace Ck
 		return mBlendingMode;
 	}
 
-	Material::ShadingMode RenderQueue::GetShadingMode() const
-	{
-		return mShadingMode;
-	}
-
 	void RenderQueue::Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey)
 	{
 		mRecords.Emplace(RecordInfo{ std::move(record), sortingKey });
 	}
+
+    MaterialProgramVariant* RenderQueue::FindMaterialProgramVariant(RenderableType renderable, Material::ShadingMode shadingMode, Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const
+	{
+	    MaterialProgram* materialProgram = mMaterialProgramSet->GetMaterialProgram(renderable, shadingMode);
+	    if (!materialProgram)
+	    {
+	        CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No MaterialProgram found for renderable %s in shading mode %s"), renderable, shadingMode);
+	        return nullptr;
+	    }
+
+	    MaterialProgramVariant* materialProgramVariant = materialProgram->GetVariant(vertexAttributes, materialTextures);
+	    if (!materialProgramVariant)
+	    {
+	        CK_LOG(RenderQueueLogCategory, LogLevel::Error, CK_TEXT("No variant found in material program %s with usage mask %d and %d"), materialProgram->GetName(), vertexAttributes, materialTextures);
+	        return nullptr;
+	    }
+
+	    return materialProgramVariant;
+    }
 }

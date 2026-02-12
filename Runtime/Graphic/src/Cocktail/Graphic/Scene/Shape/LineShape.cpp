@@ -45,7 +45,7 @@ namespace Ck
         recordInfo.IsStrip = mIsStip;
         recordInfo.HasVertexColor = mVertexBuffer->GetVertexArray()->GetVertexLayout()->FindAttribute(VertexAttributeSemantic::Color) != nullptr;
 
-        queue.PushLine(recordInfo, 0);
+        queue.PushLine(recordInfo, Material::ShadingMode::Unlit, 0);
     }
 
     void LineShape::ExtendBoundingVolume(Volume<float>& volume)

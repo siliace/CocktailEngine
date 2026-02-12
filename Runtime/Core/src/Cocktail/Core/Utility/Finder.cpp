@@ -1,4 +1,3 @@
-#include <Cocktail/Core/System/FileSystem/Storage.hpp>
 #include <Cocktail/Core/Utility/Finder.hpp>
 
 namespace Ck
@@ -12,10 +11,10 @@ namespace Ck
 
 	Finder& Finder::WithExtension(String fileExtension)
 	{
-		if (fileExtension[0] != CK_CHAR('.'))
-			fileExtension.Append(CK_CHAR('.'));
+	    if (!fileExtension.IsEmpty() && fileExtension.First() != CK_CHAR('.'))
+            fileExtension.Prepend(CK_CHAR('.'));
 
-		mFileExtension = std::move(fileExtension);
+	    mFileExtension = std::move(fileExtension);
 
 		return *this;
 	}
@@ -41,39 +40,39 @@ namespace Ck
 		return *this;
 	}
 
-	Array<Path> Finder::Get() const
+	Array<Path> Finder::Get(FileSystemDriver* fileSystemDriver) const
 	{
 		Array<Path> content;
 		for (const Path& source : mSource)
-			content.Append(Get(source, mDepth));
+			content.Append(Get(source, mDepth, fileSystemDriver));
 
 		return content;
 	}
 
-	Array<Path> Finder::Get(const Path& source, unsigned int depth) const
+	Array<Path> Finder::Get(const Path& source, unsigned int depth, FileSystemDriver* fileSystemDriver) const
 	{
 		Array<Path> content;
-		UniquePtr<Directory> directory = Storage::OpenDirectory(source);
+		UniquePtr<Directory> directory = fileSystemDriver->OpenDirectory(source);
 
 		for (const Path& child : directory->GetContent())
 		{
 			if (child == CK_TEXT(".") || child == CK_TEXT(".."))
 				continue;
 
-			if (Storage::IsFile(child) && !mIgnoreFiles)
+			if (fileSystemDriver->IsFile(child) && !mIgnoreFiles)
 			{
 				if (!mFileExtension.IsEmpty() && child.GetExtension() != mFileExtension)
 					continue;
 
 				content.Add(child);
 			}
-			else if (Storage::IsDirectory(child))
+			else if (fileSystemDriver->IsDirectory(child))
 			{
 				if (!mIgnoreDirectories)
 					content.Add(child);
 
 				if (depth > 0)
-					content.Append(Get(child, depth - 1));
+					content.Append(Get(child, depth - 1, fileSystemDriver));
 			}
 		}
 

@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMSET_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMSET_HPP
 
+#include <Cocktail/Graphic/Material/Material.hpp>
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramManager.hpp>
 
 namespace Ck
@@ -15,21 +16,20 @@ namespace Ck
 		/**
 		 * \brief 
 		 * \param materialProgramManager
-		 * \param shadingMode
 		 */
-		MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode);
+		MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager);
 
 		/**
 		 * \brief 
 		 * \param renderableType 
 		 * \return 
 		 */
-		std::shared_ptr<MaterialProgram> GetMaterialProgram(RenderableType renderableType) const;
+		MaterialProgram* GetMaterialProgram(RenderableType renderableType, Material::ShadingMode shadingMode) const;
 
 	private:
 
 		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
-		EnumMap<RenderableType, std::shared_ptr<MaterialProgram>> mMaterialPrograms;
+		EnumMap<RenderableType, EnumMap<Material::ShadingMode, MaterialProgram*>> mMaterialPrograms;
 	};
 }
 

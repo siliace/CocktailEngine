@@ -43,9 +43,6 @@ namespace Ck
 
         for (const std::shared_ptr<Material>& material : mMaterials)
         {
-            if (material->GetShadingMode() != queue.GetShadingMode())
-                continue;
-
             if (material->GetAlphaMode() == Material::AlphaMode::Opaque && queue.GetBlendingMode() == RenderQueue::BlendingMode::Transparent)
                 continue;
 
@@ -71,7 +68,7 @@ namespace Ck
                 recordInfo.FirstVertex = geometry.FirstVertex;
                 recordInfo.FirstIndex = geometry.FirstIndex;
 
-                queue.PushStaticMesh(recordInfo, distanceToCamera);
+                queue.PushStaticMesh(recordInfo, material->GetShadingMode(), distanceToCamera);
             }
         }
     }

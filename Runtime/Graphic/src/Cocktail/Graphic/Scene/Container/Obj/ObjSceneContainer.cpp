@@ -78,7 +78,7 @@ namespace Ck
 	{
 		MaterialInfo materialInfo;
 		materialInfo.Name = objMaterial.name.c_str();
-		materialInfo.ShadingMode = Material::ShadingMode::Phong;
+		materialInfo.ShadingMode = Material::ShadingMode::Lit;
 		materialInfo.Parameters.Base = { objMaterial.diffuse[0], objMaterial.diffuse[1], objMaterial.diffuse[2], objMaterial.dissolve };
 		materialInfo.Parameters.Emission = { objMaterial.emission[0], objMaterial.emission[1], objMaterial.emission[2], 1.f };
 

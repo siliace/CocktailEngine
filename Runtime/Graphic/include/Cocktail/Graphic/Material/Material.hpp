@@ -19,11 +19,9 @@ namespace Ck
 
 		enum class ShadingMode
 		{
-			Flat,
-			Phong,
-			BlinnPhong,
-			BRDF,
 			Unlit,
+		    Flat,
+		    Lit,
 		};
 
 		enum class TextureType

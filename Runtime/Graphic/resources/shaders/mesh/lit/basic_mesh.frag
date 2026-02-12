@@ -199,6 +199,8 @@ void main()
 		}
 		diffuseColor += lightColor * baseColor.rgb;
 	}
+#else
+	diffuseColor = baseColor.rgb;
 #endif
 
 	pixel.rgb = ambientColor + diffuseColor;

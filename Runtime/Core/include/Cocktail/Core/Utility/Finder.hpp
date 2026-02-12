@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_UTILITY_FINDER_HPP
 
 #include <Cocktail/Core/System/FileSystem/Path.hpp>
+#include <Cocktail/Core/System/FileSystem/Local/LocalFileSystem.hpp>
 
 namespace Ck
 {
@@ -52,17 +53,18 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Array<Path> Get() const;
+		Array<Path> Get(FileSystemDriver* fileSystemDriver = LocalFileSystem::GetRootDriver()) const;
 
 	private:
 
 		/**
 		 * \brief 
 		 * \param source 
-		 * \param depth 
+		 * \param depth
+		 * \param fileSystemDriver
 		 * \return 
 		 */
-		Array<Path> Get(const Path& source, unsigned int depth) const;
+		Array<Path> Get(const Path& source, unsigned int depth, FileSystemDriver* fileSystemDriver) const;
 
 		bool mIgnoreFiles = false;
 		bool mIgnoreDirectories = false;

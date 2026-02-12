@@ -1,19 +1,17 @@
-#include <Cocktail/Core/Application/App.hpp>
-
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 
 namespace Ck
 {
-	MaterialProgramSet::MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager, Material::ShadingMode shadingMode) :
+	MaterialProgramSet::MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager) :
 		mMaterialProgramManager(std::move(materialProgramManager))
 	{
-		mMaterialProgramManager->SelectMaterialPrograms(shadingMode, [&](RenderableType renderableType, std::shared_ptr<MaterialProgram> materialProgram) {
-			mMaterialPrograms[renderableType] = std::move(materialProgram);
+		mMaterialProgramManager->SelectMaterialPrograms([&](RenderableType renderableType, MaterialProgram* materialProgram) {
+			mMaterialPrograms[renderableType][materialProgram->GetShadingMode()] = materialProgram;
 		});
 	}
 
-	std::shared_ptr<MaterialProgram> MaterialProgramSet::GetMaterialProgram(RenderableType renderableType) const
-	{
-		return mMaterialPrograms[renderableType];
-	}
+    MaterialProgram* MaterialProgramSet::GetMaterialProgram(RenderableType renderableType, Material::ShadingMode shadingMode) const
+    {
+		return mMaterialPrograms[renderableType][shadingMode];
+    }
 }

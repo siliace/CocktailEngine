@@ -15,6 +15,11 @@ namespace Ck
 	{
 	public:
 
+	    /**
+	     * \brief
+	     */
+	    MaterialProgram() = delete;
+
 		/**
 		 * \brief Constructor
 		 * \param renderDevice
@@ -22,16 +27,24 @@ namespace Ck
 		 */
 		MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo);
 
-		std::shared_ptr<MaterialProgramVariant> GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
+        MaterialProgram(const MaterialProgram& other) = delete;
+        MaterialProgram(MaterialProgram&& other) = default;
+        MaterialProgram& operator=(const MaterialProgram& other) = delete;
+        MaterialProgram& operator=(MaterialProgram&& other) = default;
+
+        MaterialProgramVariant* GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
 
 		const String& GetName() const;
+
+	    Material::ShadingMode GetShadingMode() const;
 
 	private:
 
 		using VariantKey = CompositeKey<Flags<VertexAttributeSemantic>, Flags<Material::TextureType>>;
 
 		String mName;
-		std::unordered_map<VariantKey, std::shared_ptr<MaterialProgramVariant>> mVariants;
+	    Material::ShadingMode mShadingMode;
+		std::unordered_map<VariantKey, UniquePtr<MaterialProgramVariant>> mVariants;
 	};
 }
 

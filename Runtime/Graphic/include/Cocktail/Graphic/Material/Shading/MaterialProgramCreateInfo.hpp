@@ -19,6 +19,11 @@ namespace Ck
 		 */
 		String Name;
 
+	    /**
+	     * \brief 
+	     */
+	    Material::ShadingMode ShadingMode;
+
 		/**
 		 * \brief 
 		 */

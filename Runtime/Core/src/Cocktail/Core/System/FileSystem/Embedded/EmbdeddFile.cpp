@@ -8,6 +8,7 @@ namespace Ck
 	EmbeddedFile::EmbeddedFile(const cmrc::embedded_filesystem& fileSystem, const Path& path, const FileOpenFlags& flags):
 		mPath(path)
 	{
+	    mPath.ToFormatInPlace(Path::Format::Generic);
 		if (flags & FileOpenFlagBits::Truncate | flags & FileOpenFlagBits::Write)
 			throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
 

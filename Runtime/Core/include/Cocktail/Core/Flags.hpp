@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_FLAGS_HPP
 
 #include <Cocktail/Core/Enum.hpp>
+#include <Cocktail/Core/Utility/StringFormater.hpp>
 
 namespace Ck
 {
@@ -421,6 +422,18 @@ namespace Ck
         using Underlying = typename Flags<T>::UnderlyingType;
         return static_cast<Underlying>(lhs) > static_cast<Underlying>(rhs);
     }
+
+    template <typename T>
+    struct Formatter<Flags<T>, void>
+    {
+        using FlagsType = Flags<T>;
+        using IntegerType = typename Flags<T>::UnderlyingType;
+
+        IntegerType Apply(const FlagsType& value) const noexcept
+        {
+            return value.GetHashCode();
+        }
+    };
 }
 
 namespace std

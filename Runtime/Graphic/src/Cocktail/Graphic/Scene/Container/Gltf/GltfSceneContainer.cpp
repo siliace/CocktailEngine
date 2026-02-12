@@ -65,7 +65,7 @@ namespace Ck
         materialInfo.Name = gltfMaterial.name.c_str();
         materialInfo.Parameters.Base = GltfUtils::ConvertLinearColor(gltfMaterial.pbrMetallicRoughness.baseColorFactor);
         materialInfo.Parameters.Emission = GltfUtils::ConvertLinearColor(gltfMaterial.emissiveFactor);
-        materialInfo.ShadingMode = Material::ShadingMode::Phong;
+        materialInfo.ShadingMode = Material::ShadingMode::Lit;
         materialInfo.DoubleSided = gltfMaterial.doubleSided;
         materialInfo.Parameters.Roughness = static_cast<float>(gltfMaterial.pbrMetallicRoughness.roughnessFactor);
         materialInfo.Parameters.Metallic = static_cast<float>(gltfMaterial.pbrMetallicRoughness.metallicFactor);

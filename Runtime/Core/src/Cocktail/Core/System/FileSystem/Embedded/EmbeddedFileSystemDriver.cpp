@@ -6,7 +6,7 @@ namespace Ck
 {
 	bool EmbeddedFileSystemDriver::IsFile(const Path& path) const
 	{
-		AsciiString p = AsciiString::Convert(path.ToString());
+		AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
 			if (fileSystem.is_file(p.GetData()))
@@ -18,7 +18,7 @@ namespace Ck
 
 	bool EmbeddedFileSystemDriver::IsDirectory(const Path& path) const
 	{
-		AsciiString p = AsciiString::Convert(path.ToString());
+		AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
 			if (fileSystem.is_directory(p.GetData()))
@@ -40,7 +40,7 @@ namespace Ck
 
 	UniquePtr<File> EmbeddedFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
 	{
-		AsciiString p = AsciiString::Convert(path.ToString());
+		AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
 		for (const cmrc::embedded_filesystem& fileSystem : mFileSystems)
 		{
 			if (fileSystem.is_file(p.GetData()))
@@ -52,7 +52,7 @@ namespace Ck
 
 	UniquePtr<Directory> EmbeddedFileSystemDriver::OpenDirectory(const Path& path)
 	{
-		AsciiString p = AsciiString::Convert(path.ToString());
+		AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
 		for (const cmrc::embedded_filesystem& mFileSystem : mFileSystems)
 		{
 			if (mFileSystem.is_directory(p.GetData()))

@@ -830,7 +830,7 @@ namespace Ck
 		 */
 		BasicString& Append(const CharType* string, SizeType length)
 		{
-			if (!IsEmpty())
+			if (!mCharacters.IsEmpty())
 				mCharacters.PopLast();
 
 			const CharType* begin = mCharacters.GetData();

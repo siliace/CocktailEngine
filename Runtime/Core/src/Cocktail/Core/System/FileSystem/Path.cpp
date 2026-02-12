@@ -121,6 +121,12 @@ namespace Ck
         return character == CK_CHAR('\\') || character == CK_CHAR('/');
     }
 
+    Path::Path() :
+        mFormat(Format::Auto)
+    {
+	    /// Nothing
+    }
+
     Path::Path(StringView string, Format format) :
         Path(string.GetData(), string.GetLength(), format)
     {
@@ -209,6 +215,25 @@ namespace Ck
         return Join(Parse(other, length));
     }
 
+    Path& Path::ToFormatInPlace(Format format)
+	{
+	    if (mFormat == format)
+	        return *this;
+
+	    for (String& element : mElements)
+	        CheckElementSeparator(element, format, SystemSeparator);
+
+	    mFormat = format;
+	    mJoined.SetDirty();
+
+	    return *this;
+    }
+
+    Path Path::ToFormat(Format format) const
+    {
+	    return Path(*this).ToFormatInPlace(format);
+    }
+
     bool Path::IsEmpty() const
     {
         return mRoot.IsEmpty() && mElements.IsEmpty();
@@ -217,6 +242,14 @@ namespace Ck
     bool Path::IsAbsolute() const
     {
         return !mRoot.IsEmpty();
+    }
+
+    bool Path::HasExtension(StringView extension) const
+    {
+	    if (mElements.IsEmpty())
+	        return false;
+
+	    return mElements.Last().EndsWith(extension);
     }
 
     const String& Path::GetRoot() const

@@ -6,7 +6,8 @@ namespace Ck
 		mFileSystem(fileSystem),
 		mPath(std::move(path))
 	{
-		mUtf8Path = Utf8String::Convert(path.ToString());
+	    mPath.ToFormatInPlace(Path::Format::Generic);
+		mUtf8Path = Utf8String::Convert(mPath.ToString());
 	}
 
 	Array<Path> EmbeddedDirectory::GetContent() const
@@ -17,8 +18,14 @@ namespace Ck
 		children.Reserve(std::distance(iterable.begin(), iterable.end()));
 		for (auto it = iterable.begin(); it != iterable.end(); ++it)
 		{
-			AsciiStringView filename = (*it).filename().c_str();
-			children.Add(Path::Merge(mPath, String::Convert(filename)));
+			AsciiString filename = (*it).filename().c_str();
+
+		    Path child = mPath;
+		    child.Join(String::Convert(filename));
+
+		    String test = child.ToString();
+
+			children.Add(std::move(child));
 		}
 
 		return children;

@@ -1,12 +1,11 @@
 #include <Cocktail/Core/Log/Log.hpp>
 
+#include <Cocktail/Graphic/Material/Material.hpp>
 #include <Cocktail/Graphic/Material/Shading/MaterialProgram.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
 #include <Cocktail/Renderer/Shader/ShaderCreateInfo.hpp>
 #include <Cocktail/Renderer/Shader/ShaderProgramCreateInfo.hpp>
-
-#include "Cocktail/Graphic/Material/Material.hpp"
 
 namespace Ck
 {
@@ -38,7 +37,8 @@ namespace Ck
 	}
 
 	MaterialProgram::MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo) :
-		mName(createInfo.Name)
+		mName(createInfo.Name),
+        mShadingMode(createInfo.ShadingMode)
 	{
 		for (const EnumMap<Renderer::ShaderType, ByteArray>& variantBinaries : createInfo.VariantsBinaries)
 		{
@@ -77,7 +77,7 @@ namespace Ck
 			shaderProgramCreateInfo.StaticSamplers = staticSamplers;
 
 			std::shared_ptr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
-			std::shared_ptr<MaterialProgramVariant> variant = std::make_shared<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));
+			UniquePtr<MaterialProgramVariant> variant = MakeUnique<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));
 
 			Flags<VertexAttributeSemantic> vertexAttributes;
 			for (VertexAttributeSemantic attribute : Enum<VertexAttributeSemantic>::Values)
@@ -101,18 +101,18 @@ namespace Ck
 		}
 	}
 
-	std::shared_ptr<MaterialProgramVariant> MaterialProgram::GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const
+	MaterialProgramVariant* MaterialProgram::GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const
 	{
 		/// First try to find the best program
 		for (const auto& [key, materialProgram] : mVariants)
 		{
 			if (key == VariantKey(vertexAttributes, materialTextures))
-				return materialProgram;
+				return materialProgram.Get();
 		}
 
 		/// Otherwise fallback on one that can just partially support our material
 		unsigned int bestScore = 0;
-		std::shared_ptr<MaterialProgramVariant> bestVariant;
+		MaterialProgramVariant* bestVariant = nullptr;
 		for (const auto& [key, variant] : mVariants)
 		{
 			const unsigned int vertexAttributeScore = EvaluateCompatibility(std::get<0>(key), vertexAttributes);
@@ -127,7 +127,7 @@ namespace Ck
 			if (score > bestScore)
 			{
 				bestScore = score;
-				bestVariant = variant;
+				bestVariant = variant.Get();
 			}
 		}
 
@@ -138,4 +138,9 @@ namespace Ck
 	{
 		return mName;
 	}
+
+    Material::ShadingMode MaterialProgram::GetShadingMode() const
+    {
+	    return mShadingMode;
+    }
 }

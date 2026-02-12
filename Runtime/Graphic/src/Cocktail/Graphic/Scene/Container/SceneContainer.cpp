@@ -80,7 +80,7 @@ namespace Ck
 	{
 		MaterialInfo material;
 		material.Name = "Default";
-		material.ShadingMode = Material::ShadingMode::Phong;
+		material.ShadingMode = Material::ShadingMode::Lit;
 		material.Parameters.Base = baseColor;
 		material.DoubleSided = true;
 		material.AlphaMode = Material::AlphaMode::Opaque;
