@@ -461,7 +461,7 @@ cocktail_resource_directory(GRAPHIC_FILES
 
 cocktail_add_runtime_library(
         NAME Graphic
-        DEPENDS Core Renderer Vulkan
+        DEPENDS Core Renderer D3D12 Vulkan
         LINK tinyobjloader tinygltf
         DEFINES TINYGLTF_NO_STB_IMAGE TINYGLTF_NO_STB_IMAGE_WRITE
         SOURCES ${GRAPHIC_FILES}

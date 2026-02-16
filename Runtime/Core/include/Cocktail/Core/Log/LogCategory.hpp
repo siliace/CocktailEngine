@@ -1,9 +1,6 @@
 #ifndef COCKTAIL_CORE_LOG_LOGCATEGORY_HPP
 #define COCKTAIL_CORE_LOG_LOGCATEGORY_HPP
 
-#include <string>
-
-#include <Cocktail/Core/Enum.hpp>
 #include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Log/LogLevel.hpp>
 
