@@ -42,6 +42,8 @@ namespace Ck
     void PositionalLight::SetRange(float range)
     {
         mRange = range;
+        mLinearAttenuationFactor.SetDirty();
+        mQuadraticAttenuationFactor.SetDirty();
     }
 
     float PositionalLight::ComputeAttenuation(float distance) const
@@ -50,7 +52,7 @@ namespace Ck
         float linearFactor = GetLinearAttenuationFactor() * distance;
         float quadraticFactor = GetQuadraticAttenuationFactor() * std::pow(distance, 2.f);
 
-        return 1.0 / (constantFactor + linearFactor + quadraticFactor);
+        return 1.f / (constantFactor + linearFactor + quadraticFactor);
     }
 
     float PositionalLight::GetConstantAttenuationFactor() const
@@ -72,8 +74,8 @@ namespace Ck
         });
     }
 
-    PositionalLight::PositionalLight(const std::shared_ptr<TransformationNode>& transformationNode, float range, LinearColor color, float intensity) :
-        Transformable(transformationNode),
+    PositionalLight::PositionalLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity) :
+        Transformable(std::move(transformationNode)),
         Light(color, intensity),
         mRange(range),
         mLinearAttenuationCurve(DefaultLinearAttenuationCurve),

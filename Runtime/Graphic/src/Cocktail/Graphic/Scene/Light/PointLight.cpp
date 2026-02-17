@@ -4,11 +4,6 @@
 
 namespace Ck
 {
-    namespace
-    {
-
-    }
-
     PointLight* PointLight::Create(std::shared_ptr<Scene> scene, float range, LinearColor color, Vector3<float> position, float intensity)
     {
         Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());

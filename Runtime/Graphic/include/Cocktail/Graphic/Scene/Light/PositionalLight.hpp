@@ -72,7 +72,7 @@ namespace Ck
          * \param color
          * \param intensity
          */
-        PositionalLight(const std::shared_ptr<TransformationNode>& transformationNode, float range, LinearColor color, float intensity);
+        PositionalLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity);
 
     private:
 
