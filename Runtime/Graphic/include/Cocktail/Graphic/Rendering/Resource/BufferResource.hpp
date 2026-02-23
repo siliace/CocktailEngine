@@ -3,6 +3,7 @@
 
 #include <memory>
  
+#include <Cocktail/Graphic/Export.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/GraphicResource.hpp>
 
 #include <Cocktail/Renderer/Buffer/Buffer.hpp>
@@ -12,7 +13,7 @@ namespace Ck
 	/**
      * \brief 
      */
-    class BufferResource : public GraphicResource, public std::enable_shared_from_this<BufferResource>
+    class COCKTAIL_GRAPHIC_API BufferResource : public GraphicResource, public std::enable_shared_from_this<BufferResource>
     {
     public:
 

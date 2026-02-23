@@ -29,14 +29,21 @@ namespace Ck
 			{
 				Box<float> obb;
 				const Transformation& worldTransformation = sceneNode->GetWorldTransformation();
-				for (std::size_t i = 0; i < boundingVolume.GetVertexCount(); i++)
-				{
-					Vector3<float> vertex = boundingVolume.GetVertex(i);
-					Vector3<float> worldVertex = worldTransformation.Apply(vertex);
-					obb.Extend(worldVertex);
-				}
+			    if (!worldTransformation.IsIdentity())
+			    {
+			        for (std::size_t i = 0; i < boundingVolume.GetVertexCount(); i++)
+			        {
+			            Vector3<float> vertex = boundingVolume.GetVertex(i);
+			            Vector3<float> worldVertex = worldTransformation.Apply(vertex);
+			            obb.Extend(worldVertex);
+			        }
+			    }
+			    else
+			    {
+			        obb.Extend(boundingVolume);
+			    }
 
-				if (mFrustum.Intersect(obb) != Intersection::Outside || obb.Intersect(mFrustum) != Intersection::Outside)
+				if (mFrustum.Intersect(obb) != Intersection::Outside)
 				{
 					mRenderables.Add(sceneNode);
 					for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())

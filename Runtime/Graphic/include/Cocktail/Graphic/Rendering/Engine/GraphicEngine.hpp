@@ -12,6 +12,8 @@
 #include <Cocktail/Renderer/GraphicApi.hpp>
 #include <Cocktail/Renderer/RenderDevice.hpp>
 
+#include "Cocktail/Graphic/Rendering/Resource/StorageBuffer.hpp"
+
 namespace Ck
 {
 	class Window;
@@ -53,6 +55,32 @@ namespace Ck
 		 * \return
 		 */
 		std::shared_ptr<IndexBuffer> CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable = false, const AnsiChar* name = "");
+
+        /**
+         * \brief
+         * \param size
+         * \param updatable
+         * \param name
+         * \return
+         */
+	    std::shared_ptr<StorageBuffer> CreateStorageBuffer(std::size_t size, bool updatable = false, const AnsiChar* name = "");
+
+	    /**
+	     * \brief
+	     *
+	     * \tparam T
+	     *
+	     * \param elementCount
+	     * \param updatable
+	     * \param name
+	     *
+	     * \return
+	     */
+	    template <typename T>
+	    std::shared_ptr<TypedStorageBuffer<T>> CreateTypedStorageBuffer(unsigned int elementCount, bool updatable = false, const AnsiChar* name = "")
+	    {
+	        return std::make_shared<TypedStorageBuffer<T>>(shared_from_this(), elementCount, name);
+	    }
 
 		/**
 		 * \brief 

@@ -71,7 +71,12 @@ namespace Ck
 		return Matrix3<float>::FromQuaternion(mRotation) * Vector3<float>::HadamardProduct(mScale, vertex) + mTranslation;
 	}
 
-	Vector3<float> Transformation::GetTranslation() const
+    bool Transformation::IsIdentity() const
+    {
+	    return mTranslation == Vector3<float>::Zero() && mRotation == Quaternion<float>::Identity() && mScale == Vector3<float>::Unit();
+    }
+
+    Vector3<float> Transformation::GetTranslation() const
 	{
 		return mTranslation;
 	}
@@ -140,4 +145,14 @@ namespace Ck
 			return transformationMatrix;
 		});
 	}
+
+    bool Transformation::operator==(const Transformation& rhs) const
+    {
+        return std::tie(mTranslation, mRotation, mScale) == std::tie(rhs.mTranslation, rhs.mRotation, rhs.mScale);
+    }
+
+    bool Transformation::operator!=(const Transformation& rhs) const
+    {
+        return !(*this == rhs);
+    }
 }

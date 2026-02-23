@@ -3,6 +3,8 @@
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 
+#include "Cocktail/Renderer/Buffer/Buffer.hpp"
+
 namespace Ck
 {
 	RecordDrawContext::RecordDrawContext(Renderer::RenderContext& renderContext, RenderingModifiers modifiers) :
@@ -61,7 +63,20 @@ namespace Ck
 		commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
 	}
 
-	void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
+    void RecordDrawContext::BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset) const
+    {
+	    assert (offset < buffer->GetSize());
+	    BindBuffer(commandList, name, buffer, offset, buffer->GetSize() - offset);
+    }
+
+    void RecordDrawContext::BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset, std::size_t range) const
+    {
+	    assert (offset + range <= buffer->GetSize());
+	    if (Renderer::UniformSlot* instanceBufferSlot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name))
+	        commandList.BindBuffer(instanceBufferSlot, 0, buffer, offset, range);
+    }
+
+    void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
 	{
 		std::size_t allocationSize = size;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);

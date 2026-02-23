@@ -55,6 +55,29 @@ namespace Ck
          */
         void ExtendBoundingVolume(Volume<float>& volume) override;
 
+    protected:
+
+        /**
+         * \brief Emits a static mesh render record to the render queue
+         *
+         * This method is responsible for submitting a fully prepared
+         * StaticMeshRecordInfo to the given RenderQueue.
+         *
+         * It is designed as an extension point for derived classes that may
+         * want to alter how records are emitted (e.g. modify material parameters,
+         * adjust sorting keys, inject additional data, or redirect to another
+         * render record type).
+         *
+         * The default implementation forwards the record to the queue using
+         * the provided sorting key.
+         *
+         * \param queue The render queue that will receive the record.
+         * \param staticMeshRecordInfo The fully populated mesh record to emit.
+         * \param shadingMode The shading mode associated with this emission.
+         * \param sortingKey The sorting key used to order the record within the queue.
+         */
+        virtual void EmitRecord(RenderQueue& queue, const StaticMeshRecordInfo& staticMeshRecordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey);
+
     private:
 
         struct Geometry

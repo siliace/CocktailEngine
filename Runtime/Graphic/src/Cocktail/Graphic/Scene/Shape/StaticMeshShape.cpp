@@ -68,7 +68,7 @@ namespace Ck
                 recordInfo.FirstVertex = geometry.FirstVertex;
                 recordInfo.FirstIndex = geometry.FirstIndex;
 
-                queue.PushStaticMesh(recordInfo, material->GetShadingMode(), distanceToCamera);
+                EmitRecord(queue, recordInfo, material->GetShadingMode(), distanceToCamera);
             }
         }
     }
@@ -97,5 +97,10 @@ namespace Ck
                 volume.Extend(point);
             }
         }
+    }
+
+    void StaticMeshShape::EmitRecord(RenderQueue& queue, const StaticMeshRecordInfo& staticMeshRecordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey)
+    {
+        queue.PushStaticMesh(staticMeshRecordInfo, shadingMode, sortingKey);
     }
 }

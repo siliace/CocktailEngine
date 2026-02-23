@@ -5,6 +5,7 @@
 
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramSet.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/CustomRecordInfo.hpp>
+#include <Cocktail/Graphic/Rendering/Queue/InstancedStaticMeshRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/LineRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecordInfo.hpp>
@@ -60,6 +61,15 @@ namespace Ck
          * \param sortingKey Key used to sort the record before rendering
          */
         void PushStaticMesh(const StaticMeshRecordInfo& recordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey);
+
+        /**
+         * \brief Pushes an instanced static mesh render record into the queue
+         *
+         * \param recordInfo The instanced static mesh record information
+         * \param shadingMode The shading mode to use to render the record
+         * \param sortingKey Key used to sort the record before rendering
+         */
+        void PushInstancedStaticMesh(const InstancedStaticMeshRecordInfo& recordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey);
 
         /**
          * \brief Pushes a line render record into the queue

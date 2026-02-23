@@ -68,7 +68,7 @@ namespace Ck
                 entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
                 entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
 
-                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/line"), Path::Format::Generic), builtinDriver))
+                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/line/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
 
                 materialProgramLibrary->Register(entry);
@@ -92,7 +92,31 @@ namespace Ck
                 entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
                 entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
 
-                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit"), Path::Format::Generic), builtinDriver))
+                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/basic"), Path::Format::Generic), builtinDriver))
+                    entry.VariantsBinaries.Add(std::move(binaries));
+
+                materialProgramLibrary->Register(entry);
+            });
+
+            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+                FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
+
+                MaterialProgramLibrary::Entry entry;
+                entry.Name = CK_TEXT("instanced_mesh");
+                entry.RenderableType = RenderableType::InstancedMesh;
+                entry.ShadingMode = Material::ShadingMode::Lit;
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Tangent] = "ck_VertexTangent";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::BiTangent] = "ck_VertexBiTangent";
+                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface.Textures[Material::TextureType::MetallicRoughness] = { "ck_MaterialMetallicRoughness", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+
+                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/instanced"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
 
                 materialProgramLibrary->Register(entry);
@@ -112,7 +136,27 @@ namespace Ck
                 entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
                 entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
 
-                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit"), Path::Format::Generic), builtinDriver))
+                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/basic"), Path::Format::Generic), builtinDriver))
+                    entry.VariantsBinaries.Add(std::move(binaries));
+
+                materialProgramLibrary->Register(entry);
+            });
+
+            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+                FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
+
+                MaterialProgramLibrary::Entry entry;
+                entry.Name = CK_TEXT("instanced_mesh");
+                entry.RenderableType = RenderableType::InstancedMesh;
+                entry.ShadingMode = Material::ShadingMode::Unlit;
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
+                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+
+                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/instanced"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
 
                 materialProgramLibrary->Register(entry);

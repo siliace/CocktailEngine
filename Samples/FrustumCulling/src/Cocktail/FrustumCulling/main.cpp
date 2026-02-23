@@ -14,6 +14,8 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
+#include "Cocktail/Graphic/Scene/Shape/InstancedStaticMeshShape.hpp"
+
 using namespace Ck;
 
 Main::ExitCode ApplicationMain(Application* application)
@@ -33,20 +35,30 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
+    Array<Transformation> instances;
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        for (unsigned int j = 0; j < 30; j++)
+        {
+            Transformation& transformation = instances.Emplace(Transformation::Identity());
+            transformation.SetTranslation(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
+        }
+    }
+
 	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
 	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Unlit, true);
 	material->SetEmissiveColor(LinearColor::White);
-	std::shared_ptr<Shape> shape = std::make_shared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
+    std::shared_ptr<Shape> shape = std::make_shared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
 
-	for (unsigned int i = 0; i < 30; i++)
-	{
-		for (unsigned int j = 0; j < 30; j++)
-		{
-			std::shared_ptr<SceneNode> sceneNode = scene->CreateSceneNode();
-			sceneNode->SetPosition(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
-			sceneNode->AddShape(shape);
-		}
-	}
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        for (unsigned int j = 0; j < 30; j++)
+        {
+            std::shared_ptr<SceneNode> sceneNode = scene->CreateSceneNode();
+            sceneNode->SetPosition(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
+            sceneNode->AddShape(shape);
+        }
+    }
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);

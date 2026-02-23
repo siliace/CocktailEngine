@@ -1,7 +1,7 @@
 #include <Cocktail/Core/Math/Matrix/Matrix3.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
-#include <Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp>
+#include <Cocktail/Graphic/Rendering/Queue/InstancedStaticMeshRecord.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
 
@@ -42,39 +42,41 @@ namespace Ck
         }
     }
 
-	ObjectPool<StaticMeshRecord> StaticMeshRecord::sRecordPool;
+	ObjectPool<InstancedStaticMeshRecord> InstancedStaticMeshRecord::sRecordPool;
 
-	std::shared_ptr<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+	std::shared_ptr<InstancedStaticMeshRecord> InstancedStaticMeshRecord::New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
 	{
 		return sRecordPool.Allocate(recordInfo, materialProgramVariant);
 	}
 
-	StaticMeshRecord::StaticMeshRecord(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant) :
+	InstancedStaticMeshRecord::InstancedStaticMeshRecord(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant) :
 		mRecordInfo(recordInfo),
 		mMaterialProgramVariant(materialProgramVariant)
 	{
 		/// Nothing
 	}
 
-	void StaticMeshRecord::Draw(Renderer::CommandList& commandList, RecordDrawContext& drawContext) const
+	void InstancedStaticMeshRecord::Draw(Renderer::CommandList& commandList, RecordDrawContext& drawContext) const
 	{
+	    const StaticMeshRecordInfo& staticMeshRecordInfo = mRecordInfo.StaticMeshRecord;
+
 		drawContext.BindMaterialProgram(commandList, *mMaterialProgramVariant);
 
 		VertexInfo vertexInfo;
-		vertexInfo.Model = mRecordInfo.Model.Transpose();
-		Matrix3<float> normalMatrix = Matrix3<float>::From(mRecordInfo.Model).Inverse().Transpose();
+		vertexInfo.Model = staticMeshRecordInfo.Model.Transpose();
+		Matrix3<float> normalMatrix = Matrix3<float>::From(staticMeshRecordInfo.Model).Inverse().Transpose();
 		for (unsigned int i = 0; i < 3; i++)
 			vertexInfo.Normal[i] = Vector4<float>(normalMatrix.GetColumn(i).Normalized(), 0.f);
 
 		MaterialInfo materialInfo;
-	    materialInfo.BaseColor = mRecordInfo.MaterialBaseColor;
-	    materialInfo.EmissiveColor[0] = mRecordInfo.MaterialEmissiveColor.R;
-	    materialInfo.EmissiveColor[1] = mRecordInfo.MaterialEmissiveColor.G;
-	    materialInfo.EmissiveColor[2] = mRecordInfo.MaterialEmissiveColor.B;
-	    materialInfo.Roughness = mRecordInfo.MaterialRoughness;
-	    materialInfo.Metallic = mRecordInfo.MaterialMetallic;
-		materialInfo.AlphaMode = static_cast<int>(mRecordInfo.AlphaMode);
-		materialInfo.AlphaCutoff = mRecordInfo.AlphaCutoff;
+	    materialInfo.BaseColor = staticMeshRecordInfo.MaterialBaseColor;
+	    materialInfo.EmissiveColor[0] = staticMeshRecordInfo.MaterialEmissiveColor.R;
+	    materialInfo.EmissiveColor[1] = staticMeshRecordInfo.MaterialEmissiveColor.G;
+	    materialInfo.EmissiveColor[2] = staticMeshRecordInfo.MaterialEmissiveColor.B;
+	    materialInfo.Roughness = staticMeshRecordInfo.MaterialRoughness;
+	    materialInfo.Metallic = staticMeshRecordInfo.MaterialMetallic;
+		materialInfo.AlphaMode = static_cast<int>(staticMeshRecordInfo.AlphaMode);
+		materialInfo.AlphaCutoff = staticMeshRecordInfo.AlphaCutoff;
 
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
@@ -82,7 +84,7 @@ namespace Ck
 		{
 			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))
 			{
-				std::shared_ptr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
+				std::shared_ptr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
 				if (!textureView)
 					continue;
 
@@ -90,9 +92,11 @@ namespace Ck
 			}
 		}
 
-		for (unsigned int i = 0; i < mRecordInfo.VertexBufferCount; i++)
+	    drawContext.BindBuffer(commandList, "instances", mRecordInfo.InstancesBuffer, mRecordInfo.InstanceBufferOffset);
+
+		for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
 		{
-			const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = mRecordInfo.VertexBuffers[i];
+			const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = staticMeshRecordInfo.VertexBuffers[i];
 
 			const VertexLayout* vertexLayout = vertexBuffer.VertexLayout;
 
@@ -103,37 +107,37 @@ namespace Ck
 
 		if (drawContext.GetModifiers() & RecordDrawContext::RenderingModifierBits::Wireframe)
 		{
-			commandList.SetPrimitiveTopology(IsStripTopology(mRecordInfo.PrimitiveTopology) ? Renderer::PrimitiveTopology::LineStrip : Renderer::PrimitiveTopology::Line);
+			commandList.SetPrimitiveTopology(IsStripTopology(staticMeshRecordInfo.PrimitiveTopology) ? Renderer::PrimitiveTopology::LineStrip : Renderer::PrimitiveTopology::Line);
 			commandList.SetPolygonMode(Renderer::PolygonMode::Line);
 		}
 		else
 		{
-			commandList.SetPrimitiveTopology(mRecordInfo.PrimitiveTopology);
-			commandList.SetPolygonMode(GetPrimitivePolygonMode(mRecordInfo.PrimitiveTopology));
+			commandList.SetPrimitiveTopology(staticMeshRecordInfo.PrimitiveTopology);
+			commandList.SetPolygonMode(GetPrimitivePolygonMode(staticMeshRecordInfo.PrimitiveTopology));
 		}
 
-		commandList.SetCullMode(mRecordInfo.DoubleSided ? Renderer::CullMode::None : Renderer::CullMode::Back);
+		commandList.SetCullMode(staticMeshRecordInfo.DoubleSided ? Renderer::CullMode::None : Renderer::CullMode::Back);
 		commandList.SetFrontFace(Renderer::FrontFace::CounterClockwise);
 
 		commandList.EnableDepthTest(true);
-		commandList.EnableDepthWrite(mRecordInfo.AlphaMode == Material::AlphaMode::Opaque);
+		commandList.EnableDepthWrite(staticMeshRecordInfo.AlphaMode == Material::AlphaMode::Opaque);
 		commandList.SetDepthCompareOp(Renderer::CompareOp::Less);
 
-		commandList.EnableBlending(0, mRecordInfo.AlphaMode != Material::AlphaMode::Opaque);
+		commandList.EnableBlending(0, staticMeshRecordInfo.AlphaMode != Material::AlphaMode::Opaque);
 		commandList.SetBlendingFunction(0, Renderer::BlendFactor::SourceAlpha, Renderer::BlendFactor::OneMinusSourceAlpha, Renderer::BlendFactor::One, Renderer::BlendFactor::OneMinusSourceAlpha);
 		commandList.SetBlendingEquation(0, Renderer::BlendOp::Add, Renderer::BlendOp::Add);
 
-		if (mRecordInfo.IndexBuffer)
+		if (staticMeshRecordInfo.IndexBuffer)
 		{
-			commandList.BindIndexBuffer(mRecordInfo.IndexBuffer, mRecordInfo.IndexBufferOffset, mRecordInfo.IndexType);
-			commandList.DrawIndexed(mRecordInfo.Count, 1, mRecordInfo.FirstIndex, mRecordInfo.FirstVertex, 0);
+			commandList.BindIndexBuffer(staticMeshRecordInfo.IndexBuffer, staticMeshRecordInfo.IndexBufferOffset, staticMeshRecordInfo.IndexType);
+			commandList.DrawIndexed(staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, staticMeshRecordInfo.FirstVertex, mRecordInfo.FirstInstance);
 		}
 		else
 		{
-			commandList.Draw(mRecordInfo.Count, 1, mRecordInfo.FirstIndex, 0);
+			commandList.Draw(staticMeshRecordInfo.Count,  mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, mRecordInfo.FirstInstance);
 		}
 
-		for (unsigned int i = 0; i < mRecordInfo.VertexBufferCount; i++)
+		for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
 			commandList.EnableVertexBinding(i, false);
 	}
 }

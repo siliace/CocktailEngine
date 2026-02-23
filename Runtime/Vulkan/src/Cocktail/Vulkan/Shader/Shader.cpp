@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 		{
 			switch (descriptorType)
 			{
-			case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER: 
+			case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER:
 				return Renderer::DescriptorType::Sampler;
 
 			case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
@@ -146,7 +146,7 @@ namespace Ck::Vulkan
 			vkCreateInfo.codeSize = createInfo.Code.GetSize();
 			vkCreateInfo.pCode = reinterpret_cast<const Uint32*>(createInfo.Code.GetData());
 		}
-		 
+
 		COCKTAIL_VK_CHECK(vkCreateShaderModule(mRenderDevice->GetHandle(), &vkCreateInfo, mAllocationCallbacks, &mHandle));
 
 		Shader::SetObjectName(createInfo.Name);
@@ -253,13 +253,13 @@ namespace Ck::Vulkan
 				result = spvReflectEnumerateInputVariables(&module, &reflectInputVertexAttributeCount, reflectInputVariables.GetData());
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mInputAttributeLocations.Resize(reflectInputVertexAttributeCount);
+				mInputAttributeLocations.Reserve(reflectInputVertexAttributeCount);
 				for (unsigned int i = 0; i < reflectInputVertexAttributeCount; i++)
 				{
 					if (reflectInputVariables[i]->location == static_cast<unsigned int>(-1))
 						continue;
 
-					mInputAttributeLocations[i] = ReflectInterfaceVariable(reflectInputVariables[i]);
+					mInputAttributeLocations.Add(ReflectInterfaceVariable(reflectInputVariables[i]));
 				}
 			}
 		}
@@ -276,13 +276,13 @@ namespace Ck::Vulkan
 				result = spvReflectEnumerateOutputVariables(&module, &reflectOutputVertexAttributeCount, &reflectOutputVariables[0]);
 				assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
-				mOutputAttributeLocations.Resize(reflectOutputVertexAttributeCount);
+				mOutputAttributeLocations.Reserve(reflectOutputVertexAttributeCount);
 				for (unsigned int i = 0; i < reflectOutputVertexAttributeCount; i++)
 				{
 					if (reflectOutputVariables[i]->location == static_cast<unsigned int>(-1))
 						continue;
 
-					mOutputAttributeLocations[i] = ReflectInterfaceVariable(reflectOutputVariables[i]);
+					mOutputAttributeLocations.Add(ReflectInterfaceVariable(reflectOutputVariables[i]));
 				}
 			}
 		}
@@ -380,5 +380,5 @@ namespace Ck::Vulkan
 	{
 		return mHandle;
 	}
-	
+
 }

@@ -18,6 +18,11 @@ namespace Ck
 		 */
 		Mesh,
 
+	    /**
+         * \brief
+         */
+	    InstancedMesh,
+
 		/**
 		 * \brief 
 		 */

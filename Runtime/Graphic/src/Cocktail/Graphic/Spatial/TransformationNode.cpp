@@ -50,7 +50,6 @@ namespace Ck
 				return parent->GetWorldTransformation().Compose(mLocalTransformation);
 
 			return mLocalTransformation;
-
 		});
 	}
 

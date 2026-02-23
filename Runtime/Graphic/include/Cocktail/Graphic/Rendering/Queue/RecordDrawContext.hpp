@@ -71,6 +71,25 @@ namespace Ck
 		 */
 		void BindData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const;
 
+        /**
+         * \brief
+         * \param commandList
+         * \param name
+         * \param buffer
+         * \param offset
+         */
+	    void BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset) const;
+
+        /**
+         * \brief
+         * \param commandList
+         * \param name
+         * \param buffer
+         * \param offset
+         * \param range
+         */
+	    void BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset, std::size_t range) const;
+
 		/**
 		 * \brief
 		 * \param commandList

@@ -80,7 +80,12 @@ namespace Ck
 		return indexBuffer;
 	}
 
-	std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name)
+    std::shared_ptr<StorageBuffer> GraphicEngine::CreateStorageBuffer(std::size_t size, bool updatable, const AnsiChar* name)
+    {
+	    return std::make_shared<StorageBuffer>(shared_from_this(), size, name);
+    }
+
+    std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name)
 	{
 		std::shared_ptr<MipMapsTextureResource> textureResource = std::make_shared<MipMapsTextureResource>(shared_from_this(), mipMaps, name);
 		for (unsigned int layer = 0; layer < mipMaps->GetArrayLayerCount(); layer++)

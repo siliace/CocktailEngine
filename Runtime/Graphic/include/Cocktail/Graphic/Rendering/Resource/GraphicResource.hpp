@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_GRAPHICRESOURCE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_GRAPHICRESOURCE_HPP
 
+#include <memory>
+
 #include <Cocktail/Renderer/Memory/MemoryResource.hpp>
 
 namespace Ck
