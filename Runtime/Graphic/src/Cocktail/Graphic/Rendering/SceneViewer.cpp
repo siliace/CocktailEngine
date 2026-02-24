@@ -33,7 +33,6 @@ namespace Ck
 		if (!framebuffer)
 			return;
 
-		RecordDrawContext drawContext(*graphicEngine->GetRenderContext());
 		
 		Renderer::CommandListCreateInfo commandListCreateInfo;
 		commandListCreateInfo.Usage = Renderer::CommandListUsageBits::Graphic;
@@ -48,12 +47,12 @@ namespace Ck
 
 		SceneInfo sceneInfo;
 		sceneInfo.AmbientFactor = 0.1f;
-		drawContext.BindPersistentData(*commandList, "sceneInfo", Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(SceneInfo), &sceneInfo);
-		
+	    mDrawContext.BindData(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(SceneInfo), &sceneInfo);
+
 		for (const ViewportEntry& viewportEntry : mViewports)
 		{
 			const std::shared_ptr<Viewport>& viewport = viewportEntry.Viewport;
-			viewport->Bind(*commandList, *framebuffer, drawContext, viewportEntry.Index == 0);
+			viewport->Bind(*commandList, *framebuffer, mDrawContext, viewportEntry.Index == 0);
 
 			Array<Light*> lights = mScene->CollectLights(*viewport->GetCamera());
 
@@ -109,7 +108,7 @@ namespace Ck
 				}
 			}
 
-			drawContext.BindPersistentData(*commandList, "lightsInfo", Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
+			mDrawContext.BindData(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
 
 			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
 			{
@@ -118,8 +117,8 @@ namespace Ck
 				renderable->AddToQueue(*mBlendingRenderQueue, *camera);
 			}
 			
-			mOpaqueRenderQueue->Flush(*commandList, drawContext);
-			mBlendingRenderQueue->Flush(*commandList, drawContext);
+			mOpaqueRenderQueue->Flush(*commandList, mDrawContext);
+			mBlendingRenderQueue->Flush(*commandList, mDrawContext);
 		
 			commandList->EndRenderPass();
 		}
@@ -131,7 +130,8 @@ namespace Ck
 	}
 
 	SceneViewer::SceneViewer(std::shared_ptr<Scene> scene) :
-		mScene(std::move(scene))
+		mScene(std::move(scene)),
+		mDrawContext(*mScene->GetGraphicEngine()->GetRenderContext())
 	{
 		mOpaqueRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), RenderQueue::BlendingMode::Opaque);
 		mBlendingRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), RenderQueue::BlendingMode::Transparent);

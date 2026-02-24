@@ -1,9 +1,8 @@
 #include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 
+#include <Cocktail/Renderer/Buffer/Buffer.hpp>
 #include <Cocktail/Renderer/Buffer/BufferAllocator.hpp>
 #include <Cocktail/Renderer/Shader/UniformSlot.hpp>
-
-#include "Cocktail/Renderer/Buffer/Buffer.hpp"
 
 namespace Ck
 {
@@ -15,113 +14,147 @@ namespace Ck
 		/// Nothing
 	}
 
-	void RecordDrawContext::BindMaterialProgram(Renderer::CommandList& commandList, const MaterialProgramVariant& materialProgramVariant)
+	void RecordDrawContext::BindMaterialProgram(Renderer::CommandList& commandList, const MaterialProgramVariant* materialProgramVariant)
 	{
-		mCurrentMaterialProgram = &materialProgramVariant;
-		commandList.BindShaderProgram(mCurrentMaterialProgram->GetShaderProgram().get());
-		for (const auto& [key, area] : mPersistentBuffers)
-		{
-			const AsciiString& name = std::get<0>(key);
-			unsigned int arrayIndex = std::get<1>(key);
+	    Renderer::ShaderProgram* shaderProgram = materialProgramVariant->GetShaderProgram();
+	    if (mCurrentMaterialProgram != materialProgramVariant)
+	    {
+	        mCurrentMaterialProgram = materialProgramVariant;
+	    }
 
-			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
-			if (!slot)
-				continue;
-
-			commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
-		}
+	    /// TODO: move this to the if when moving the command list in the context
+	    commandList.BindShaderProgram(shaderProgram);
 	}
 
-	void RecordDrawContext::BindVertexData(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout& vertexLayout, unsigned vertexCount, const void* data) const
+    void RecordDrawContext::BindData(ShaderBindingDomain domain, BindingSlot bindingSlot, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
 	{
-		unsigned int stride = vertexLayout.GetStride();
+        Renderer::BufferAllocator* allocator = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified);
+	    Renderer::BufferArea area = allocator->PushData(size, data);
 
+	    BindBuffer(domain, bindingSlot, area.Buffer, arrayIndex, area.BaseOffset, area.Range);
+	}
+
+    void RecordDrawContext::BindBuffer(ShaderBindingDomain domain, BindingSlot bindingSlot, const Renderer::Buffer* buffer, unsigned int arrayIndex)
+    {
+	    BindBuffer(domain, bindingSlot, buffer, arrayIndex, 0, buffer->GetSize());
+    }
+
+    void RecordDrawContext::BindBuffer(ShaderBindingDomain domain, BindingSlot bindingSlot, const Renderer::Buffer* buffer, unsigned int arrayIndex, std::size_t offset, std::size_t range)
+    {
+	    assert(bindingSlot != InvalidBindingSlot);
+	    assert(buffer != nullptr);
+	    assert(offset + range < buffer->GetSize());
+
+	    mBindingTable.BindBuffer(domain, bindingSlot, buffer, arrayIndex, offset, range);
+    }
+
+    void RecordDrawContext::BindSampler(ShaderBindingDomain domain, BindingSlot bindingSlot, const Renderer::Sampler* sampler, unsigned int arrayIndex)
+    {
+	    mBindingTable.BindSampler(domain, bindingSlot, sampler, arrayIndex);
+    }
+
+    void RecordDrawContext::BindTexture(ShaderBindingDomain domain, BindingSlot bindingSlot, const Renderer::TextureView* texture, unsigned int arrayIndex)
+    {
+	    mBindingTable.BindTexture(domain, bindingSlot, texture, arrayIndex);
+    }
+
+    void RecordDrawContext::BindTextureSampler(ShaderBindingDomain domain, BindingSlot bindingSlot, const Renderer::TextureView* texture, const Renderer::Sampler* sampler, unsigned int arrayIndex)
+    {
+	    mBindingTable.BindTextureSampler(domain, bindingSlot, texture, sampler, arrayIndex);
+    }
+
+    void RecordDrawContext::BindVertexData(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout* vertexLayout, unsigned vertexCount, const void* data) const
+	{
+		unsigned int stride = vertexLayout->GetStride();
 		std::size_t allocationSize = vertexCount * stride;
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
-
-		commandList.EnableVertexBinding(binding, true);
-		commandList.BindVertexBuffer(binding, area.Buffer, area.BaseOffset, stride, vertexLayout.IsInstanced(), vertexLayout.GetDivisor());
-		SetVertexInputAttributes(commandList, binding, vertexLayout);
+        BindVertexBuffer(commandList, binding, vertexLayout, area.Buffer, area.BaseOffset);
 	}
 
-	void RecordDrawContext::BindIndexData(Renderer::CommandList& commandList, Renderer::IndexType indexType, unsigned int indexCount, const void* data) const
+    void RecordDrawContext::BindVertexBuffer(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout* vertexLayout, const Renderer::Buffer* buffer, std::size_t offset) const
+    {
+	    assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Vertex);
+
+		unsigned int stride = vertexLayout->GetStride();
+	    Array<Renderer::VertexInputAttribute, LinearAllocator<32>> vertexInputAttributes;
+
+	    for (const VertexAttribute& attribute : vertexLayout->GetAttributes())
+	    {
+	        PixelFormat::Layout formatLayout = GetVertexInputAttributeFormatLayout(attribute.GetElementCount());
+	        PixelFormat::Encoding formatEncoding = attribute.IsNormalized() ? PixelFormat::Encoding::Normalized : PixelFormat::Encoding::Raw;
+
+	        Renderer::VertexAttributeLocation* attributeLocation = mCurrentMaterialProgram->GetVertexAttributeLocation(attribute.GetSemantic());
+	        if (!attributeLocation)
+	            continue;
+
+	        Renderer::VertexInputAttribute& inputAttribute = vertexInputAttributes.Emplace();
+	        inputAttribute.Location = attributeLocation->GetLocation();
+	        inputAttribute.Format = PixelFormat::Color(formatLayout, attribute.GetType(), formatEncoding);
+	        inputAttribute.Offset = attribute.GetOffset();
+	    }
+
+	    commandList.EnableVertexBinding(binding, true);
+	    commandList.SetVertexInputAttributes(binding, vertexInputAttributes.GetSize(), vertexInputAttributes.GetData());
+	    commandList.BindVertexBuffer(binding, buffer, offset, stride, vertexLayout->IsInstanced(), vertexLayout->GetDivisor());
+    }
+
+    void RecordDrawContext::BindIndexData(Renderer::CommandList& commandList, Renderer::IndexType indexType, unsigned int indexCount, const void* data) const
 	{
 		std::size_t allocationSize = indexCount * Renderer::ToDataType(indexType).GetSize();
 		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
 
-		commandList.BindIndexBuffer(area.Buffer, area.BaseOffset, indexType);
+		BindIndexBuffer(commandList, area.Buffer, indexType, area.BaseOffset);
 	}
 
-	void RecordDrawContext::BindData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data) const
-	{
-		std::size_t allocationSize = size;
-		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
-
-		Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
-		assert(slot);
-
-		commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
-	}
-
-    void RecordDrawContext::BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset) const
+    void RecordDrawContext::BindIndexBuffer(Renderer::CommandList& commandList, const Renderer::Buffer* buffer, Renderer::IndexType indexType, std::size_t offset) const
     {
-	    assert (offset < buffer->GetSize());
-	    BindBuffer(commandList, name, buffer, offset, buffer->GetSize() - offset);
+	    assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Index);
+
+	    commandList.BindIndexBuffer(buffer, offset, indexType);
     }
 
-    void RecordDrawContext::BindBuffer(Renderer::CommandList& commandList, AsciiStringView name, const Renderer::Buffer* buffer, std::size_t offset, std::size_t range) const
+    void RecordDrawContext::Draw(Renderer::CommandList& commandList, unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) const
     {
-	    assert (offset + range <= buffer->GetSize());
-	    if (Renderer::UniformSlot* instanceBufferSlot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name))
-	        commandList.BindBuffer(instanceBufferSlot, 0, buffer, offset, range);
+	    for (const auto& [key, entry] : mBindingTable.GetEntries())
+	    {
+	        ShaderBindingDomain domain = std::get<0>(key);
+	        unsigned int index = std::get<1>(key);
+
+	        const Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetSlot(domain, index);
+	        if (slot != nullptr)
+	            entry->Bind(commandList, slot);
+	    }
+
+	    commandList.Draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
 
-    void RecordDrawContext::BindPersistentData(Renderer::CommandList& commandList, AsciiStringView name, Renderer::BufferUsageFlags usage, unsigned int arrayIndex, std::size_t size, const void* data)
+    void RecordDrawContext::DrawIndexed(Renderer::CommandList& commandList, unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) const
 	{
-		std::size_t allocationSize = size;
-		Renderer::BufferArea area = mRenderContext->GetBufferAllocator(usage, Renderer::MemoryType::Unified)->PushData(allocationSize, data);
+	    for (const auto& [key, entry] : mBindingTable.GetEntries())
+	    {
+	        ShaderBindingDomain domain = std::get<0>(key);
+	        unsigned int index = std::get<1>(key);
 
-		mPersistentBuffers[CompositeKey<AsciiString, unsigned int>(AsciiString::FromView(name), arrayIndex)] = area;
+	        const Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetSlot(domain, index);
+	        if (slot != nullptr)
+	            entry->Bind(commandList, slot);
+	    }
 
-		if (mCurrentMaterialProgram)
-		{
-			Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetShaderProgram()->FindUniformSlot(name);
-			if (slot)
-				commandList.BindBuffer(slot, arrayIndex, area.Buffer, area.BaseOffset, area.Range);
-		}
-	}
+	    commandList.DrawIndexed(indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
+    }
 
-	void RecordDrawContext::SetVertexInputAttributes(Renderer::CommandList& commandList, unsigned int binding, const VertexLayout& vertexLayout) const
-	{
-		commandList.EnableVertexBinding(binding, true);
-		const Array<VertexAttribute>& attributes = vertexLayout.GetAttributes();
-		Renderer::VertexInputAttribute* vertexInputAttributes = COCKTAIL_STACK_ALLOC(Renderer::VertexInputAttribute, attributes.GetSize());
+    void RecordDrawContext::EnableVertexBindings(Renderer::CommandList& commandList, unsigned int firstBinding, unsigned int bindingsCount, bool enable)
+    {
+	    for (unsigned int i = firstBinding; i < bindingsCount; ++i)
+	        commandList.EnableVertexBinding(i, enable);
+    }
 
-		unsigned int attributeCount = 0;
-		for (const VertexAttribute& attribute : attributes)
-		{
-			PixelFormat::Layout formatLayout = GetVertexInputAttributeFormatLayout(attribute.GetElementCount());
-			PixelFormat::Encoding formatEncoding = attribute.IsNormalized() ? PixelFormat::Encoding::Normalized : PixelFormat::Encoding::Raw;
-
-			Renderer::VertexAttributeLocation* attributeLocation = mCurrentMaterialProgram->GetVertexAttributeLocation(attribute.GetSemantic());
-			if (!attributeLocation)
-				continue;
-
-			vertexInputAttributes[attributeCount].Location = attributeLocation->GetLocation();
-			vertexInputAttributes[attributeCount].Format = PixelFormat::Color(formatLayout, attribute.GetType(), formatEncoding);
-			vertexInputAttributes[attributeCount].Offset = attribute.GetOffset();
-			++attributeCount;
-		}
-
-		commandList.SetVertexInputAttributes(binding, attributeCount, vertexInputAttributes);
-	}
-
-	RecordDrawContext::RenderingModifiers RecordDrawContext::GetModifiers() const
+    RecordDrawContext::RenderingModifiers RecordDrawContext::GetModifiers() const
 	{
 		return mModifiers;
 	}
 
-	PixelFormat::Layout RecordDrawContext::GetVertexInputAttributeFormatLayout(unsigned int elementCount)
+    PixelFormat::Layout RecordDrawContext::GetVertexInputAttributeFormatLayout(unsigned int elementCount)
 	{
 		assert(elementCount > 0 && elementCount < 5);
 

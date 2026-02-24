@@ -99,7 +99,27 @@ namespace Ck::Vulkan
 		return nullptr;
 	}
 
-	std::shared_ptr<PipelineLayout> ShaderProgram::GetPipelineLayout() const
+    unsigned int ShaderProgram::GetUniformSlotCount() const
+    {
+	    return mUniformSlots.GetSize();
+    }
+
+    unsigned int ShaderProgram::GetUniformSlots(Renderer::UniformSlot** slots, unsigned int slotCount, unsigned int firstSlot) const
+    {
+	    assert(slots != nullptr);
+
+	    unsigned int slotAvailable = 0;
+	    if (firstSlot < mUniformSlots.GetSize())
+	    {
+	        slotAvailable = std::min(slotCount, mUniformSlots.GetSize() - firstSlot);
+	        for (unsigned int i = 0; i < slotAvailable; i++)
+	            slots[i] = mUniformSlots[i + firstSlot].Get();
+	    }
+
+	    return slotAvailable;
+    }
+
+    std::shared_ptr<PipelineLayout> ShaderProgram::GetPipelineLayout() const
 	{
 		return mPipelineLayout;
 	}

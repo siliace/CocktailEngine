@@ -2237,17 +2237,67 @@ namespace Ck
                 SizeType allocateCount = size - mSize;
                 E* availableElements = Allocate(allocateCount);
                 for (SizeType i = 0; i < size; ++i)
-                    ConstructRange(allocateCount, availableElements, element);
+                    ObjectMemoryUtils::ConstructRange(allocateCount, availableElements, element);
 
                 mSize += allocateCount;
             }
             else if (size < mSize)
             {
                 SizeType destroyCount = mSize - size;
-                DestroyRange(destroyCount, GetData() + size);
+                ObjectMemoryUtils::DestroyRange(destroyCount, GetData() + size);
 
                 mSize -= destroyCount;
             }
+        }
+
+        /**
+         * \brief Ensures the array can contain at least \p size elements
+         *
+         * If the current size of the array is bigger or equal to \p size, the array remain unchanged.
+         * Otherwise, it will allocate new elements to match \p size.
+         * New elements are constructed by copying \p element.
+         *
+         * \param size Minimal size of the array
+         *
+         * \return true if the array size changed, false otherwise
+         */
+        bool EnsureSize(SizeType size)
+        {
+            assert(size > 0);
+
+            if (size > mSize)
+            {
+                Resize(size);
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * \brief Ensures the array can contain at least \p size elements
+         *
+         * If the current size of the array is bigger or equal to \p size, the array remain unchanged.
+         * Otherwise, it will allocate new elements to match \p size.
+         * New elements are constructed by copying \p element.
+         *
+         * \param size Minimal size of the array
+         * \param element Element to initialize new elements with
+         *
+         * \return true if the array size changed, false otherwise
+         */
+        template <typename U, typename = std::enable_if_t<std::is_constructible_v<E, U>>>
+        bool EnsureSize(SizeType size, const U& element)
+        {
+            assert(size > 0);
+
+            if (size > mSize)
+            {
+                Resize(size, element);
+                return true;
+            }
+
+            return false;
         }
 
         /**

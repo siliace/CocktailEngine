@@ -57,16 +57,31 @@ namespace Ck
     {
         application->Singleton<MaterialProgramLibrary>();
 
-        application->AfterBooted<SystemServiceProvider>([](Application* application, ServiceProvider* systemServiceProvider) {
-            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+        application->AfterBooted<SystemServiceProvider>([this](Application* application, ServiceProvider* systemServiceProvider) {
+            application->Invoke([this](MaterialProgramLibrary* materialProgramLibrary) {
                 FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
 
                 MaterialProgramLibrary::Entry entry;
                 entry.Name = CK_TEXT("basic_line");
                 entry.RenderableType = RenderableType::Line;
                 entry.ShadingMode = Material::ShadingMode::Unlit;
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
+                entry.Interface = MaterialProgramInterface::Builder()
+                .SetVertexAttribute(VertexAttributeSemantic::Position, "ck_VertexPosition")
+                .SetVertexAttribute(VertexAttributeSemantic::Normal, "ck_VertexNormal")
+                .SetVertexAttribute(VertexAttributeSemantic::TexCoord, "ck_VertexTexCoord")
+                .SetVertexAttribute(VertexAttributeSemantic::Color, "ck_VertexColor")
+                .SetVertexAttribute(VertexAttributeSemantic::Tangent, "ck_VertexTangent")
+                .SetVertexAttribute(VertexAttributeSemantic::BiTangent, "ck_VertexBiTangent")
+                .SetBindingSlot(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, "sceneInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, "cameraInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, "lightsInfo", Renderer::DescriptorType::StorageBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::BaseColor, "ck_MaterialBaseColor", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::MetallicRoughness, "ck_MaterialMetallicRoughness", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Normal, "ck_MaterialNormal", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
+                .Get();;
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/line/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -74,23 +89,30 @@ namespace Ck
                 materialProgramLibrary->Register(entry);
             });
 
-            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+            application->Invoke([this](MaterialProgramLibrary* materialProgramLibrary) {
                 FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
 
                 MaterialProgramLibrary::Entry entry;
                 entry.Name = CK_TEXT("basic_mesh");
                 entry.RenderableType = RenderableType::Mesh;
                 entry.ShadingMode = Material::ShadingMode::Lit;
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Tangent] = "ck_VertexTangent";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::BiTangent] = "ck_VertexBiTangent";
-                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::MetallicRoughness] = { "ck_MaterialMetallicRoughness", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface = MaterialProgramInterface::Builder()
+                .SetVertexAttribute(VertexAttributeSemantic::Position, "ck_VertexPosition")
+                .SetVertexAttribute(VertexAttributeSemantic::Normal, "ck_VertexNormal")
+                .SetVertexAttribute(VertexAttributeSemantic::TexCoord, "ck_VertexTexCoord")
+                .SetVertexAttribute(VertexAttributeSemantic::Color, "ck_VertexColor")
+                .SetVertexAttribute(VertexAttributeSemantic::Tangent, "ck_VertexTangent")
+                .SetVertexAttribute(VertexAttributeSemantic::BiTangent, "ck_VertexBiTangent")
+                .SetBindingSlot(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, "sceneInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, "cameraInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, "lightsInfo", Renderer::DescriptorType::StorageBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::BaseColor, "ck_MaterialBaseColor", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::MetallicRoughness, "ck_MaterialMetallicRoughness", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Normal, "ck_MaterialNormal", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
+                .Get();;
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -98,43 +120,62 @@ namespace Ck
                 materialProgramLibrary->Register(entry);
             });
 
-            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+            application->Invoke([this](MaterialProgramLibrary* materialProgramLibrary) {
                 FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
 
                 MaterialProgramLibrary::Entry entry;
                 entry.Name = CK_TEXT("instanced_mesh");
                 entry.RenderableType = RenderableType::InstancedMesh;
                 entry.ShadingMode = Material::ShadingMode::Lit;
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Normal] = "ck_VertexNormal";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Tangent] = "ck_VertexTangent";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::BiTangent] = "ck_VertexBiTangent";
-                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::MetallicRoughness] = { "ck_MaterialMetallicRoughness", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface = MaterialProgramInterface::Builder()
+                .SetVertexAttribute(VertexAttributeSemantic::Position, "ck_VertexPosition")
+                .SetVertexAttribute(VertexAttributeSemantic::Normal, "ck_VertexNormal")
+                .SetVertexAttribute(VertexAttributeSemantic::TexCoord, "ck_VertexTexCoord")
+                .SetVertexAttribute(VertexAttributeSemantic::Color, "ck_VertexColor")
+                .SetVertexAttribute(VertexAttributeSemantic::Tangent, "ck_VertexTangent")
+                .SetVertexAttribute(VertexAttributeSemantic::BiTangent, "ck_VertexBiTangent")
+                .SetBindingSlot(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, "sceneInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, "cameraInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, "lightsInfo", Renderer::DescriptorType::StorageBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::BaseColor, "ck_MaterialBaseColor", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::MetallicRoughness, "ck_MaterialMetallicRoughness", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Normal, "ck_MaterialNormal", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
+                .Get();;
 
-                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/instanced"), Path::Format::Generic), builtinDriver))
+                for (auto& [shaderName, binaries] :
+                     ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/instanced"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
 
                 materialProgramLibrary->Register(entry);
             });
 
-            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+            application->Invoke([this](MaterialProgramLibrary* materialProgramLibrary) {
                 FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
 
                 MaterialProgramLibrary::Entry entry;
                 entry.Name = CK_TEXT("basic_mesh");
                 entry.RenderableType = RenderableType::Mesh;
                 entry.ShadingMode = Material::ShadingMode::Unlit;
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface = MaterialProgramInterface::Builder()
+                .SetVertexAttribute(VertexAttributeSemantic::Position, "ck_VertexPosition")
+                .SetVertexAttribute(VertexAttributeSemantic::Normal, "ck_VertexNormal")
+                .SetVertexAttribute(VertexAttributeSemantic::TexCoord, "ck_VertexTexCoord")
+                .SetVertexAttribute(VertexAttributeSemantic::Color, "ck_VertexColor")
+                .SetVertexAttribute(VertexAttributeSemantic::Tangent, "ck_VertexTangent")
+                .SetVertexAttribute(VertexAttributeSemantic::BiTangent, "ck_VertexBiTangent")
+                .SetBindingSlot(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, "sceneInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, "cameraInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, "lightsInfo", Renderer::DescriptorType::StorageBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::BaseColor, "ck_MaterialBaseColor", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::MetallicRoughness, "ck_MaterialMetallicRoughness", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Normal, "ck_MaterialNormal", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
+                .Get();;
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -142,21 +183,33 @@ namespace Ck
                 materialProgramLibrary->Register(entry);
             });
 
-            application->Invoke([](MaterialProgramLibrary* materialProgramLibrary) {
+            application->Invoke([this](MaterialProgramLibrary* materialProgramLibrary) {
                 FileSystemDriver* builtinDriver = Storage::ResolveDriver(CK_TEXT("builtin"));
 
                 MaterialProgramLibrary::Entry entry;
                 entry.Name = CK_TEXT("instanced_mesh");
                 entry.RenderableType = RenderableType::InstancedMesh;
                 entry.ShadingMode = Material::ShadingMode::Unlit;
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Position] = "ck_VertexPosition";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::TexCoord] = "ck_VertexTexCoord";
-                entry.Interface.VertexAttributes[VertexAttributeSemantic::Color] = "ck_VertexColor";
-                entry.Interface.Textures[Material::TextureType::BaseColor] = { "ck_MaterialBaseColor", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Normal] = { "ck_MaterialNormal", Renderer::StaticSampler::TrilinearWrap };
-                entry.Interface.Textures[Material::TextureType::Alpha] = { "ck_MaterialAlpha", Renderer::StaticSampler::TrilinearWrap };
+                entry.Interface = MaterialProgramInterface::Builder()
+                .SetVertexAttribute(VertexAttributeSemantic::Position, "ck_VertexPosition")
+                .SetVertexAttribute(VertexAttributeSemantic::Normal, "ck_VertexNormal")
+                .SetVertexAttribute(VertexAttributeSemantic::TexCoord, "ck_VertexTexCoord")
+                .SetVertexAttribute(VertexAttributeSemantic::Color, "ck_VertexColor")
+                .SetVertexAttribute(VertexAttributeSemantic::Tangent, "ck_VertexTangent")
+                .SetVertexAttribute(VertexAttributeSemantic::BiTangent, "ck_VertexBiTangent")
+                .SetBindingSlot(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, "sceneInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, "cameraInfo", Renderer::DescriptorType::UniformBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, "lightsInfo", Renderer::DescriptorType::StorageBuffer)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::BaseColor, "ck_MaterialBaseColor", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::MetallicRoughness, "ck_MaterialMetallicRoughness", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Normal, "ck_MaterialNormal", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
+                .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
+                .Get();;
 
-                for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/instanced"), Path::Format::Generic), builtinDriver))
+                for (auto& [shaderName, binaries] :
+                     ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/instanced"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
 
                 materialProgramLibrary->Register(entry);

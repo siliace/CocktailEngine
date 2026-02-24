@@ -45,7 +45,7 @@ namespace Ck
 		projection.At(1, 1) = 2.f / (top - bottom);
 		projection.At(1, 3) = -((top + bottom) / (top - bottom));
 		projection.At(2, 2) = -2.f / (zFar - zNear);
-		projection.At(2, 3) = -((zFar - zNear) / (zFar - zNear));
+		projection.At(2, 3) = -((zFar + zNear) / (zFar - zNear));
 		projection.At(3, 3) = 1.f;
 
 		return projection * ComputeViewMatrix();

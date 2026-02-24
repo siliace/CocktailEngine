@@ -57,10 +57,10 @@ namespace Ck::Vulkan
 		void BindShaderProgram(const Renderer::ShaderProgram* inShaderProgram) override;
 		void BindVertexBuffer(unsigned int binding, const Renderer::Buffer* inVertexBuffer, std::size_t offset, unsigned int stride, bool instanced, unsigned int divisor) override;
 		void BindIndexBuffer(const Renderer::Buffer* inIndexBuffer, std::size_t offset, Renderer::IndexType indexType) override;
-		void BindSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler) override;
-		void BindTextureSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler) override;
-		void BindTexture(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView) override;
-		void BindBuffer(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range) override;
+		void BindSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler) override;
+		void BindTextureSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler) override;
+		void BindTexture(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView) override;
+		void BindBuffer(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range) override;
 
 		void UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int length, const void* data) override;
 

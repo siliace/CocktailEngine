@@ -60,7 +60,7 @@ namespace Ck
 	{
 	    const StaticMeshRecordInfo& staticMeshRecordInfo = mRecordInfo.StaticMeshRecord;
 
-		drawContext.BindMaterialProgram(commandList, *mMaterialProgramVariant);
+		drawContext.BindMaterialProgram(commandList, mMaterialProgramVariant);
 
 		VertexInfo vertexInfo;
 		vertexInfo.Model = staticMeshRecordInfo.Model.Transpose();
@@ -82,28 +82,24 @@ namespace Ck
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))
-			{
-				std::shared_ptr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
-				if (!textureView)
-					continue;
+		    std::shared_ptr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
+		    if (!textureView)
+		        continue;
 
-				commandList.BindTextureSampler(slot, 0, textureView.get(), nullptr);
-			}
+            BindingSlot slot = MaterialProgram::GetMaterialTextureBindingSlot(textureType);
+		    if (slot == InvalidBindingSlot)
+		        continue;
+
+		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.get(), nullptr);
 		}
 
-	    drawContext.BindBuffer(commandList, "instances", mRecordInfo.InstancesBuffer, mRecordInfo.InstanceBufferOffset);
+	    drawContext.BindBuffer(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, mRecordInfo.InstancesBuffer);
 
-		for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
-		{
-			const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = staticMeshRecordInfo.VertexBuffers[i];
-
-			const VertexLayout* vertexLayout = vertexBuffer.VertexLayout;
-
-			commandList.EnableVertexBinding(i, true);
-			commandList.BindVertexBuffer(i, vertexBuffer.Buffer, vertexBuffer.Offset, vertexLayout->GetStride());
-			drawContext.SetVertexInputAttributes(commandList, i, *vertexLayout);
-		}
+	    for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
+	    {
+	        const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = staticMeshRecordInfo.VertexBuffers[i];
+	        drawContext.BindVertexBuffer(commandList, i, vertexBuffer.VertexLayout, vertexBuffer.Buffer, vertexBuffer.Offset);
+	    }
 
 		if (drawContext.GetModifiers() & RecordDrawContext::RenderingModifierBits::Wireframe)
 		{
@@ -129,15 +125,14 @@ namespace Ck
 
 		if (staticMeshRecordInfo.IndexBuffer)
 		{
-			commandList.BindIndexBuffer(staticMeshRecordInfo.IndexBuffer, staticMeshRecordInfo.IndexBufferOffset, staticMeshRecordInfo.IndexType);
-			commandList.DrawIndexed(staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, staticMeshRecordInfo.FirstVertex, mRecordInfo.FirstInstance);
+		    drawContext.BindIndexBuffer(commandList, staticMeshRecordInfo.IndexBuffer, staticMeshRecordInfo.IndexType, staticMeshRecordInfo.IndexBufferOffset);
+			drawContext.DrawIndexed(commandList, staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, staticMeshRecordInfo.FirstVertex, mRecordInfo.FirstInstance);
 		}
 		else
 		{
-			commandList.Draw(staticMeshRecordInfo.Count,  mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, mRecordInfo.FirstInstance);
+			drawContext.Draw(commandList, staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, mRecordInfo.FirstInstance);
 		}
 
-		for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
-			commandList.EnableVertexBinding(i, false);
+	    drawContext.EnableVertexBindings(commandList, 0, staticMeshRecordInfo.VertexBufferCount, false);
 	}
 }

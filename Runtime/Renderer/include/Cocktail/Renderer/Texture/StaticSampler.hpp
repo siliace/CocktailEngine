@@ -5,6 +5,7 @@ namespace Ck::Renderer
 {
 	enum class StaticSampler
 	{
+		None,
 		NearestClamp,
 		LinearClamp,
 		TrilinearClamp,

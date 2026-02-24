@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMVARIANT_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMVARIANT_HPP
 
+#include <Cocktail/Core/Utility/CompositeKey.hpp>
+
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramInterface.hpp>
 
 #include <Cocktail/Renderer/Shader/ShaderProgram.hpp>
@@ -8,53 +10,27 @@
 
 namespace Ck
 {
-	/**
-	 * \brief
-	 */
-	class COCKTAIL_GRAPHIC_API MaterialProgramVariant
-	{
-	public:
+    class COCKTAIL_GRAPHIC_API MaterialProgramVariant
+    {
+    public:
 
-		MaterialProgramVariant(const MaterialProgramInterface& interface, std::shared_ptr<Renderer::ShaderProgram> shaderProgram);
+        MaterialProgramVariant(std::shared_ptr<MaterialProgramInterface>, std::shared_ptr<Renderer::ShaderProgram> shaderProgram);
 
-		/**
-		 * \brief
-		 * \param semantic
-		 * \return
-		 */
-		Renderer::VertexAttributeLocation* GetVertexAttributeLocation(VertexAttributeSemantic semantic) const;
+        Renderer::VertexAttributeLocation* GetVertexAttributeLocation(VertexAttributeSemantic semantic) const;
 
-		/**
-		 * \brief
-		 * \param textureType
-		 * \return
-		 */
-		Renderer::UniformSlot* GetMaterialTextureSlot(Material::TextureType textureType) const;
+        const Renderer::UniformSlot* GetSlot(ShaderBindingDomain domain, BindingSlot bindingSlot) const;
 
-		/**
-		 * \brief
-		 * \return
-		 */
-		const std::shared_ptr<Renderer::ShaderProgram>& GetShaderProgram() const;
-
-        /**
-	     * \brief
-	     * \return
-	     */
-	    Flags<VertexAttributeSemantic> GetVertexAttributeUsage() const;
-
-        /**
-         * \brief
-         * \return
-         */
-        Flags<Material::TextureType> GetMaterialTextureUsage() const;
+        Renderer::ShaderProgram* GetShaderProgram() const;
 
     private:
 
-		std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
-		EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
-		EnumMap<Material::TextureType, Renderer::UniformSlot*> mTextureUniformSlots;
-	};
+        using SlotIdentifier = CompositeKey<ShaderBindingDomain, BindingSlot>;
+
+        std::shared_ptr<MaterialProgramInterface> mInterface;
+        std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
+        EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
+        std::unordered_map<SlotIdentifier, Renderer::UniformSlot*> mSlots;
+    };
 }
 
 #endif // COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMVARIANT_HPP

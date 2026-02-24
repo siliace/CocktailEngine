@@ -15,16 +15,9 @@ namespace Ck
 	{
 	public:
 
-	    /**
-	     * \brief
-	     */
-	    MaterialProgram() = delete;
+	    static BindingSlot GetMaterialTextureBindingSlot(Material::TextureType textureType);
 
-		/**
-		 * \brief Constructor
-		 * \param renderDevice
-		 * \param createInfo
-		 */
+	    MaterialProgram() = delete;
 		MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo);
 
         MaterialProgram(const MaterialProgram& other) = delete;
@@ -44,6 +37,7 @@ namespace Ck
 
 		String mName;
 	    Material::ShadingMode mShadingMode;
+	    std::shared_ptr<MaterialProgramInterface> mInterface;
 		std::unordered_map<VariantKey, UniquePtr<MaterialProgramVariant>> mVariants;
 	};
 }

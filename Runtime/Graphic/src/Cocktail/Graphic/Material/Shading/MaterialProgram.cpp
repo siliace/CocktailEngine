@@ -36,8 +36,23 @@ namespace Ck
 		}
 	}
 
-	MaterialProgram::MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo) :
+    BindingSlot MaterialProgram::GetMaterialTextureBindingSlot(Material::TextureType textureType)
+    {
+	    switch (textureType)
+	    {
+            case Material::TextureType::BaseColor: return MaterialBindingSlots::BaseColor;
+            case Material::TextureType::MetallicRoughness: return MaterialBindingSlots::MetallicRoughness;
+            case Material::TextureType::Normal: return MaterialBindingSlots::Normal;
+            case Material::TextureType::Alpha: return MaterialBindingSlots::Alpha;
+            case Material::TextureType::Emission: return MaterialBindingSlots::Emission;
+        }
+
+	    return InvalidBindingSlot;
+    }
+
+    MaterialProgram::MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo) :
 		mName(createInfo.Name),
+        mInterface(createInfo.Interface),
         mShadingMode(createInfo.ShadingMode)
 	{
 		for (const EnumMap<Renderer::ShaderType, ByteArray>& variantBinaries : createInfo.VariantsBinaries)
@@ -61,20 +76,27 @@ namespace Ck
 			assert(shaderCount > 0);
 			shaderProgramCreateInfo.ShaderCount = shaderCount;
 
-			int staticSamplerCount = 0;
-			Renderer::StaticSamplerInfo* staticSamplers = COCKTAIL_STACK_ALLOC(Renderer::StaticSamplerInfo, Enum<Material::TextureType>::ValueCount);
-			for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
-			{
-				if (createInfo.Interface.Textures[textureType].Name.IsEmpty())
-					continue;
+		    Array<Renderer::StaticSamplerInfo> staticSamplers;
+		    for (ShaderBindingDomain domain : Enum<ShaderBindingDomain>::Values)
+		    {
+                const BindingDomainInterface* bindingDomainInterface = mInterface->GetBindingDomainInterface(domain);
+		        if (!bindingDomainInterface)
+		            continue;
 
-				staticSamplers[staticSamplerCount].Member = createInfo.Interface.Textures[textureType].Name;
-				staticSamplers[staticSamplerCount].Sampler = createInfo.Interface.Textures[textureType].Sampler;
-				++staticSamplerCount;
-			}
+		        for (unsigned int i = 0; i < bindingDomainInterface->GetSlotInterfaceCount(); i++)
+		        {
+		            const SlotInterface& slotInterface = bindingDomainInterface->GetSlotInterface(i);
+		            if (slotInterface.Type == Renderer::DescriptorType::TextureSampler)
+		            {
+                        Renderer::StaticSamplerInfo& staticSampler = staticSamplers.Emplace();
+		                staticSampler.Member = slotInterface.Name;
+		                staticSampler.Sampler = slotInterface.Sampler;
+		            }
+		        }
+		    }
 
-			shaderProgramCreateInfo.StaticSamplerCount = staticSamplerCount;
-			shaderProgramCreateInfo.StaticSamplers = staticSamplers;
+			shaderProgramCreateInfo.StaticSamplerCount = staticSamplers.GetSize();
+			shaderProgramCreateInfo.StaticSamplers = staticSamplers.GetData();
 
 			std::shared_ptr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
 			UniquePtr<MaterialProgramVariant> variant = MakeUnique<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));
@@ -91,7 +113,8 @@ namespace Ck
 			Flags<Material::TextureType> materialTextures;
 			for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 			{
-				if (variant->GetMaterialTextureSlot(textureType) == nullptr)
+			    BindingSlot bindingSlot = GetMaterialTextureBindingSlot(textureType);
+				if (bindingSlot == InvalidBindingSlot || variant->GetSlot(ShaderBindingDomain::Material, bindingSlot) == nullptr)
 					continue;
 
 				materialTextures |= textureType;

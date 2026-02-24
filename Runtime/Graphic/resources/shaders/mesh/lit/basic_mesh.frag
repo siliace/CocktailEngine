@@ -45,14 +45,14 @@ layout (set = 0, binding = 0) uniform SceneInfo {
 	float ambientFactor;
 } sceneInfo;
 
-layout (std430, set = 0, binding = 1) readonly buffer LightInfo {
-	LightInstance lightInstances[];
-} lightsInfo;
-
 layout (set = 1, binding = 0) uniform CameraInfo {
 	mat4 viewProjection;
 	vec3 viewDirection;
 } cameraInfo;
+
+layout (std430, set = 1, binding = 1) readonly buffer LightInfo {
+	LightInstance lightInstances[];
+} lightsInfo;
 
 #ifdef COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE
 layout (set = 2, binding = 0) uniform sampler2D ck_MaterialBaseColor;

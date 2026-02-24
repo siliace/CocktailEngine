@@ -61,9 +61,18 @@ namespace Ck::Vulkan
 		 */
 		Renderer::UniformSlot* FindUniformSlot(AsciiStringView name) const override;
 
+        /**
+         * \brief
+         *
+         * \return
+         */
+	    unsigned int GetUniformSlotCount() const override;
+
+	    unsigned int GetUniformSlots(Renderer::UniformSlot** slots, unsigned int slotCount, unsigned int firstSlot) const override;
+
 		/**
-		 * \brief 
-		 * \return 
+		 * \brief
+		 * \return
 		 */
 		std::shared_ptr<PipelineLayout> GetPipelineLayout() const;
 

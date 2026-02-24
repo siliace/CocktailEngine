@@ -58,7 +58,7 @@ namespace Ck
 
 	void StaticMeshRecord::Draw(Renderer::CommandList& commandList, RecordDrawContext& drawContext) const
 	{
-		drawContext.BindMaterialProgram(commandList, *mMaterialProgramVariant);
+		drawContext.BindMaterialProgram(commandList, mMaterialProgramVariant);
 
 		VertexInfo vertexInfo;
 		vertexInfo.Model = mRecordInfo.Model.Transpose();
@@ -80,25 +80,21 @@ namespace Ck
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-			if (Renderer::UniformSlot* slot = mMaterialProgramVariant->GetMaterialTextureSlot(textureType))
-			{
-				std::shared_ptr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
-				if (!textureView)
-					continue;
+		    std::shared_ptr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
+		    if (!textureView)
+		        continue;
 
-				commandList.BindTextureSampler(slot, 0, textureView.get(), nullptr);
-			}
+		    BindingSlot slot = MaterialProgram::GetMaterialTextureBindingSlot(textureType);
+		    if (slot == InvalidBindingSlot)
+		        continue;
+
+		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.get(), nullptr);
 		}
 
 		for (unsigned int i = 0; i < mRecordInfo.VertexBufferCount; i++)
 		{
 			const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = mRecordInfo.VertexBuffers[i];
-
-			const VertexLayout* vertexLayout = vertexBuffer.VertexLayout;
-
-			commandList.EnableVertexBinding(i, true);
-			commandList.BindVertexBuffer(i, vertexBuffer.Buffer, vertexBuffer.Offset, vertexLayout->GetStride());
-			drawContext.SetVertexInputAttributes(commandList, i, *vertexLayout);
+		    drawContext.BindVertexBuffer(commandList, i, vertexBuffer.VertexLayout, vertexBuffer.Buffer, vertexBuffer.Offset);
 		}
 
 		if (drawContext.GetModifiers() & RecordDrawContext::RenderingModifierBits::Wireframe)
@@ -125,15 +121,14 @@ namespace Ck
 
 		if (mRecordInfo.IndexBuffer)
 		{
-			commandList.BindIndexBuffer(mRecordInfo.IndexBuffer, mRecordInfo.IndexBufferOffset, mRecordInfo.IndexType);
-			commandList.DrawIndexed(mRecordInfo.Count, 1, mRecordInfo.FirstIndex, mRecordInfo.FirstVertex, 0);
+		    drawContext.BindIndexBuffer(commandList, mRecordInfo.IndexBuffer, mRecordInfo.IndexType, mRecordInfo.IndexBufferOffset);
+		    drawContext.DrawIndexed(commandList, mRecordInfo.Count, 1, mRecordInfo.FirstIndex, mRecordInfo.FirstVertex, 0);
 		}
 		else
 		{
-			commandList.Draw(mRecordInfo.Count, 1, mRecordInfo.FirstIndex, 0);
+			drawContext.Draw(commandList,mRecordInfo.Count, 1, mRecordInfo.FirstIndex, 0);
 		}
 
-		for (unsigned int i = 0; i < mRecordInfo.VertexBufferCount; i++)
-			commandList.EnableVertexBinding(i, false);
+	    drawContext.EnableVertexBindings(commandList, 0, mRecordInfo.VertexBufferCount, false);
 	}
 }

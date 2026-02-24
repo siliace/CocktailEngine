@@ -1,3 +1,5 @@
+#include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
+
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/VulkanUtils.hpp>
 #include <Cocktail/Vulkan/Buffer/Buffer.hpp>
@@ -15,8 +17,6 @@
 #include <Cocktail/Vulkan/Texture/Sampler.hpp>
 #include <Cocktail/Vulkan/Texture/Texture.hpp>
 #include <Cocktail/Vulkan/Texture/TextureView.hpp>
-
-#include "Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp"
 
 namespace Ck::Vulkan
 {
@@ -1061,34 +1061,34 @@ namespace Ck::Vulkan
 		GetGraphicStateManager()->BindIndexBuffer(indexBuffer, offset, indexType);
 	}
 
-	void CommandList::BindSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler)
+	void CommandList::BindSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler)
 	{
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::Sampler);
 
-		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(slot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
 		mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Sampler*>(sampler));
 	}
 
-	void CommandList::BindTextureSampler(Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler)
+	void CommandList::BindTextureSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler)
 	{
 		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
 		assert(slot->GetDescriptorType() == Renderer::DescriptorType::TextureSampler);
 
-		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(slot);
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(slot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
 		mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const TextureView*>(textureView), static_cast<const Sampler*>(sampler));
 	}
 
-	void CommandList::BindTexture(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
+	void CommandList::BindTexture(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
 	{
 		const TextureView* textureView = static_cast<const TextureView*>(inTextureView);
 		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
 
-		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(uniformSlot);
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(uniformSlot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
 		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
@@ -1103,11 +1103,11 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void CommandList::BindBuffer(Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range)
+	void CommandList::BindBuffer(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range)
 	{
 		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
 
-		UniformSlot* descriptorSetSlot = static_cast<UniformSlot*>(uniformSlot);
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(uniformSlot);
 		unsigned int set = descriptorSetSlot->GetSet();
 		unsigned int binding = descriptorSetSlot->GetBinding();
 		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());

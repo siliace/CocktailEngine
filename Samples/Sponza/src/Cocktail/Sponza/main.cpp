@@ -18,8 +18,6 @@
 
 #include <Cocktail/Sponza/ImGuiOverlay.hpp>
 
-#include "Cocktail/Graphic/Scene/Shape/LineShape.hpp"
-
 using namespace Ck;
 
 CMRC_DECLARE(sponza);

@@ -75,10 +75,17 @@ namespace Ck::Vulkan
 		 */
 		const AsciiString& GetName() const override;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+        /**
+         * \brief
+         *
+         * \return
+         */
+        Uint64 GetCompatibilityHash() const override;
+
+        /**
+         * \brief
+         * \return
+         */
 		unsigned int GetSet() const;
 
 		/**
@@ -92,6 +99,7 @@ namespace Ck::Vulkan
 		Renderer::ShaderProgramType mProgramType;
 		Array<UniquePtr<Renderer::UniformMember>> mMembers;
 		AsciiString mName;
+	    Uint64 mCompatibilityHash;
 		DescriptorSetLayoutBinding mLayoutBindingInfo;
 		unsigned int mSet;
 	};

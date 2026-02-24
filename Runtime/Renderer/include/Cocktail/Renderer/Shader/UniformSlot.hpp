@@ -140,6 +140,13 @@ namespace Ck::Renderer
 		 * \return The name of the uniform if found in the stage
 		 */
 		virtual const AsciiString& GetName() const = 0;
+
+        /**
+         * \brief
+         *
+         * \return
+         */
+	    virtual Uint64 GetCompatibilityHash() const = 0;
 	};
 }
 

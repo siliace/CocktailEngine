@@ -122,6 +122,7 @@ namespace Ck
 		};
 
 		std::shared_ptr<Scene> mScene;
+	    RecordDrawContext mDrawContext;
 		std::set<ViewportEntry, ViewportComparator> mViewports;
 		UniquePtr<RenderQueue> mOpaqueRenderQueue;
 		UniquePtr<RenderQueue> mBlendingRenderQueue;

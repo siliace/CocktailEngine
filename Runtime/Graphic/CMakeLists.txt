@@ -89,6 +89,7 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialLibraryServiceProvider.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialLibraryServiceProvider.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialProgram.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialProgramInterface.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialProgramLibrary.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialProgramLibrary.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Material/Shading/MaterialProgramManager.cpp
@@ -147,6 +148,7 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/ShaderBindingTable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Rendering/Queue/StaticMeshRecordInfo.hpp
         SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/CustomRecord.hpp
@@ -155,10 +157,11 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/InstancedStaticMeshRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/LineRecord.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/LineRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/RecordDrawContext.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/RenderQueue.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/ShaderBindingTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Rendering/Queue/StaticMeshRecord.cpp
 )
 
 cocktail_source_directory(GRAPHIC_FILES

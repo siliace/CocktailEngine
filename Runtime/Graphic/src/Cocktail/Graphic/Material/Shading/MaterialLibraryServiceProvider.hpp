@@ -5,6 +5,8 @@
 
 namespace Ck
 {
+    class MaterialProgramInterface;
+
 	class MaterialLibraryServiceProvider : public ServiceProvider
 	{
 	public:

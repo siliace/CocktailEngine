@@ -73,9 +73,17 @@ namespace Ck::Vulkan
 	UniformSlot::UniformSlot(Renderer::ShaderProgramType programType, const Array<BlockMember>& members, AsciiString name, const DescriptorSetLayoutBinding& layoutBindingInfo, unsigned int set) :
 		mProgramType(programType),
 		mName(std::move(name)),
+        mCompatibilityHash(0),
 		mLayoutBindingInfo(layoutBindingInfo),
 		mSet(set)
 	{
+	    HashCombine(mCompatibilityHash, mSet);
+	    HashCombine(mCompatibilityHash, mLayoutBindingInfo.Binding);
+	    HashCombine(mCompatibilityHash, mLayoutBindingInfo.Type);
+	    HashCombine(mCompatibilityHash, mLayoutBindingInfo.DescriptorCount);
+	    HashCombine(mCompatibilityHash, mLayoutBindingInfo.ShaderStages);
+	    HashCombine(mCompatibilityHash, mLayoutBindingInfo.StaticSampler);
+
 		mMembers.Reserve(members.GetSize());
 		for (unsigned int i = 0; i < members.GetSize(); i++)
 			mMembers.Emplace(new MyUniformMember(this, members[i]));
@@ -129,7 +137,12 @@ namespace Ck::Vulkan
 		return mName;
 	}
 
-	unsigned int UniformSlot::GetBinding() const
+    Uint64 UniformSlot::GetCompatibilityHash() const
+    {
+        return mCompatibilityHash;
+    }
+
+    unsigned int UniformSlot::GetBinding() const
 	{
 		return mLayoutBindingInfo.Binding;
 	}

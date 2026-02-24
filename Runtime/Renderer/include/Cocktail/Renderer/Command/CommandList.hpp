@@ -178,10 +178,10 @@ namespace Ck::Renderer
 		virtual void BindShaderProgram(const ShaderProgram* shaderProgram) = 0;
 		virtual void BindVertexBuffer(unsigned int binding, const Buffer* vertexBuffer, std::size_t offset, unsigned int stride, bool instanced = false, unsigned int divisor = 0) = 0;
 		virtual void BindIndexBuffer(const Buffer* indexBuffer, std::size_t offset, IndexType indexType) = 0;
-		virtual void BindSampler(UniformSlot* slot, unsigned int arrayIndex, const Sampler* sampler) = 0;
-		virtual void BindTextureSampler(UniformSlot* slot, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler) = 0;
-		virtual void BindTexture(UniformSlot* slot, unsigned int arrayIndex, const TextureView* textureView) = 0;
-		virtual void BindBuffer(UniformSlot* slot, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range) = 0;
+		virtual void BindSampler(const UniformSlot* slot, unsigned int arrayIndex, const Sampler* sampler) = 0;
+		virtual void BindTextureSampler(const UniformSlot* slot, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler) = 0;
+		virtual void BindTexture(const UniformSlot* slot, unsigned int arrayIndex, const TextureView* textureView) = 0;
+		virtual void BindBuffer(const UniformSlot* slot, unsigned int arrayIndex, const Buffer* uniformBuffer, std::size_t offset, std::size_t range) = 0;
 
 		virtual void UpdatePipelineConstant(ShaderType shaderType, unsigned int offset, unsigned int length, const void* data) = 0;
 
@@ -231,7 +231,7 @@ namespace Ck::Renderer
 		 * \param firstVertex The first vertex to draw
 		 * \param firstInstance The first instance to draw
 		 */
-		virtual void Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex = 0, unsigned int firstInstance = 0) = 0;
+		virtual void Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) = 0;
 
 		/**
 		 * \brief Issue an indexed draw call in the CommandList
@@ -242,7 +242,7 @@ namespace Ck::Renderer
 		 * \param indexOffset A value added to the index before accessing the vertex buffer
 		 * \param firstInstance The first instance to draw
 		 */
-		virtual void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex = 0, int indexOffset = 0, unsigned int firstInstance = 0) = 0;
+		virtual void DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) = 0;
 
 		/**
 		 * \brief Issue an indirect draw call in the CommandList

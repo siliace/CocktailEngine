@@ -15,7 +15,7 @@ namespace Ck::Renderer
 		/**
 		 * \brief 
 		 */
-		Buffer* Buffer = nullptr;
+		const Buffer* Buffer = nullptr;
 
 		/**
 		 * \brief 

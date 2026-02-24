@@ -18,7 +18,7 @@ namespace Ck
 
     void LineRecord::Draw(Renderer::CommandList& commandList, RecordDrawContext& drawContext) const
     {
-        drawContext.BindMaterialProgram(commandList, *mMaterialProgramVariant);
+        drawContext.BindMaterialProgram(commandList, mMaterialProgramVariant);
 
         VertexInfo vertexInfo;
         vertexInfo.Model = mRecordInfo.WorldMatrix.Transpose();
@@ -71,6 +71,6 @@ namespace Ck
         commandList.SetBlendingFunction(0, Renderer::BlendFactor::SourceAlpha, Renderer::BlendFactor::OneMinusSourceAlpha, Renderer::BlendFactor::One, Renderer::BlendFactor::OneMinusSourceAlpha);
         commandList.SetBlendingEquation(0, Renderer::BlendOp::Add, Renderer::BlendOp::Add);
 
-        commandList.Draw(mRecordInfo.PointCount, 1);
+        drawContext.Draw(commandList, mRecordInfo.PointCount);
     }
 }
