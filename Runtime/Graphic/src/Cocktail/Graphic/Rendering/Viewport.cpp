@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	Viewport::Viewport(Camera* camera, const Rectangle<unsigned int>& area):
+	Viewport::Viewport(Camera* camera, const Rectangle<float>& area):
 		mCamera(camera),
 		mArea(area)
 	{
@@ -26,8 +26,8 @@ namespace Ck
 		Renderer::Viewport viewport;
 		viewport.X = mArea.Position.X();
 		viewport.Y = mArea.Position.Y();
-		viewport.Width = mArea.Extent.X();
-		viewport.Height = mArea.Extent.Y();
+		viewport.Width = mArea.Extent.Width;
+		viewport.Height = mArea.Extent.Height;
 		viewport.MinDepth = 0.f;
 		viewport.MaxDepth = 1.f;
 		commandList.SetViewport(viewport);
@@ -35,8 +35,8 @@ namespace Ck
 		Renderer::Scissor scissor;
 		scissor.Position.Width = mArea.Position.X();
 		scissor.Position.Height = mArea.Position.Y();
-		scissor.Size.Width = mArea.Extent.X();
-		scissor.Size.Height = mArea.Extent.Y();
+		scissor.Size.Width = mArea.Extent.Width;
+		scissor.Size.Height = mArea.Extent.Height;
 		commandList.SetScissor(scissor);
 
 		CameraInfo cameraInfo;
@@ -45,12 +45,12 @@ namespace Ck
 		drawContext.BindData(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(CameraInfo), &cameraInfo);
 	}
 
-	Rectangle<unsigned int> Viewport::GetArea() const
+	Rectangle<float> Viewport::GetArea() const
 	{
 		return mArea;
 	}
 
-	void Viewport::SetArea(Rectangle<unsigned int> area)
+	void Viewport::SetArea(Rectangle<float> area)
 	{
 		mArea = area;
 	}

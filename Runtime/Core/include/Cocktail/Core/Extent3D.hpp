@@ -38,10 +38,23 @@ namespace Ck
 			/// Nothong
 		}
 
+	    /**
+         * \brief
+         *
+         * \tparam U
+         *
+         * \param other
+         */
+	    template <typename U>
+        Extent3D(const Extent3D<U>& other)
+		{
+		    Width = static_cast<T>(other.Width);
+		    Height = static_cast<T>(other.Height);
+		    Depth = static_cast<T>(other.Depth);
+		}
+
 		T Width;
-
 		T Height;
-
 		T Depth;
 	};
 

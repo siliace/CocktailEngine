@@ -22,7 +22,7 @@ namespace Ck
 		 * \param zBounds 
 		 * \return 
 		 */
-		static OrthographicCamera* Create(std::shared_ptr<Scene> scene, Rectangle<unsigned int> area, Vector2<float> zBounds);
+		static OrthographicCamera* Create(std::shared_ptr<Scene> scene, const Rectangle<float>& area, Vector2<float> zBounds);
 
 		/**
 		 * \brief 
@@ -30,12 +30,24 @@ namespace Ck
 		 * \param area 
 		 * \param zBounds 
 		 */
-		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<unsigned int> area, Vector2<float> zBounds);
+		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<float> area, Vector2<float> zBounds);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+        /**
+         * \brief
+         * \return
+         */
+        const Rectangle<float>& GetArea() const;
+
+        /**
+         * \brief
+         * \param area
+         */
+	    void SetArea(const Rectangle<float>& area);
+
+        /**
+         * \brief
+         * \return
+         */
 		Frustum<float> ComputeFrustum() const override;
 
 		/**
@@ -46,7 +58,7 @@ namespace Ck
 
 	private:
 
-		Rectangle<unsigned int> mArea;
+		Rectangle<float> mArea;
 		Vector2<float> mZBounds;
 		LazyValue<Matrix4<float>> mProjectionViewMatrix;
 	};

@@ -34,8 +34,31 @@ namespace Ck
 			/// Nothong
 		}
 
-		T Width;
+	    /**
+	     * \brief
+	     *
+	     * \tparam U
+	     *
+	     * \param other
+	     */
+	    template <typename U>
+	    Extent2D(const Extent2D<U>& other)
+		{
+		    Width = static_cast<T>(other.Width);
+		    Height = static_cast<T>(other.Height);
+		}
 
+        /**
+         * \brief
+         *
+         * \return
+         */
+	    T GetRatio() const
+		{
+		    return Width / Height;
+		}
+
+		T Width;
 		T Height;
 	};
 

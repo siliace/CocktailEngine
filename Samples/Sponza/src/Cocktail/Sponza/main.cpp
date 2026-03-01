@@ -50,9 +50,9 @@ Main::ExitCode ApplicationMain(Application* application)
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
 	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor::White);
 
-	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
-	Vector2<float> zBounds(0.1f, 4500.f);
-	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), aspectRatio, zBounds);
+    Vector2<float> zBounds(0.1f, 4500.f);
+    Rectangle<float> viewportArea(Vector2<float>::Zero(), windowSize);
+	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), viewportArea.Extent.GetRatio(), zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
 	FreeFlyCameraViewController cameraController(camera);
 
@@ -107,16 +107,16 @@ Main::ExitCode ApplicationMain(Application* application)
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
 	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
-	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, viewportArea);
 	viewer->AttachViewport(viewport, 0);
 
 	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
-		windowSize = event.Size;
-		camera->SetAspectRatio((float)windowSize.Width / (float)windowSize.Height);
-		viewport->SetArea(Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+        viewportArea.Extent = event.Size;
+	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
+		viewport->SetArea(viewportArea);
 	});
 
 	Duration lastFrameBegin = application->Uptime();

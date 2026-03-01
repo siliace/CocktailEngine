@@ -74,6 +74,41 @@ namespace Ck
         }
 
         /**
+         * \brief
+         *
+         * \param size
+         * \param zBounds
+         * \param position
+         * \param front
+         * \param right
+         * \param up
+         *
+         * \return
+         */
+        static Frustum Orthographic(const Extent2D<T>& size, const Vector2<T>& zBounds, const Vector3<T>& position, const Vector3<T>& front, const Vector3<T>& right, const Vector3<T>& up = Vector3<T>::Up())
+        {
+            Frustum frustum;
+
+            T halfWidth  = size.Width / static_cast<T>(2);
+            T halfHeight = size.Height / static_cast<T>(2);
+            T zNear = zBounds.X();
+            T zFar  = zBounds.Y();
+
+            Vector3<T> nearCenter = position + front * zNear;
+            Vector3<T> farCenter  = position + front * zFar;
+            frustum.mCenter = (nearCenter + farCenter) / static_cast<T>(2);
+
+            frustum.mPlanes[Face::Near] = Plane<T>(nearCenter,  front);
+            frustum.mPlanes[Face::Far] = Plane<T>(farCenter,   -front);
+            frustum.mPlanes[Face::Right] = Plane<T>(position + right * halfWidth,  right);
+            frustum.mPlanes[Face::Left] = Plane<T>(position - right * halfWidth, -right);
+            frustum.mPlanes[Face::Top] = Plane<T>(position + up * halfHeight,    up);
+            frustum.mPlanes[Face::Bottom] = Plane<T>(position - up * halfHeight,   -up);
+
+            return frustum;
+        }
+
+        /**
          * \brief Default constructor
          */
         Frustum() = default;

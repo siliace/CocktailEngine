@@ -21,7 +21,7 @@ namespace Ck
 		 * \param camera 
 		 * \param area 
 		 */
-		Viewport(Camera* camera, const Rectangle<unsigned>& area);
+		Viewport(Camera* camera, const Rectangle<float>& area);
 
 		/**
 		 * \brief 
@@ -35,13 +35,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		Rectangle<unsigned int> GetArea() const;
+		Rectangle<float> GetArea() const;
 
 		/**
 		 * \brief 
 		 * \param area 
 		 */
-		void SetArea(Rectangle<unsigned int> area);
+		void SetArea(Rectangle<float> area);
 
 		/**
 		 * \brief Get the Camera used to render this Viewport
@@ -52,7 +52,7 @@ namespace Ck
 	private:
 
 		Camera* mCamera;
-		Rectangle<unsigned int> mArea;
+		Rectangle<float> mArea;
 	};
 }
 

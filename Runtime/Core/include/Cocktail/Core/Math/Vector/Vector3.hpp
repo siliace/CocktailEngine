@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_MATH_VECTOR_VECTOR3_HPP
 #define COCKTAIL_CORE_MATH_VECTOR_VECTOR3_HPP
 
+#include <Cocktail/Core/Extent3D.hpp>
 #include <Cocktail/Core/Math/Angle.hpp>
 #include <Cocktail/Core/Math/Vector/Vector2.hpp>
 
@@ -142,6 +143,21 @@ namespace Ck
 			Z() = z;
 		}
 
+	    /**
+         * \brief
+         *
+         * \tparam U
+         *
+         * \param other
+         */
+	    template <typename U>
+        Vector3(const Vector3<U>& other)
+		{
+		    X() = static_cast<T>(other.X());
+		    Y() = static_cast<T>(other.Y());
+		    Z() = static_cast<T>(other.Z());
+		}
+
 		/**
 		 * \brief 
 		 * \return 
@@ -196,6 +212,17 @@ namespace Ck
 			return Vector<Vector3, T, 3>::At(2);
 		}
 	};
+
+    template <typename T>
+    Vector3<T> operator+(const Vector3<T>& lhs, const Extent3D<T> rhs)
+    {
+        Vector3<T> result = lhs;
+        lhs.X() += rhs.Width;
+        lhs.Y() += rhs.Height;
+        lhs.Z() += rhs.Depth;
+
+        return result;
+    }
 }
 
 #endif // COCKTAIL_CORE_MATH_VECTOR_VECTOR3_HPP

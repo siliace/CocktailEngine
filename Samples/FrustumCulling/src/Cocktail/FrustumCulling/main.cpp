@@ -14,8 +14,6 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
-#include "Cocktail/Graphic/Scene/Shape/InstancedStaticMeshShape.hpp"
-
 using namespace Ck;
 
 Main::ExitCode ApplicationMain(Application* application)
@@ -35,16 +33,6 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
-    Array<Transformation> instances;
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        for (unsigned int j = 0; j < 30; j++)
-        {
-            Transformation& transformation = instances.Emplace(Transformation::Identity());
-            transformation.SetTranslation(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
-        }
-    }
-
 	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
 	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Unlit, true);
 	material->SetEmissiveColor(LinearColor::White);
@@ -62,11 +50,11 @@ Main::ExitCode ApplicationMain(Application* application)
 
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);
-
 	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
-	
     FreeFlyCameraViewController cameraController(camera);
+
+    Rectangle<float> viewportArea(Vector2<float>::Zero(), windowSize);
 
     float move = 1.f;
     float rightTranslation = 0.f;
@@ -119,14 +107,14 @@ Main::ExitCode ApplicationMain(Application* application)
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
 	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
-	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, viewportArea);
 	viewer->AttachViewport(viewport, 0);
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
-		windowSize = event.Size;
-		camera->SetAspectRatio((float)windowSize.Width / (float)windowSize.Height);
-		viewport->SetArea(Rectangle(Vector2<unsigned int>(0, 0), Vector2(windowSize.Width, windowSize.Height)));
+	    viewportArea.Extent = event.Size;
+	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
+		viewport->SetArea(viewportArea);
 	});
 
 	Duration lastFrameBegin = application->Uptime();

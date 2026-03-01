@@ -4,146 +4,176 @@
 #include <cassert>
 
 #include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Extent2D.hpp>
 #include <Cocktail/Core/Math/Polygon/Polygon.hpp>
 
 namespace Ck
 {
-	/**
-	 * \brief 
-	 * \tparam T 
-	 */
-	template <typename T>
-	class Rectangle : public Polygon<T>
-	{
-	public:
+    template <typename T, typename Enable = void>
+    struct SafeMakeUnsigned
+    {
+    };
 
-		/**
-		 * \brief 
-		 * \param length 
-		 * \return 
-		 */
-		static Rectangle Square(T length)
-		{
-			return Rectangle(Vector2<T>(length, length));
-		}
+    template <typename T>
+    struct SafeMakeUnsigned<T, std::enable_if_t<std::is_floating_point_v<T>>>
+    {
+        using Type = T;
+    };
 
-		/**
-		 * \brief 
-		 * \param position 
-		 * \param length 
-		 * \return 
-		 */
-		static Rectangle Square(Vector2<T> position, T length)
-		{
-			return Rectangle(position, Vector2<T>(length, length));
-		}
+    template <typename T>
+    struct SafeMakeUnsigned<T, std::enable_if_t<!std::is_floating_point_v<T>>>
+    {
+        using Type = std::make_unsigned_t<T>;
+    };
 
-		/**
-		 * \brief
-		 * \param extent
-		 */
-		explicit Rectangle(Vector2<T> extent) :
-			Rectangle(Vector2<T>::Zero(), extent)
-		{
-			/// Nothing
-		}
+    template <typename T>
+    using SafeMakeUnsignedType = typename SafeMakeUnsigned<T>::Type;
 
-		/**
-		 * \brief 
-		 */
-		Rectangle() = default;
+    /**
+     * \brief
+     *
+     * \tparam T
+     */
+    template <typename T>
+    class Rectangle : public Polygon<T>
+    {
+    public:
 
-		/**
-		 * \brief 
-		 * \param position 
-		 * \param extent 
-		 */
-		Rectangle(Vector2<T> position, Vector2<T> extent) :
-			Position(position),
-			Extent(extent)
-		{
-			/// Nothing
-		}
+        static_assert(std::is_signed_v<T>);
 
-		/**
-		 * \brief 
-		 * \param x 
-		 * \param y 
-		 * \param width 
-		 * \param height 
-		 */
-		Rectangle(T x, T y, T width, T height) :
-			Rectangle(Vector2(x, y), Vector2(width, height))
-		{
-			/// Nothing
-		}
+        using SizeType = SafeMakeUnsignedType<T>;
 
-		/**
-		 * \brief 
-		 * \param vertex 
-		 * \return 
-		 */
-		bool Contains(const Vector2<T>& vertex) const override
-		{
-			if (vertex.X() < Position.X() || vertex.X() > Position.X() + Extent.X())
-				return false;
+        using PointType = Vector2<T>;
+        using ExtentType = Extent2D<SizeType>;
 
-			if (vertex.Y() < Position.Y() || vertex.Y() > Position.Y() + Extent.Y())
-				return false;
+        /**
+         * \brief
+         *
+         * \param size
+         *
+         * \return
+         */
+        static Rectangle Square(SizeType size)
+        {
+            return Rectangle(MakeExtent(size, size));
+        }
 
-			return true;
-		}
+        /**
+         * \brief
+         *
+         * \param position
+         * \param size
+         *
+         * \return
+         */
+        static Rectangle Square(PointType position, SizeType size)
+        {
+            return Rectangle(position, MakeExtent(size, size));
+        }
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		std::size_t GetVertexCount() const override
-		{
-			return 4;
-		}
+        /**
+         * \brief
+         *
+         * \param extent
+         */
+        explicit Rectangle(ExtentType extent) :
+            Rectangle(PointType::Zero(), extent)
+        {
+            /// Nothing
+        }
 
-		/**
-		 * \brief 
-		 * \param index 
-		 * \return 
-		 */
-		Vector2<T> GetVertex(std::size_t index) const override
-		{
-			assert(index < 4);
+        /**
+         * \brief
+         */
+        Rectangle() = default;
 
-			switch (index)
-			{
+        /**
+         * \brief
+         *
+         * \param position
+         * \param extent
+         */
+        Rectangle(PointType position, ExtentType extent) :
+            Position(position),
+            Extent(extent)
+        {
+            /// Nothing
+        }
 
-			case 0:
-				return { Position.X(), Position.Y() };
+        /**
+         * \brief
+         *
+         * \param x
+         * \param y
+         * \param width
+         * \param height
+         */
+        Rectangle(T x, T y, SizeType width, SizeType height) :
+            Rectangle(Vector2(x, y), MakeExtent(width, height))
+        {
+            /// Nothing
+        }
 
-			case 1:
-				return { Position.X() + Extent.X(), Position.Y() };
+        /**
+         * \brief
+         *
+         * \param vertex
+         *
+         * \return
+         */
+        bool Contains(const PointType& vertex) const override
+        {
+            if (vertex.X() < Position.X() || vertex.X() > Position.X() + Extent.Width)
+                return false;
 
-			case 2:
-				return { Position.X() + Extent.X(), Position.Y() + Extent.Y() };
+            if (vertex.Y() < Position.Y() || vertex.Y() > Position.Y() + Extent.Height)
+                return false;
 
-			case 3:
-				return { Position.X(), Position.Y() + Extent.Y() };
-			}
+            return true;
+        }
 
-			COCKTAIL_UNREACHABLE();
-			return {};
-		}
+        /**
+         * \brief
+         * \return
+         */
+        std::size_t GetVertexCount() const override
+        {
+            return 4;
+        }
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Vector2<T> GetCenter() const override
-		{
-			return (Position + Extent) / static_cast<T>(2);
-		}
+        /**
+         * \brief
+         * \param index
+         * \return
+         */
+        PointType GetVertex(std::size_t index) const override
+        {
+            assert(index < 4);
 
-		Vector2<T> Position;
-		Vector2<T> Extent;
-	};
+            switch (index)
+            {
+                case 0: return { Position.X(), Position.Y() };
+                case 1: return { Position.X() + Extent.Width, Position.Y() };
+                case 2: return { Position.X() + Extent.Width, Position.Y() + Extent.Height };
+                case 3: return { Position.X(), Position.Y() + Extent.Height };
+            }
+
+            COCKTAIL_UNREACHABLE();
+            return {};
+        }
+
+        /**
+         * \brief
+         * \return
+         */
+        PointType GetCenter() const override
+        {
+            return (Position + Extent) / static_cast<T>(2);
+        }
+
+        PointType Position;
+        ExtentType Extent;
+    };
 }
 
 #endif // COCKTAIL_CORE_MATH_POLYGON_RECTANGLE_HPP

@@ -119,10 +119,17 @@ namespace Ck
 			}
 			else
 			{
-				Rectangle<unsigned int> area;
+			    Vector2<float> position;
+			    position.X() = -cameraInfo->Orthographic.HorizontalMagnification;
+			    position.Y() = -cameraInfo->Orthographic.VerticalMagnification;
+
+			    Extent2D<float> extent;
+			    extent.Width = 2.f * cameraInfo->Orthographic.HorizontalMagnification;
+			    extent.Height = 2.f * cameraInfo->Orthographic.VerticalMagnification;
+
 				camera = MakeUnique<OrthographicCamera>(
 					sceneNode->GetTransformationNode(),
-					area,
+					Rectangle(position, extent),
 					cameraInfo->DepthBounds
 				);
 			}

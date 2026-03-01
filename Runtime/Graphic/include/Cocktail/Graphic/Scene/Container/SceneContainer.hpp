@@ -19,7 +19,8 @@ namespace Ck
 
 			struct OrthographicInfo
 			{
-				
+				float HorizontalMagnification;
+				float VerticalMagnification;
 			};
 
 			String Name;

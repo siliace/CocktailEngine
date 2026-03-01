@@ -61,6 +61,22 @@ namespace Ck
 			W() = w;
 		}
 
+	    /**
+         * \brief
+         *
+         * \tparam U
+         *
+         * \param other
+         */
+	    template <typename U>
+        Vector4(const Vector4<U>& other)
+		{
+		    X() = static_cast<T>(other.X());
+		    Y() = static_cast<T>(other.Y());
+		    Z() = static_cast<T>(other.Z());
+		    W() = static_cast<T>(other.W());
+		}
+
 		/**
 		 * \brief
 		 * \return

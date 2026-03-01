@@ -33,6 +33,8 @@ namespace Ck
             }
             else
             {
+                cameraInfo.Orthographic.HorizontalMagnification = gltfCamera.orthographic.xmag;
+                cameraInfo.Orthographic.VerticalMagnification = gltfCamera.orthographic.ymag;
                 cameraInfo.DepthBounds.X() = gltfCamera.orthographic.znear;
                 cameraInfo.DepthBounds.Y() = gltfCamera.orthographic.zfar;
             }
