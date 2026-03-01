@@ -47,15 +47,15 @@ namespace Ck
 		/**
 		 * \brief
 		 * \param viewport
-		 * \param index
 		 */
-		void AttachViewport(std::shared_ptr<Viewport> viewport, unsigned int index = 0);
+		void AttachViewport(UniquePtr<Viewport> viewport);
 
-		/**
-		 * \brief
-		 * \param viewport
-		 */
-		void DetachViewport(const std::shared_ptr<Viewport>& viewport);
+        /**
+         * \brief
+         *
+         * \param size
+         */
+	    void Resize(const Extent2D<unsigned int>& size);
 
 		/**
 		 * \brief 
@@ -91,39 +91,9 @@ namespace Ck
 
 	private:
 
-		/**
-		 * \brief 
-		 */
-		struct ViewportEntry
-		{
-			/**
-			 * \brief 
-			 */
-			std::shared_ptr<Viewport> Viewport;
-
-			/**
-			 * \brief 
-			 */
-			unsigned int Index = 0;
-		};
-
-		/**
-		 * \brief 
-		 */
-		struct ViewportComparator
-		{
-			/**
-			 * \brief 
-			 * \param lhs 
-			 * \param rhs 
-			 * \return 
-			 */
-			int operator()(const ViewportEntry& lhs, const ViewportEntry& rhs) const noexcept;
-		};
-
 		std::shared_ptr<Scene> mScene;
 	    RecordDrawContext mDrawContext;
-		std::set<ViewportEntry, ViewportComparator> mViewports;
+		Array<UniquePtr<Viewport>> mViewports;
 		UniquePtr<RenderQueue> mOpaqueRenderQueue;
 		UniquePtr<RenderQueue> mBlendingRenderQueue;
 		Signal<Renderer::RenderContext&, Renderer::Framebuffer&> mOnRendered;

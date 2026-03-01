@@ -190,6 +190,7 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/SceneGraph.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/SceneNode.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/SceneLoader.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Graphic/Scene/SceneView.hpp
         SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/Scene.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneGraph.cpp
@@ -197,6 +198,7 @@ cocktail_source_directory(GRAPHIC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneLoaderServiceProvider.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneLoaderServiceProvider.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneNode.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Graphic/Scene/SceneView.cpp
 )
 
 cocktail_source_directory(GRAPHIC_FILES

@@ -1,5 +1,6 @@
 #include <Cocktail/Graphic/Scene/Scene.hpp>
 #include <Cocktail/Graphic/Scene/SceneNode.hpp>
+#include <Cocktail/Graphic/Scene/Camera/Camera.hpp>
 
 namespace Ck
 {
@@ -17,11 +18,11 @@ namespace Ck
 		mShapes.Add(std::move(shape));
 	}
 
-	void SceneNode::AddToQueue(RenderQueue& queue, const Camera& camera)
+	void SceneNode::AddToQueue(RenderQueue& queue, const Camera* camera)
 	{
 		assert(mVisible);
 
-		const Transformation& cameraTransformation = camera.GetWorldTransformation();
+		const Transformation& cameraTransformation = camera->GetWorldTransformation();
 		const Transformation& worldTransformation = GetTransformationNode()->GetWorldTransformation();
 
 		for (const std::shared_ptr<Shape>& shape : mShapes)

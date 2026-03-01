@@ -4,65 +4,6 @@
 
 namespace Ck
 {
-	class FrustumCullAction
-	{
-	public:
-
-		explicit FrustumCullAction(const Frustum<float>& frustum) :
-			mFrustum(frustum)
-		{
-			mRenderables.Reserve(1024);
-		}
-
-		void ProcessSceneNode(SceneNode* sceneNode)
-		{
-			if (!sceneNode->IsVisible())
-				return;
-
-			const Volume<float>& boundingVolume = sceneNode->GetBoundingVolume();
-			if (boundingVolume.IsNull())
-			{
-				for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
-					ProcessSceneNode(childSceneNode.get());
-			}
-			else
-			{
-				Box<float> obb;
-				const Transformation& worldTransformation = sceneNode->GetWorldTransformation();
-			    if (!worldTransformation.IsIdentity())
-			    {
-			        for (std::size_t i = 0; i < boundingVolume.GetVertexCount(); i++)
-			        {
-			            Vector3<float> vertex = boundingVolume.GetVertex(i);
-			            Vector3<float> worldVertex = worldTransformation.Apply(vertex);
-			            obb.Extend(worldVertex);
-			        }
-			    }
-			    else
-			    {
-			        obb.Extend(boundingVolume);
-			    }
-
-				if (mFrustum.Intersect(obb) != Intersection::Outside)
-				{
-					mRenderables.Add(sceneNode);
-					for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
-						ProcessSceneNode(childSceneNode.get());
-				}
-			}
-		}
-
-		const Array<Renderable*>& GetRenderables() const
-		{
-			return mRenderables;
-		}
-
-	private:
-
-		Frustum<float> mFrustum;
-		Array<Renderable*> mRenderables;
-	};
-
 	Scene::Scene(std::shared_ptr<GraphicEngine> graphicEngine) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
@@ -140,38 +81,22 @@ namespace Ck
 		return mOnSceneNodeAdded;
 	}
 
-	Array<Renderable*> Scene::CollectRenderables(const Camera& camera) const
-	{
-		FrustumCullAction action(camera.ComputeFrustum());
-		action.ProcessSceneNode(mSceneGraph->GetRoot().get());
+    void Scene::PerformAction(SceneAction& action) const
+    {
+        action.Accept(mSceneGraph->GetRoot().get());
+    }
 
-		return action.GetRenderables();
-	}
+    const Array<UniquePtr<Camera>>& Scene::GetCameras() const
+    {
+	    return mCameras;
+    }
 
-	Array<Light*> Scene::CollectLights(const Camera& camera) const
-	{
-		Array<Light*> lights;
-		lights.Reserve(mLights.GetSize());
+    const Array<UniquePtr<Light>>& Scene::GetLights() const
+    {
+	    return mLights;
+    }
 
-		Frustum<float> cameraFrustum = camera.ComputeFrustum();
-
-		for (unsigned int i = 0; i < mLights.GetSize(); i++)
-		{
-			Light* light = mLights[i].Get();
-
-			if (NearlyEqual(light->GetIntensity(), 0.f))
-				continue;
-
-			if (light->FrustumCull(cameraFrustum) == Intersection::Outside)
-				continue;
-
-			lights.Add(light);
-		}
-
-		return lights;
-	}
-
-	std::shared_ptr<GraphicEngine> Scene::GetGraphicEngine() const
+    std::shared_ptr<GraphicEngine> Scene::GetGraphicEngine() const
 	{
 		return mGraphicEngine;
 	}

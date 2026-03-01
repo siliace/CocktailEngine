@@ -51,7 +51,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor::White);
 
     Vector2<float> zBounds(0.1f, 4500.f);
-    Rectangle<float> viewportArea(Vector2<float>::Zero(), windowSize);
+    Rectangle<float> viewportArea(0.f, 0.f, 1.f, 1.f);
 	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), viewportArea.Extent.GetRatio(), zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
 	FreeFlyCameraViewController cameraController(camera);
@@ -107,8 +107,9 @@ Main::ExitCode ApplicationMain(Application* application)
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
 	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
-	std::shared_ptr<Viewport> viewport = std::make_shared<Viewport>(camera, viewportArea);
-	viewer->AttachViewport(viewport, 0);
+    UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.get(), camera);
+	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
+	viewer->AttachViewport(std::move(viewport));
 
 	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());
 
@@ -116,7 +117,6 @@ Main::ExitCode ApplicationMain(Application* application)
 	{
         viewportArea.Extent = event.Size;
 	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
-		viewport->SetArea(viewportArea);
 	});
 
 	Duration lastFrameBegin = application->Uptime();

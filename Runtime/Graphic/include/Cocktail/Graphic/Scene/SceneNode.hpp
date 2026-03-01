@@ -34,7 +34,7 @@ namespace Ck
 		 * \param queue
 		 * \param camera 
 		 */
-		void AddToQueue(RenderQueue& queue, const Camera& camera) override;
+		void AddToQueue(RenderQueue& queue, const Camera* camera) override;
 
 		/**
 		 * \brief

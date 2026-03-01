@@ -3,6 +3,7 @@
 
 #include <Cocktail/Core/Math/Volume/Frustum.hpp>
 
+#include <Cocktail/Graphic/Scene/Scene.hpp>
 #include <Cocktail/Graphic/Spatial/Transformable.hpp>
 
 namespace Ck
@@ -35,8 +36,9 @@ namespace Ck
 	protected:
 
 		/**
-		 * \brief 
-		 * \param transformationNode 
+		 * \brief Constructor
+		 *
+		 * \param transformationNode The transformation node giving the position and rotation of the camera in the world
 		 */
 		explicit Camera(std::shared_ptr<TransformationNode> transformationNode);
 	};

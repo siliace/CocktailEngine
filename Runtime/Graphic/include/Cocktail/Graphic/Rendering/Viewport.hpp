@@ -3,7 +3,7 @@
 
 #include <Cocktail/Core/Math/Polygon/Rectangle.hpp>
 
-#include <Cocktail/Graphic/Scene/Camera/Camera.hpp>
+#include <Cocktail/Graphic/Scene/SceneView.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 
 #include <Cocktail/Renderer/Command/CommandList.hpp>
@@ -18,10 +18,10 @@ namespace Ck
 	public:
 		/**
 		 * \brief 
-		 * \param camera 
+		 * \param sceneView
 		 * \param area 
 		 */
-		Viewport(Camera* camera, const Rectangle<float>& area);
+		Viewport(UniquePtr<SceneView> sceneView, const Rectangle<float>& area);
 
 		/**
 		 * \brief 
@@ -31,27 +31,36 @@ namespace Ck
 		 */
 		void Bind(Renderer::CommandList& commandList, Renderer::Framebuffer& framebuffer, RecordDrawContext& drawContext, bool clear);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Rectangle<float> GetArea() const;
+        /**
+         * \brief
+         * \return
+         */
+	    SceneView* GetSceneView() const;
 
-		/**
-		 * \brief 
-		 * \param area 
-		 */
-		void SetArea(Rectangle<float> area);
+        /**
+         * \brief
+         *
+         * \return
+         */
+	    const Rectangle<float>& GetArea() const;
 
-		/**
-		 * \brief Get the Camera used to render this Viewport
-		 * \return The camera
-		 */
-		Camera* GetCamera() const;
+        /**
+         * \brief
+         *
+         * \param area
+         */
+	    void SetArea(const Rectangle<float>& area);
 
-	private:
+    private:
 
-		Camera* mCamera;
+        /**
+         * \brief
+         * \param clientSize
+         * \return
+         */
+	    Rectangle<float> ComputeClientArea(const Extent2D<unsigned int>& clientSize);
+
+	    UniquePtr<SceneView> mSceneView;
 		Rectangle<float> mArea;
 	};
 }

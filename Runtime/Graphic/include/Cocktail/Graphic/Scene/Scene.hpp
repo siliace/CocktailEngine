@@ -8,112 +8,138 @@
 
 namespace Ck
 {
-	class Camera;
-	class Light;
+    class Camera;
+    class Light;
 
-	/**
-	 * \brief 
-	 */
-	class COCKTAIL_GRAPHIC_API Scene
-	{
-	public:
+    class SceneAction
+    {
+    public:
 
-		/**
-		 * \brief 
-		 * \param transformationGraph 
-		 */
-		explicit Scene(std::shared_ptr<GraphicEngine> graphicEngine);
+        virtual ~SceneAction() = default;
 
-		/**
-		 * \brief
-		 */
-		~Scene();
+        virtual bool BeforeAccept(SceneNode* sceneNode)
+        {
+            return true;
+        }
 
-		/**
-		 * \brief 
-		 * \param camera
-		 */
-		void AddCamera(UniquePtr<Camera> camera);
+        void Accept(SceneNode* sceneNode)
+        {
+            if (BeforeAccept(sceneNode))
+            {
+                if (DoAccept(sceneNode))
+                {
+                    for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
+                        Accept(childSceneNode.get());
+                }
 
-		/**
-		 * \brief 
-		 * \param camera 
-		 */
-		void RemoveCamera(const Camera* camera);
+                AfterAccept(sceneNode);
+            }
+        }
 
-		/**
-		 * \brief 
-		 * \param light 
-		 */
-		void AddLight(UniquePtr<Light> light);
+        virtual void AfterAccept(SceneNode* sceneNode)
+        {
+        }
 
-		/**
-		 * \brief 
-		 * \param light 
-		 */
-		void RemoveLight(const Light* light);
+    protected:
 
-		/**
-		 * \brief
-		 * \return
-		 */
-		std::shared_ptr<SceneNode> CreateSceneNode();
+        virtual bool DoAccept(SceneNode* sceneNode) = 0;
+    };
 
-		/**
-		 * \brief
-		 * \return
-		 */
-		std::shared_ptr<TransformationNode> CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
+    /**
+     * \brief
+     */
+    class COCKTAIL_GRAPHIC_API Scene
+    {
+    public:
 
-		/**
-		 * \brief
-		 * \return
-		 */
-		Signal<Camera*>& OnCameraAdded();
+        /**
+         * \brief
+         * \param transformationGraph
+         */
+        explicit Scene(std::shared_ptr<GraphicEngine> graphicEngine);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Signal<Light*>& OnLightAdded();
+        /**
+         * \brief
+         */
+        ~Scene();
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Signal<std::shared_ptr<SceneNode>>& OnSceneNodeAdded();
+        /**
+         * \brief
+         * \param camera
+         */
+        void AddCamera(UniquePtr<Camera> camera);
 
-		/**
-		 * \brief
-		 * \param camera
-		 * \return
-		 */
-		Array<Renderable*> CollectRenderables(const Camera& camera) const;
+        /**
+         * \brief
+         * \param camera
+         */
+        void RemoveCamera(const Camera* camera);
 
-		/**
-		 * \brief 
-		 * \param camera 
-		 * \return 
-		 */
-		Array<Light*> CollectLights(const Camera& camera) const;
+        /**
+         * \brief
+         * \param light
+         */
+        void AddLight(UniquePtr<Light> light);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		std::shared_ptr<GraphicEngine> GetGraphicEngine() const;
+        /**
+         * \brief
+         * \param light
+         */
+        void RemoveLight(const Light* light);
 
-	private:
+        /**
+         * \brief
+         * \return
+         */
+        std::shared_ptr<SceneNode> CreateSceneNode();
 
-		std::shared_ptr<GraphicEngine> mGraphicEngine;
-		UniquePtr<TransformationGraph> mTransformationGraph;
-		UniquePtr<SceneGraph> mSceneGraph;
-		Array<UniquePtr<Camera>> mCameras;
-		Array<UniquePtr<Light>> mLights;
-		Signal<Camera*> mOnCameraAdded;
-		Signal<Light*> mOnLightAdded;
-		Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;
-	};
+        /**
+         * \brief
+         * \return
+         */
+        std::shared_ptr<TransformationNode> CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
+
+        /**
+         * \brief
+         * \return
+         */
+        Signal<Camera*>& OnCameraAdded();
+
+        /**
+         * \brief
+         * \return
+         */
+        Signal<Light*>& OnLightAdded();
+
+        /**
+         * \brief
+         * \return
+         */
+        Signal<std::shared_ptr<SceneNode>>& OnSceneNodeAdded();
+
+        void PerformAction(SceneAction& action) const;
+
+        const Array<UniquePtr<Camera>>& GetCameras() const;
+
+        const Array<UniquePtr<Light>>& GetLights() const;
+
+        /**
+         * \brief
+         * \return
+         */
+        std::shared_ptr<GraphicEngine> GetGraphicEngine() const;
+
+    private:
+
+        std::shared_ptr<GraphicEngine> mGraphicEngine;
+        UniquePtr<TransformationGraph> mTransformationGraph;
+        UniquePtr<SceneGraph> mSceneGraph;
+        Array<UniquePtr<Camera>> mCameras;
+        Array<UniquePtr<Light>> mLights;
+        Signal<Camera*> mOnCameraAdded;
+        Signal<Light*> mOnLightAdded;
+        Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;
+    };
 }
 
 #endif // COCKTAIL_GRAPHIC_SCENE_SCENE_HPP

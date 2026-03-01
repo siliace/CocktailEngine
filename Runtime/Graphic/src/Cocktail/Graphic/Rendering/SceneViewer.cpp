@@ -11,29 +11,18 @@
 
 namespace Ck
 {
-	void SceneViewer::AttachViewport(std::shared_ptr<Viewport> viewport, unsigned index)
-	{
-		mViewports.insert(mViewports.end(), ViewportEntry{viewport, index});
-	}
+    void SceneViewer::AttachViewport(UniquePtr<Viewport> viewport)
+    {
+	    mViewports.Add(std::move(viewport));
+    }
 
-	void SceneViewer::DetachViewport(const std::shared_ptr<Viewport>& viewport)
-	{
-		auto viewportEntryIt = std::find_if(mViewports.begin(), mViewports.end(), [&](const ViewportEntry& entry) {
-			return entry.Viewport == viewport;
-		});
-
-		assert(viewportEntryIt != mViewports.end());
-		mViewports.erase(viewportEntryIt);
-	}
-
-	void SceneViewer::Render()
+    void SceneViewer::Render()
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
 		Renderer::Framebuffer* framebuffer = AcquireNextFramebuffer(*graphicEngine->GetRenderContext());
 		if (!framebuffer)
 			return;
 
-		
 		Renderer::CommandListCreateInfo commandListCreateInfo;
 		commandListCreateInfo.Usage = Renderer::CommandListUsageBits::Graphic;
 		Renderer::CommandList* commandList = graphicEngine->GetRenderContext()->CreateCommandList(commandListCreateInfo);
@@ -49,12 +38,16 @@ namespace Ck
 		sceneInfo.AmbientFactor = 0.1f;
 	    mDrawContext.BindData(ShaderBindingDomain::Scene, SceneBindingSlots::SceneInfo, Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(SceneInfo), &sceneInfo);
 
-		for (const ViewportEntry& viewportEntry : mViewports)
+        bool needClean = true;
+		for (const UniquePtr<Viewport>& viewport : mViewports)
 		{
-			const std::shared_ptr<Viewport>& viewport = viewportEntry.Viewport;
-			viewport->Bind(*commandList, *framebuffer, mDrawContext, viewportEntry.Index == 0);
+		    viewport->Bind(*commandList, *framebuffer, mDrawContext, needClean);
+		    needClean = false;
 
-			Array<Light*> lights = mScene->CollectLights(*viewport->GetCamera());
+		    SceneView* viewportSceneView = viewport->GetSceneView();
+
+		    viewportSceneView->Update();
+			Array<Light*> lights = viewportSceneView->GetLights();
 
 			struct LightInstance
 			{
@@ -110,13 +103,9 @@ namespace Ck
 
 			mDrawContext.BindData(ShaderBindingDomain::Viewport, ViewportBindingSlots::Lights, Renderer::BufferUsageFlagBits::Storage, 0, lightCount * sizeof(LightInstance), lightsInfo);
 
-			for (Renderable* renderable : mScene->CollectRenderables(*viewport->GetCamera()))
-			{
-				Camera* camera = viewport->GetCamera();
-				renderable->AddToQueue(*mOpaqueRenderQueue, *camera);
-				renderable->AddToQueue(*mBlendingRenderQueue, *camera);
-			}
-			
+		    viewportSceneView->AddToQueue(*mOpaqueRenderQueue);
+		    viewportSceneView->AddToQueue(*mBlendingRenderQueue);
+
 			mOpaqueRenderQueue->Flush(*commandList, mDrawContext);
 			mBlendingRenderQueue->Flush(*commandList, mDrawContext);
 		
@@ -145,10 +134,5 @@ namespace Ck
 	Signal<Renderer::RenderContext&, Renderer::Framebuffer&>& SceneViewer::OnRendered()
 	{
 		return mOnRendered;
-	}
-
-	int SceneViewer::ViewportComparator::operator()(const ViewportEntry& lhs, const ViewportEntry& rhs) const noexcept
-	{
-		return lhs.Index < rhs.Index;
 	}
 }

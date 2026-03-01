@@ -1,62 +1,66 @@
-#include <Cocktail/Graphic/Rendering/Viewport.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
+#include <Cocktail/Graphic/Rendering/Viewport.hpp>
 
 namespace Ck
 {
-	Viewport::Viewport(Camera* camera, const Rectangle<float>& area):
-		mCamera(camera),
-		mArea(area)
-	{
-		/// Nothing
-	}
+    Viewport::Viewport(UniquePtr<SceneView> sceneView, const Rectangle<float>& area) :
+        mSceneView(std::move(sceneView)),
+        mArea(area)
+    {
+        /// Nothing
+    }
 
-	void Viewport::Bind(Renderer::CommandList& commandList, Renderer::Framebuffer& framebuffer, RecordDrawContext& drawContext, bool clear)
-	{
-		struct CameraInfo
-		{
-			Matrix4<float> ViewProjection;
-			Vector3<float> ViewDirection;
-		};
+    void Viewport::Bind(Renderer::CommandList& commandList, Renderer::Framebuffer& framebuffer, RecordDrawContext& drawContext, bool clear)
+    {
+        Renderer::RenderPassBeginInfo renderPassBeginInfo;
+        renderPassBeginInfo.Mode = clear ? Renderer::RenderPassMode::Clear : Renderer::RenderPassMode::Load;
+        renderPassBeginInfo.Framebuffer = &framebuffer;
+        commandList.BeginRenderPass(renderPassBeginInfo);
 
-		Renderer::RenderPassBeginInfo renderPassBeginInfo;
-		renderPassBeginInfo.Mode = clear ? Renderer::RenderPassMode::Clear : Renderer::RenderPassMode::Load;
-		renderPassBeginInfo.Framebuffer = &framebuffer;
-		commandList.BeginRenderPass(renderPassBeginInfo);
+        Rectangle<float> clientArea = ComputeClientArea(MakeExtent(framebuffer.GetSize().Width, framebuffer.GetSize().Height));
 
-		Renderer::Viewport viewport;
-		viewport.X = mArea.Position.X();
-		viewport.Y = mArea.Position.Y();
-		viewport.Width = mArea.Extent.Width;
-		viewport.Height = mArea.Extent.Height;
-		viewport.MinDepth = 0.f;
-		viewport.MaxDepth = 1.f;
-		commandList.SetViewport(viewport);
+        Renderer::Viewport viewport;
+        viewport.X = clientArea.Position.X();
+        viewport.Y = clientArea.Position.Y();
+        viewport.Width = clientArea.Extent.Width;
+        viewport.Height = clientArea.Extent.Height;
+        viewport.MinDepth = 0.f;
+        viewport.MaxDepth = 1.f;
+        commandList.SetViewport(viewport);
 
-		Renderer::Scissor scissor;
-		scissor.Position.Width = mArea.Position.X();
-		scissor.Position.Height = mArea.Position.Y();
-		scissor.Size.Width = mArea.Extent.Width;
-		scissor.Size.Height = mArea.Extent.Height;
-		commandList.SetScissor(scissor);
+        Renderer::Scissor scissor;
+        scissor.Position.Width = clientArea.Position.X();
+        scissor.Position.Height = clientArea.Position.Y();
+        scissor.Size.Width = clientArea.Extent.Width;
+        scissor.Size.Height = clientArea.Extent.Height;
+        commandList.SetScissor(scissor);
 
-		CameraInfo cameraInfo;
-		cameraInfo.ViewProjection = mCamera->ComputeProjectionViewMatrix().Transpose();
-		cameraInfo.ViewDirection = mCamera->GetFront();
-		drawContext.BindData(ShaderBindingDomain::Viewport, ViewportBindingSlots::CameraInfo, Renderer::BufferUsageFlagBits::Uniform, 0, sizeof(CameraInfo), &cameraInfo);
-	}
+        mSceneView->Bind(drawContext);
+    }
 
-	Rectangle<float> Viewport::GetArea() const
-	{
-		return mArea;
-	}
+    SceneView* Viewport::GetSceneView() const
+    {
+        return mSceneView.Get();
+    }
 
-	void Viewport::SetArea(Rectangle<float> area)
-	{
-		mArea = area;
-	}
-	
-	Camera* Viewport::GetCamera() const
-	{
-    	return mCamera;
-	}
+    const Rectangle<float>& Viewport::GetArea() const
+    {
+        return mArea;
+    }
+
+    void Viewport::SetArea(const Rectangle<float>& area)
+    {
+        mArea = area;
+    }
+
+    Rectangle<float> Viewport::ComputeClientArea(const Extent2D<unsigned int>& clientSize)
+    {
+        Rectangle<float> clientArea;
+        clientArea.Position.X() = mArea.Position.X() * clientSize.Width;
+        clientArea.Position.Y() = mArea.Position.Y() * clientSize.Height;
+        clientArea.Extent.Width = mArea.Extent.Width * clientSize.Width;
+        clientArea.Extent.Height = mArea.Extent.Height * clientSize.Height;
+
+        return clientArea;
+    }
 }
