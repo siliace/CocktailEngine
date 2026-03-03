@@ -93,16 +93,24 @@
 	#define COCKTAIL_DECLARE_TEMPLATE_TAG(__Name) template <typename T> struct __Name##Tag{}; template <typename T> inline constexpr __Name##Tag<T> __Name;
 #endif
 
+#ifndef COCKTAIL_UTF8_TEXT
+    #define COCKTAIL_UTF8_CHAR(__Char) static_cast<::Ck::Utf8Char>(COCKTAIL_CONCATENATE_STRING(u8, __Char))
+    #define COCKTAIL_UTF8_TEXT(__Text) reinterpret_cast<const ::Ck::Utf8Char*>(COCKTAIL_CONCATENATE_STRING(u8, __Text))
+
+    #define CK_UTF8_CHAR(__Text) COCKTAIL_UTF8_CHAR(__Text)
+    #define CK_UTF8_TEXT(__Text) COCKTAIL_UTF8_TEXT(__Text)
+#endif
+
 #ifndef COCKTAIL_TEXT
 	#ifdef COCKTAIL_OS_WINDOWS
 		#define COCKTAIL_CHAR(__Char) L ## __Char
 		#define COCKTAIL_TEXT(__Text) L ## __Text
 	#else
-		#define COCKTAIL_CHAR(__Char) static_cast<::Ck::Utf8Char>(COCKTAIL_CONCATENATE_STRING(u8, __Char))
-		#define COCKTAIL_TEXT(__Text) reinterpret_cast<const ::Ck::Utf8Char*>(COCKTAIL_CONCATENATE_STRING(u8, __Text))
+		#define COCKTAIL_CHAR(__Char) COCKTAIL_UTF8_CHAR(__Char)
+		#define COCKTAIL_TEXT(__Text) COCKTAIL_UTF8_TEXT(__Text)
 	#endif
 	#define CK_CHAR(__Text) COCKTAIL_CHAR(__Text)
-	#define CK_TEXT(__Text) COCKTAIL_TEXT(__Text)
+    #define CK_TEXT(__Text) COCKTAIL_TEXT(__Text)
 #endif
 
 namespace Ck

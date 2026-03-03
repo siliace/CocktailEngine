@@ -543,6 +543,9 @@ namespace Ck
         template <typename TOtherEncoding, typename TOtherAllocator>
         static BasicString Convert(const BasicString<TOtherEncoding, TOtherAllocator>& other)
         {
+            if (other.IsEmpty())
+                return Empty;
+
             return Convert(typename BasicString<TOtherEncoding, TOtherAllocator>::View(other));
         }
 
@@ -562,6 +565,9 @@ namespace Ck
         template <typename TOtherEncoding>
         static BasicString Convert(const BasicStringView<TOtherEncoding>& other)
         {
+            if (other.IsEmpty())
+                return Empty;
+
             return ConvertFrom<TOtherEncoding>(other.GetData(), other.GetLength());
         }
 
@@ -587,17 +593,20 @@ namespace Ck
         static BasicString ConvertFrom(const typename TOtherEncoder::CharType* other)
         {
             using OtherEncoder = TOtherEncoder;
-            ;
+
             using OtherCharType = typename OtherEncoder::CharType;
             using OtherSizeType = typename OtherEncoder::SizeType;
+
+            if (other == nullptr)
+                return Empty;
 
             return ConvertFrom<OtherEncoder>(other, StringUtils<OtherCharType, OtherSizeType>::GetLength(other));
         }
 
         /**
-         * \brief Converts a null-terminated raw string from another encoding into this string type
+         * \brief Converts a raw string from another encoding into this string type
          *
-         * This function accepts a pointer to a null-terminated string encoded with a different
+         * This function accepts a pointer to a string encoded with a different
          * encoder and character type, decodes each codepoint to UTF-32, and re-encodes it using
          * this string’s encoder. The resulting text is stored in a new String instance.
          *
@@ -606,17 +615,19 @@ namespace Ck
          *
          * \tparam TOtherEncoder The encoder type used by the source string
          *
-         * \param other A pointer to the null-terminated source string to convert
+         * \param other A pointer to the source string to convert
+         * \param otherLength The length of the source string convert
          *
          * \return A new String instance containing the converted text
-         *
-         * \note This function assumes that the input string is properly null-terminated
          */
         template <typename TOtherEncoder>
         static BasicString ConvertFrom(const typename TOtherEncoder::CharType* other, typename TOtherEncoder::SizeType otherLength)
         {
             using OtherEncoder = TOtherEncoder;
             using OtherSizeType = typename OtherEncoder::SizeType;
+
+            if (other == nullptr || otherLength == 0)
+                return Empty;
 
             BasicString converted;
             converted.Reserve(otherLength * EncodingType::MaxCodepointEncodingLength);
@@ -1501,7 +1512,46 @@ namespace Ck
 
         void Reserve(SizeType size)
         {
-            mCharacters.Reserve(size);
+            mCharacters.Reserve(size + 1);
+        }
+
+        void Resize(SizeType size)
+        {
+            if (!IsEmpty())
+                PopLast();
+
+            mCharacters.Resize(size + 1, '\0');
+        }
+
+        bool EnsureSize(SizeType size)
+        {
+            if (!IsEmpty())
+                PopLast();
+
+            bool resized = mCharacters.EnsureSize(size + 1);
+            mCharacters[size] = '\0';
+
+            return resized;
+        }
+
+        void Resize(SizeType size, CharType value)
+        {
+            if (!IsEmpty())
+                PopLast();
+
+            mCharacters.Resize(size, value);
+            mCharacters.Append('\0');
+        }
+
+        bool EnsureSize(SizeType size, CharType value)
+        {
+            if (!IsEmpty())
+                PopLast();
+
+            bool resized = mCharacters.EnsureSize(size + 1, value);
+            mCharacters[size] = '\0';
+
+            return resized;
         }
 
         bool IsEmpty() const

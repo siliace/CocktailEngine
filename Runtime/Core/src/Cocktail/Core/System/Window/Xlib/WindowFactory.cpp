@@ -14,18 +14,18 @@ namespace Ck::Detail::Xlib
         for (SystemCursorType cursorType : Enum<SystemCursorType>::Values)
         {
             if (IsSystemCursorSupported(cursorType))
-                mSystemCursors[cursorType] = std::make_shared<SystemCursor>(mDisplay, cursorType);
+                mSystemCursors[cursorType] = MakeUnique<SystemCursor>(mDisplay, cursorType);
         }
     } 
 
-    std::shared_ptr<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
+    UniquePtr<Ck::ImageCursor> WindowFactory::CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot)
     {
-        return std::make_shared<ImageCursor>(mDisplay, image, hotspot);
+        return MakeUnique<ImageCursor>(mDisplay, image, hotspot);
     }
 
-    std::shared_ptr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
+    UniquePtr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
     {
-        std::shared_ptr<Window> window = std::make_shared<Window>(mDisplay, createInfo);
+        UniquePtr<Window> window = MakeUnique<Window>(mDisplay, createInfo);
 
         window->Connect(window->OnKeyboardEvent(), [](const WindowKeyboardEvent& event) {
 			App::Resolve<Ck::KeyboardService>()->OnKeyboardEvent().Emit({
@@ -51,24 +51,17 @@ namespace Ck::Detail::Xlib
 			});
 		});
 
-        mOnWindowCreated.Emit(window);
-
         return window;
     }
 
-	std::shared_ptr<Ck::SystemCursor> WindowFactory::LoadSystemCursor(SystemCursorType type)
+	Ck::SystemCursor* WindowFactory::LoadSystemCursor(SystemCursorType type)
     {
-		return mSystemCursors[type];
+		return mSystemCursors[type].Get();
     }
 
     bool WindowFactory::IsSystemCursorSupported(SystemCursorType cursorType) const
     {
         return cursorType != SystemCursorType::SizeTopLeftBottomRight && cursorType != SystemCursorType::SizeBottomLeftTopRight;
-    }
-
-    Signal<std::shared_ptr<Ck::Window>>& WindowFactory::OnWindowCreated() 
-    {
-        return mOnWindowCreated;
     }
 
     ::Display* WindowFactory::GetDisplay() const

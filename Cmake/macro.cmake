@@ -99,7 +99,7 @@ endfunction()
 
 function(cocktail_add_sample)
     # parse the arguments
-    cmake_parse_arguments(THIS "" "NAME;DEBUG_DIRECTORY" "SOURCES;DEPENDS;RESOURCES" ${ARGN})
+    cmake_parse_arguments(THIS "" "NAME;DEBUG_DIRECTORY" "SOURCES;DEPENDS;LINK;RESOURCES" ${ARGN})
     if (NOT "${THIS_UNPARSED_ARGUMENTS}" STREQUAL "")
         message(FATAL_ERROR "Extra unparsed arguments when calling cocktail_add_sample: ${THIS_UNPARSED_ARGUMENTS}")
     endif ()
@@ -135,6 +135,8 @@ function(cocktail_add_sample)
     foreach(dependency IN LISTS THIS_DEPENDS)
         target_link_libraries(${THIS_TARGET} PUBLIC COCKTAIL::${dependency})
     endforeach()
+
+    target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK})
 
     if (WIN32)
         add_custom_command(TARGET ${THIS_TARGET} POST_BUILD

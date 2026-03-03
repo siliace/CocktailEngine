@@ -61,6 +61,17 @@ namespace Ck
         using Text = Utf8Encoder<Utf8Char, Uint32>;
 #endif
 
+        template <typename TSrc>
+        static Utf32Char MakeCodePoint(CharType<TSrc>* buffer, SizeType<TSrc> length = TSrc::MaxCodepointEncodingLength)
+        {
+            Utf32Char codepoint;
+            auto decoded = TSrc::Decode(buffer, length, codepoint);
+            if (decoded == 0)
+                ExceptionUtils::ThrowCodepointDecodingException(0);
+
+            return codepoint;
+        }
+
         /**
          * \brief Converts a string view to a byte array using the specified destination encoder
          *
@@ -213,6 +224,28 @@ namespace Ck
             string.mCharacters.Add(static_cast<StringCharType>('\0'));
 
             return string;
+        }
+
+        template <typename TSrc, typename TDst, typename TAllocator = HeapAllocator>
+        static Array<CharType<TDst>, TAllocator> Convert(const CharType<TSrc>* source, SizeType<TSrc> length)
+        {
+            Array<CharType<TDst>, TAllocator> characters;
+            characters.Reserve(length * TDst::MaxCodepointEncodingLength);
+
+            for (auto i = 0; i < length;)
+            {
+                CharType<TDst> buffer[TDst::MaxCodepointEncodingLength];
+
+                auto [decoded, encoded] = ConvertCodepoint<TSrc, TDst>(&source[i], length - i, &buffer[0]);
+                if (decoded == 0)
+                    ExceptionUtils::ThrowCodepointDecodingException(i);
+
+                characters.Append(buffer, encoded);
+
+                i += decoded;
+            }
+
+            return characters;
         }
 
     private:

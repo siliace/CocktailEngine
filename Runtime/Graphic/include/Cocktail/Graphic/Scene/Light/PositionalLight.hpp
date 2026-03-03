@@ -68,11 +68,12 @@ namespace Ck
          * \brief
          *
          * \param transformationNode
+         * \param name
          * \param range
          * \param color
          * \param intensity
          */
-        PositionalLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity);
+        PositionalLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity);
 
     private:
 

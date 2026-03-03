@@ -1845,6 +1845,31 @@ namespace Ck
         }
 
         /**
+         * \brief Removes every element satisfying a predicate
+         *
+         * \tparam TPredicate Type of the predicate function
+         *
+         * \param predicate Predicate to test elements
+         *
+         * \return Removed elements
+         */
+        template <typename TPredicate>
+        Array RemoveIf(TPredicate predicate)
+        {
+            Array removed;
+            removed.Reserve(mSize);
+            FilterInPlace([&](E& element) {
+                const bool remove = predicate(element);
+                if (remove)
+                    removed.Add(std::move(element));
+
+                return remove;
+            });
+
+            return removed;
+        }
+
+        /**
          * \brief Returns a new array containing elements satisfying the predicate
          *
          * \tparam TPredicate Type of the predicate function

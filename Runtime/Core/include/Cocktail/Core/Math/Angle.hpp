@@ -18,7 +18,10 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		static const Angle Zero;
+		static Angle Zero()
+		{
+		    return {};
+		}
 
 		/**
 		 * \brief 
@@ -104,9 +107,6 @@ namespace Ck
 
 		T mAngle;
 	};
-
-	template <typename T>
-	const Angle<T> Angle<T>::Zero;
 
 	/**
 	 * \brief 

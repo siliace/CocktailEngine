@@ -7,6 +7,9 @@ namespace Ck
     const Color Color::Red = { 255, 0, 0 };
     const Color Color::Green = { 0, 255, 0 };
     const Color Color::Blue = { 0, 0, 255 };
+    const Color Color::Yellow = { 255, 255, 0 };
+    const Color Color::Cyan = { 0, 255, 255 };
+    const Color Color::Magenta = { 255, 0, 255 };
     const Color Color::Transparent = { 0, 0, 0, 0 };
 
     const LinearColor LinearColor::Black = { 0.f, 0.f, 0.f };
@@ -14,6 +17,9 @@ namespace Ck
     const LinearColor LinearColor::Red = { 1.f, 0.f, 0.f };
     const LinearColor LinearColor::Green = { 0.f, 1.f, 0.f };
     const LinearColor LinearColor::Blue = { 0.f, 0.f, 1.f };
+    const LinearColor LinearColor::Yellow = { 1.f, 1.f, 0.f };
+    const LinearColor LinearColor::Cyan = { 0.f, 1.f, 1.f };
+    const LinearColor LinearColor::Magenta = { 1.f, 0.f, 1.f };
     const LinearColor LinearColor::Transparent = { 0.f, 0.f, 0.f, 0.f };
 
     Uint8 ColorConversion::FloatColorToByte(float c)

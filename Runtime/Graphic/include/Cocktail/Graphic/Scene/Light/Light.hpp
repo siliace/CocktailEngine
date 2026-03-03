@@ -2,6 +2,7 @@
 #define COCKTAIL_GRAPHIC_SCENE_LIGHT_LIGHT_HPP
 
 #include <Cocktail/Core/Color.hpp>
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/Math/Intersection.hpp>
 #include <Cocktail/Core/Math/Volume/Frustum.hpp>
 
@@ -65,6 +66,13 @@ namespace Ck
          */
         void SetIntensity(float intensity);
 
+        /**
+         * \brief
+         *
+         * \return
+         */
+        const String& GetName() const;
+
     protected:
 
         /**
@@ -72,11 +80,13 @@ namespace Ck
          *
          * \param color
          * \param intensity
+         * \param name
          */
-        Light(LinearColor color, float intensity);
+        Light(String name, LinearColor color, float intensity);
 
     private:
 
+        String mName;
         LinearColor mColor;
         float mIntensity;
     };

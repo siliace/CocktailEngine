@@ -12,9 +12,9 @@ namespace Ck::Detail::Xlib
     public:
 
 		/**
-		 * \brief 
-		 * \param createInfo 
-		 * \param windowClass 
+		 * \brief
+		 * \param display
+		 * \param createInfo
 		 */
 		Window(::Display* display, const WindowCreateInfo& createInfo);
 		
@@ -216,6 +216,8 @@ namespace Ck::Detail::Xlib
 			::Visual Visual;
 			::Colormap Colormap;
 			::Window Window;
+		    ::XIM InputMethod;
+		    ::XIC InputContext;
 		};
 
 		Handle mHandle;
