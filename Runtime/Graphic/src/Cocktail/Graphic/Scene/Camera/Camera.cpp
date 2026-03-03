@@ -7,8 +7,14 @@ namespace Ck
 		return GetTransformationNode()->GetWorldTransformation().GetInverse().ToMatrix();
 	}
 
-    Camera::Camera(std::shared_ptr<TransformationNode> transformationNode) :
-		Transformable(std::move(transformationNode))
+    const String& Camera::GetName() const
+    {
+        return mName;
+    }
+
+    Camera::Camera(std::shared_ptr<TransformationNode> transformationNode, String name) :
+		Transformable(std::move(transformationNode)),
+        mName(std::move(name))
 	{
 		/// Nothing
 	}

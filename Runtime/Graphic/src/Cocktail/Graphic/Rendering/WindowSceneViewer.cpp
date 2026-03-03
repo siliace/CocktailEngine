@@ -46,13 +46,13 @@ namespace Ck
 		}
 	}
 
-	WindowSceneViewer::WindowSceneViewer(std::shared_ptr<Scene> scene, std::shared_ptr<Window> window, SceneViewerParameters parameters, bool vSync) :
+	WindowSceneViewer::WindowSceneViewer(std::shared_ptr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync) :
 		SceneViewer(std::move(scene))
 	{
 		Renderer::RenderDevice* renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
 
 		Renderer::RenderSurfaceCreateInfo renderSurfaceCreateInfo;
-		renderSurfaceCreateInfo.Window = std::move(window);
+		renderSurfaceCreateInfo.Window = window;
 		renderSurfaceCreateInfo.DepthStencilFormat = parameters.DepthStencilFormat;
 		renderSurfaceCreateInfo.Samples = parameters.Samples;
 		renderSurfaceCreateInfo.EnableVSync = vSync;

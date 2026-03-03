@@ -16,22 +16,24 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param scene 
+		 * \param scene
+		 * \param name
 		 * \param fov 
 		 * \param aspectRatio 
 		 * \param zBounds 
 		 * \return 
 		 */
-		static PerspectiveCamera* Create(std::shared_ptr<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		static PerspectiveCamera* Create(std::shared_ptr<Scene> scene, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 
-		 * \param transformationNode 
+		 * \param transformationNode
+		 * \param name
 		 * \param fov 
 		 * \param aspectRatio 
 		 * \param zBounds 
 		 */
-		PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

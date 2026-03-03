@@ -587,7 +587,7 @@ namespace Ck
         static BasicString ConvertFrom(const typename TOtherEncoder::CharType* other)
         {
             using OtherEncoder = TOtherEncoder;
-            ;
+
             using OtherCharType = typename OtherEncoder::CharType;
             using OtherSizeType = typename OtherEncoder::SizeType;
 

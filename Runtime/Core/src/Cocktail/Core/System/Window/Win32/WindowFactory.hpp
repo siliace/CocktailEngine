@@ -32,7 +32,7 @@ namespace Ck::Detail::Win32
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
+		UniquePtr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
@@ -48,18 +48,11 @@ namespace Ck::Detail::Win32
 		 */
 		bool IsSystemCursorSupported(SystemCursorType systemCursorType) const override;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Signal<std::shared_ptr<Ck::Window>>& OnWindowCreated() override;
-
 	private:
 
 		HINSTANCE mInstanceHandle;
 		WindowClass mWindowClass;
 		EnumMap<SystemCursorType, std::shared_ptr<Ck::SystemCursor>> mSystemCursors;
-		Signal<std::shared_ptr<Ck::Window>> mOnWindowCreated;
 	};
 }
 

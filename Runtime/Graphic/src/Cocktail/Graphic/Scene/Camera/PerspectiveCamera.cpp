@@ -3,19 +3,19 @@
 
 namespace Ck
 {
-	PerspectiveCamera* PerspectiveCamera::Create(std::shared_ptr<Scene> scene, Angle<float> fov, float aspectRatio, Vector2<float> zBounds)
+	PerspectiveCamera* PerspectiveCamera::Create(std::shared_ptr<Scene> scene, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds)
 	{
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
 
-		UniquePtr<PerspectiveCamera> camera = MakeUnique<PerspectiveCamera>(std::move(transformationNode), fov, aspectRatio, zBounds);
+		UniquePtr<PerspectiveCamera> camera = MakeUnique<PerspectiveCamera>(std::move(transformationNode), std::move(name), fov, aspectRatio, zBounds);
 		PerspectiveCamera* cameraPtr = camera.Get();
 		scene->AddCamera(std::move(camera));
 
 		return cameraPtr;
 	}
 
-	PerspectiveCamera::PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, Angle<float> fov, float aspectRatio, Vector2<float> zBounds) :
-		Camera(std::move(transformationNode)),
+	PerspectiveCamera::PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds) :
+		Camera(std::move(transformationNode), std::move(name)),
 		mFov(fov),
 		mAspectRatio(aspectRatio),
 		mZBounds(zBounds)

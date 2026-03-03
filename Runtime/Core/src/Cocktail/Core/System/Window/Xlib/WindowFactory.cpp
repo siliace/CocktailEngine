@@ -23,9 +23,9 @@ namespace Ck::Detail::Xlib
         return std::make_shared<ImageCursor>(mDisplay, image, hotspot);
     }
 
-    std::shared_ptr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
+    UniquePtr<Ck::Window> WindowFactory::CreateWindow(const WindowCreateInfo& createInfo)
     {
-        std::shared_ptr<Window> window = std::make_shared<Window>(mDisplay, createInfo);
+        UniquePtr<Window> window = MakeUnique<Window>(mDisplay, createInfo);
 
         window->Connect(window->OnKeyboardEvent(), [](const WindowKeyboardEvent& event) {
 			App::Resolve<Ck::KeyboardService>()->OnKeyboardEvent().Emit({
@@ -51,8 +51,6 @@ namespace Ck::Detail::Xlib
 			});
 		});
 
-        mOnWindowCreated.Emit(window);
-
         return window;
     }
 
@@ -64,11 +62,6 @@ namespace Ck::Detail::Xlib
     bool WindowFactory::IsSystemCursorSupported(SystemCursorType cursorType) const
     {
         return cursorType != SystemCursorType::SizeTopLeftBottomRight && cursorType != SystemCursorType::SizeBottomLeftTopRight;
-    }
-
-    Signal<std::shared_ptr<Ck::Window>>& WindowFactory::OnWindowCreated() 
-    {
-        return mOnWindowCreated;
     }
 
     ::Display* WindowFactory::GetDisplay() const

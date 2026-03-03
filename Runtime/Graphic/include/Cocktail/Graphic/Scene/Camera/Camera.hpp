@@ -33,6 +33,12 @@ namespace Ck
 		 */
 		virtual Matrix4<float> ComputeProjectionViewMatrix() = 0;
 
+        /**
+         * \brief
+         * \return
+         */
+	    const String& GetName() const;
+
 	protected:
 
 		/**
@@ -40,7 +46,11 @@ namespace Ck
 		 *
 		 * \param transformationNode The transformation node giving the position and rotation of the camera in the world
 		 */
-		explicit Camera(std::shared_ptr<TransformationNode> transformationNode);
+		Camera(std::shared_ptr<TransformationNode> transformationNode, String name);
+
+	private:
+
+	    String mName;
 	};
 }
 

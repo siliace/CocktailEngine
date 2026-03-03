@@ -8,6 +8,8 @@ set(BUILD_SHARED_LIBS OFF)
 set(ENABLE_SPVREMAPPER OFF)
 add_subdirectory(glslang)
 
+add_subdirectory(ImGui)
+
 add_subdirectory(magic_enum)
 
 option(SPIRV_REFLECT_EXECUTABLE "" OFF)

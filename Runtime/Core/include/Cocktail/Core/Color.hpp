@@ -85,6 +85,9 @@ namespace Ck
         static const Color Red; /*!< Opaque red (255, 0, 0, 255) */
         static const Color Green; /*!< Opaque green (0, 255, 0, 255) */
         static const Color Blue; /*!< Opaque blue (0, 0, 255, 255) */
+        static const Color Yellow; /*!< Opaque yellow (255, 255, 0.f, 255) */
+        static const Color Cyan; /*!< Opaque cyan (0.f, 255, 255, 255) */
+        static const Color Magenta; /*!< Opaque magenta (255, 0.f, 255, 255) */
         static const Color Transparent; /*!< Fully transparent (0, 0, 0, 0) */
 
         /**
@@ -238,6 +241,9 @@ namespace Ck
         static const LinearColor Red; /*!< Opaque red (1.f, 0.f, 0.f, 1.f) */
         static const LinearColor Green; /*!< Opaque green (0.f, 1.f, 0.f, 1.f) */
         static const LinearColor Blue; /*!< Opaque blue (0.f, 0.f, 1.f, 1.f) */
+        static const LinearColor Yellow; /*!< Opaque yellow (1.f, 1.f, 0.f, 1.f) */
+        static const LinearColor Cyan; /*!< Opaque cyan (0.f, 1.f, 1.f, 1.f) */
+        static const LinearColor Magenta; /*!< Opaque magenta (1.f, 0.f, 1.f, 1.f) */
         static const LinearColor Transparent; /*!< Fully transparent (0.f, 0.f, 0.f, 0.f) */
 
         /**

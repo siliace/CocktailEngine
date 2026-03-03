@@ -22,7 +22,13 @@ namespace Ck
         mIntensity = intensity;
     }
 
-    Light::Light(LinearColor color, float intensity) :
+    const String& Light::GetName() const
+    {
+        return mName;
+    }
+
+    Light::Light(String name, LinearColor color, float intensity) :
+        mName(std::move(name)),
         mColor(color),
         mIntensity(intensity)
     {

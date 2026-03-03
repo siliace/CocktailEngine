@@ -15,20 +15,17 @@ namespace Ck::Detail::Xlib
 
 		std::shared_ptr<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
 
-		std::shared_ptr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
+		UniquePtr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
 
 		std::shared_ptr<Ck::SystemCursor> LoadSystemCursor(SystemCursorType type) override;
 
 		bool IsSystemCursorSupported(SystemCursorType systemCursorType) const override;
 
-		Signal<std::shared_ptr<Ck::Window>>& OnWindowCreated() override;
-		
 		::Display* GetDisplay() const;
 
 	private:
 
 		::Display* mDisplay;
-		Signal<std::shared_ptr<Ck::Window>> mOnWindowCreated;
 		EnumMap<SystemCursorType, std::shared_ptr<Ck::SystemCursor>> mSystemCursors;
     };
 }

@@ -215,6 +215,28 @@ namespace Ck
             return string;
         }
 
+        template <typename TSrc, typename TDst, typename TAllocator = HeapAllocator>
+        static Array<CharType<TDst>, TAllocator> Convert(const CharType<TSrc>* source, SizeType<TSrc> length)
+        {
+            Array<CharType<TDst>, TAllocator> characters;
+            characters.Reserve(length * TDst::MaxCodepointEncodingLength);
+
+            for (auto i = 0; i < length;)
+            {
+                CharType<TDst> buffer[TDst::MaxCodepointEncodingLength];
+
+                auto [decoded, encoded] = ConvertCodepoint<TSrc, TDst>(&source[i], length - i, &buffer[0]);
+                if (decoded == 0)
+                    ExceptionUtils::ThrowCodepointDecodingException(i);
+
+                characters.Append(buffer, encoded);
+
+                i += decoded;
+            }
+
+            return characters;
+        }
+
     private:
 
         /**
