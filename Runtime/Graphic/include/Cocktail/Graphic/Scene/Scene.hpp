@@ -48,7 +48,7 @@ namespace Ck
     /**
      * \brief
      */
-    class COCKTAIL_GRAPHIC_API Scene
+    class COCKTAIL_GRAPHIC_API Scene : public std::enable_shared_from_this<Scene>
     {
     public:
 

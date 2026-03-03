@@ -13,9 +13,9 @@ namespace Ck
         .SetKeyFrame(160.f, 0.0027f)
         .SetKeyFrame(200.f, 0.0022f)
         .SetKeyFrame(325.f, 0.0014f)
-        .SetKeyFrame(600.f, 0.007f)
+        .SetKeyFrame(600.f, 0.0007f)
         .SetKeyFrame(3250.f, 0.00014f)
-        .SetInterpolationFunction(Smoothstep)
+        .SetInterpolationFunction(Lerp)
         .Get();
 
     const ScalarInterpolationCurve<float> PositionalLight::DefaultQuadraticAttenuationCurve = ScalarInterpolationCurve<float>::Builder()
@@ -31,7 +31,7 @@ namespace Ck
         .SetKeyFrame(325.f, 0.0007f)
         .SetKeyFrame(600.f, 0.0002f)
         .SetKeyFrame(3250.f, 0.000007f)
-        .SetInterpolationFunction(Smoothstep)
+        .SetInterpolationFunction(Lerp)
         .Get();
 
     float PositionalLight::GetRange() const
@@ -74,9 +74,9 @@ namespace Ck
         });
     }
 
-    PositionalLight::PositionalLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity) :
+    PositionalLight::PositionalLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity) :
         Transformable(std::move(transformationNode)),
-        Light(color, intensity),
+        Light(std::move(name), color, intensity),
         mRange(range),
         mLinearAttenuationCurve(DefaultLinearAttenuationCurve),
         mQuadraticAttenuationCurve(DefaultQuadraticAttenuationCurve)

@@ -21,7 +21,7 @@ namespace Ck
          * \param intensity
          * \return
          */
-        static SpotLight* Create(std::shared_ptr<Scene> scene, float range, LinearColor color, Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
+        static SpotLight* Create(std::shared_ptr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
 
         /**
          * \brief
@@ -29,7 +29,7 @@ namespace Ck
          * \param color
          * \param intensity
          */
-        SpotLight(std::shared_ptr<TransformationNode> transformationNode, float range, LinearColor color, float intensity = 100.f);
+        SpotLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity = 100.f);
 
         /**
          * \brief

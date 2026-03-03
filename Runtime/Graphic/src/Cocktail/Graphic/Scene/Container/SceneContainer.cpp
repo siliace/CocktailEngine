@@ -113,6 +113,7 @@ namespace Ck
 			{
 				camera = MakeUnique<PerspectiveCamera>(
 					sceneNode->GetTransformationNode(),
+				    cameraInfo->Name,
 					cameraInfo->Perspective.FieldOfView, cameraInfo->Perspective.AspectRatio, 
 					cameraInfo->DepthBounds
 				);
@@ -129,6 +130,7 @@ namespace Ck
 
 				camera = MakeUnique<OrthographicCamera>(
 					sceneNode->GetTransformationNode(),
+				    cameraInfo->Name,
 					Rectangle(position, extent),
 					cameraInfo->DepthBounds
 				);

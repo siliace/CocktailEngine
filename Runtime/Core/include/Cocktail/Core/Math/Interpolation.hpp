@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_MATH_INTERPOLATION_HPP
 #define COCKTAIL_CORE_MATH_INTERPOLATION_HPP
 
-#include <utility>
+#include <cassert>
 
 namespace Ck
 {
@@ -20,7 +20,9 @@ namespace Ck
     template <typename T, typename U>
     T Lerp(const T& a, const T& b, U x)
     {
-        return a * (1 - x) + b * x;
+        assert(a != b);
+
+        return a * (T(1) - x) + b * x;
     }
 
     /**
@@ -38,8 +40,10 @@ namespace Ck
     template <typename T, typename U>
     T Smoothstep(const T& a, const T& b, U x)
     {
+        assert(a != b);
+
         auto t = std::clamp((x - a) / (b - a), T(0), T(1));
-        return t * t * (3 - 2 * t);
+        return t * t * (T(3) - T(2) * t);
     }
 }
 

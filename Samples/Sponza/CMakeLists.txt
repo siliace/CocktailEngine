@@ -1,29 +1,38 @@
 project(Sponza)
 
 cocktail_source_directory(SPONZA_FILES
-    SRC 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiOverlay.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiOverlay.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiServiceProvider.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGuiServiceProvider.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/New.cpp
+        FOLDER "ImUi"
+        INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/ImUi.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/Menu/MenuBarManager.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/Menu/MenuModule.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/Menu/PanelControllerMenuModule.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/Panel/Panel.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/Panel/PanelManager.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/WindowContainer.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/WindowRenderer.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/ImUi/WindowResources.hpp
+        SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/ImUi.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/Menu/MenuBarManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/Menu/MenuModule.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/Menu/PanelControllerMenuModule.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/Panel/Panel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/Panel/PanelManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/WindowContainer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/WindowRenderer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImUi/WindowResources.cpp
 )
 
 cocktail_source_directory(SPONZA_FILES
-    FOLDER "ImGui"
-    SRC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imconfig.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui_demo.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui_draw.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui_internal.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui_tables.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imgui_widgets.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imstb_rectpack.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imstb_textedit.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/ImGui/imstb_truetype.h
+        INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/SceneMenuModule.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Sponza/SystemMenuModule.hpp
+        SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/New.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/SceneMenuModule.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Sponza/SystemMenuModule.cpp
 )
 
 cocktail_add_shader(SPONZA_FILES
@@ -48,6 +57,7 @@ cocktail_add_sample(
     NAME sponza
     SOURCES ${SPONZA_FILES}
     DEPENDS Core Main Graphic Renderer Vulkan
+    LINK ImGui
     DEBUG_DIRECTORY ${PROJECT_SOURCE_DIR}
     RESOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/Shaders/ImGui/default.vert.spv

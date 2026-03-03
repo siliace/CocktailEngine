@@ -4,19 +4,19 @@
 
 namespace Ck
 {
-	OrthographicCamera* OrthographicCamera::Create(std::shared_ptr<Scene> scene, const Rectangle<float>& area, Vector2<float> zBounds)
+	OrthographicCamera* OrthographicCamera::Create(std::shared_ptr<Scene> scene, String name, const Rectangle<float>& area, Vector2<float> zBounds)
 	{
 		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
 
-		UniquePtr<OrthographicCamera> camera = MakeUnique<OrthographicCamera>(std::move(transformationNode), area, zBounds);
+		UniquePtr<OrthographicCamera> camera = MakeUnique<OrthographicCamera>(std::move(transformationNode), std::move(name), area, zBounds);
 		OrthographicCamera* cameraPtr = camera.Get();
 		scene->AddCamera(std::move(camera));
 
 		return cameraPtr;
 	}
 
-	OrthographicCamera::OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<float> area, Vector2<float> zBounds) :
-		Camera(std::move(transformationNode)),
+	OrthographicCamera::OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds) :
+		Camera(std::move(transformationNode), std::move(name)),
 		mArea(std::move(area)),
 		mZBounds(zBounds)
 	{
@@ -63,4 +63,9 @@ namespace Ck
 
 		return projection * ComputeViewMatrix();
 	}
+
+    Camera::Type OrthographicCamera::GetType() const
+    {
+	    return Type::Orthographic;
+    }
 }

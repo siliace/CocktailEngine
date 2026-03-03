@@ -16,7 +16,10 @@
 
 #include <Cocktail/Main/ExitCode.hpp>
 
-#include <Cocktail/Sponza/ImGuiOverlay.hpp>
+#include <Cocktail/Sponza/SceneMenuModule.hpp>
+#include <Cocktail/Sponza/SystemMenuModule.hpp>
+#include <Cocktail/Sponza/ImUi/Menu/MenuBarManager.hpp>
+#include <Cocktail/Sponza/ImUi/WindowContainer.hpp>
 
 using namespace Ck;
 
@@ -29,7 +32,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	});
 
 	Extent2D windowSize = MakeExtent(800u, 600u);
-	std::shared_ptr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
+	UniquePtr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
@@ -48,11 +51,11 @@ Main::ExitCode ApplicationMain(Application* application)
 	});
 
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
-	DirectionalLight* directionalLight = DirectionalLight::Create(scene, lightDirection, LinearColor::White);
+	DirectionalLight* directionalLight = DirectionalLight::Create(scene, CK_TEXT("SunLight"), lightDirection, LinearColor::White);
 
     Vector2<float> zBounds(0.1f, 4500.f);
     Rectangle<float> viewportArea(0.f, 0.f, 1.f, 1.f);
-	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(60.f), viewportArea.Extent.GetRatio(), zBounds);
+	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, CK_TEXT("MainCamera"), Angle<float>::Degree(60.f), windowSize.GetRatio(), zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
 	FreeFlyCameraViewController cameraController(camera);
 
@@ -106,18 +109,25 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
+	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
     UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.get(), camera);
 	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
 	viewer->AttachViewport(std::move(viewport));
-
-	ImGuiOverlay overlay(*window, *viewer, *graphicEngine->GetRenderDevice(), *graphicEngine->GetRenderContext());
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
         viewportArea.Extent = event.Size;
 	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
 	});
+
+    ImUi::WindowContainer windowContainer(window.Get(), graphicEngine->GetRenderDevice());
+    application->Connect(viewer->OnRendered(), [&](Renderer::RenderContext& renderContext, Renderer::Framebuffer& framebuffer) {
+       windowContainer.Render(&renderContext, &framebuffer, Duration::Milliseconds(16));
+    });
+
+    ImUi::MenuBarManager* menuBarManager = windowContainer.GetMenuBarManager();
+    menuBarManager->CreateMenu<SceneMenuModule>(scene.get());
+    menuBarManager->CreateMenu<SystemMenuModule>();
 
 	Duration lastFrameBegin = application->Uptime();
 	while (window->PollEvents())
@@ -127,7 +137,6 @@ Main::ExitCode ApplicationMain(Application* application)
 	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Right, rightTranslation);
 	    cameraController.Translate(FreeFlyCameraViewController::TranslationAxis::Front, frontTranslation);
 		cameraController.Update(Duration::Between(lastFrameBegin, frameBegin));
-		overlay.Update();
 
 		viewer->Render();
 

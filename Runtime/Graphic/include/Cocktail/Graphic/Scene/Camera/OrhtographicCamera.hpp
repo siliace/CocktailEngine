@@ -18,19 +18,21 @@ namespace Ck
 
 		/**
 		 * \brief 
-		 * \param scene 
+		 * \param scene
+		 * \param name
 		 * \param zBounds 
 		 * \return 
 		 */
-		static OrthographicCamera* Create(std::shared_ptr<Scene> scene, const Rectangle<float>& area, Vector2<float> zBounds);
+		static OrthographicCamera* Create(std::shared_ptr<Scene> scene, String name, const Rectangle<float>& area, Vector2<float> zBounds);
 
 		/**
 		 * \brief 
-		 * \param transformationNode 
+		 * \param transformationNode
+		 * \param name
 		 * \param area 
 		 * \param zBounds 
 		 */
-		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, Rectangle<float> area, Vector2<float> zBounds);
+		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds);
 
         /**
          * \brief
@@ -56,7 +58,13 @@ namespace Ck
 		 */
 		Matrix4<float> ComputeProjectionViewMatrix() override;
 
-	private:
+        /**
+         * \brief
+         * \return
+         */
+        Type GetType() const override;
+
+    private:
 
 		Rectangle<float> mArea;
 		Vector2<float> mZBounds;

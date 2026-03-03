@@ -200,25 +200,34 @@ namespace Ck
         {
             assert(!mKeyFrames.IsEmpty());
 
-            if (const KeyFrame& firstKeyFrame = mKeyFrames.First(); key <= firstKeyFrame.Key)
+            const KeyFrame& firstKeyFrame = mKeyFrames.First();
+            if (key <= firstKeyFrame.Key)
                 return firstKeyFrame.Value;
 
-            if (const KeyFrame& lastKeyFrame = mKeyFrames.Last(); key >= lastKeyFrame.Key)
+            const KeyFrame& lastKeyFrame = mKeyFrames.Last();
+            if (key >= lastKeyFrame.Key)
                 return lastKeyFrame.Value;
 
-            for (unsigned int i = 0; i < mKeyFrames.GetSize(); i++)
+            Optional<const KeyFrame&> exactKeyFrame = mKeyFrames.FindIf([&](const KeyFrame& keyFrame) {
+                return NearlyEqual(keyFrame.Key, key);
+            });
+
+            if (!exactKeyFrame.IsEmpty())
+                return exactKeyFrame.Get().Value;
+
+            for (unsigned int i = 0; i < mKeyFrames.GetSize() - 1; i++)
             {
                 const auto& [t0, v0] = mKeyFrames[i];
                 const auto& [t1, v1] = mKeyFrames[i + 1];
 
-                if (!(key >= mKeyFrames[i].Key && key <= mKeyFrames[i + 1].Key))
+                if (key < t0 || key > t1)
                     continue;
 
                 auto alpha = (key - t0) / (t1 - t0);
                 return mInterpolationFunction(v0, v1, alpha);
             }
 
-            ExceptionUtils::ThrowOutOfRange(static_cast<Uint32>(mKeyFrames.First().Key), static_cast<Uint32>(mKeyFrames.Last().Key));
+            ExceptionUtils::ThrowOutOfRange(static_cast<Uint32>(firstKeyFrame.Key), static_cast<Uint32>(lastKeyFrame.Key));
         }
 
         /**

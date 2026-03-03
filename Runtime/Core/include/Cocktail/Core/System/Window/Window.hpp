@@ -67,13 +67,14 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual std::shared_ptr<Cursor> GetCursor() const = 0;
+        virtual Cursor* GetCursor() const = 0;
 
         /**
          * \brief
+         *
          * \param cursor
          */
-        virtual void SetCursor(std::shared_ptr<Cursor> cursor) = 0;
+        virtual void SetCursor(Cursor* cursor) = 0;
 
         virtual bool IsCursorVisible() const = 0;
 

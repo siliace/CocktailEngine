@@ -1,132 +1,145 @@
 #include <Cocktail/Core/Application/App.hpp>
-#include <Cocktail/Core/Utility/Optional.hpp>
 #include <Cocktail/Core/System/Window/Cursor.hpp>
 #include <Cocktail/Core/System/Window/Xlib/AtomManager.hpp>
 #include <Cocktail/Core/System/Window/Xlib/Window.hpp>
+#include <Cocktail/Core/Utility/Optional.hpp>
 
 #ifndef Button6
-    #define Button6 6
+#define Button6 6
 #endif // Button6
 
 #ifndef Button7
-    #define Button7 7
+#define Button7 7
 #endif // Button6
 
 #ifndef Button8
-    #define Button8 8
+#define Button8 8
 #endif // Button6
 
 #ifndef Button9
-    #define Button9 9
+#define Button9 9
 #endif // Button6
 
 namespace Ck::Detail::Xlib
 {
     namespace
     {
-        static constexpr long EventsMasks = KeyPressMask | KeyReleaseMask |        /// Keyboard events
+        static constexpr long EventsMasks = KeyPressMask | KeyReleaseMask | /// Keyboard events
                                             PointerMotionMask | ButtonMotionMask | /// Mouse move events
-                                            ButtonPressMask | ButtonReleaseMask |  /// Mouse buttons events
-                                            FocusChangeMask |                      /// Focus events
-                                            StructureNotifyMask |                  /// Resize events
-                                            VisibilityChangeMask |                 /// Visibility change (internal uses only)
-                                            EnterWindowMask | LeaveWindowMask |    /// Mouse Enter/Leave
-                                            PropertyChangeMask;                    
+                                            ButtonPressMask | ButtonReleaseMask | /// Mouse buttons events
+                                            FocusChangeMask | /// Focus events
+                                            StructureNotifyMask | /// Resize events
+                                            VisibilityChangeMask | /// Visibility change (internal uses only)
+                                            EnterWindowMask | LeaveWindowMask | /// Mouse Enter/Leave
+                                            PropertyChangeMask;
 
         Optional<KeyboardKey> ConvertKeySym(KeySym keySym)
         {
             switch (keySym)
             {
-            case XK_a: return Optional<KeyboardKey>::Of(KeyboardKey::A);
-            case XK_b: return Optional<KeyboardKey>::Of(KeyboardKey::B);
-            case XK_c: return Optional<KeyboardKey>::Of(KeyboardKey::C);
-            case XK_d: return Optional<KeyboardKey>::Of(KeyboardKey::D);
-            case XK_e: return Optional<KeyboardKey>::Of(KeyboardKey::E);
-            case XK_f: return Optional<KeyboardKey>::Of(KeyboardKey::F);
-            case XK_g: return Optional<KeyboardKey>::Of(KeyboardKey::G);
-            case XK_h: return Optional<KeyboardKey>::Of(KeyboardKey::H);
-            case XK_i: return Optional<KeyboardKey>::Of(KeyboardKey::I);
-            case XK_j: return Optional<KeyboardKey>::Of(KeyboardKey::J);
-            case XK_k: return Optional<KeyboardKey>::Of(KeyboardKey::K);
-            case XK_l: return Optional<KeyboardKey>::Of(KeyboardKey::L);
-            case XK_m: return Optional<KeyboardKey>::Of(KeyboardKey::M);
-            case XK_n: return Optional<KeyboardKey>::Of(KeyboardKey::N);
-            case XK_o: return Optional<KeyboardKey>::Of(KeyboardKey::O);
-            case XK_p: return Optional<KeyboardKey>::Of(KeyboardKey::P);
-            case XK_q: return Optional<KeyboardKey>::Of(KeyboardKey::Q);
-            case XK_r: return Optional<KeyboardKey>::Of(KeyboardKey::R);
-            case XK_s: return Optional<KeyboardKey>::Of(KeyboardKey::S);
-            case XK_t: return Optional<KeyboardKey>::Of(KeyboardKey::T);
-            case XK_u: return Optional<KeyboardKey>::Of(KeyboardKey::U);
-            case XK_v: return Optional<KeyboardKey>::Of(KeyboardKey::V);
-            case XK_w: return Optional<KeyboardKey>::Of(KeyboardKey::W);
-            case XK_x: return Optional<KeyboardKey>::Of(KeyboardKey::X);
-            case XK_y: return Optional<KeyboardKey>::Of(KeyboardKey::Y);
-            case XK_z: return Optional<KeyboardKey>::Of(KeyboardKey::Z);
-            case XK_0: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad0);
-            case XK_1: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad1);
-            case XK_2: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad2);
-            case XK_3: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad3);
-            case XK_4: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad4);
-            case XK_5: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad5);
-            case XK_6: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad6);
-            case XK_7: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad7);
-            case XK_8: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad8);
-            case XK_9: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad9);
-            case XK_Num_Lock: return Optional<KeyboardKey>::Of(KeyboardKey::NumLock);
-            case XK_KP_0: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad0);
-            case XK_KP_1: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad1);
-            case XK_KP_2: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad2);
-            case XK_KP_3: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad3);
-            case XK_KP_4: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad4);
-            case XK_KP_5: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad5);
-            case XK_KP_6: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad6);
-            case XK_KP_7: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad7);
-            case XK_KP_8: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad8);
-            case XK_KP_9: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad9);
-            case XK_KP_Add: return Optional<KeyboardKey>::Of(KeyboardKey::Add);
-            case XK_KP_Subtract: return Optional<KeyboardKey>::Of(KeyboardKey::Subtract);
-            case XK_KP_Multiply: return Optional<KeyboardKey>::Of(KeyboardKey::Multiply);
-            case XK_KP_Divide: return Optional<KeyboardKey>::Of(KeyboardKey::Divide);
-            case XK_F1: return Optional<KeyboardKey>::Of(KeyboardKey::F1);
-            case XK_F2: return Optional<KeyboardKey>::Of(KeyboardKey::F2);
-            case XK_F3: return Optional<KeyboardKey>::Of(KeyboardKey::F3);
-            case XK_F4: return Optional<KeyboardKey>::Of(KeyboardKey::F4);
-            case XK_F5: return Optional<KeyboardKey>::Of(KeyboardKey::F5);
-            case XK_F6: return Optional<KeyboardKey>::Of(KeyboardKey::F6);
-            case XK_F7: return Optional<KeyboardKey>::Of(KeyboardKey::F7);
-            case XK_F8: return Optional<KeyboardKey>::Of(KeyboardKey::F8);
-            case XK_F9: return Optional<KeyboardKey>::Of(KeyboardKey::F9);
-            case XK_F10: return Optional<KeyboardKey>::Of(KeyboardKey::F10);
-            case XK_F11: return Optional<KeyboardKey>::Of(KeyboardKey::F11);
-            case XK_F12: return Optional<KeyboardKey>::Of(KeyboardKey::F12);
-            case XK_F13: return Optional<KeyboardKey>::Of(KeyboardKey::F13);
-            case XK_F14: return Optional<KeyboardKey>::Of(KeyboardKey::F14);
-            case XK_F15: return Optional<KeyboardKey>::Of(KeyboardKey::F15);
-            case XK_F16: return Optional<KeyboardKey>::Of(KeyboardKey::F16);
-            case XK_F17: return Optional<KeyboardKey>::Of(KeyboardKey::F17);
-            case XK_F18: return Optional<KeyboardKey>::Of(KeyboardKey::F18);
-            case XK_F19: return Optional<KeyboardKey>::Of(KeyboardKey::F19);
-            case XK_F20: return Optional<KeyboardKey>::Of(KeyboardKey::F20);
-            case XK_F21: return Optional<KeyboardKey>::Of(KeyboardKey::F21);
-            case XK_F22: return Optional<KeyboardKey>::Of(KeyboardKey::F22);
-            case XK_F23: return Optional<KeyboardKey>::Of(KeyboardKey::F23);
-            case XK_F24: return Optional<KeyboardKey>::Of(KeyboardKey::F24);
-            case XK_Left: return Optional<KeyboardKey>::Of(KeyboardKey::Left);
-            case XK_Right: return Optional<KeyboardKey>::Of(KeyboardKey::Right);
-            case XK_Up: return Optional<KeyboardKey>::Of(KeyboardKey::Up);
-            case XK_Down: return Optional<KeyboardKey>::Of(KeyboardKey::Down);
-            case XK_space: return Optional<KeyboardKey>::Of(KeyboardKey::Space);
-            case XK_Escape: return Optional<KeyboardKey>::Of(KeyboardKey::Escape);
-            case XK_Control_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftControl);
-            case XK_Control_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightControl);
-            case XK_Alt_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftAlt);
-            case XK_Alt_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightAlt);
-            case XK_Super_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftSystem);
-            case XK_Super_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightSystem);
-            case XK_Shift_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftShift);
-            case XK_Shift_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightShift);
+                case XK_BackSpace: return Optional<KeyboardKey>::Of(KeyboardKey::Backspace);
+                case XK_Tab: return Optional<KeyboardKey>::Of(KeyboardKey::Tabulation);
+                case XK_Clear: return Optional<KeyboardKey>::Of(KeyboardKey::Clear);
+                case XK_Linefeed: return Optional<KeyboardKey>::Of(KeyboardKey::Enter);
+                case XK_Pause: return Optional<KeyboardKey>::Of(KeyboardKey::Pause);
+                case XK_Caps_Lock: return Optional<KeyboardKey>::Of(KeyboardKey::CapsLock);
+                case XK_Escape: return Optional<KeyboardKey>::Of(KeyboardKey::Escape);
+                case XK_space: return Optional<KeyboardKey>::Of(KeyboardKey::Space);
+                case XK_Prior: return Optional<KeyboardKey>::Of(KeyboardKey::Prior);
+                case XK_Next: return Optional<KeyboardKey>::Of(KeyboardKey::Next);
+                case XK_End: return Optional<KeyboardKey>::Of(KeyboardKey::End);
+                case XK_Home: return Optional<KeyboardKey>::Of(KeyboardKey::Home);
+                case XK_Left: return Optional<KeyboardKey>::Of(KeyboardKey::Left);
+                case XK_Right: return Optional<KeyboardKey>::Of(KeyboardKey::Right);
+                case XK_Up: return Optional<KeyboardKey>::Of(KeyboardKey::Up);
+                case XK_Down: return Optional<KeyboardKey>::Of(KeyboardKey::Down);
+                case XK_Select: return Optional<KeyboardKey>::Of(KeyboardKey::Select);
+                case XK_Print: return Optional<KeyboardKey>::Of(KeyboardKey::Print);
+                case XK_Execute: return Optional<KeyboardKey>::Of(KeyboardKey::Execute);
+                //case VK_SNAPSHOT: return Optional<KeyboardKey>::Of(KeyboardKey::ScreenShot);
+                case XK_Insert: return Optional<KeyboardKey>::Of(KeyboardKey::Insert);
+                case XK_Delete: return Optional<KeyboardKey>::Of(KeyboardKey::Delete);
+                case XK_Help: return Optional<KeyboardKey>::Of(KeyboardKey::Help);
+                case XK_a: return Optional<KeyboardKey>::Of(KeyboardKey::A);
+                case XK_b: return Optional<KeyboardKey>::Of(KeyboardKey::B);
+                case XK_c: return Optional<KeyboardKey>::Of(KeyboardKey::C);
+                case XK_d: return Optional<KeyboardKey>::Of(KeyboardKey::D);
+                case XK_e: return Optional<KeyboardKey>::Of(KeyboardKey::E);
+                case XK_f: return Optional<KeyboardKey>::Of(KeyboardKey::F);
+                case XK_g: return Optional<KeyboardKey>::Of(KeyboardKey::G);
+                case XK_h: return Optional<KeyboardKey>::Of(KeyboardKey::H);
+                case XK_i: return Optional<KeyboardKey>::Of(KeyboardKey::I);
+                case XK_j: return Optional<KeyboardKey>::Of(KeyboardKey::J);
+                case XK_k: return Optional<KeyboardKey>::Of(KeyboardKey::K);
+                case XK_l: return Optional<KeyboardKey>::Of(KeyboardKey::L);
+                case XK_m: return Optional<KeyboardKey>::Of(KeyboardKey::M);
+                case XK_n: return Optional<KeyboardKey>::Of(KeyboardKey::N);
+                case XK_o: return Optional<KeyboardKey>::Of(KeyboardKey::O);
+                case XK_p: return Optional<KeyboardKey>::Of(KeyboardKey::P);
+                case XK_q: return Optional<KeyboardKey>::Of(KeyboardKey::Q);
+                case XK_r: return Optional<KeyboardKey>::Of(KeyboardKey::R);
+                case XK_s: return Optional<KeyboardKey>::Of(KeyboardKey::S);
+                case XK_t: return Optional<KeyboardKey>::Of(KeyboardKey::T);
+                case XK_u: return Optional<KeyboardKey>::Of(KeyboardKey::U);
+                case XK_v: return Optional<KeyboardKey>::Of(KeyboardKey::V);
+                case XK_w: return Optional<KeyboardKey>::Of(KeyboardKey::W);
+                case XK_x: return Optional<KeyboardKey>::Of(KeyboardKey::X);
+                case XK_y: return Optional<KeyboardKey>::Of(KeyboardKey::Y);
+                case XK_z: return Optional<KeyboardKey>::Of(KeyboardKey::Z);
+                case XK_Super_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftSystem);
+                case XK_Super_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightSystem);
+                //case VK_APPS: return Optional<KeyboardKey>::Of(KeyboardKey::App);
+                //case VK_SLEEP: return Optional<KeyboardKey>::Of(KeyboardKey::Sleep);
+                case XK_KP_0: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad0);
+                case XK_KP_1: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad1);
+                case XK_KP_2: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad2);
+                case XK_KP_3: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad3);
+                case XK_KP_4: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad4);
+                case XK_KP_5: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad5);
+                case XK_KP_6: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad6);
+                case XK_KP_7: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad7);
+                case XK_KP_8: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad8);
+                case XK_KP_9: return Optional<KeyboardKey>::Of(KeyboardKey::NumPad9);
+                case XK_KP_Multiply: return Optional<KeyboardKey>::Of(KeyboardKey::Multiply);
+                case XK_KP_Add: return Optional<KeyboardKey>::Of(KeyboardKey::Add);
+		        case XK_KP_Separator: return Optional<KeyboardKey>::Of(KeyboardKey::Separator);
+                case XK_KP_Subtract: return Optional<KeyboardKey>::Of(KeyboardKey::Subtract);
+		        case XK_KP_Decimal: return Optional<KeyboardKey>::Of(KeyboardKey::Decimal);
+                case XK_KP_Divide: return Optional<KeyboardKey>::Of(KeyboardKey::Divide);
+                case XK_F1: return Optional<KeyboardKey>::Of(KeyboardKey::F1);
+                case XK_F2: return Optional<KeyboardKey>::Of(KeyboardKey::F2);
+                case XK_F3: return Optional<KeyboardKey>::Of(KeyboardKey::F3);
+                case XK_F4: return Optional<KeyboardKey>::Of(KeyboardKey::F4);
+                case XK_F5: return Optional<KeyboardKey>::Of(KeyboardKey::F5);
+                case XK_F6: return Optional<KeyboardKey>::Of(KeyboardKey::F6);
+                case XK_F7: return Optional<KeyboardKey>::Of(KeyboardKey::F7);
+                case XK_F8: return Optional<KeyboardKey>::Of(KeyboardKey::F8);
+                case XK_F9: return Optional<KeyboardKey>::Of(KeyboardKey::F9);
+                case XK_F10: return Optional<KeyboardKey>::Of(KeyboardKey::F10);
+                case XK_F11: return Optional<KeyboardKey>::Of(KeyboardKey::F11);
+                case XK_F12: return Optional<KeyboardKey>::Of(KeyboardKey::F12);
+                case XK_F13: return Optional<KeyboardKey>::Of(KeyboardKey::F13);
+                case XK_F14: return Optional<KeyboardKey>::Of(KeyboardKey::F14);
+                case XK_F15: return Optional<KeyboardKey>::Of(KeyboardKey::F15);
+                case XK_F16: return Optional<KeyboardKey>::Of(KeyboardKey::F16);
+                case XK_F17: return Optional<KeyboardKey>::Of(KeyboardKey::F17);
+                case XK_F18: return Optional<KeyboardKey>::Of(KeyboardKey::F18);
+                case XK_F19: return Optional<KeyboardKey>::Of(KeyboardKey::F19);
+                case XK_F20: return Optional<KeyboardKey>::Of(KeyboardKey::F20);
+                case XK_F21: return Optional<KeyboardKey>::Of(KeyboardKey::F21);
+                case XK_F22: return Optional<KeyboardKey>::Of(KeyboardKey::F22);
+                case XK_F23: return Optional<KeyboardKey>::Of(KeyboardKey::F23);
+                case XK_F24: return Optional<KeyboardKey>::Of(KeyboardKey::F24);
+                case XK_Num_Lock: return Optional<KeyboardKey>::Of(KeyboardKey::NumLock);
+		        case XK_Scroll_Lock: return Optional<KeyboardKey>::Of(KeyboardKey::ScrollLock);
+                case XK_Shift_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftShift);
+                case XK_Shift_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightShift);
+                case XK_Control_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftControl);
+                case XK_Control_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightControl);
+                case XK_Alt_L: return Optional<KeyboardKey>::Of(KeyboardKey::LeftAlt);
+                case XK_Alt_R: return Optional<KeyboardKey>::Of(KeyboardKey::RightAlt);
             }
+
             return Optional<KeyboardKey>::Empty();
         }
 
@@ -151,22 +164,22 @@ namespace Ck::Detail::Xlib
 
             if (xFlags & Button1Mask)
                 flags |= MouseEventFlagBits::LeftButton;
-            
+
             if (xFlags & Button2Mask)
                 flags |= MouseEventFlagBits::MiddleButton;
-            
+
             if (xFlags & Button3Mask)
                 flags |= MouseEventFlagBits::RightButton;
-            
+
             if (xFlags & Button4Mask)
                 flags |= MouseEventFlagBits::ExtraButton1;
-            
+
             if (xFlags & Button5Mask)
                 flags |= MouseEventFlagBits::ExtraButton2;
-            
+
             if (xFlags & ShiftMask)
                 flags |= MouseEventFlagBits::ShiftKey;
-            
+
             if (xFlags & ControlMask)
                 flags |= MouseEventFlagBits::ControlKey;
 
@@ -177,11 +190,11 @@ namespace Ck::Detail::Xlib
         {
             switch (button)
             {
-            case Button1: return MouseButton::Left;
-            case Button2: return MouseButton::Middle;
-            case Button3: return MouseButton::Right;
-            case Button8: return MouseButton::Extra1;
-            case Button9: return MouseButton::Extra2;
+                case Button1: return MouseButton::Left;
+                case Button2: return MouseButton::Middle;
+                case Button3: return MouseButton::Right;
+                case Button8: return MouseButton::Extra1;
+                case Button9: return MouseButton::Extra2;
             }
 
             COCKTAIL_UNREACHABLE();
@@ -218,7 +231,7 @@ namespace Ck::Detail::Xlib
         if (createInfo.Parent)
         {
             Ck::Window* parent = createInfo.Parent;
-            parentHandle = ((Handle*)parent->GetSystemHandle())->Window;
+            parentHandle = static_cast<Handle*>(parent->GetSystemHandle())->Window;
         }
         else
         {
@@ -234,18 +247,8 @@ namespace Ck::Detail::Xlib
         attributes.event_mask = EventsMasks;
 
         // Create the window
-        mHandle.Window = XCreateWindow(
-            mHandle.Display, 
-            parentHandle, 
-            createInfo.Position.Width, createInfo.Position.Height,
-            createInfo.Size.Width, createInfo.Size.Height,
-            0,
-            DefaultDepth(mHandle.Display, DefaultScreen(mHandle.Display)),
-            InputOutput,
-            visual,
-            CWColormap | CWEventMask | CWBorderPixel,
-            &attributes
-        );
+        mHandle.Window = XCreateWindow(mHandle.Display, parentHandle, createInfo.Position.Width, createInfo.Position.Height, createInfo.Size.Width, createInfo.Size.Height, 0,
+                                       DefaultDepth(mHandle.Display, DefaultScreen(mHandle.Display)), InputOutput, visual, CWColormap | CWEventMask | CWBorderPixel, &attributes);
 
         SetTitle(createInfo.Title);
 
@@ -287,26 +290,27 @@ namespace Ck::Detail::Xlib
                 hints.functions |= WMHints::Function::Maximize;
             }
 
-            XChangeProperty(
-                mHandle.Display,
-                mHandle.Window,
-                hintsAtom,
-                hintsAtom,
-                32,
-                PropModeReplace,
-                reinterpret_cast<const unsigned char*>(&hints),
-                5
-            );
+            XChangeProperty(mHandle.Display, mHandle.Window, hintsAtom, hintsAtom, 32, PropModeReplace, reinterpret_cast<const unsigned char*>(&hints), 5);
         });
 
         mLastSize = GetSize();
         mHiddenCursor = CreateHiddenCursor(mHandle.Display, mHandle.Window);
+
+        mHandle.InputMethod = XOpenIM(mHandle.Display, nullptr, nullptr, nullptr);
+        mHandle.InputContext =
+            XCreateIC(mHandle.InputMethod, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, mHandle.Window, XNFocusWindow, mHandle.Window, NULL);
 
         SetVisible(true);
     }
 
     Window::~Window()
     {
+        if (mHandle.InputContext)
+            XDestroyIC(mHandle.InputContext);
+
+        if (mHandle.InputMethod)
+            XCloseIM(mHandle.InputMethod);
+
         if (mHandle.Colormap)
             XFreeColormap(mHandle.Display, mHandle.Colormap);
 
@@ -328,7 +332,7 @@ namespace Ck::Detail::Xlib
             XNextEvent(mHandle.Display, &xEvent);
             switch (xEvent.type)
             {
-            case Expose:
+                case Expose:
                 {
                     if (xEvent.xexpose.count == 0)
                     {
@@ -340,7 +344,7 @@ namespace Ck::Detail::Xlib
                 }
                 break;
 
-            case ClientMessage:
+                case ClientMessage:
                 {
                     AtomManager* atomManager = App::Resolve<AtomManager>();
                     if (xEvent.xclient.message_type == atomManager->GetAtom(CK_TEXT("WM_PROTOCOLS")))
@@ -373,15 +377,15 @@ namespace Ck::Detail::Xlib
                 }
                 break;
 
-            case DestroyNotify:
+                case DestroyNotify:
                 {
                     mHandle.Colormap = 0;
                     mHandle.Window = 0;
                 }
                 break;
 
-            case MotionNotify:
-                {  
+                case MotionNotify:
+                {
                     WindowMouseMoveEvent event;
                     event.Window = this;
                     event.Flags = GetMouseEventFlags(xEvent.xmotion.state);
@@ -395,7 +399,7 @@ namespace Ck::Detail::Xlib
                 }
                 break;
 
-            case ConfigureNotify:
+                case ConfigureNotify:
                 {
                     Extent2D<int> position(xEvent.xconfigure.x, xEvent.xconfigure.y);
                     Extent2D<unsigned int> size(xEvent.xconfigure.width, xEvent.xconfigure.height);
@@ -422,8 +426,8 @@ namespace Ck::Detail::Xlib
                 }
                 break;
 
-            case ButtonPress:
-            case ButtonRelease:
+                case ButtonPress:
+                case ButtonRelease:
                 {
                     const bool pressed = xEvent.type == ButtonPress;
                     const Extent2D<int> position(xEvent.xbutton.x, xEvent.xbutton.y);
@@ -448,25 +452,25 @@ namespace Ck::Detail::Xlib
 
                         switch (xEvent.xbutton.button)
                         {
-                        case Button4:
-                            event.Wheel = MouseWheel::Vertical;
-                            event.Delta = 1.f;
-                            break;
+                            case Button4:
+                                event.Wheel = MouseWheel::Vertical;
+                                event.Delta = 1.f;
+                                break;
 
-                        case Button5:
-                            event.Wheel = MouseWheel::Vertical;
-                            event.Delta = -1.f;
-                            break;
+                            case Button5:
+                                event.Wheel = MouseWheel::Vertical;
+                                event.Delta = -1.f;
+                                break;
 
-                        case Button6:
-                            event.Wheel = MouseWheel::Horizontal;
-                            event.Delta = 1.f;
-                            break;
+                            case Button6:
+                                event.Wheel = MouseWheel::Horizontal;
+                                event.Delta = 1.f;
+                                break;
 
-                        case Button7:
-                            event.Wheel = MouseWheel::Horizontal;
-                            event.Delta = -1.f;
-                            break;
+                            case Button7:
+                                event.Wheel = MouseWheel::Horizontal;
+                                event.Delta = -1.f;
+                                break;
                         }
 
                         mOnMouseWheel.Emit(event);
@@ -474,8 +478,8 @@ namespace Ck::Detail::Xlib
                 }
                 break;
 
-            case KeyPress:
-            case KeyRelease:
+                case KeyPress:
+                case KeyRelease:
                 {
                     GetMessageKey(xEvent.xkey).Then([&](KeyboardKey key) {
                         WindowKeyboardEvent event;
@@ -485,18 +489,35 @@ namespace Ck::Detail::Xlib
                         event.Repeated = false;
 
                         mOnKeyboard.Emit(event);
+
+                        if (event.Pressed)
+                        {
+                            TextChar buffer[Encoders::Text::MaxCodepointEncodingLength];
+
+                            KeySym keysym;
+                            int status = 0;
+                            int length = Xutf8LookupString(mHandle.InputContext, &xEvent.xkey, reinterpret_cast<char*>(&buffer[0]), Encoders::Text::MaxCodepointEncodingLength, &keysym, &status);
+                            if (status == XLookupChars || status == XLookupBoth)
+                            {
+                                WindowTextEvent textEvent;
+                                textEvent.Window = this;
+                                textEvent.Unicode = Encoders::MakeCodePoint<Encoders::Text>(buffer, length);
+
+                                mOnTextEvent.Emit(textEvent);
+                            }
+                        }
                     });
                 }
                 break;
-            
-            case UnmapNotify:
+
+                case UnmapNotify:
                 {
                     if (xEvent.xunmap.window == mHandle.Window)
                         mMapped = false;
                 }
                 break;
 
-            case VisibilityNotify:
+                case VisibilityNotify:
                 {
                     if (xEvent.xvisibility.state != VisibilityPartiallyObscured)
                         mMapped = true;
@@ -509,39 +530,39 @@ namespace Ck::Detail::Xlib
     }
 
     void Window::Update()
-    {   
+    {
         XEvent exposeEvent;
         exposeEvent.type = Expose;
         exposeEvent.xexpose.display = mHandle.Display;
         XSendEvent(mHandle.Display, mHandle.Window, False, ExposureMask, &exposeEvent);
     }
 
-	bool Window::HasFocus()
-	{
+    bool Window::HasFocus()
+    {
         ::Window focused;
         int revertTo;
         XGetInputFocus(mHandle.Display, &focused, &revertTo);
 
         return focused == mHandle.Window;
-	}
+    }
 
-	void Window::Minimize()
-	{
-	}
+    void Window::Minimize()
+    {
+    }
 
-	bool Window::IsMinimized() const
-	{
+    bool Window::IsMinimized() const
+    {
         return false;
-	}
+    }
 
-	void Window::Maximize()
-	{
-	}
+    void Window::Maximize()
+    {
+    }
 
-	bool Window::IsMaximized() const
-	{
+    bool Window::IsMaximized() const
+    {
         return false;
-	}
+    }
 
     void Window::SetVisible(bool visible)
     {
@@ -553,7 +574,7 @@ namespace Ck::Detail::Xlib
             while (!mMapped)
                 PollEvents();
         }
-        else 
+        else
         {
             XUnmapWindow(mHandle.Display, mHandle.Window);
             XFlush(mHandle.Display);
@@ -571,7 +592,7 @@ namespace Ck::Detail::Xlib
     void Window::SetCursor(std::shared_ptr<Cursor> cursor)
     {
         mCursor = std::move(cursor);
-        XDefineCursor(mHandle.Display, mHandle.Window, (::Cursor)mCursor->GetSystemHandle());
+        XDefineCursor(mHandle.Display, mHandle.Window, (::Cursor) mCursor->GetSystemHandle());
     }
 
     bool Window::IsCursorVisible() const
@@ -581,7 +602,7 @@ namespace Ck::Detail::Xlib
 
     void Window::SetCursorVisible(bool visible)
     {
-        ::Cursor cursorHandle = visible ? (::Cursor)mCursor->GetSystemHandle() : mHiddenCursor;
+        ::Cursor cursorHandle = visible ? (::Cursor) mCursor->GetSystemHandle() : mHiddenCursor;
         XDefineCursor(mHandle.Display, mHandle.Window, cursorHandle);
         XFlush(mHandle.Display);
     }
@@ -599,10 +620,10 @@ namespace Ck::Detail::Xlib
         {
             XUngrabPointer(display, CurrentTime);
         }
-	}
+    }
 
-	void Window::SetIcon(const Image* icon)
-	{
+    void Window::SetIcon(const Image* icon)
+    {
     }
 
     String Window::GetTitle() const
@@ -615,12 +636,8 @@ namespace Ck::Detail::Xlib
 
     void Window::SetTitle(const String& title)
     {
-        XChangeProperty(mHandle.Display, mHandle.Window,
-            XInternAtom(mHandle.Display, "_NET_WM_NAME", False),
-            XInternAtom(mHandle.Display, "UTF8_STRING", False),
-            8, PropModeReplace,
-            reinterpret_cast<const unsigned char*>(title.GetData()), title.GetLength()
-        );
+        XChangeProperty(mHandle.Display, mHandle.Window, XInternAtom(mHandle.Display, "_NET_WM_NAME", False), XInternAtom(mHandle.Display, "UTF8_STRING", False), 8,
+                        PropModeReplace, reinterpret_cast<const unsigned char*>(title.GetData()), title.GetLength());
     }
 
     Extent2D<unsigned int> Window::GetSize() const
@@ -636,29 +653,28 @@ namespace Ck::Detail::Xlib
         XFlush(mHandle.Display);
     }
 
-	Extent2D<int> Window::GetPosition() const
+    Extent2D<int> Window::GetPosition() const
     {
         XWindowAttributes windowAttributes;
         XGetWindowAttributes(mHandle.Display, mHandle.Window, &windowAttributes);
         return Extent2D<int>(windowAttributes.x, windowAttributes.y);
-
     }
 
-	void Window::SetPosition(const Extent2D<int>& position)
+    void Window::SetPosition(const Extent2D<int>& position)
     {
         XMoveWindow(mHandle.Display, mHandle.Window, position.Width, position.Height);
         XFlush(mHandle.Display);
     }
 
-	Extent2D<unsigned int> Window::GetMinSize() const
-	{
+    Extent2D<unsigned int> Window::GetMinSize() const
+    {
         XSizeHints sizeHints;
         XGetNormalHints(mHandle.Display, mHandle.Window, &sizeHints);
         return Extent2D<unsigned int>(sizeHints.min_width, sizeHints.min_height);
-	}
+    }
 
-	void Window::SetMinSize(const Extent2D<unsigned int>& size)
-	{   
+    void Window::SetMinSize(const Extent2D<unsigned int>& size)
+    {
         Extent2D<unsigned int> currentSize = GetSize();
 
         XSizeHints sizeHints;
@@ -672,17 +688,17 @@ namespace Ck::Detail::Xlib
         clampedSize.Height = std::max(size.Height, currentSize.Height);
 
         SetSize(clampedSize);
-	}
+    }
 
-	Extent2D<unsigned int> Window::GetMaxSize() const
-	{
+    Extent2D<unsigned int> Window::GetMaxSize() const
+    {
         XSizeHints sizeHints;
         XGetNormalHints(mHandle.Display, mHandle.Window, &sizeHints);
         return Extent2D<unsigned int>(sizeHints.max_width, sizeHints.max_height);
-	}
+    }
 
-	void Window::SetMaxSize(const Extent2D<unsigned int>& size)
-	{
+    void Window::SetMaxSize(const Extent2D<unsigned int>& size)
+    {
         Extent2D<unsigned int> currentSize = GetSize();
 
         XSizeHints sizeHints;
@@ -696,60 +712,60 @@ namespace Ck::Detail::Xlib
         clampedSize.Height = std::min(size.Height, currentSize.Height);
 
         SetSize(clampedSize);
-	}
+    }
 
-	Signal<WindowCloseEvent>& Window::OnCloseEvent()
+    Signal<WindowCloseEvent>& Window::OnCloseEvent()
     {
         return mOnClose;
     }
-	
+
     Signal<WindowRedrawEvent>& Window::OnRedrawEvent()
     {
         return mOnRedraw;
     }
-	
+
     Signal<WindowFocusEvent>& Window::OnFocusEvent()
     {
         return mOnFocus;
     }
-	
+
     Signal<WindowMovedEvent>& Window::OnMovedEvent()
     {
         return mOnMoved;
     }
-	
+
     Signal<WindowResizedEvent>& Window::OnResizedEvent()
     {
         return mOnResized;
     }
-	
+
     Signal<WindowTextEvent>& Window::OnTextEvent()
     {
         return mOnTextEvent;
     }
-	
+
     Signal<WindowKeyboardEvent>& Window::OnKeyboardEvent()
     {
         return mOnKeyboard;
     }
-	
+
     Signal<WindowMouseMoveEvent>& Window::OnMouseMovedEvent()
     {
         return mOnMouseMoved;
     }
-	
+
     Signal<WindowMouseButtonEvent>& Window::OnMouseButtonEvent()
     {
         return mOnMouseButton;
     }
 
-	Signal<WindowMouseWheelEvent>& Window::OnMouseWheelEvent()
+    Signal<WindowMouseWheelEvent>& Window::OnMouseWheelEvent()
     {
         return mOnMouseWheel;
     }
 
     void* Window::GetSystemHandle() const
     {
-        return (void*)&mHandle;
+        return (void*) &mHandle;
     }
 }

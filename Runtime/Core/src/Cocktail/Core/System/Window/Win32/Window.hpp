@@ -70,13 +70,13 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Cursor> GetCursor() const override;
+		Cursor* GetCursor() const override;
 
 		/**
 		 * \brief 
 		 * \param cursor 
 		 */
-		void SetCursor(std::shared_ptr<Cursor> cursor) override;
+		void SetCursor(Cursor* cursor) override;
 
 		bool IsCursorVisible() const override;
 
@@ -174,7 +174,7 @@ namespace Ck::Detail::Win32
 	private:
 
 		HWND mHandle;
-		std::shared_ptr<Cursor> mCursor;
+		Cursor* mCursor;
 		Optional<Extent2D<unsigned int>> mMinSize;
 		Optional<Extent2D<unsigned int>> mMaxSize;
 		HICON mIcon;
