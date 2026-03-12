@@ -67,8 +67,8 @@ namespace Ck::Detail::Xlib
         if (keyCode == InvalidKeyCode)
             return false;
 
-        std::array<char, 32> keys;
-        XQueryKeymap(mDisplay, keys.data());
+        StaticArray<char, 32> keys;
+        XQueryKeymap(mDisplay, keys.GetData());
         return (keys[keyCode / 8] & (1 << (keyCode % 8))) != 0;
     }
 }

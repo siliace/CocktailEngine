@@ -18,7 +18,7 @@ namespace Ck
 
 	    using ElementType = typename Vector<Vector3, T, 3>::ElementType;
 
-		static constexpr std::size_t Size = Vector<Vector3, T, 3>::Size;
+		static constexpr unsigned int Size = Vector<Vector3, T, 3>::Size;
 
 		/**
 		 * \brief

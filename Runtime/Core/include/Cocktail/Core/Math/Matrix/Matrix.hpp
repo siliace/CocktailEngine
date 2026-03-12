@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_MATH_MATRIX_MATRIX_HPP
 #define COCKTAIL_CORE_MATH_MATRIX_MATRIX_HPP
 
-#include <array>
+#include <Cocktail/Core/StaticArray.hpp>
 
 namespace Ck
 {
@@ -20,8 +20,8 @@ namespace Ck
 		using RowType = Row<T>;
 		using ColumnType = Column<T>;
 
-		static constexpr std::size_t Width = RowType::Size;
-		static constexpr std::size_t Height = ColumnType::Size;
+		static constexpr unsigned int Width = RowType::Size;
+		static constexpr unsigned int Height = ColumnType::Size;
 
 		/**
 		 * \brief Constructor
@@ -40,7 +40,7 @@ namespace Ck
 		 */
 		explicit Matrix(T value)
 		{
-			std::fill(mElements.begin(), mElements.end(), value);
+		    mElements.Fill(value);
 		}
 
 		/**
@@ -49,9 +49,9 @@ namespace Ck
 		 * \param y The ordinate of the element
 		 * \return The element
 		 */
-		T& At(std::size_t x, std::size_t y)
+		T& At(unsigned int x, unsigned int y)
 		{
-			return mElements.at(y + x * Width);
+			return mElements.At(y + x * Width);
 		}
 
 		/**
@@ -60,9 +60,9 @@ namespace Ck
 		 * \param y The ordinate of the element
 		 * \return The element
 		 */
-		const T& At(std::size_t x, std::size_t y) const
+		const T& At(unsigned int x, unsigned int y) const
 		{
-			return mElements.at(y + x * Width);
+			return mElements.At(y + x * Width);
 		}
 
 		/**
@@ -70,10 +70,10 @@ namespace Ck
 		 * \param rowIndex 
 		 * \return 
 		 */
-		RowType GetRow(std::size_t rowIndex) const
+		RowType GetRow(unsigned int rowIndex) const
 		{
 			RowType row;
-			for (std::size_t i = 0; i < Width; i++)
+			for (unsigned int i = 0; i < Width; i++)
 				row.At(i) = At(rowIndex, i);
 
 			return row;
@@ -84,9 +84,9 @@ namespace Ck
 		 * \param rowIndex 
 		 * \param row 
 		 */
-		void SetRow(std::size_t rowIndex, const RowType& row)
+		void SetRow(unsigned int rowIndex, const RowType& row)
 		{
-			for (std::size_t i = 0; i < Width; i++)
+			for (unsigned int i = 0; i < Width; i++)
 				At(rowIndex, i) = row.At(i);
 		}
 
@@ -95,10 +95,10 @@ namespace Ck
 		 * \param columnIndex
 		 * \return
 		 */
-		ColumnType GetColumn(std::size_t columnIndex) const
+		ColumnType GetColumn(unsigned int columnIndex) const
 		{
 			ColumnType column;
-			for (std::size_t i = 0; i < Height; i++)
+			for (unsigned int i = 0; i < Height; i++)
 				column.At(i) = At(i, columnIndex);
 
 			return column;
@@ -109,9 +109,9 @@ namespace Ck
 		 * \param columnIndex
 		 * \param row
 		 */
-		void SetColumn(std::size_t columnIndex, const ColumnType& row)
+		void SetColumn(unsigned int columnIndex, const ColumnType& row)
 		{
-			for (std::size_t i = 0; i < Height; i++)
+			for (unsigned int i = 0; i < Height; i++)
 				At(i, columnIndex) = row.At(i);
 		}
 
@@ -135,7 +135,7 @@ namespace Ck
 
 	private:
 
-		std::array<T, Width * Height> mElements;
+		StaticArray<T, Width * Height> mElements;
 	};
 }
 

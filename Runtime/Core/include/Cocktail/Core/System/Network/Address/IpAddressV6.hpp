@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESSV6_HPP
 #define COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESSV6_HPP
 
-#include <array>
-
+#include <Cocktail/Core/StaticArray.hpp>
 #include <Cocktail/Core/System/Network/Address/IpAddress.hpp>
 
 namespace Ck
@@ -118,8 +117,8 @@ namespace Ck
 
 		union
 		{
-			std::array<Uint8, 16> Bytes;
-			std::array<Uint16, 8> Shorts;
+			StaticArray<Uint8, 16> Bytes;
+			StaticArray<Uint16, 8> Shorts;
 		};
 	};
 }

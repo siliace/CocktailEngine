@@ -63,50 +63,32 @@ namespace Ck
 
         E& First()
         {
-            if (Optional<E&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mElements[0];
         }
 
         const E& First() const
         {
-            if (Optional<const E&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mElements[0];
         }
 
         Optional<E&> TryFirst()
         {
-            if (IsEmpty())
-                return Optional<E&>::Empty();
-
-            return Optional<E&>::Of(At(0));
+            return Optional<E&>::Of(mElements[0]);
         }
 
         Optional<const E&> TryFirst() const
         {
-            if (IsEmpty())
-                return Optional<const E&>::Empty();
-
-            return Optional<const E&>::Of(At(0));
+            return Optional<const E&>::Of(mElements[0]);
         }
 
         E& Last()
         {
-            if (Optional<E&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mElements[TSize - 1];
         }
 
         const E& Last() const
         {
-            if (Optional<const E&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mElements[TSize - 1];
         }
 
         Optional<E&> TryLast()
@@ -271,7 +253,7 @@ namespace Ck
         }
 
         template <typename TFunction>
-        StaticArray<typename FunctionTraits<TFunction>::Return, TSize> Transform(TFunction transformer) const
+        StaticArray<typename FunctionTraits<TFunction>::Return, TSize> Map(TFunction transformer) const
         {
             using T = typename FunctionTraits<TFunction>::Return;
             static_assert(FunctionTraits<TFunction>::Arity <= 2, "Transform function takes only 0, 1 or 2 parameters");
@@ -464,7 +446,7 @@ namespace Ck
 
         Optional<E&> TryFirst()
         {
-            return Optional<const E&>::Empty();
+            return Optional<E&>::Empty();
         }
 
         Optional<const E&> TryFirst() const
@@ -484,7 +466,7 @@ namespace Ck
 
         constexpr Optional<E&> TryLast()
         {
-            return Optional<const E&>::Empty();
+            return Optional<E&>::Empty();
         }
 
         constexpr Optional<const E&> TryLast() const

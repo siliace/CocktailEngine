@@ -23,7 +23,7 @@ namespace Ck
 		/**
 		 * \brief
 		 */
-		static constexpr std::size_t Size = LineType::Size;
+		static constexpr unsigned int Size = LineType::Size;
 
 		/**
 		 * \brief
@@ -69,9 +69,9 @@ namespace Ck
 		MatrixType Transpose() const
 		{
 			MatrixType transposed;
-			for (std::size_t i = 0; i < MatrixType::Size; i++)
+			for (unsigned int i = 0; i < MatrixType::Size; i++)
 			{
-				for (std::size_t j = 0; j < MatrixType::Size; j++)
+				for (unsigned int j = 0; j < MatrixType::Size; j++)
 					transposed.At(i, j) = this->At(j, i);
 			}
 
@@ -85,7 +85,7 @@ namespace Ck
 		LineType GetDiagonal() const
 		{
 			LineType diagonal;
-			for (std::size_t i = 0; i < diagonal.GetSize(); i++)
+			for (unsigned int i = 0; i < diagonal.GetSize(); i++)
 				diagonal.At(i) = this->At(i, i);
 
 			return diagonal;
@@ -97,7 +97,7 @@ namespace Ck
 		 */
 		void SetDiagonal(const LineType& diagonal)
 		{
-			for (std::size_t i = 0; i < diagonal.GetSize(); i++)
+			for (unsigned int i = 0; i < diagonal.GetSize(); i++)
 				this->At(i, i) = diagonal.At(i);
 		}
 	};
@@ -106,7 +106,7 @@ namespace Ck
 	Line<T> operator*(const SquareMatrix<BaseMatrix, Line, T>& left, const Line<T>& right)
 	{
 		Line<T> product;
-		for (std::size_t i = 0; i < SquareMatrix<BaseMatrix, Line, T>::Size; i++)
+		for (unsigned int i = 0; i < SquareMatrix<BaseMatrix, Line, T>::Size; i++)
 			product.At(i) = Line<T>::DotProduct(right, left.GetColumn(i));
 
 		return product;
@@ -116,15 +116,15 @@ namespace Ck
 	BaseMatrix<T> operator*(const SquareMatrix<BaseMatrix, Line, T>& left, const SquareMatrix<BaseMatrix, Line, T>& right)
 	{
 		BaseMatrix<T> product;
-		for (std::size_t x = 0; x < SquareMatrix<BaseMatrix, Line, T>::Size; x++)
+		for (unsigned int x = 0; x < SquareMatrix<BaseMatrix, Line, T>::Size; x++)
 		{
 			Line<T> row = left.GetRow(x);
-			for (std::size_t y = 0; y < SquareMatrix<BaseMatrix, Line, T>::Size; y++)
+			for (unsigned int y = 0; y < SquareMatrix<BaseMatrix, Line, T>::Size; y++)
 			{
 				T sum = 0;
 
 				Line<T> column = right.GetColumn(y);
-				for (std::size_t i = 0; i < SquareMatrix<BaseMatrix, Line, T>::Size; i++)
+				for (unsigned int i = 0; i < SquareMatrix<BaseMatrix, Line, T>::Size; i++)
 					sum += row.At(i) * column.At(i);
 
 				product.At(x, y) = sum;

@@ -21,30 +21,30 @@ namespace Ck
 
 	std::size_t IpAddressV6::GetLength() const
 	{
-		return Bytes.size();
+		return Bytes.GetSize();
 	}
 
 	Uint8 IpAddressV6::GetByte(std::size_t index) const
 	{
-		assert(index < Bytes.size());
+		assert(index < Bytes.GetSize());
 		return Bytes[index];
 	}
 
 	void IpAddressV6::SetByte(std::size_t index, Uint8 value)
 	{
-		assert(index < Bytes.size());
+		assert(index < Bytes.GetSize());
 		Bytes[index] = value;
 	}
 
 	Uint16 IpAddressV6::GetShort(std::size_t index) const
 	{
-		assert(index < Shorts.size());
+		assert(index < Shorts.GetSize());
 		return Shorts[index];
 	}
 
 	void IpAddressV6::SetShort(std::size_t index, Uint16 value)
 	{
-		assert(index < Shorts.size());
+		assert(index < Shorts.GetSize());
 		Shorts[index] = value;
 	}
 
@@ -56,7 +56,7 @@ namespace Ck
 	String IpAddressV6::ToString() const
 	{
 		String result;
-		for (String::SizeType i = 0; i < Bytes.size(); i++)
+		for (String::SizeType i = 0; i < Bytes.GetSize(); i++)
 		{
 			if (i > 0)
 				result.Append(CK_CHAR(':'));

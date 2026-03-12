@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESSV4_HPP
 #define COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESSV4_HPP
 
-#include <array>
-
 #include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/StaticArray.hpp>
 #include <Cocktail/Core/System/Network/Address/IpAddress.hpp>
 
 namespace Ck
@@ -124,7 +123,7 @@ namespace Ck
 
     private:
         
-        std::array<Uint8, 4> mBytes;
+        StaticArray<Uint8, 4> mBytes;
     };
 }
 #endif // COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESSV4_HPP

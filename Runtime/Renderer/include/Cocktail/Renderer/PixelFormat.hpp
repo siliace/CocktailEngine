@@ -1,10 +1,9 @@
 #ifndef COCKTAIL_RENDERER_PIXELFORMAT_HPP
 #define COCKTAIL_RENDERER_PIXELFORMAT_HPP
 
-#include <array>
-
 #include <Cocktail/Core/DataType.hpp>
 #include <Cocktail/Core/Extent3D.hpp>
+#include <Cocktail/Core/StaticArray.hpp>
 #include <Cocktail/Core/Image/ImageRawFormat.hpp>
 
 #include <Cocktail/Renderer/Export.hpp>
@@ -319,7 +318,7 @@ namespace Ck
         PixelFormat(CompressionScheme compressionScheme, bool srgb);
 
         Layout mLayout;
-        std::array<Channel, MaxChannelCount> mChannels;
+        StaticArray<Channel, MaxChannelCount> mChannels;
         Encoding mEncoding;
         CompressionScheme mCompressionScheme;
     };
