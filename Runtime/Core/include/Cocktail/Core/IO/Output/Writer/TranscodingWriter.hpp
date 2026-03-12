@@ -35,10 +35,10 @@ namespace Ck
 
                 i += decoded;
 
-                InnerCharType encodingBuffer[InnerEncodingType::MaxCodepoinTSrcLength];
+                InnerCharType encodingBuffer[InnerEncodingType::MaxCodepointEncodingLength];
                 InnerSizeType encoded = InnerEncodingType::Encode(codepoint, encodingBuffer);
                 if (encoded == 0)
-                    ExceptionUtils::ThrowCodepoinTSrcException(codepoint);
+                    ExceptionUtils::ThrowCodepointEncodingException(codepoint);
 
                 mDestination->Write(encodingBuffer, encoded);
             }

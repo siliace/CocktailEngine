@@ -7,7 +7,7 @@
 namespace Ck
 {
     template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
-    class FileReader : public InputStreamReader<TEncoding, FileInputStream<TAllocator>>
+    class FileReader : public InputStreamReader<TEncoding, TAllocator>
     {
     public:
 
@@ -19,7 +19,7 @@ namespace Ck
 
         explicit FileReader(const Path& path, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
             mFileInputStream(path, driver),
-            InputStreamReader<TEncoding, FileInputStream<TAllocator>>(mFileInputStream)
+            InputStreamReader<TEncoding, TAllocator>(mFileInputStream)
         {
             /// Nothing
         }

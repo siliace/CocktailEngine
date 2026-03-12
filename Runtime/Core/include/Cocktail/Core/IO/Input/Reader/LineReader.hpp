@@ -45,7 +45,7 @@ namespace Ck
                 {
 #ifdef COCKTAIL_OS_WINDOWS
                     line.TryLast().Then([&](CharType last) {
-                        if (last == static_cast<CharType>(last))
+                        if (last == static_cast<CharType>('\r'))
                             line.PopLast();
                     });
 #endif
