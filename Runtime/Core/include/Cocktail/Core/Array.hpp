@@ -1714,7 +1714,16 @@ namespace Ck
         template <typename TPredicate>
         Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
         {
-            return const_cast<Array*>(this)->FindIf(predicate, start);
+            assert(start <= mSize);
+
+            for (SizeType i = start; i < mSize; ++i)
+            {
+                const E& element = At(i);
+                if (predicate(element))
+                    return Optional<const E&>::Of(element);
+            }
+
+            return Optional<const E&>::Empty();
         }
 
         /**
@@ -1726,16 +1735,16 @@ namespace Ck
          * \return Pointer to an element if found, nullptr otherwise
          */
         template <typename TPredicate>
-        E* FindLastIf(TPredicate predicate)
+        Optional<E&> FindLastIf(TPredicate predicate)
         {
             for (SizeType i = mSize; i-- > 0;)
             {
                 E& element = At(i);
                 if (predicate(element))
-                    return &element;
+                    return Optional<E&>::Of(element);
             }
 
-            return nullptr;
+            return Optional<E&>::Empty();
         }
 
         /**
@@ -1748,9 +1757,16 @@ namespace Ck
          * \return Pointer to the element if found, nullptr otherwise
          */
         template <typename TPredicate>
-        const E* FindLastIf(TPredicate predicate) const
+        Optional<const E&> FindLastIf(TPredicate predicate) const
         {
-            return const_cast<Array*>(this)->FindLastIf(predicate);
+            for (SizeType i = mSize; i-- > 0;)
+            {
+                const E& element = At(i);
+                if (predicate(element))
+                    return Optional<const E&>::Of(element);
+            }
+
+            return Optional<const E&>::Empty();
         }
 
         /**
