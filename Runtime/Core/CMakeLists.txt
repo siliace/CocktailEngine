@@ -575,6 +575,8 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Monitor/Monitor.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Monitor/MonitorService.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/Monitor/VideoMode.hpp
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/Monitor/Monitor.cpp
 )
 
 if (WIN32)

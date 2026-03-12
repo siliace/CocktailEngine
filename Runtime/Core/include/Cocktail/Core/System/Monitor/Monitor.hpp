@@ -1,7 +1,9 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
 
+#include <Cocktail/Core/Application/ServiceFacade.hpp>
 #include <Cocktail/Core/String.hpp>
+#include <Cocktail/Core/System/Monitor/MonitorService.hpp>
 #include <Cocktail/Core/System/Monitor/VideoMode.hpp>
 
 namespace Ck
@@ -9,7 +11,7 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class Monitor
+	class COCKTAIL_CORE_API Monitor : public ServiceFacade<MonitorService>
 	{
 	public:
 
@@ -31,13 +33,41 @@ namespace Ck
 			/**
 			 * \brief The monitor is vertical on the right
 			 */
-			RightPortait,
+			RightPortrait,
 
 			/**
 			 * \brief The monitor is vertical on the left
 			 */
-			LeftPortait
+			LeftPortrait
 		};
+
+	    /**
+         * \brief Get the primary monitor of the system
+         * On Windows, the primary monitor is the one where is the start button
+         * On Linux, the primary monitor is usually chosen by the window manager
+         * \return The primary monitor
+         */
+	    static Monitor* GetPrimaryMonitor();
+
+	    /**
+         * \brief
+         * \return
+         */
+	    static unsigned int GetMonitorCount();
+
+	    /**
+         * \brief
+         * \param index
+         * \return
+         */
+	    static Monitor* GetMonitor(unsigned int index);
+
+	    /**
+         * \brief
+         * \param window
+         * \return
+         */
+	    static Monitor* GetWindowMonitor(const Window& window);
 
 		/**
 		 * \brief 

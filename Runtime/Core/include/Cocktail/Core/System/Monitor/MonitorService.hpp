@@ -1,13 +1,10 @@
 #ifndef COCKTAIL_CORE_SYSTEM_MONITOR_MONITORSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_MONITOR_MONITORSERVICE_HPP
 
-#include <memory>
-
-#include <Cocktail/Core/System/Monitor/Monitor.hpp>
-
 namespace Ck
 {
-	class Window;
+	class Monitor;
+    class Window;
 
 	/**
 	 * \brief 

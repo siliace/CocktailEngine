@@ -1,7 +1,6 @@
+#include <Cocktail/Core/String.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Monitor/Win32/Monitor.hpp>
-
-#include "Cocktail/Core/String.hpp"
 
 namespace Ck::Detail::Win32
 {
@@ -53,9 +52,9 @@ namespace Ck::Detail::Win32
 		switch (devMode.dmDisplayOrientation)
 		{
 		case DMDO_DEFAULT: return Orientation::Landscape;
-		case DMDO_90: return Orientation::RightPortait;
+		case DMDO_90: return Orientation::RightPortrait;
 		case DMDO_180: return Orientation::UpsideDownLandscape;
-		case DMDO_270: return Orientation::LeftPortait;
+		case DMDO_270: return Orientation::LeftPortrait;
 		}
 
 		COCKTAIL_UNREACHABLE();
