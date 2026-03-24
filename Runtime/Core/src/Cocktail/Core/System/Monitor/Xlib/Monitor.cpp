@@ -50,9 +50,9 @@ namespace Ck::Detail::Xlib
 			switch (rotation)
 			{
 			case RR_Rotate_0: return Monitor::Orientation::Landscape;
-			case RR_Rotate_90: return Monitor::Orientation::RightPortait;
+			case RR_Rotate_90: return Monitor::Orientation::RightPortrait;
 			case RR_Rotate_180: return Monitor::Orientation::UpsideDownLandscape;
-			case RR_Rotate_270: return Monitor::Orientation::LeftPortait;
+			case RR_Rotate_270: return Monitor::Orientation::LeftPortrait;
 			}
 
 			COCKTAIL_UNREACHABLE();

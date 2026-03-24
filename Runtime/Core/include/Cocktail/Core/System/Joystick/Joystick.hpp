@@ -16,7 +16,7 @@ namespace Ck
     /**
      * \brief
      */
-    class Joystick : public ServiceFacade<JoystickManager>
+    class COCKTAIL_CORE_API Joystick : public ServiceFacade<JoystickManager>
     {
     public:
 

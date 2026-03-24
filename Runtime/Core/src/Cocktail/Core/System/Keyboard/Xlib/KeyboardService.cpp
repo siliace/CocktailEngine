@@ -1,3 +1,4 @@
+#include <Cocktail/Core/StaticArray.hpp>
 #include <Cocktail/Core/System/Keyboard/Xlib/KeyboardService.hpp>
 
 namespace Ck::Detail::Xlib
