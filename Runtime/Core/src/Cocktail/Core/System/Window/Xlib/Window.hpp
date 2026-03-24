@@ -71,13 +71,13 @@ namespace Ck::Detail::Xlib
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Cursor> GetCursor() const override;
+		Cursor* GetCursor() const override;
 
 		/**
 		 * \brief 
 		 * \param cursor 
 		 */
-		void SetCursor(std::shared_ptr<Cursor> cursor) override;
+		void SetCursor(Cursor* cursor) override;
 
 		bool IsCursorVisible() const override;
 
@@ -221,7 +221,7 @@ namespace Ck::Detail::Xlib
 		};
 
 		Handle mHandle;
-		std::shared_ptr<Cursor> mCursor;
+		Cursor* mCursor;
 		Extent2D<int> mCursorPosition;
 		::Cursor mHiddenCursor;
 		bool mMapped;

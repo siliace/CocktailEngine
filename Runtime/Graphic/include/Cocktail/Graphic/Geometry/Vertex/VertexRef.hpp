@@ -120,19 +120,49 @@ namespace Ck
 		 * \param dataType 
 		 * \param elementCount 
 		 */
-		void Set(VertexAttributeSemantic semantic, const void* value, DataType dataType, unsigned int elementCount);
+	    void Set(VertexAttributeSemantic semantic, const void* value, DataType dataType, unsigned int elementCount);
+
+	    /**
+         * \brief
+         *
+         * \tparam T
+         *
+         * \param semantic
+         * \param vector
+         */
+	    template <typename T>
+        void SetVector(VertexAttributeSemantic semantic, const Vector2<T>& vector)
+	    {
+	        Set<T>(semantic, static_cast<const T*>(vector), 2);
+	    }
 
 		/**
 		 * \brief
+		 *
 		 * \tparam T
+		 *
 		 * \param semantic
 		 * \param vector
 		 */
-		template <template <class> typename TVector, typename T, std::size_t S>
-		void SetVector(VertexAttributeSemantic semantic, const Vector<TVector, T, S>& vector)
+		template <typename T>
+		void SetVector(VertexAttributeSemantic semantic, const Vector3<T>& vector)
 		{
-			Set<T>(semantic, static_cast<const T*>(vector), S);
+			Set<T>(semantic, static_cast<const T*>(vector), 3);
 		}
+
+	    /**
+         * \brief
+         *
+         * \tparam T
+         *
+         * \param semantic
+         * \param vector
+         */
+	    template <typename T>
+        void SetVector(VertexAttributeSemantic semantic, const Vector4<T>& vector)
+	    {
+	        Set<T>(semantic, static_cast<const T*>(vector), 4);
+	    }
 
 		/**
 		 * \brief

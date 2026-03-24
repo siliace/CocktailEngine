@@ -219,6 +219,8 @@ namespace Ck::Detail::Xlib
     }
 
     Window::Window(::Display* display, const WindowCreateInfo& createInfo) :
+        mHandle(),
+        mCursor(nullptr),
         mHiddenCursor(0),
         mMapped(false)
     {
@@ -584,15 +586,15 @@ namespace Ck::Detail::Xlib
         }
     }
 
-    std::shared_ptr<Cursor> Window::GetCursor() const
+    Cursor* Window::GetCursor() const
     {
         return mCursor;
     }
 
-    void Window::SetCursor(std::shared_ptr<Cursor> cursor)
+    void Window::SetCursor(Cursor* cursor)
     {
-        mCursor = std::move(cursor);
-        XDefineCursor(mHandle.Display, mHandle.Window, (::Cursor) mCursor->GetSystemHandle());
+        mCursor = cursor;
+        XDefineCursor(mHandle.Display, mHandle.Window, (::Cursor)mCursor->GetSystemHandle());
     }
 
     bool Window::IsCursorVisible() const

@@ -19,7 +19,7 @@ using namespace Ck;
 Main::ExitCode ApplicationMain(Application* application)
 {
 	Extent2D windowSize = MakeExtent(800u, 600u);
-	std::shared_ptr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
+	UniquePtr<Window> window = application->Invoke([&](WindowFactory* windowFactory)
 	{
 		WindowCreateInfo windowCreateInfo;
 		windowCreateInfo.Size = windowSize;
@@ -51,7 +51,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
 	Vector2<float> zBounds(0.1f, 1000.f);
     Rectangle<float> viewportArea(0.f, 0.f, 1.f, 1.f);
-	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, Angle<float>::Degree(45.f), aspectRatio, zBounds);
+	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, CK_TEXT("MainCamera"), Angle<float>::Degree(45.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 0.f, 10.f));
     FreeFlyCameraViewController cameraController(camera);
 
@@ -105,7 +105,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window, viewerParameters, true);
+	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
 
     UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.get(), camera);
 	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
@@ -113,8 +113,7 @@ Main::ExitCode ApplicationMain(Application* application)
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
-	    viewportArea.Extent = event.Size;
-	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
+	    camera->SetAspectRatio(static_cast<float>(event.Size.Width) / static_cast<float>(event.Size.Height));
 	});
 
 	Duration lastFrameBegin = application->Uptime();

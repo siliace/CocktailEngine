@@ -53,9 +53,10 @@ Main::ExitCode ApplicationMain(Application* application)
 	Vector3<float> lightDirection = Vector3<float>::Normalize(Vector3<float>::Down() - Vector3<float>::Right());
 	DirectionalLight* directionalLight = DirectionalLight::Create(scene, CK_TEXT("SunLight"), lightDirection, LinearColor::White);
 
+    float aspectRatio = static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height);
     Vector2<float> zBounds(0.1f, 4500.f);
     Rectangle<float> viewportArea(0.f, 0.f, 1.f, 1.f);
-	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, CK_TEXT("MainCamera"), Angle<float>::Degree(60.f), windowSize.GetRatio(), zBounds);
+	PerspectiveCamera* camera = PerspectiveCamera::Create(scene, CK_TEXT("MainCamera"), Angle<float>::Degree(60.f), aspectRatio, zBounds);
 	camera->SetPosition(Vector3<float>(0.f, 3.f, 0.f));
 	FreeFlyCameraViewController cameraController(camera);
 
@@ -116,8 +117,7 @@ Main::ExitCode ApplicationMain(Application* application)
 
 	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
 	{
-        viewportArea.Extent = event.Size;
-	    camera->SetAspectRatio(viewportArea.Extent.GetRatio());
+	    camera->SetAspectRatio(static_cast<float>(event.Size.Width) / static_cast<float>(event.Size.Height));
 	});
 
     ImUi::WindowContainer windowContainer(window.Get(), graphicEngine->GetRenderDevice());
