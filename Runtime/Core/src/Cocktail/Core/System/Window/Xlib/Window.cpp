@@ -494,18 +494,29 @@ namespace Ck::Detail::Xlib
 
                         if (event.Pressed)
                         {
-                            TextChar buffer[Encoders::Text::MaxCodepointEncodingLength];
+                            char buffer[64];
 
                             KeySym keysym;
                             int status = 0;
-                            int length = Xutf8LookupString(mHandle.InputContext, &xEvent.xkey, reinterpret_cast<char*>(&buffer[0]), Encoders::Text::MaxCodepointEncodingLength, &keysym, &status);
-                            if (status == XLookupChars || status == XLookupBoth)
+                            int length = Xutf8LookupString(mHandle.InputContext, &xEvent.xkey, buffer, 64, &keysym, &status);
+                            if ((status == XLookupChars || status == XLookupBoth) && length > 0)
                             {
                                 WindowTextEvent textEvent;
                                 textEvent.Window = this;
-                                textEvent.Unicode = Encoders::MakeCodePoint<Encoders::Text>(buffer, length);
 
-                                mOnTextEvent.Emit(textEvent);
+                                for (unsigned int i = 0; i < length;)
+                                {
+                                    Utf32Char codepoint;
+                                    unsigned int decoded = Encoders::Text::Decode(static_cast<const Utf8Char*>(buffer) + i, length - i, codepoint);
+                                    if (decoded == 0)
+                                        ExceptionUtils::ThrowCodepointDecodingException(i);
+
+                                    i += decoded;
+
+                                    textEvent.Codepoint = codepoint;
+
+                                    mOnTextEvent.Emit(textEvent);
+                                }
                             }
                         }
                     });

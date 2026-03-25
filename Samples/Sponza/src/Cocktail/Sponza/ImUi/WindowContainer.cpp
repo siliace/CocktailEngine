@@ -234,7 +234,7 @@ namespace Ck::ImUi
         });
 
         Connect(mNativeWindow->OnTextEvent(), [&](const WindowTextEvent& event) {
-            io.AddInputCharacter(event.Unicode);
+            io.AddInputCharacter(event.Codepoint);
         });
     }
 

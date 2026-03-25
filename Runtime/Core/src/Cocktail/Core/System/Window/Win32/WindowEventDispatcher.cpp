@@ -122,11 +122,37 @@ namespace Ck::Detail::Win32
 
 		case WM_CHAR:
 			{
-				WindowTextEvent event;
-				event.Window = window;
-				event.Unicode = wParam;
+                Optional<Utf32Char> codepoint;
+                WildChar c = static_cast<WildChar>(wParam);
+                if (Encoders::Utf16::IsHighSurrogate(c))
+                {
+                    mPendingHighSurrogate = c; 
+                }
+			    else
+			    {
+                    if (Encoders::Utf16::IsLowSurrogate(c))
+                    {
+                        if (mPendingHighSurrogate != 0)
+                        {
+                            WildChar chars[] = { mPendingHighSurrogate, c };
+                            codepoint = Optional<Utf32Char>::Of(Encoders::MakeCodePoint<Encoders::Text>(chars, 2));
+                        }
+                    }
+                    else
+                    {
+                        codepoint = Optional<Utf32Char>::Of(c);
+                    }
 
-				window->OnTextEvent().Emit(event);
+			        mPendingHighSurrogate = 0;
+			    }
+
+				codepoint.Then([window](Utf32Char codepoint) {
+                    WindowTextEvent event;
+                    event.Window = window;
+                    event.Codepoint = codepoint;
+
+                    window->OnTextEvent().Emit(event);
+                });
 			}
 			break;
 

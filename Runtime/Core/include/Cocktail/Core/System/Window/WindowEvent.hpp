@@ -58,6 +58,18 @@ namespace Ck
          */
         Extent2D<int> Position;
     };
+
+    struct WindowResizeStartEvent : WindowEvent
+    {
+    };
+
+    struct WindowResizingEvent : public WindowEvent
+    {
+        /**
+         * \brief
+         */
+        Extent2D<unsigned int> Size;
+    };
     
     /**
      * \brief
@@ -83,7 +95,7 @@ namespace Ck
 	    /**
          * \brief UTF-32 Unicode value of the character
          */
-        Uint32 Unicode = 0;
+        Utf32Char Codepoint = 0;
     };
 
     /**

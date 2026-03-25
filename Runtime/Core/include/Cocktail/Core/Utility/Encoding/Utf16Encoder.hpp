@@ -41,11 +41,43 @@ namespace Ck
         static constexpr bool SupportSurrogate = true;
 
         /**
-         * \brief Maximum number of bytes required to encode a single code point.
+         * \brief Maximum number of UTF16 code units required to encode a single code point.
          *
          * For UTF-16, each code point can be encoded using up to 2 characters
          */
         static constexpr SizeType MaxCodepointEncodingLength = 2;
+
+        /**
+         * \brief Checks whether a UTF-16 code unit is a high surrogate
+         *
+         * A high surrogate is a UTF-16 code unit in the range [0xD800, 0xDBFF].
+         * It must be followed by a valid low surrogate to form a complete
+         * supplementary Unicode code point.
+         *
+         * \param c The UTF-16 code unit to test
+         *
+         * \return True if \p c is a high surrogate, false otherwise
+         */
+        static constexpr bool IsHighSurrogate(CharType c)
+        {
+            return c >= 0xD800 && c <= 0xDBFF;
+        }
+
+        /**
+         * \brief Checks whether a UTF-16 code unit is a low surrogate
+         *
+         * A low surrogate is a UTF-16 code unit in the range [0xDC00, 0xDFFF].
+         * It must follow a valid high surrogate to form a complete
+         * supplementary Unicode code point.
+         *
+         * \param c The UTF-16 code unit to test
+         *
+         * \return True if \p c is a low surrogate, false otherwise
+         */
+        static constexpr bool IsLowSurrogate(CharType c)
+        {
+            return c >= 0xDC00 && c <= 0xDFFF;
+        }
 
         /**
          * \brief Determines the number of bytes required to represent the first UTF-16 character in a string
@@ -60,13 +92,13 @@ namespace Ck
         static SizeType GetCharCount(const CharType* string)
         {
             CharType w1 = string[0];
-            if (w1 >= 0xDC00 && w1 <= 0xDFFF)
+            if (IsLowSurrogate(w1))
                 return 0;
 
-            if (w1 >= 0xD800 && w1 <= 0xDBFF)
+            if (IsHighSurrogate(w1))
             {
                 CharType w2 = string[1];
-                if (w2 < 0xDC00 || w2 > 0xDFFF)
+                if (!IsLowSurrogate(w2))
                     return 0;
 
                 return 2;
@@ -140,7 +172,7 @@ namespace Ck
          *
          * \return The number of bytes written to \p out, or 0 if the input is invalid
          */
-        static unsigned int Encode(Utf32Char in, CharType* out)
+        static SizeType Encode(Utf32Char in, CharType* out)
         {
             if (in <= 0xFFFF)
             {
