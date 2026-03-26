@@ -115,8 +115,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
 	viewer->AttachViewport(std::move(viewport));
 
-	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event)
-	{
+	application->Connect(window->OnResizedEvent(), [&](WindowResizedEvent event) {
 	    camera->SetAspectRatio(static_cast<float>(event.Size.Width) / static_cast<float>(event.Size.Height));
 	});
 

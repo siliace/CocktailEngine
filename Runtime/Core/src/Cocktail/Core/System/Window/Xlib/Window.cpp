@@ -408,6 +408,16 @@ namespace Ck::Detail::Xlib
 
                     if (size != mLastSize)
                     {
+                        if (!mResizing)
+                        {
+                            mResizing = true;
+
+                            WindowResizingBeginEvent event;
+                            event.Window = this;
+
+                            mOnResizingBegin.Emit(event);
+                        }
+
                         WindowResizedEvent event;
                         event.Window = this;
                         event.Size = size;

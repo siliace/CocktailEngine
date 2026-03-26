@@ -59,16 +59,20 @@ namespace Ck
         Extent2D<int> Position;
     };
 
-    struct WindowResizeStartEvent : WindowEvent
+    struct WindowResizingStartEvent : WindowEvent
     {
     };
 
-    struct WindowResizingEvent : public WindowEvent
+    struct WindowResizingEvent : WindowEvent
     {
         /**
          * \brief
          */
         Extent2D<unsigned int> Size;
+    };
+
+    struct WindowResizingEndEvent : WindowEvent
+    {
     };
     
     /**

@@ -184,13 +184,19 @@ namespace Ck
          * \brief
          * \return
          */
-        virtual Signal<WindowResizeStartEvent>& OnResizeStartEvent() = 0;
+        virtual Signal<WindowResizingStartEvent>& OnResizingStartEvent() = 0;
 
         /**
          * \brief
          * \return
          */
         virtual Signal<WindowResizingEvent>& OnResizingEvent() = 0;
+
+        /**
+         * \brief
+         * \return
+         */
+        virtual Signal<WindowResizingEndEvent>& OnResizingEndEvent() = 0;
         
         /**
          * \brief
