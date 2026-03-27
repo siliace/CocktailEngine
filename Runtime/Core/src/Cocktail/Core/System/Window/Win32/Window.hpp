@@ -162,7 +162,9 @@ namespace Ck::Detail::Win32
 		Signal<WindowRedrawEvent>& OnRedrawEvent() override;
 		Signal<WindowFocusEvent>& OnFocusEvent() override;
 		Signal<WindowMovedEvent>& OnMovedEvent() override;
-		Signal<WindowResizedEvent>& OnResizedEvent() override;
+        Signal<WindowResizeStartEvent>& OnResizeStartEvent() override;
+        Signal<WindowResizingEvent>& OnResizingEvent() override;
+        Signal<WindowResizedEvent>& OnResizedEvent() override;
 		Signal<WindowTextEvent>& OnTextEvent() override;
 		Signal<WindowKeyboardEvent>& OnKeyboardEvent() override;
 		Signal<WindowMouseMoveEvent>& OnMouseMovedEvent() override;
@@ -183,6 +185,8 @@ namespace Ck::Detail::Win32
 		Signal<WindowRedrawEvent> mOnRedraw;
 		Signal<WindowFocusEvent> mOnFocus;
 		Signal<WindowMovedEvent> mOnMoved;
+        Signal<WindowResizeStartEvent> mOnResizeStartEvent;
+        Signal<WindowResizingEvent> mOnResizingEvent;
 		Signal<WindowResizedEvent> mOnResized;
 		Signal<WindowTextEvent> mOnTextEvent;
 		Signal<WindowKeyboardEvent> mOnKeyboard;

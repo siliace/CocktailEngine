@@ -179,6 +179,18 @@ namespace Ck
          * \return
          */
         virtual Signal<WindowMovedEvent>& OnMovedEvent() = 0;
+
+        /**
+         * \brief
+         * \return
+         */
+        virtual Signal<WindowResizeStartEvent>& OnResizeStartEvent() = 0;
+
+        /**
+         * \brief
+         * \return
+         */
+        virtual Signal<WindowResizingEvent>& OnResizingEvent() = 0;
         
         /**
          * \brief

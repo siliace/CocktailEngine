@@ -352,6 +352,16 @@ namespace Ck::Detail::Win32
 		return mOnMoved;
 	}
 
+    Signal<WindowResizeStartEvent>& Window::OnResizeStartEvent()
+    {
+        return mOnResizeStartEvent;
+    }
+
+    Signal<WindowResizingEvent>& Window::OnResizingEvent()
+    {
+        return mOnResizingEvent;
+    }
+
 	Signal<WindowResizedEvent>& Window::OnResizedEvent()
 	{
 		return mOnResized;
