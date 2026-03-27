@@ -101,6 +101,7 @@ namespace Ck::Detail::Win32
 			return event;
 		}
 
+		mutable bool mResizing = false; /// TODO: this should be per window !
 		mutable WildChar mPendingHighSurrogate = 0; /// TODO: this should be per window !
 		mutable Extent2D<int> mMousePosition; /// TODO: this should be per window !
 	};

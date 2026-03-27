@@ -222,7 +222,8 @@ namespace Ck::Detail::Xlib
         mHandle(),
         mCursor(nullptr),
         mHiddenCursor(0),
-        mMapped(false)
+        mMapped(false),
+        mResizing(false)
     {
         mHandle.Display = display;
 
@@ -349,7 +350,8 @@ namespace Ck::Detail::Xlib
                 case ClientMessage:
                 {
                     AtomManager* atomManager = App::Resolve<AtomManager>();
-                    if (xEvent.xclient.message_type == atomManager->GetAtom(CK_TEXT("WM_PROTOCOLS")))
+                    static const Atom wmProtocolsAtom = atomManager->GetAtom(CK_TEXT("WM_PROTOCOLS"), false);
+                    if (xEvent.xclient.message_type == wmProtocolsAtom)
                     {
                         static const Atom wmDeleteWindow = atomManager->GetAtom(CK_TEXT("WM_DELETE_WINDOW"));
                         static const Atom netWmPing = atomManager->GetAtom(CK_TEXT("_NET_WM_PING"), false);
@@ -408,12 +410,40 @@ namespace Ck::Detail::Xlib
 
                     if (size != mLastSize)
                     {
-                        WindowResizedEvent event;
-                        event.Window = this;
-                        event.Size = size;
-                        event.DisplayMode = WindowDisplayMode::Normal;
+                        if (!mPendingResize.IsEmpty() && mPendingResize.Get() == size)
+                        {
+                            WindowResizedEvent mOnResizedEvent;
+                            mOnResizedEvent.Window = this;
+                            mOnResizedEvent.Size = size;
+                            mOnResizedEvent.DisplayMode = WindowDisplayMode::Normal;
+                            mOnResized.Emit(mOnResizedEvent);
 
-                        mOnResized.Emit(event);
+                            mPendingResize = Optional<Extent2D<unsigned int>>::Empty();
+                        }
+                        else
+                        {
+                            if (!mResizing)
+                            {
+                                WindowResizingStartEvent resizingStartEvent;
+                                resizingStartEvent.Window = this;
+                                mOnResizingStart.Emit(resizingStartEvent);
+
+                                mResizing = true;
+                            }
+
+                            WindowResizingEvent resizingEvent;
+                            resizingEvent.Window = this;
+                            resizingEvent.Size = size;
+                            mOnResizing.Emit(resizingEvent);
+
+                            WindowResizedEvent mOnResizedEvent;
+                            mOnResizedEvent.Window = this;
+                            mOnResizedEvent.Size = size;
+                            mOnResizedEvent.DisplayMode = WindowDisplayMode::Normal;
+                            mOnResized.Emit(mOnResizedEvent);
+
+                            mLastSizeEvent = Optional<Instant>::Of(Instant::Now());
+                        }
 
                         mLastSize = size;
                     }
@@ -507,7 +537,7 @@ namespace Ck::Detail::Xlib
                                 for (unsigned int i = 0; i < length;)
                                 {
                                     Utf32Char codepoint;
-                                    unsigned int decoded = Encoders::Text::Decode(static_cast<const Utf8Char*>(buffer) + i, length - i, codepoint);
+                                    unsigned int decoded = Encoders::Text::Decode(reinterpret_cast<const Utf8Char*>(buffer) + i, length - i, codepoint);
                                     if (decoded == 0)
                                         ExceptionUtils::ThrowCodepointDecodingException(i);
 
@@ -537,6 +567,13 @@ namespace Ck::Detail::Xlib
                 }
                 break;
             }
+        }
+
+        if (!mLastSizeEvent.IsEmpty() && Duration::Between(Instant::Now(), mLastSizeEvent.Get()) > Duration::Seconds(1))
+        {
+            WindowResizingEndEvent resizingEndEvent;
+            resizingEndEvent.Window = this;
+            mOnResizingEnd.Emit(resizingEndEvent);
         }
 
         return !closeRequested;
@@ -663,6 +700,7 @@ namespace Ck::Detail::Xlib
     void Window::SetSize(const Extent2D<unsigned int>& size)
     {
         XResizeWindow(mHandle.Display, mHandle.Window, size.Width, size.Height);
+        mPendingResize = Optional<Extent2D<unsigned int>>::Of(size);
         XFlush(mHandle.Display);
     }
 
@@ -745,6 +783,21 @@ namespace Ck::Detail::Xlib
     Signal<WindowMovedEvent>& Window::OnMovedEvent()
     {
         return mOnMoved;
+    }
+
+    Signal<WindowResizingStartEvent>& Window::OnResizingStartEvent()
+    {
+        return mOnResizingStart;
+    }
+
+    Signal<WindowResizingEvent>& Window::OnResizingEvent()
+    {
+        return mOnResizing;
+    }
+
+    Signal<WindowResizingEndEvent>& Window::OnResizingEndEvent()
+    {
+        return mOnResizingEnd;
     }
 
     Signal<WindowResizedEvent>& Window::OnResizedEvent()
