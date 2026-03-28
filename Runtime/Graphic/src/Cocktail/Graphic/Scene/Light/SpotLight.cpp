@@ -8,16 +8,16 @@ namespace Ck
     SpotLight* SpotLight::Create(std::shared_ptr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position, float intensity)
     {
         Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
-        std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode(transformation);
+        TransformationNode* transformationNode = scene->CreateTransformationNode(transformation);
 
-        UniquePtr<SpotLight> spotLight = MakeUnique<SpotLight>(std::move(transformationNode), std::move(name), range, color, intensity);
+        UniquePtr<SpotLight> spotLight = MakeUnique<SpotLight>(transformationNode, std::move(name), range, color, intensity);
         SpotLight* spotLightPtr = spotLight.Get();
         scene->AddLight(std::move(spotLight));
 
         return spotLightPtr;
     }
 
-    SpotLight::SpotLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity) :
+    SpotLight::SpotLight(TransformationNode* transformationNode, String name, float range, LinearColor color, float intensity) :
         PositionalLight(transformationNode, std::move(name), range, color, intensity),
         mInnerCutoff(Angle<float>::Degree(15.f)),
         mOuterCutoff(Angle<float>::Degree(30.f))

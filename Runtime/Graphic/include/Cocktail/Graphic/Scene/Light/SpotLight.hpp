@@ -29,7 +29,7 @@ namespace Ck
          * \param color
          * \param intensity
          */
-        SpotLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity = 100.f);
+        SpotLight(TransformationNode* transformationNode, String name, float range, LinearColor color, float intensity = 100.f);
 
         /**
          * \brief

@@ -17,7 +17,7 @@ namespace Ck
 		/**
 		 * \brief
 		 */
-		SceneGraph(Scene* scene, std::shared_ptr<TransformationNode> rootTransformationNode);
+		SceneGraph(Scene* scene, TransformationNode* rootTransformationNode);
 
 	private:
 

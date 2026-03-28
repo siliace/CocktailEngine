@@ -53,8 +53,7 @@ namespace Ck
 		 */
 		~AcyclicGraph()
 		{
-			mRoot = nullptr;
-			mNodePool.Clear();
+		    Detach();
 		}
 
 		/**
@@ -64,14 +63,22 @@ namespace Ck
 		 * \return 
 		 */
 		template <typename... Args>
-		std::shared_ptr<T> CreateNode(Args&&... args)
+		T* CreateNode(Args&&... args)
 		{
-			return mNodePool.Allocate(std::forward<Args>(args)...);
+			NodePtr node = mNodePool.AllocateUnique(std::forward<Args>(args)...);
+		    T* nodePtr = node.Get();
+
+		    mNodes.Add(std::move(node));
+
+		    return nodePtr;
 		}
 
 		void Detach()
 		{
-			mRoot = nullptr;
+		    mRoot = nullptr;
+
+		    mNodes.Clear();
+		    mNodePool.Clear();
 		}
 
 		/**
@@ -89,17 +96,20 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<T> GetRoot() const
+		T* GetRoot() const
 		{
 			return mRoot;
 		}
 
     protected:
 
-		std::shared_ptr<T> mRoot;
+		T* mRoot;
 
 	private:
 
+        using NodePtr = typename ObjectPool<T>::Unique;
+
+        Array<NodePtr> mNodes;
 		ObjectPool<T> mNodePool;
 	};
 
@@ -118,13 +128,13 @@ namespace Ck
 		 * \brief 
 		 * \param child 
 		 */
-		void InsertChild(std::shared_ptr<T> child)
+		void InsertChild(T* child)
 		{
-			if (auto parent = child->GetParent())
+			if (T* parent = child->GetParent())
 				parent->RemoveChild(child);
 
 			child->mParent = static_cast<T*>(this);
-			mChildren.Add(std::move(child));
+			mChildren.Add(child);
 		}
 
 		/**
@@ -132,7 +142,7 @@ namespace Ck
 		 * \param child 
 		 * \return 
 		 */
-		void RemoveChild(const std::shared_ptr<T>& child)
+		void RemoveChild(T* child)
 		{
 			mChildren.Remove(child);
 		}
@@ -146,7 +156,7 @@ namespace Ck
 		void Visit(TCallable callable)
 		{
 			callable(static_cast<T*>(this));
-			for (const std::shared_ptr<T>& child : mChildren)
+			for (const T*& child : mChildren)
 				child->Visit(callable);
 		}
 
@@ -155,7 +165,7 @@ namespace Ck
 			return mParent;
 		}
 
-		const Array<std::shared_ptr<T>>& GetChildren() const
+		const Array<T*>& GetChildren() const
 		{
 			return mChildren;
 		}
@@ -163,7 +173,7 @@ namespace Ck
 	private:
 
 		T* mParent = nullptr;
-		Array<std::shared_ptr<T>> mChildren;
+		Array<T*> mChildren;
 	};
 }
 

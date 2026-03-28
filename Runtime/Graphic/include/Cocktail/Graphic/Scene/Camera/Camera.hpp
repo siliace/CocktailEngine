@@ -58,7 +58,7 @@ namespace Ck
 		 *
 		 * \param transformationNode The transformation node giving the position and rotation of the camera in the world
 		 */
-		Camera(std::shared_ptr<TransformationNode> transformationNode, String name);
+		Camera(TransformationNode* transformationNode, String name);
 
 	private:
 

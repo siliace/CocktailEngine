@@ -42,7 +42,7 @@ Main::ExitCode ApplicationMain(Application* application)
     {
         for (unsigned int j = 0; j < 30; j++)
         {
-            std::shared_ptr<SceneNode> sceneNode = scene->CreateSceneNode();
+            SceneNode* sceneNode = scene->CreateSceneNode();
             sceneNode->SetPosition(Vector3<float>((i - 15.f) * 2.f, (j - 15.f) * 2.f, 0.f));
             sceneNode->AddShape(shape);
         }

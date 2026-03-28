@@ -101,7 +101,7 @@ namespace Ck
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<TransformationNode> GetTransformationNode() const;
+		TransformationNode* GetTransformationNode() const;
 
 	protected:
 
@@ -109,11 +109,11 @@ namespace Ck
 		 * \brief
 		 * \param transformationNode
 		 */
-		explicit Transformable(std::shared_ptr<TransformationNode> transformationNode);
+		explicit Transformable(TransformationNode* transformationNode);
 
 	private:
 
-		std::shared_ptr<TransformationNode> mTransformationNode;
+		TransformationNode* mTransformationNode;
 	};
 }
 

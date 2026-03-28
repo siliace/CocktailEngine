@@ -4,8 +4,8 @@
 
 namespace Ck
 {
-	SceneNode::SceneNode(Scene* scene, std::shared_ptr<TransformationNode> transformationNode) :
-		Transformable(std::move(transformationNode)),
+	SceneNode::SceneNode(Scene* scene, TransformationNode* transformationNode) :
+		Transformable(transformationNode),
 		mScene(scene),
 		mVisible(true)
 	{

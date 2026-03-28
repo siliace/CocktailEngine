@@ -28,8 +28,8 @@ namespace Ck
             {
                 if (DoAccept(sceneNode))
                 {
-                    for (const std::shared_ptr<SceneNode>& childSceneNode : sceneNode->GetChildren())
-                        Accept(childSceneNode.get());
+                    for (SceneNode* child : sceneNode->GetChildren())
+                        Accept(child);
                 }
 
                 AfterAccept(sceneNode);
@@ -54,7 +54,7 @@ namespace Ck
 
         /**
          * \brief
-         * \param transformationGraph
+         * \param graphicEngine
          */
         explicit Scene(std::shared_ptr<GraphicEngine> graphicEngine);
 
@@ -91,13 +91,13 @@ namespace Ck
          * \brief
          * \return
          */
-        std::shared_ptr<SceneNode> CreateSceneNode();
+        SceneNode* CreateSceneNode();
 
         /**
          * \brief
          * \return
          */
-        std::shared_ptr<TransformationNode> CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
+        TransformationNode* CreateTransformationNode(const Transformation& transformation = Transformation::Identity());
 
         /**
          * \brief
@@ -115,7 +115,7 @@ namespace Ck
          * \brief
          * \return
          */
-        Signal<std::shared_ptr<SceneNode>>& OnSceneNodeAdded();
+        Signal<SceneNode*>& OnSceneNodeAdded();
 
         void PerformAction(SceneAction& action) const;
 
@@ -138,7 +138,7 @@ namespace Ck
         Array<UniquePtr<Light>> mLights;
         Signal<Camera*> mOnCameraAdded;
         Signal<Light*> mOnLightAdded;
-        Signal<std::shared_ptr<SceneNode>> mOnSceneNodeAdded;
+        Signal<SceneNode*> mOnSceneNodeAdded;
     };
 }
 

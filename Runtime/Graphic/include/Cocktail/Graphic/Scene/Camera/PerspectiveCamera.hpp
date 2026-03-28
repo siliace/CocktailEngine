@@ -33,7 +33,7 @@ namespace Ck
 		 * \param aspectRatio 
 		 * \param zBounds 
 		 */
-		PerspectiveCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+		PerspectiveCamera(TransformationNode* transformationNode, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
 
 		/**
 		 * \brief 

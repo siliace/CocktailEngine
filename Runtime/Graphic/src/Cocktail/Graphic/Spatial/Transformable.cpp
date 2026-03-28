@@ -21,7 +21,7 @@ namespace Ck
 
     void Transformable::AttachTo(const Transformable& parent)
 	{
-		std::shared_ptr<TransformationNode> transformationNode = parent.GetTransformationNode();
+		TransformationNode* transformationNode = parent.GetTransformationNode();
 		transformationNode->InsertChild(mTransformationNode);
 	}
 
@@ -81,13 +81,13 @@ namespace Ck
 		return mTransformationNode->GetWorldTransformation();
 	}
 
-	std::shared_ptr<TransformationNode> Transformable::GetTransformationNode() const
+	TransformationNode* Transformable::GetTransformationNode() const
 	{
 		return mTransformationNode;
 	}
 
-	Transformable::Transformable(std::shared_ptr<TransformationNode> transformationNode):
-		mTransformationNode(std::move(transformationNode))
+	Transformable::Transformable(TransformationNode* transformationNode):
+		mTransformationNode(transformationNode)
 	{
 		assert(mTransformationNode);
 	}

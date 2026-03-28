@@ -32,7 +32,7 @@ namespace Ck
 		 * \param area 
 		 * \param zBounds 
 		 */
-		OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds);
+		OrthographicCamera(TransformationNode* transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds);
 
         /**
          * \brief

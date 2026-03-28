@@ -46,7 +46,7 @@ Main::ExitCode ApplicationMain(Application* application)
 	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
 
-	std::shared_ptr<SceneNode> sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
+	SceneNode* sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
 		return sceneLoader->LoadFromPath(CK_TEXT("./resources/Models/Sponza/Sponza.gltf"), {})->AddToScene(*scene);
 	});
 

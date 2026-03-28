@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	SceneGraph::SceneGraph(Scene* scene, std::shared_ptr<TransformationNode> rootTransformationNode) :
+	SceneGraph::SceneGraph(Scene* scene, TransformationNode* rootTransformationNode) :
 		mScene(scene)
 	{
 		mRoot = CreateNode(mScene, std::move(rootTransformationNode));

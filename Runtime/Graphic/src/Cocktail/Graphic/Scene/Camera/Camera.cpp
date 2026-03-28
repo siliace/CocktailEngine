@@ -12,8 +12,8 @@ namespace Ck
         return mName;
     }
 
-    Camera::Camera(std::shared_ptr<TransformationNode> transformationNode, String name) :
-		Transformable(std::move(transformationNode)),
+    Camera::Camera(TransformationNode* transformationNode, String name) :
+		Transformable(transformationNode),
         mName(std::move(name))
 	{
 		/// Nothing

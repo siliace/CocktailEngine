@@ -41,7 +41,7 @@ namespace Ck
 		 * \param scene 
 		 * \return 
 		 */
-		std::shared_ptr<SceneNode> AddToScene(Scene& scene);
+		SceneNode* AddToScene(Scene& scene);
 
 	protected:
 
@@ -108,7 +108,7 @@ namespace Ck
 		 * \param materials 
 		 * \return 
 		 */
-		std::shared_ptr<SceneNode> ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials);
+		SceneNode* ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials);
 	};
 }
 

@@ -74,8 +74,8 @@ namespace Ck
         });
     }
 
-    PositionalLight::PositionalLight(std::shared_ptr<TransformationNode> transformationNode, String name, float range, LinearColor color, float intensity) :
-        Transformable(std::move(transformationNode)),
+    PositionalLight::PositionalLight(TransformationNode* transformationNode, String name, float range, LinearColor color, float intensity) :
+        Transformable(transformationNode),
         Light(std::move(name), color, intensity),
         mRange(range),
         mLinearAttenuationCurve(DefaultLinearAttenuationCurve),

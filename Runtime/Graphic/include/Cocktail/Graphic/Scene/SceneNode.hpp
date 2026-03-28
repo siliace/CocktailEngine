@@ -21,7 +21,7 @@ namespace Ck
 		 * \brief 
 		 * \param transformationNode 
 		 */
-		SceneNode(Scene* scene, std::shared_ptr<TransformationNode> transformationNode);
+		SceneNode(Scene* scene, TransformationNode* transformationNode);
 
 		/**
 		 * \brief 

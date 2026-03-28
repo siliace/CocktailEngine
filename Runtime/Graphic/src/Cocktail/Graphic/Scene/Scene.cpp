@@ -45,10 +45,10 @@ namespace Ck
 		});
 	}
 
-	std::shared_ptr<SceneNode> Scene::CreateSceneNode()
+	SceneNode* Scene::CreateSceneNode()
 	{
-		std::shared_ptr<TransformationNode> transformationNode = CreateTransformationNode();
-		std::shared_ptr<SceneNode> sceneNode = mSceneGraph->CreateNode(this, std::move(transformationNode));
+		TransformationNode* transformationNode = CreateTransformationNode();
+		SceneNode* sceneNode = mSceneGraph->CreateNode(this, transformationNode);
 
 		mSceneGraph->GetRoot()->InsertChild(sceneNode);
 
@@ -57,10 +57,10 @@ namespace Ck
 		return sceneNode;
 	}
 
-	std::shared_ptr<TransformationNode> Scene::CreateTransformationNode(const Transformation& transformation)
+	TransformationNode* Scene::CreateTransformationNode(const Transformation& transformation)
 	{
-		std::shared_ptr<TransformationNode> transformationNode = mTransformationGraph->CreateNode(transformation);
-		std::shared_ptr<TransformationNode> rootTransformation = mTransformationGraph->GetRoot();
+		TransformationNode* transformationNode = mTransformationGraph->CreateNode(transformation);
+		TransformationNode* rootTransformation = mTransformationGraph->GetRoot();
 		rootTransformation->InsertChild(transformationNode);
 
 		return transformationNode;
@@ -76,14 +76,14 @@ namespace Ck
 		return mOnLightAdded;
 	}
 
-	Signal<std::shared_ptr<SceneNode>>& Scene::OnSceneNodeAdded()
+	Signal<SceneNode*>& Scene::OnSceneNodeAdded()
 	{
 		return mOnSceneNodeAdded;
 	}
 
     void Scene::PerformAction(SceneAction& action) const
     {
-        action.Accept(mSceneGraph->GetRoot().get());
+        action.Accept(mSceneGraph->GetRoot());
     }
 
     const Array<UniquePtr<Camera>>& Scene::GetCameras() const

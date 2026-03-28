@@ -22,6 +22,8 @@ namespace Ck
         {
             return node->IsVisible();
         }
+        
+    protected:
 
         bool DoAccept(SceneNode* sceneNode) override
         {
@@ -50,11 +52,6 @@ namespace Ck
 
             mRenderables.Add(sceneNode);
             return true;
-        }
-
-        const Array<Renderable*>& GetRenderables() const
-        {
-            return mRenderables;
         }
 
     private:

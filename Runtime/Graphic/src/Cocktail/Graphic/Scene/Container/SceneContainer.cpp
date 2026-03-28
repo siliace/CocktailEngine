@@ -10,7 +10,7 @@ namespace Ck
 		return mCameras;
 	}
 
-	std::shared_ptr<SceneNode> SceneContainer::AddToScene(Scene& scene)
+	SceneNode* SceneContainer::AddToScene(Scene& scene)
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
@@ -65,7 +65,7 @@ namespace Ck
 			meshes.Add(std::move(mesh));
 		}
 
-		std::shared_ptr<SceneNode> sceneNode = ProcessNode(scene, nullptr, mRoot, meshes, materials);
+		SceneNode* sceneNode = ProcessNode(scene, nullptr, mRoot, meshes, materials);
 		graphicEngine->FlushTransfer();
 
 		return sceneNode;
@@ -88,9 +88,9 @@ namespace Ck
 		return material;
 	}
 
-	std::shared_ptr<SceneNode> SceneContainer::ProcessNode(Scene& scene, std::shared_ptr<SceneNode> parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials)
+	SceneNode* SceneContainer::ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials)
 	{
-		std::shared_ptr<SceneNode> sceneNode = scene.CreateSceneNode();
+		SceneNode* sceneNode = scene.CreateSceneNode();
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
 		if (parent)

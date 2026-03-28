@@ -1,22 +1,21 @@
 #include <Cocktail/Graphic/Scene/Camera/OrhtographicCamera.hpp>
 #include <Cocktail/Graphic/Scene/Scene.hpp>
-#include <utility>
 
 namespace Ck
 {
 	OrthographicCamera* OrthographicCamera::Create(std::shared_ptr<Scene> scene, String name, const Rectangle<float>& area, Vector2<float> zBounds)
 	{
-		std::shared_ptr<TransformationNode> transformationNode = scene->CreateTransformationNode();
+		TransformationNode* transformationNode = scene->CreateTransformationNode();
 
-		UniquePtr<OrthographicCamera> camera = MakeUnique<OrthographicCamera>(std::move(transformationNode), std::move(name), area, zBounds);
+		UniquePtr<OrthographicCamera> camera = MakeUnique<OrthographicCamera>(transformationNode, std::move(name), area, zBounds);
 		OrthographicCamera* cameraPtr = camera.Get();
 		scene->AddCamera(std::move(camera));
 
 		return cameraPtr;
 	}
 
-	OrthographicCamera::OrthographicCamera(std::shared_ptr<TransformationNode> transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds) :
-		Camera(std::move(transformationNode), std::move(name)),
+	OrthographicCamera::OrthographicCamera(TransformationNode* transformationNode, String name, Rectangle<float> area, Vector2<float> zBounds) :
+		Camera(transformationNode, std::move(name)),
 		mArea(std::move(area)),
 		mZBounds(zBounds)
 	{
