@@ -7,6 +7,30 @@
 
 namespace Ck::Detail::Win32
 {
+    namespace
+    {
+        Instant FiletimeToInstant(const FILETIME& fileTime)
+        {
+            // Number of 100ns periods between 1st january 1601 and 1st january 1970
+            static constexpr Uint64 DurationToEpoch = 116444736000000000ULL;
+
+            LARGE_INTEGER time;
+            time.HighPart = fileTime.dwHighDateTime;
+            time.LowPart = fileTime.dwLowDateTime;
+
+            // Number of 100ns periods since 1st january 1601
+            Uint64 fileTime100ns = time.QuadPart;
+
+            // Number of 100ns periods since 1st january 1970
+            Uint64 epoch100ns = fileTime100ns - DurationToEpoch;
+
+            Uint64 seconds = epoch100ns / 10000000ULL;
+            Uint32 nanoseconds = static_cast<Uint32>(epoch100ns % 10000000ULL * 100ULL);
+
+            return Instant::EpochSeconds(seconds, nanoseconds);
+        }
+    }
+
 	LocalFileSystemDriver::LocalFileSystemDriver(Path base) :
 		mBase(std::move(base))
 	{
@@ -155,4 +179,44 @@ namespace Ck::Detail::Win32
 
 		return Optional<Path>::Of(InPlace, finalPath, finalPathLength);
 	}
+
+    PathInfo LocalFileSystemDriver::GetPathInfo(const Path& path) const
+    {
+        PathInfo pathInfo;
+
+        WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+        BOOL result = GetFileAttributesEx(path.ToString().GetData(), GetFileExInfoStandard, &fileInfo);
+        if (result == FALSE)
+        {
+            DWORD lastError = ::GetLastError();
+            if (lastError != ERROR_FILE_NOT_FOUND)
+                throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+
+            return pathInfo;
+        }
+
+        pathInfo.CreationTime = FiletimeToInstant(fileInfo.ftCreationTime);
+        pathInfo.LastAccessTime = FiletimeToInstant(fileInfo.ftLastAccessTime);
+        pathInfo.LastChangeTime = FiletimeToInstant(fileInfo.ftLastWriteTime);
+
+        if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_NORMAL)
+        {
+            LARGE_INTEGER fileSize;
+            fileSize.HighPart = fileInfo.nFileSizeHigh;
+            fileSize.LowPart = fileInfo.nFileSizeLow;
+
+            pathInfo.Type = PathType::File;
+            pathInfo.Size = fileSize.QuadPart;
+        }
+        else if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            pathInfo.Type = PathType::Directory;
+        }
+        else
+        {
+            pathInfo.Type = PathType::Other;
+        }
+
+        return pathInfo;
+    }
 }

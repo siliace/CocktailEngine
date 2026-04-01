@@ -1,14 +1,14 @@
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
-#include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectory.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectoryWatcher.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFile.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileLock.hpp>
 #include <Cocktail/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp>
-#include <Cocktail/Core/Utility/StringUtils.hpp>
+#include <Cocktail/Core/System/SystemError.hpp>
 
 namespace Ck::Detail::Unix
 {
@@ -113,4 +113,49 @@ namespace Ck::Detail::Unix
 
 		return Optional<Path>::Of(resolvedPath);
 	}
+
+    PathInfo LocalFileSystemDriver::GetPathInfo(const Path& path) const
+    {
+	    PathInfo pathInfo;
+
+	    struct statx stx{};
+	    Memory::Zero(stx);
+
+	    long int result = statx(AT_FDCWD, reinterpret_cast<const AnsiChar*>(path.ToString().GetData()), AT_STATX_SYNC_AS_STAT, STATX_BASIC_STATS | STATX_BTIME, &stx);
+	    if (result != 0)
+	    {
+	        if (errno != ENOENT)
+	            throw std::system_error(errno, std::generic_category());
+
+	        return pathInfo;
+	    }
+
+	    pathInfo.LastAccessTime = Instant::EpochSeconds(stx.stx_atime.tv_sec, stx.stx_atime.tv_nsec);
+	    pathInfo.LastChangeTime = Instant::EpochSeconds(stx.stx_mtime.tv_sec, stx.stx_mtime.tv_nsec);
+
+	    if (stx.stx_mask & STATX_BTIME)
+	    {
+	        pathInfo.CreationTime = Instant::EpochSeconds(stx.stx_btime.tv_sec, stx.stx_btime.tv_nsec);
+	    }
+	    else
+	    {
+	        pathInfo.CreationTime = Instant::EpochSeconds(stx.stx_ctime.tv_sec, stx.stx_ctime.tv_nsec);
+	    }
+
+	    if (S_ISREG(stx.stx_mode))
+	    {
+	        pathInfo.Type = PathType::File;
+	        pathInfo.Size = stx.stx_size;
+	    }
+	    else if (S_ISDIR(stx.stx_mode))
+	    {
+	        pathInfo.Type = PathType::Directory;
+	    }
+	    else
+	    {
+	        pathInfo.Type = PathType::Other;
+	    }
+
+	    return pathInfo;
+    }
 }

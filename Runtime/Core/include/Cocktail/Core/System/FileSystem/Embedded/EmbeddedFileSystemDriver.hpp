@@ -91,10 +91,12 @@ namespace Ck
 		 */
 		Optional<Path> TryMakeCanonical(const Path& path) override;
 
-		/**
-		 * \brief 
-		 * \param fileSystem 
-		 */
+        PathInfo GetPathInfo(const Path& path) const override;
+
+        /**
+         * \brief
+         * \param fileSystem
+         */
 		void Register(cmrc::embedded_filesystem fileSystem);
 
 	private:

@@ -87,7 +87,32 @@ namespace Ck
 		return Optional<Path>::Of(path);
 	}
 
-	void EmbeddedFileSystemDriver::Register(cmrc::embedded_filesystem fileSystem)
+    PathInfo EmbeddedFileSystemDriver::GetPathInfo(const Path& path) const
+    {
+		AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
+	    return mFileSystems.FindIf([&](const cmrc::embedded_filesystem& filesystem) {
+	        return filesystem.exists(p.GetData());
+	    }).Map([&](const cmrc::embedded_filesystem& filesystem) {
+	        PathInfo pathInfo;
+	        if (filesystem.is_file(p.GetData()))
+	        {
+	            pathInfo.Type = PathType::File;
+	            pathInfo.Size = filesystem.open(p.GetData()).size();
+	        }
+	        else if (filesystem.is_directory(p.GetData()))
+	        {
+	            pathInfo.Type = PathType::Directory;
+	        }
+	        else
+	        {
+	            pathInfo.Type = PathType::Other;
+	        }
+
+	        return pathInfo;
+	    }).GetOr(PathInfo{});
+    }
+
+    void EmbeddedFileSystemDriver::Register(cmrc::embedded_filesystem fileSystem)
 	{
 		mFileSystems.Add(std::move(fileSystem));
 	}
