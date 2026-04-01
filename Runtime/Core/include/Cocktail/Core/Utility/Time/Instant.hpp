@@ -46,7 +46,7 @@ namespace Ck
          *
          * \return Instant corresponding to the given epoch time
          */
-        static Instant EpochSeconds(Uint64 seconds, Uint64 nanoseconds);
+        static Instant EpochSeconds(Uint64 seconds, Uint32 nanoseconds);
 
         /**
          * \brief Constructs an invalid or zero instant
@@ -104,7 +104,7 @@ namespace Ck
          *
          * \return Nanoseconds offset within the current second
          */
-        Uint64 GetNanoseconds() const;
+        Uint32 GetNanoseconds() const;
 
     private:
 
@@ -114,10 +114,10 @@ namespace Ck
          * \param seconds Number of seconds since the epoch
          * \param nanoseconds Nanoseconds offset within the second
          */
-        Instant(Uint64 seconds, Uint64 nanoseconds);
+        Instant(Uint64 seconds, Uint32 nanoseconds);
 
         Uint64 mSeconds;
-        Uint64 mNanoseconds;
+        Uint32 mNanoseconds;
     };
 }
 

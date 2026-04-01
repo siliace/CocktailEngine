@@ -14,7 +14,7 @@ namespace Ck
 		};
 	}
 
-	Instant Instant::EpochSeconds(Uint64 seconds, Uint64 nanoseconds)
+	Instant Instant::EpochSeconds(Uint64 seconds, Uint32 nanoseconds)
 	{
 		return {seconds, nanoseconds};
 	}
@@ -55,7 +55,7 @@ namespace Ck
 	{
 		const bool isNanoseconds = offset.GetUnit().IsSmaller(TimeUnit::Seconds());
 		Uint64 seconds = mSeconds;
-		Uint64 nanoseconds = mNanoseconds;
+		Uint32 nanoseconds = mNanoseconds;
 
 		if (isNanoseconds)
 		{
@@ -86,12 +86,12 @@ namespace Ck
 		return mSeconds;
 	}
 
-	Uint64 Instant::GetNanoseconds() const
+	Uint32 Instant::GetNanoseconds() const
 	{
 		return mNanoseconds;
 	}
 
-	Instant::Instant(Uint64 seconds, Uint64 nanoseconds) :
+	Instant::Instant(Uint64 seconds, Uint32 nanoseconds) :
 		mSeconds(seconds),
 		mNanoseconds(nanoseconds)
 	{
