@@ -3,6 +3,7 @@
 
 #include <Cocktail/Core/Cocktail.hpp>
 #include <Cocktail/Core/Utility/ExceptionUtils.hpp>
+#include <Cocktail/Core/Utility/FunctionTraits.hpp>
 
 namespace Ck
 {
@@ -148,9 +149,9 @@ namespace Ck
 		 * \return 
 		 */
 		template <typename Callable>
-		auto Map(Callable&& mapper) const -> Optional<decltype(mapper(T{}))>
+		auto Map(Callable&& mapper) const -> Optional<FunctionReturnType<Callable>>
 		{
-			using U = decltype(mapper(T{}));
+			using U = FunctionReturnType<Callable>;
 
 			if (mEmpty)
 				return Optional<U>::Empty();
@@ -462,9 +463,9 @@ namespace Ck
 		 * \return
 		 */
 		template <typename Callable>
-		auto Map(Callable&& mapper) const -> Optional<decltype(mapper(T{})) >
+		auto Map(Callable&& mapper) const -> Optional<FunctionReturnType<Callable> >
 		{
-			using U = decltype(mapper(T{}));
+			using U = FunctionReturnType<Callable>;
 
 			if (!mValue)
 				return Optional<U>::Empty();
