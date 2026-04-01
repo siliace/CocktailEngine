@@ -60,7 +60,7 @@ namespace Ck
 		/**
 		 * \brief Specifies the new position of the POV hat
 		 */
-		Flags<JoystickPovPosition> Position = JoystickPovPosition::Centered;
+		Flags<JoystickPovPosition> Position;
 	};
 }
 

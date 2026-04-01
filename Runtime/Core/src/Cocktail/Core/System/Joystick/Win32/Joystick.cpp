@@ -160,10 +160,6 @@ namespace Ck::Detail::Win32
 			if (joystickState.dwPOV > JOY_POVBACKWARD)
 				position |= JoystickPovPosition::Left;
 		}
-		else
-		{
-			position = JoystickPovPosition::Centered;
-		}
 
 		return position;
 	}

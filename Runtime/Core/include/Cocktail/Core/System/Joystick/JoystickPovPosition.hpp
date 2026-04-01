@@ -13,27 +13,22 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		Centered = Bit(0),
+		Right = Bit(0),
 
 		/**
 		 * \brief 
 		 */
-		Right = Bit(1),
+		Left = Bit(1),
 
 		/**
 		 * \brief 
 		 */
-		Left = Bit(2),
+		Up = Bit(2),
 
 		/**
 		 * \brief 
 		 */
-		Up = Bit(3),
-
-		/**
-		 * \brief 
-		 */
-		Down = Bit(4)
+		Down = Bit(3)
 	};
 }
 
