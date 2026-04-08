@@ -4,6 +4,60 @@
 #include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
 
+TEMPLATE_TEST_CASE("Construct an Array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    SECTION("empty")
+    {
+        Ck::Array<int, TestType> array;
+
+        REQUIRE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 0);
+    }
+
+    SECTION("from initialize list")
+    {
+        Ck::Array<int, TestType> array = { 1, 2, 3 };
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 3);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == i + 1);
+    }
+
+    SECTION("with a default size")
+    {
+        Ck::Array<int, TestType> array(5);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 5);
+    }
+
+    SECTION("with a default size and an initial content")
+    {
+        Ck::Array<int, TestType> array(5, 3);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 5);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == 3);
+    }
+
+    SECTION("from a raw pointer and an element count")
+    {
+        int ints[] = { 3, 5, 7 };
+
+        Ck::Array<int, TestType> array(ints, 3);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 3);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == ints[i]);
+    }
+}
+
 TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
