@@ -22,9 +22,6 @@ namespace Ck
 
 		    Path child = mPath;
 		    child.Join(String::Convert(filename));
-
-		    String test = child.ToString();
-
 			children.Add(std::move(child));
 		}
 

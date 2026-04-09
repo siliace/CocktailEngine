@@ -18,7 +18,7 @@ namespace Ck
 	    /**
          * \brief Ensure a directory exists
          *
-         * This function will create recursively directories to ensure \p uri is a valid directory
+         * This function will create recursively directories to ensure \p path is a valid directory
          *
          * \param path The path of the directory to create
          * \param driver The file system driver where the directory should be accessible

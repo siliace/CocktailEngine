@@ -84,6 +84,15 @@ namespace Ck
 		 */
 		void CreateDirectory(const URI& uri) const;
 
+	    /**
+         * \brief Create a directory iterator
+         *
+         * \param uri The uri of the directory
+         *
+         * return Unique pointer to a DirectoryIterator object
+         */
+	    UniquePtr<DirectoryIterator> CreateDirectoryIterator(const URI& uri);
+
 		/**
 		 * \brief Opens a file for reading and/or writing
 		 *
@@ -109,34 +118,86 @@ namespace Ck
 		UniquePtr<Directory> OpenDirectory(const URI& uri) const;
 
 		/**
-		 * \brief Copies a resource from a source URI to a destination URI
+		 * \brief Copies a file from a source URI to a destination URI
 		 *
-		 * \param source URI of the resource to copy
+		 * \param source URI of the file to copy
 		 * \param destination Target location
-		 * \param failIfExists If true, the operation fails when the destination already exists
-		 *
-		 * \throws May throw if copying is not supported by the backend or if preconditions fail
+         * \param options Copy behavior options
 		 */
-		void Copy(const URI& source, const URI& destination, bool failIfExists = false) const;
+		void CopyFile(const URI& source, const URI& destination, const FileCopyOptions& options) const;
+
+	    /**
+         * \brief Copies a directory from a source URI to a destination URI
+         *
+         * The copy operation is delegated to the filesystem driver associated
+         * with the source and destination URI schemes.
+         *
+         * Behavior such as recursion, overwriting existing entries, and metadata
+         * preservation is controlled by \p options.
+         *
+         * \param source URI of the directory to copy
+         * \param destination Target directory location
+         * \param options Copy behavior options (recursive, overwrite, etc.)
+         */
+	    void CopyDirectory(const URI& source, const URI& destination, const DirectoryCopyOptions& options) const;
 
 		/**
-		 * \brief Moves (renames) a resource from a source URI to a destination URI
+		 * \brief Moves (renames) a file from a source URI to a destination URI
 		 *
-		 * After a successful move, the source resource no longer exists.
+	     * After a successful move, the source file no longer exists.
+         * Depending on the underlying filesystem, the operation may be performed
+	     * atomically or fallback to a copy + remove strategy.
+         *
+         * Behavior such as overwriting, and metadata preservation is controlled by \p options.
 		 *
 		 * \param source Location of the existing resource
 		 * \param destination New target location
+         * \param options Copy behavior options
 		 */
-		void Move(const URI& source, const URI& destination) const;
+		void MoveFile(const URI& source, const URI& destination, const FileMoveOptions& options) const;
+
+	    /**
+         * \brief Moves (renames) a directory from a source URI to a destination URI
+         *
+         * After a successful move, the source directory no longer exists.
+         * Depending on the underlying filesystem, the operation may be performed
+         * atomically or fallback to a copy + remove strategy.
+         *
+         * Behavior such as overwriting, recursion (for fallback), and metadata
+         * preservation is controlled by \p options.
+         *
+         * \param source Location of the existing directory
+         * \param destination New target location
+         * \param options Move behavior options
+         *
+         * \throws May throw if the operation fails or is not supported
+         */
+	    void MoveDirectory(const URI& source, const URI& destination, const DirectoryMoveOptions& options) const;
 
 		/**
-		 * \brief Removes a file or directory
+	    * \brief Removes a file at the given URI
+         *
+         * The removal operation is delegated to the filesystem driver associated
+         * with the URI scheme.
 		 *
-		 * Removal of non-empty directories depends on the backend implementation
-		 *
-		 * \param uri Location of the resource to delete
+	     * \param uri Location of the resource to delete
+         * \param options Removal behavior options
 		 */
-		void Remove(const URI& uri) const;
+		void RemoveFile(const URI& uri, const FileRemoveOptions& options) const;
+
+	    /**
+         * \brief Removes a directory at the given URI
+         *
+         * The removal operation is delegated to the filesystem driver associated
+         * with the URI scheme.
+         *
+         * Removal of non-empty directories depends on the \p options and the
+         * capabilities of the underlying filesystem driver.
+         *
+         * \param uri Location of the directory to delete
+         * \param options Removal behavior options
+         */
+        void RemoveDirectory(const URI& uri, const DirectoryRemoveOptions& options) const;
 
 		/**
 		 * \brief Registers and retains a filesystem driver for the given URI scheme
@@ -181,18 +242,22 @@ namespace Ck
 		 *
 		 * to implicitly target a specific filesystem driver, e.g. "file" or "asset".
 		 *
-		 * @return A constant reference to the string representing the default scheme
+		 * \return A constant reference to the string representing the default scheme
 		 */
 	    const String& GetDefaultScheme() const;
 
 	    /**
-         * \brief
-         * \param scheme
-         * \return
+         * \brief Resolves the filesystem driver associated with a URI scheme
+         *
+         * Looks up the driver registered for the given \p scheme.
+         *
+         * \param scheme The URI scheme to resolve (e.g. "file", "asset")
+         *
+         * \return Pointer to the associated FileSystemDriver, or nullptr if not found
          */
 	    FileSystemDriver* ResolveDriver(const String& scheme) const;
 
-	private:
+    private:
 
 		String mDefaultScheme;
 		std::unordered_map<String, FileSystemDriver*> mDrivers;

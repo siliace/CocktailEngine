@@ -412,6 +412,7 @@ cocktail_source_directory(CORE_FILES
     FOLDER "System/FileSystem"
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/Directory.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/DirectoryIterator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/DirectoryWatcher.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/File.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileCursorMode.hpp
@@ -419,6 +420,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileOpenFlags.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/FileSystemDriver.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/Path.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/PathInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/Storage.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/StorageService.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/System/FileSystem/URI.hpp
@@ -436,6 +438,8 @@ cocktail_source_directory(CORE_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectory.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectoryIterator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectoryIterator.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.cpp
@@ -457,6 +461,8 @@ if (WIN32)
         SRC
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectory.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectory.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectoryIterator.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectoryIterator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectoryWatcher.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalDirectoryWatcher.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Win32/LocalFile.hpp
@@ -474,6 +480,8 @@ elseif (LINUX)
         SRC
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectory.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectory.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectoryIterator.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectoryIterator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectoryWatcher.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalDirectoryWatcher.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/System/FileSystem/Local/Unix/LocalFile.hpp

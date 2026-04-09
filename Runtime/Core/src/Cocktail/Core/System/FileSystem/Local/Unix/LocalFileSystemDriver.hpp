@@ -19,13 +19,16 @@ namespace Ck::Detail::Unix
 
 		UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
 		UniquePtr<Directory> OpenDirectory(const Path& path) override;
+        UniquePtr<DirectoryIterator> CreateDirectoryIterator(const Path& path) override;
 
-		void Copy(const Path& source, const Path& destination, bool failIfExists) override;
-		void Move(const Path& source, const Path& destination) override;
+	    void CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options) override;
+        void CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options) override;
+        void MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options) override;
+        void MoveDirectory(const Path& source, const Path& destination, const DirectoryMoveOptions& options) override;
+        void RemoveFile(const Path& path, const FileRemoveOptions& options) override;
+        void RemoveDirectory(const Path& path, const DirectoryRemoveOptions& options) override;
 
-		void Remove(const Path& path) override;
-
-		UniquePtr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
+        UniquePtr<FileLock> CreateLock(File& file, std::size_t offset, std::size_t length) override;
 		UniquePtr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive) override;
 
 		Path MakeCanonical(const Path& path) override;

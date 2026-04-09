@@ -8,95 +8,32 @@
 
 namespace Ck
 {
-	/**
-	 * \brief 
-	 */
 	class COCKTAIL_CORE_API EmbeddedFileSystemDriver : public FileSystemDriver
 	{
 	public:
 
-		/**
-		 * \brief 
-		 * \param path 
-		 * \return 
-		 */
 		bool IsFile(const Path& path) const override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 * \return 
-		 */
 		bool IsDirectory(const Path& path) const override;
 
-		/**
-		 * \brief 
-		 * \param path 
-		 */
 		void CreateFile(const Path& path) override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 */
 		void CreateDirectory(const Path& path) override;
 
-		/**
-		 * \brief 
-		 * \param path 
-		 * \param flags 
-		 * \return 
-		 */
 		UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 * \return 
-		 */
 		UniquePtr<Directory> OpenDirectory(const Path& path) override;
+        UniquePtr<DirectoryIterator> CreateDirectoryIterator(const Path& path) override;
 
-		/**
-		 * \brief 
-		 * \param source 
-		 * \param destination 
-		 * \param failIfExists 
-		 */
-		void Copy(const Path& source, const Path& destination, bool failIfExists) override;
+        void CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options) override;
+        void CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options) override;
+        void MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options) override;
+        void MoveDirectory(const Path& source, const Path& destination, const DirectoryMoveOptions& options) override;
+        void RemoveFile(const Path& path, const FileRemoveOptions& options) override;
+        void RemoveDirectory(const Path& path, const DirectoryRemoveOptions& options) override;
 
-		/**
-		 * \brief 
-		 * \param source 
-		 * \param destination 
-		 */
-		void Move(const Path& source, const Path& destination) override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 */
-		void Remove(const Path& path) override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 * \return 
-		 */
 		Path MakeCanonical(const Path& path) override;
-
-		/**
-		 * \brief 
-		 * \param path 
-		 * \return 
-		 */
 		Optional<Path> TryMakeCanonical(const Path& path) override;
 
         PathInfo GetPathInfo(const Path& path) const override;
 
-        /**
-         * \brief
-         * \param fileSystem
-         */
 		void Register(cmrc::embedded_filesystem fileSystem);
 
 	private:

@@ -30,6 +30,11 @@ namespace Ck
         return ResolveDriver(uri.GetScheme())->CreateDirectory(uri.GetPath());
     }
 
+    UniquePtr<DirectoryIterator> StorageService::CreateDirectoryIterator(const URI& uri)
+    {
+        return ResolveDriver(uri.GetScheme())->CreateDirectoryIterator(uri.GetPath());
+    }
+
     UniquePtr<File> StorageService::OpenFile(const URI& uri, FileOpenFlags flags) const
     {
         return ResolveDriver(uri.GetScheme())->OpenFile(uri.GetPath(), flags);
@@ -40,17 +45,20 @@ namespace Ck
         return ResolveDriver(uri.GetScheme())->OpenDirectory(uri.GetPath());
     }
 
-    void StorageService::Copy(const URI& source, const URI& destination, bool failIfExists) const
+    void StorageService::CopyFile(const URI& source, const URI& destination, const FileCopyOptions& options) const
     {
         FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
         FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
         if (sourceDriver == destinationDriver)
         {
-            sourceDriver->Copy(source.GetPath(), destination.GetPath(), failIfExists);
+            sourceDriver->CopyFile(source.GetPath(), destination.GetPath(), options);
         }
         else
         {
+            if (destinationDriver->IsFile(source.GetPath()) && !options.Overwrite)
+                return;
+
             FileInputStream inputStream(source.GetPath(), sourceDriver);
             FileOutputStream outputStream(destination.GetPath(), destinationDriver);
 
@@ -58,25 +66,56 @@ namespace Ck
         }
     }
 
-    void StorageService::Move(const URI& source, const URI& destination) const
+    void StorageService::CopyDirectory(const URI& source, const URI& destination, const DirectoryCopyOptions& options) const
     {
         FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
         FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
 
         if (sourceDriver == destinationDriver)
         {
-            sourceDriver->Move(source.GetPath(), destination.GetPath());
+            sourceDriver->CopyDirectory(source.GetPath(), destination.GetPath(), options);
         }
         else
         {
-            Copy(source, destination, false);
-            sourceDriver->Remove(source.GetPath());
         }
     }
 
-    void StorageService::Remove(const URI& uri) const
+    void StorageService::MoveFile(const URI& source, const URI& destination, const FileMoveOptions& options) const
     {
-        return ResolveDriver(uri.GetScheme())->Remove(uri.GetPath());
+        FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+        FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
+
+        if (sourceDriver == destinationDriver)
+        {
+            sourceDriver->MoveFile(source.GetPath(), destination.GetPath(), options);
+        }
+        else
+        {
+        }
+    }
+
+    void StorageService::MoveDirectory(const URI& source, const URI& destination, const DirectoryMoveOptions& options) const
+    {
+        FileSystemDriver* sourceDriver = ResolveDriver(source.GetScheme());
+        FileSystemDriver* destinationDriver = ResolveDriver(destination.GetScheme());
+
+        if (sourceDriver == destinationDriver)
+        {
+            sourceDriver->MoveDirectory(source.GetPath(), destination.GetPath(), options);
+        }
+        else
+        {
+        }
+    }
+
+    void StorageService::RemoveFile(const URI& uri, const FileRemoveOptions& options) const
+    {
+        ResolveDriver(uri.GetScheme())->RemoveFile(uri.GetPath(), options);
+    }
+
+    void StorageService::RemoveDirectory(const URI& uri, const DirectoryRemoveOptions& options) const
+    {
+        ResolveDriver(uri.GetScheme())->RemoveDirectory(uri.GetPath(), options);
     }
 
     void StorageService::Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver)

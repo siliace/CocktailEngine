@@ -3,81 +3,134 @@
 
 #include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/System/FileSystem/Directory.hpp>
+#include <Cocktail/Core/System/FileSystem/DirectoryIterator.hpp>
 #include <Cocktail/Core/System/FileSystem/File.hpp>
 #include <Cocktail/Core/System/FileSystem/FileOpenFlags.hpp>
-#include <Cocktail/Core/Utility/Time/Instant.hpp>
+#include <Cocktail/Core/System/FileSystem/PathInfo.hpp>
 
 namespace Ck
 {
     /**
-     * \brief Enumeration of type of filesystem entries
+     * \brief Options used when copying a file
+     *
+     * Defines behavior for file copy operations such as overwriting existing files
+     * and preserving metadata.
      */
-    enum class PathType
+    struct FileCopyOptions
     {
         /**
-         * \brief The path does not exist
+         * \brief Allow overwriting the destination file if it already exists
          */
-        None,
+        bool Overwrite = false;
 
         /**
-         * \brief The path is a normal file
+         * \brief Preserve file metadata (timestamps, attributes, etc.)
+         *
+         * \note The exact metadata preserved depends on the underlying filesystem.
          */
-        File,
-
-        /**
-         * \brief The path is a directory
-         */
-        Directory,
-
-        /**
-         * \brief The path is something else (e.g., symlink, device file)
-         */
-        Other
+        bool PreserveMetadata = true;
     };
 
     /**
-     * \brief Structure containing information about a Path on a filesystem
+     * \brief Options used when copying a directory
+     *
+     * Extends file copy options with directory-specific behavior such as recursion
+     * and structure-only copying.
      */
-    struct PathInfo
+    struct DirectoryCopyOptions : FileCopyOptions
     {
         /**
-         * \brief The type of the path (None, File, Directory, Other)
+         * \brief Recursively copy subdirectories
+         *
+         * If false, only the top-level directory is copied.
          */
-        PathType Type = PathType::None;
+        bool Recursive = false;
 
         /**
-         * \brief The size in bytes of the entry
+         * \brief Copy only the directory structure without file contents
          *
-         * \note This value is used only if the path is a file. For directories or other types, this may be zero or undefined.
+         * When enabled, directories are created but files are not copied.
          */
-        Uint64 Size = 0;
+        bool OnlyStructure = false;
+    };
+
+    /**
+     * \brief Options used when moving a file
+     */
+    struct FileMoveOptions : FileCopyOptions
+    {
+        /**
+         * \brief Allow fallback to copy + delete when moving across filesystems
+         *
+         * \note Some platforms cannot move files across different volumes atomically.
+         *       When enabled, the implementation may perform a copy followed by a deletion.
+         */
+        bool AllowCopyFallback = true;
+    };
+
+    /**
+     * \brief Options used when moving a directory
+     */
+    struct DirectoryMoveOptions : FileMoveOptions
+    {
+        /**
+         * \brief Recursively move directory contents when fallback copy is used
+         *
+         * \note Ignored if the move is handled natively by the filesystem.
+         */
+        bool Recursive = true;
 
         /**
-         * \brief The creation timestamp of the entry
+         * \brief Move only the directory structure without file contents
          *
-         * \note This value is used only if the path is a file. May be invalid or empty for directories.
+         * \note Only applies when fallback copy is used.
          */
-        Instant CreationTime;
+        bool OnlyStructure = false;
+    };
+
+    /**
+     * \brief Options used when removing a file
+     */
+    struct FileRemoveOptions
+    {
+        /**
+         * \brief Force removal even if the file is read-only or protected
+         *
+         * \note The exact behavior depends on the platform and may involve
+         *       modifying file attributes before deletion.
+         */
+        bool Force = false;
 
         /**
-         * \brief The last modification timestamp of the entry
-         *
-         * \note This value is used only if the path is a file. May be invalid or empty for directories.
+         * \brief Ignore missing files instead of failing
          */
-        Instant LastChangeTime;
+        bool IgnoreMissing = true;
+    };
 
+    /**
+     * \brief Options used when removing a directory
+     *
+     * Extends file removal options with directory-specific behavior.
+     */
+    struct DirectoryRemoveOptions : FileRemoveOptions
+    {
         /**
-         * \brief The last access timestamp of the entry
+         * \brief Recursively remove directory contents
          *
-         * \note This value is used only if the path is a file. May be invalid or empty for directories.
+         * If false, the operation will fail if the directory is not empty.
          */
-        Instant LastAccessTime;
+        bool Recursive = false;
     };
 
     /**
      * \brief Abstract interface representing a filesystem driver
      *
-     * This interface provides operations for working with files and directories in a filesystem.
+     * FileSystemDriver defines a generic interface for interacting with a filesystem.
+     * It abstracts operations such as file and directory creation, deletion,
+     * copying, moving, and metadata retrieval.
+     *
+     * Implementations may represent local filesystems, virtual filesystems,
+     * archives, or remote storage systems.
      */
     class FileSystemDriver
     {
@@ -89,103 +142,143 @@ namespace Ck
         virtual ~FileSystemDriver() = default;
 
         /**
-         * \brief Checks if a path exists and is a regular file
+         * \brief Check if a path refers to an existing file
          *
-         * \param path The path to check
+         * \param path Path to check
          *
          * \return True if the path exists and is a file, false otherwise
          */
         virtual bool IsFile(const Path& path) const = 0;
 
         /**
-         * \brief Checks if a path exists and is a directory
+         * \brief Check if a path refers to an existing directory
          *
-         * \param path The path to check
+         * \param path Path to check
          *
          * \return True if the path exists and is a directory, false otherwise
          */
         virtual bool IsDirectory(const Path& path) const = 0;
 
         /**
-         * \brief Creates an empty file at the specified path
+         * \brief Create an empty file
          *
-         * \param path The path where the file should be created
+         * \param path Path of the file to create
          */
         virtual void CreateFile(const Path& path) = 0;
 
         /**
-         * \brief Creates a directory at the specified path
+         * \brief Create a directory
          *
-         * \param path The path where the directory should be created
+         * \param path Path of the directory to create
          */
         virtual void CreateDirectory(const Path& path) = 0;
 
         /**
-         * \brief Opens a file for reading and/or writing
+         * \brief Create a directory iterator
          *
-         * \param path The path to the file
-         * \param flags Flags controlling how the file should be opened (read, write, append, etc.)
+         * \param path The path of the directory
          *
-         * \return A unique pointer to a File object representing the opened file
+         * return Unique pointer to a DirectoryIterator object
+         */
+        virtual UniquePtr<DirectoryIterator> CreateDirectoryIterator(const Path& path) = 0;
+
+        /**
+         * \brief Open a file with specified access flags
+         *
+         * \param path Path to the file
+         * \param flags File open flags (read, write, append, etc.)
+         *
+         * \return Unique pointer to a File object
          */
         virtual UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) = 0;
 
         /**
-         * \brief Opens a directory for iteration
+         * \brief Open a directory for access
          *
-         * \param path The path to the directory
+         * \param path Path to the directory
          *
-         * \return A unique pointer to a Directory object representing the opened directory
+         * \return Unique pointer to a Directory object
          */
         virtual UniquePtr<Directory> OpenDirectory(const Path& path) = 0;
 
         /**
-         * \brief Copies a file or directory to a new location
+         * \brief Copy a file
          *
-         * \param source The path to the source file or directory
-         * \param destination The path to copy to
-         * \param failIfExists If true, operation fails if the destination already exists
+         * \param source Source file path
+         * \param destination Destination file path
+         * \param options Copy behavior options
          */
-        virtual void Copy(const Path& source, const Path& destination, bool failIfExists = false) = 0;
+        virtual void CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options) = 0;
 
         /**
-         * \brief Moves (renames) a file or directory to a new location
+         * \brief Copy a directory
          *
-         * \param source The path to the source file or directory
-         * \param destination The path to move to
+         * \param source Source directory path
+         * \param destination Destination directory path
+         * \param options Copy behavior options
          */
-        virtual void Move(const Path& source, const Path& destination) = 0;
+        virtual void CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options) = 0;
 
         /**
-         * \brief Removes a file or directory
+         * \brief Move or rename a file or directory
          *
-         * \param path The path to remove
+         * \param source Source path
+         * \param destination Destination path
+         * \param options Move behavior options
          */
-        virtual void Remove(const Path& path) = 0;
+        virtual void MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options) = 0;
 
         /**
-         * \brief Converts a path to its canonical (absolute and normalized) form
+         * \brief Move or rename a file or directory
          *
-         * \param path The path to canonicalize
-         * \return The canonicalized path
+         * \param source Source path
+         * \param destination Destination path
+         * \param options Move behavior options
+         */
+        virtual void MoveDirectory(const Path& source, const Path& destination, const DirectoryMoveOptions& options) = 0;
+
+        /**
+         * \brief Remove a file
+         *
+         * \param path Path of the file to remove
+         * \param options Removal options
+         */
+        virtual void RemoveFile(const Path& path, const FileRemoveOptions& options) = 0;
+
+        /**
+         * \brief Remove a directory
+         *
+         * \param path Path of the directory to remove
+         * \param options Removal options
+         */
+        virtual void RemoveDirectory(const Path& path, const DirectoryRemoveOptions& options) = 0;
+
+        /**
+         * \brief Convert a path to its canonical form
+         *
+         * Resolves the path to an absolute and normalized representation.
+         *
+         * \param path Path to canonicalize
+         *
+         * \return Canonical path
          */
         virtual Path MakeCanonical(const Path& path) = 0;
 
         /**
-         * \brief Attempts to convert a path to its canonical form
+         * \brief Try to convert a path to its canonical form
          *
-         * \param path The path to canonicalize
+         * \param path Path to canonicalize
          *
-         * \return Optional containing the canonical path if successful, empty if the path does not exist or cannot be canonicalized
+         * \return Optional containing canonical path if successful, empty otherwise
          */
         virtual Optional<Path> TryMakeCanonical(const Path& path) = 0;
 
         /**
-         * \brief Retrieves metadata for a path
+         * \brief Retrieve metadata about a path
          *
-         * \param path The path to query
+         * \param path Path to query
          *
-         * \return A PathInfo structure containing type, size, and timestamps
+         * \return PathInfo structure describing the entry
          */
         virtual PathInfo GetPathInfo(const Path& path) const = 0;
     };

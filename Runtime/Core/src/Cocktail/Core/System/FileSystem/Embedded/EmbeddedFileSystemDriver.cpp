@@ -1,4 +1,5 @@
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectory.hpp>
+#include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddDirectoryIterator.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbdeddFile.hpp>
 #include <Cocktail/Core/System/FileSystem/Embedded/EmbeddedFileSystemDriver.hpp>
 
@@ -62,22 +63,49 @@ namespace Ck
 		throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));
 	}
 
-	void EmbeddedFileSystemDriver::Copy(const Path& source, const Path& destination, bool failIfExists)
-	{
-		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
-	}
+    UniquePtr<DirectoryIterator> EmbeddedFileSystemDriver::CreateDirectoryIterator(const Path& path)
+    {
+	    AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
+	    for (const cmrc::embedded_filesystem& mFileSystem : mFileSystems)
+	    {
+	        if (mFileSystem.is_directory(p.GetData()))
+	            return MakeUnique<EmbeddedDirectoryIterator>(mFileSystem, path);
+	    }
 
-	void EmbeddedFileSystemDriver::Move(const Path& source, const Path& destination)
-	{
-		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
-	}
+	    return nullptr;
+    }
 
-	void EmbeddedFileSystemDriver::Remove(const Path& path)
-	{
+    void EmbeddedFileSystemDriver::CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options)
+    {
 		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
-	}
+    }
 
-	Path EmbeddedFileSystemDriver::MakeCanonical(const Path& path)
+    void EmbeddedFileSystemDriver::CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options)
+    {
+		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+    }
+
+    void EmbeddedFileSystemDriver::MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options)
+    {
+		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+    }
+
+    void EmbeddedFileSystemDriver::MoveDirectory(const Path& source, const Path& destination, const DirectoryMoveOptions& options)
+    {
+		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+    }
+
+    void EmbeddedFileSystemDriver::RemoveFile(const Path& path, const FileRemoveOptions& options)
+    {
+		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+    }
+
+    void EmbeddedFileSystemDriver::RemoveDirectory(const Path& path, const DirectoryRemoveOptions& options)
+    {
+		throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+    }
+
+    Path EmbeddedFileSystemDriver::MakeCanonical(const Path& path)
 	{
 		return path;
 	}

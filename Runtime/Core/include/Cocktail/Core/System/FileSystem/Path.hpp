@@ -106,6 +106,19 @@ namespace Ck
          */
         static Path Parse(const TextChar* path, SizeType length, Format format = Format::Auto);
 
+        /**
+         * \brief Builds a path by joining multiple components
+         *
+         * Merge constructs a Path by sequentially joining all provided
+         * path segments in order. Each argument is appended using Join(),
+         * ensuring proper path separator handling for the current platform.
+         *
+         * \tparam Args Types of path segments (must be compatible with Join)
+         *
+         * \param args Path components to merge
+         *
+         * \return A Path resulting from the concatenation of all components
+         */
         template <typename... Args>
         static Path Merge(Args&&... args)
         {

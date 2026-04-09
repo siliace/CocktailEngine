@@ -41,6 +41,6 @@ namespace Ck::Detail::Unix
 
     UniquePtr<Ck::LocalFileSystemDriver> LocalFileSystemService::CreateDriver(const Path& base)
     {
-		return MakeUnique<LocalFileSystemDriver>();
+		return MakeUnique<LocalFileSystemDriver>(base);
     }
 }
