@@ -72,7 +72,8 @@ namespace Ck
 			T y = s1 * s2 * c3 + c1 * c2 * s3;
 			T z = s1 * c2 * c3 + c1 * s2 * s3;
 			T w = c1 * s2 * c3 - s1 * c2 * s3;
-			return Quaternion::Identity(x, y, z, w);
+
+			return Quaternion(x, y, z, w);
 		}
 
 		/**
