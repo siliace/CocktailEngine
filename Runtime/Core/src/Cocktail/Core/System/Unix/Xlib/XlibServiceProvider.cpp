@@ -1,5 +1,6 @@
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/System/Clipboard/Xlib/ClipboardService.hpp>
 #include <Cocktail/Core/System/Keyboard/Xlib/KeyboardService.hpp>
 #include <Cocktail/Core/System/Monitor/Xlib/MonitorService.hpp>
 #include <Cocktail/Core/System/Mouse/Xlib/MouseService.hpp>
@@ -45,6 +46,10 @@ namespace Ck::Detail::Xlib
 		{
 			CK_LOG(XlibLogCategory, LogLevel::Warning, CK_TEXT("X11 extension RANDR is not supported, MonitorService will be disabled"));
 		}
+
+        application->Singleton<Ck::ClipboardService>([display = mDisplay](AtomManager* atomManager) -> UniquePtr<Ck::ClipboardService> {
+            return MakeUnique<ClipboardService>(atomManager, display);
+        });
 
 		application->Singleton<Ck::MouseService>([display = mDisplay](Application* app) -> UniquePtr<Ck::MouseService> {
 			return MakeUnique<MouseService>(display, app);
