@@ -56,7 +56,6 @@ namespace Ck
 		{
 		};
 
-
 		Uint32 Size;
 		Flags<FlagBits> FileFlags;
 		Uint32 Height;

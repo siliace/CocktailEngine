@@ -223,7 +223,7 @@ namespace Ck
 		 * \return
 		 */
 		template <typename Callable>
-		auto GetOrElse(Callable&& fallback) -> decltype(fallback())
+		auto GetOrElse(Callable&& fallback) -> FunctionReturnType<Callable>
 		{
 			return !mEmpty ? Get() : fallback();
 		}
@@ -234,7 +234,7 @@ namespace Ck
 		 * \return
 		 */
 		template <typename Callable>
-		auto GetOrElse(Callable&& fallback) const -> decltype(fallback())
+		auto GetOrElse(Callable&& fallback) const -> FunctionReturnType<Callable>
 		{
 			return !mEmpty ? Get() : fallback();
 		}
