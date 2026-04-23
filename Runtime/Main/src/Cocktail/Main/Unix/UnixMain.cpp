@@ -11,7 +11,5 @@ int main(int argc, char* argv[])
 
 	Ck::Main::ExitCode exitCode = Ck::Main::InvokeMain(std::move(application));
 
-    application.Reset();
-
 	return static_cast<int>(exitCode);
 }

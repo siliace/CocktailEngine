@@ -15,54 +15,74 @@
 
 namespace Ck
 {
-	/**
-	 * \brief 
-	 */
+    /**
+     * \brief Core application class responsible for managing lifecycle and services.
+     *
+     * The Application class acts as the central entry point of the program.
+     * It manages ServiceProviders, application lifecycle (boot, terminate),
+     * and provides access to environment and runtime information.
+     *
+     * It also exposes signals to observe lifecycle events.
+     */
 	class COCKTAIL_CORE_API Application : public ServiceContainer, public Observable, public UseSystemAllocator
 	{
 	public:
 	
 		/**
-		 * \brief Destructor
+	     * \brief Destructor
+         *
+         * Ensures proper cleanup of registered services and resources.
 		 */
 		~Application() override;
 
-		/**
-		 * \brief Create and register a new ServiceProvider
-		 * \tparam T The type of the ServiceProvider to create
-		 * \tparam Args Types of the arguments to use to create the ServiceProvider
-		 * \param args Arguments to use to create the ServiceProvider
-		 * \return A pointer to the created ServiceProvider
-		 */
+	    /**
+         * \brief Create and register a new ServiceProvider
+         *
+         * Constructs a ServiceProvider of type \p T and registers it
+         * into the application.
+         *
+         * \tparam T    Type of the ServiceProvider to create (must derive from ServiceProvider)
+         * \tparam Args Types of the arguments used to construct the ServiceProvider
+         *
+         * \param args  Arguments forwarded to the ServiceProvider constructor
+         */
 		template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of_v<ServiceProvider, T>>>
 		void RegisterServiceProvider(Args&&... args)
 		{
 			RegisterServiceProvider(MakeUnique<T>(this, std::forward<Args>(args)...));
 		}
 
-		/**
-		 * \brief Register a new ServiceProvider
-		 * \param serviceProvider The ServiceProvider to register
-		 * \return A pointer to the registered ServiceProvider
-		 */
+	    /**
+         * \brief Register an existing ServiceProvider
+         *
+         * \param serviceProvider The ServiceProvider instance to register
+         */
 		void RegisterServiceProvider(UniquePtr<ServiceProvider> serviceProvider);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+	    /**
+         * \brief Check whether the application has been booted
+         *
+         * \return True if Boot() has been called, false otherwise
+         */
 		bool IsBooted() const;
 
-		/**
-		 * \brief 
-		 */
+	    /**
+         * \brief Boot the application
+         *
+         * Initializes all registered ServiceProviders and triggers their boot sequence.
+         */
 		void Boot();
 
-		/**
-		 * \brief
-		 * \tparam T
-		 * \param callback
-		 */
+	    /**
+         * \brief Register a callback executed before a ServiceProvider is booted
+         *
+         * The callback is connected to the ServiceProvider's "OnBoot" signal.
+         *
+         * \tparam T Type of the ServiceProvider
+         * \tparam Callable Type of the callback function
+         *
+         * \param callback  Function to invoke before boot
+         */
 		template <typename T, typename Callable>
 		void BeforeBooted(Callable callback)
 		{
@@ -70,11 +90,17 @@ namespace Ck
 				Connect(serviceProvider->OnBoot(), callback);
 		}
 
-		/**
-		 * \brief 
-		 * \tparam T 
-		 * \param callback 
-		 */
+	    /**
+         * \brief Register a callback executed after a ServiceProvider is booted
+         *
+         * The callback is connected to the ServiceProvider's "OnBooted" signal.
+         * If the ServiceProvider is already booted, the callback is invoked immediately.
+         *
+         * \tparam T Type of the ServiceProvider
+         * \tparam Callable Type of the callback function
+         *
+         * \param callback  Function to invoke after boot
+         */
 		template <typename T, typename Callable>
 		void AfterBooted(Callable callback)
 		{
@@ -87,71 +113,90 @@ namespace Ck
 			}
 		}
 
-		/**
-		 * \brief 
-		 * \param exitCode 
-		 * \param force 
-		 * \param callSite 
-		 */
+	    /**
+         * \brief Request application exit
+         *
+         * \param exitCode Exit code to return to the operating system
+         * \param force If true, forces immediate exit
+         * \param callSite Optional string describing where the exit was requested
+         */
 		virtual void Exit(unsigned int exitCode = 0, bool force = false, StringView callSite = CK_TEXT("")) = 0;
 
 		/**
 		 * \brief Gracefully terminate the application
-		 * When the application is terminated, every bound signals with be disconnected
-		 * and every registered service provider will be deleted.
-		 * Also, every ServiceFacade class will be disabled.
+		 *
+	     * Disconnects all signals, destroys all registered ServiceProviders,
+         * and disables all ServiceFacade instances.
 		 */
 		void Terminate();
 
-		/**
-		 * \brief Get the duration since the application started
-		 * \return The uptime
-		 */
+	    /**
+         * \brief Get the time elapsed since the application started
+         *
+         * \return Application uptime
+         */
 		Duration Uptime() const;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+	    /**
+         * \brief Get the command line arguments
+         *
+         * \return Array of argument strings
+         */
 		virtual const Array<String>& GetArgv() const = 0;
 
-		/**
-		 * \brief 
-		 * \param name 
-		 * \return 
-		 */
+	    /**
+         * \brief Retrieve an environment variable
+         *
+         * \param name Name of the environment variable
+         *
+         * \return The value if found, otherwise an empty Optional
+         */
 		virtual Optional<String> GetEnvironmentVariable(StringView name) = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+	    /**
+         * \brief Check if a debugger is attached to the process
+         *
+         * \return True if a debugger is present, false otherwise
+         */
 		virtual bool IsDebuggerPresent() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+	    /**
+         * \brief Get the path of the executable
+         *
+         * \return Filesystem path to the running executable
+         */
 		virtual Path GetExecutablePath() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
+	    /**
+         * \brief Get the full command line string
+         *
+         * \return Command line used to launch the application
+         */
+	    virtual String GetCommandLine() const = 0;
+
+	    /**
+         * \brief Signal emitted when the application is terminating
+         *
+         * \return Reference to the termination signal
+         */
 		Signal<Application*>& OnTerminate();
 
 	protected:
 
-		/**
-		 * \brief
-		 */
+	    /**
+         * \brief Constructor
+         *
+         * Initializes internal state of the application.
+         */
 		Application();
 
-		/**
-		 * \brief 
-		 * \tparam T 
-		 * \return 
-		 */
+	    /**
+         * \brief Find a registered ServiceProvider by type
+         *
+         * \tparam T Type of the ServiceProvider to find
+         *
+         * \return Pointer to the ServiceProvider if found, nullptr otherwise
+         */
 		template <typename T, typename = std::enable_if_t<std::is_base_of_v<ServiceProvider, T>>>
 		ServiceProvider* FindServiceProvider() const
 		{
@@ -165,10 +210,10 @@ namespace Ck
 
 	private:
 
-		bool mBooted;
-		Array<UniquePtr<ServiceProvider>> mServiceProviders;
-		Signal<Application*> mOnTerminate;
-		Instant mStart;
+		bool mBooted; /*!< Indicates whether the application has been booted */
+		Array<UniquePtr<ServiceProvider>> mServiceProviders; /*!< Registered service providers */
+		Signal<Application*> mOnTerminate; /*!< Signal emitted on application termination */
+		Instant mStart; /*!< Time point when the application started */
 	};
 
 	namespace Detail

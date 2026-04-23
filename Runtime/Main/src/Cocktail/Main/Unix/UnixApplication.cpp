@@ -1,12 +1,13 @@
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/System/SystemError.hpp>
 
-#include <Cocktail/Main/main.hpp>
 #include <Cocktail/Main/Unix/UnixApplication.hpp>
+#include <Cocktail/Main/main.hpp>
 
 namespace Ck::Main::Unix
 {
@@ -70,5 +71,28 @@ namespace Ck::Main::Unix
             throw SystemError::GetLastError();
 
         return Path::Parse(buffer, bufferLength);
+    }
+
+    String UnixApplication::GetCommandLine() const
+    {
+        static const ssize_t BufferSize = 4096;
+
+        int fd = ::open("/proc/self/cmdline", O_RDONLY);
+        if (fd == -1)
+            throw SystemError::GetLastError();
+
+        Utf8Char buffer[BufferSize];
+        ssize_t n = read(fd, buffer, BufferSize);
+        if (n == -1)
+        {
+            std::system_error lastError = SystemError::GetLastError();
+            close(fd);
+
+            throw lastError;
+        }
+
+        close(fd);
+
+        return String(buffer, n);
     }
 }

@@ -70,4 +70,9 @@ namespace Ck::Main::Win32
 
 		return Path::Parse(executablePath, executablePathLength);
 	}
+
+    String Win32Application::GetCommandLine() const
+    {
+	    return ::GetCommandLineW();
+    }
 }
