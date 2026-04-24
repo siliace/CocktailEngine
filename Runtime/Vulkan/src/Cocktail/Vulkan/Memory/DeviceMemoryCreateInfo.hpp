@@ -11,6 +11,8 @@ namespace Ck::Vulkan
 	 */
 	struct DeviceMemoryCreateInfo
 	{
+	    float Priority = 1.f;
+
 		/**
 		 * \brief 
 		 */

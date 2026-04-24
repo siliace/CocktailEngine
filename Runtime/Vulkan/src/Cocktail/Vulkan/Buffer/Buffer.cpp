@@ -11,6 +11,7 @@ namespace Ck::Vulkan
 		mHandle(VK_NULL_HANDLE),
 		mUsage(createInfo.Usage),
 		mMemoryType(createInfo.MemoryType),
+        mMemoryPriority(createInfo.Priority),
 		mSize(createInfo.Size),
 		mExclusive(createInfo.Exclusive)
 	{
@@ -76,7 +77,12 @@ namespace Ck::Vulkan
 		return mExclusive;
 	}
 
-	Renderer::MemoryType Buffer::GetMemoryType() const
+    Renderer::MemoryPriority Buffer::GetPriority() const
+    {
+	    return mMemoryPriority;
+    }
+
+    Renderer::MemoryType Buffer::GetMemoryType() const
 	{
 		return mMemoryType;
 	}

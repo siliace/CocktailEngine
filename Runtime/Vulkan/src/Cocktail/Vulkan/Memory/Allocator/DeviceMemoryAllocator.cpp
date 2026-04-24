@@ -27,12 +27,21 @@ namespace Ck::Vulkan
 
 		unsigned int memoryTypeIndex = FindMemoryTypeIndex(memoryRequirements.memoryTypeBits, texture.GetMemoryType());
 
-		DeviceMemoryBlock* block = AllocateBlock(dedicated ? &texture : nullptr, memoryRequirements, memoryTypeIndex);
+		DeviceMemoryBlock* block;
+	    if (dedicated)
+	    {
+	        block = AllocateDedicatedBlock(&texture, texture.GetPriority(), memoryRequirements, memoryTypeIndex);
+	    }
+	    else
+	    {
+	        block = AllocateBlock(texture.GetPriority(), memoryRequirements, memoryTypeIndex);
+	    }
+
 		block->BindToTexture(*mRenderDevice, texture);
 
 		return block;
 	}
-	
+
 	DeviceMemoryBlock* DeviceMemoryAllocator::Allocate(const Buffer& buffer)
 	{
 		bool dedicated;
@@ -41,7 +50,15 @@ namespace Ck::Vulkan
 
 		unsigned int memoryTypeIndex = FindMemoryTypeIndex(memoryRequirements.memoryTypeBits, buffer.GetMemoryType());
 
-		DeviceMemoryBlock* block = AllocateBlock(dedicated ? &buffer : nullptr, memoryRequirements, memoryTypeIndex);
+	    DeviceMemoryBlock* block;
+	    if (dedicated)
+	    {
+		    block = AllocateDedicatedBlock(&buffer, buffer.GetPriority(), memoryRequirements, memoryTypeIndex);
+	    }
+	    else
+	    {
+	        block = AllocateBlock(buffer.GetPriority(), memoryRequirements, memoryTypeIndex);
+	    }
 
 		block->BindToBuffer(*mRenderDevice, buffer);
 
@@ -119,7 +136,7 @@ namespace Ck::Vulkan
 		VkMemoryPropertyFlags memoryTypeProperties = 0;
 		switch (memoryType)
 		{
-		case Renderer::MemoryType::Static: 
+		case Renderer::MemoryType::Static:
 			memoryTypeProperties |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 			break;
 
@@ -148,4 +165,33 @@ namespace Ck::Vulkan
 
 		return 0;
 	}
+
+    DeviceMemoryBlock* DeviceMemoryAllocator::AllocateBlock(Renderer::MemoryPriority priority, const VkMemoryRequirements& memoryRequirements, unsigned int memoryTypeIndex)
+    {
+	    DeviceMemoryBlock* block;
+	    for (auto& chunk : mChunks)
+	    {
+	        if (chunk->IsDedicated())
+	            continue;
+
+	        if (chunk->GetMemoryTypeIndex() != memoryTypeIndex)
+	            continue;
+
+	        if (chunk->GetMemoryPriority() != priority)
+	            continue;
+
+	        block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
+            if (block == nullptr)
+                continue;
+
+	        return block;
+	    }
+
+	    auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, priority, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
+	    block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
+
+	    mChunks.Add(std::move(chunk));
+
+	    return block;
+    }
 }

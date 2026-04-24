@@ -5,6 +5,7 @@
 #include <Cocktail/Core/Flags.hpp>
 #include <Cocktail/Renderer/PixelFormat.hpp>
 
+#include <Cocktail/Renderer/Memory/MemoryPriority.hpp>
 #include <Cocktail/Renderer/Memory/MemoryType.hpp>
 
 namespace Ck::Renderer
@@ -130,6 +131,11 @@ namespace Ck::Renderer
          * \brief Specifies the type of memory where store Texture's texels
          */
         MemoryType MemoryType = MemoryType::Static;
+
+        /**
+         * \brief Specifies the priority of the memory in the VRAM
+         */
+        MemoryPriority Priority = MemoryPriority::Medium;
 
         /**
          * \brief Specifies whether the texture to create should be queue exclusive

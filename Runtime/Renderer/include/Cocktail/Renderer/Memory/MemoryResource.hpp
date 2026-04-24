@@ -5,6 +5,8 @@
 #include <Cocktail/Renderer/Memory/MemoryType.hpp>
 #include <Cocktail/Renderer/Memory/ResourceType.hpp>
 
+#include "Cocktail/Renderer/Memory/MemoryPriority.hpp"
+
 namespace Ck::Renderer
 {
     /**
@@ -19,6 +21,12 @@ namespace Ck::Renderer
          * \return 
          */
         virtual bool IsExclusive() const = 0;
+
+        /**
+         * \brief
+         * \return
+         */
+        virtual MemoryPriority GetPriority() const = 0;
 
 	    /**
          * \brief 

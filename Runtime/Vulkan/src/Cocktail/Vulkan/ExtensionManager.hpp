@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_VULKAN_EXTENSIONMANAGER_HPP
 #define COCKTAIL_VULKAN_EXTENSIONMANAGER_HPP
 
-#include <unordered_set>
-
 #include <Cocktail/Core/String.hpp>
 
 #include <Cocktail/Renderer/RenderDeviceExtension.hpp>

@@ -16,10 +16,18 @@ namespace Ck::Vulkan
 			dedicatedAllocateInfo.buffer = createInfo.Buffer ? createInfo.Buffer->GetHandle() : VK_NULL_HANDLE;
 		}
 
+	    VkMemoryPriorityAllocateInfoEXT memoryPriority{ VK_STRUCTURE_TYPE_MEMORY_PRIORITY_ALLOCATE_INFO_EXT, nullptr };
+		{
+		    memoryPriority.priority = createInfo.Priority;
+		}
+
 		VkMemoryAllocateInfo allocateInfo{ VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, nullptr };
 		{
 			if (createInfo.Dedicated && mRenderDevice->IsFeatureSupported(RenderDeviceFeature::DedicatedAllocation))
 				Chain(allocateInfo, dedicatedAllocateInfo);
+
+		    if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::MemoryPriority))
+		        Chain(allocateInfo, memoryPriority);
 
 			allocateInfo.allocationSize = createInfo.Size;
 			allocateInfo.memoryTypeIndex = createInfo.MemoryTypeIndex;

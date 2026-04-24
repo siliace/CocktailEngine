@@ -17,28 +17,34 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 * \param renderDevice
+		 * \param blockPool
+		 * \param priority
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief
 		 * \param renderDevice
+		 * \param blockPool
 		 * \param texture
+		 * \param priority
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief
 		 * \param renderDevice
+		 * \param blockPool
 		 * \param buffer
+		 * \param priority
 		 * \param size
 		 * \param memoryTypeIndex
 		 */
-		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex);
+		DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex);
 
 		/**
 		 * \brief 
@@ -57,6 +63,8 @@ namespace Ck::Vulkan
 		 * \return 
 		 */
 		bool IsFree() const;
+
+	    Renderer::MemoryPriority GetMemoryPriority() const;
 
 		/**
 		 * \brief 
@@ -93,6 +101,7 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		ObjectPool<DeviceMemoryBlock>& mBlockPool;
+	    Renderer::MemoryPriority mMemoryPriority;
 		std::size_t mSize;
 		unsigned int mMemoryTypeIndex;
 		bool mDedicated;

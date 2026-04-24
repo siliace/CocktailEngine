@@ -23,7 +23,12 @@ namespace Ck::Vulkan
 		return false;
 	}
 
-	Renderer::MemoryType SwapchainTexture::GetMemoryType() const
+    Renderer::MemoryPriority SwapchainTexture::GetPriority() const
+    {
+	    return Renderer::MemoryPriority::Critical;
+    }
+
+    Renderer::MemoryType SwapchainTexture::GetMemoryType() const
 	{
 		return Renderer::MemoryType::Static;
 	}

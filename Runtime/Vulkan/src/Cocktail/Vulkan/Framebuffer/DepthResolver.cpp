@@ -1,4 +1,4 @@
-#include <Cocktail/Core/Utility/FileUtils.hpp>
+#include <Cocktail/Core/Utility/StorageUtils.hpp>
 
 #include <Cocktail/Vulkan/RenderDevice.hpp>
 #include <Cocktail/Vulkan/Command/CommandList.hpp>
@@ -68,9 +68,9 @@ namespace Ck::Vulkan
 		commandList.Barrier(1, postBarriers);
 	}
 
-	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const Path& path, Renderer::ShaderType shaderType)
+	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const URI& uri, Renderer::ShaderType shaderType)
 	{
-		ByteArray shaderCode = FileUtils::ReadFile(path);
+		ByteArray shaderCode = StorageUtils::ReadFile(uri);
 
 		Renderer::ShaderCreateInfo createInfo;
 		createInfo.Type = shaderType;

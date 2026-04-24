@@ -87,6 +87,8 @@ namespace Ck::Renderer
          * to improve performance.
          */
         VariableShadingRate,
+
+        MemoryPriority,
     };
 }
 

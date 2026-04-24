@@ -3,9 +3,27 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, std::size_t size, unsigned int memoryTypeIndex) :
+    namespace
+    {
+        float GetMemoryPriorityFactor(Renderer::MemoryPriority p)
+        {
+            switch (p)
+            {
+                case Renderer::MemoryPriority::Critical: return 1.0f;
+                case Renderer::MemoryPriority::High: return 0.8f;
+                case Renderer::MemoryPriority::Medium: return 0.5f;
+                case Renderer::MemoryPriority::Low: return 0.3f;
+                case Renderer::MemoryPriority::VeryLow: return 0.1f;
+                case Renderer::MemoryPriority::Streaming: return 0.0f;
+                default: return 0.5f;
+            }
+        }
+    }
+
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
+        mMemoryPriority(priority),
 		mSize(size),
 		mMemoryTypeIndex(memoryTypeIndex),
 		mDedicated(false),
@@ -14,7 +32,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(nullptr, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const AbstractTexture* texture, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -25,7 +43,7 @@ namespace Ck::Vulkan
 		AllocateDeviceMemory(texture, nullptr);
 	}
 
-	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, std::size_t size, unsigned int memoryTypeIndex) :
+	DeviceMemoryChunk::DeviceMemoryChunk(RenderDevice* renderDevice, ObjectPool<DeviceMemoryBlock>& blockPool, const Buffer* buffer, Renderer::MemoryPriority priority, std::size_t size, unsigned int memoryTypeIndex) :
 		mRenderDevice(std::move(renderDevice)),
 		mBlockPool(blockPool),
 		mSize(size),
@@ -84,7 +102,12 @@ namespace Ck::Vulkan
 		});
 	}
 
-	std::size_t DeviceMemoryChunk::GetSize() const
+    Renderer::MemoryPriority DeviceMemoryChunk::GetMemoryPriority() const
+    {
+        return mMemoryPriority;
+    }
+
+    std::size_t DeviceMemoryChunk::GetSize() const
 	{
 		return mSize;
 	}
@@ -107,6 +130,7 @@ namespace Ck::Vulkan
 	void DeviceMemoryChunk::AllocateDeviceMemory(const AbstractTexture* texture, const Buffer* buffer)
 	{
 		DeviceMemoryCreateInfo createInfo;
+        createInfo.Priority = GetMemoryPriorityFactor(mMemoryPriority);
 		createInfo.Size = mSize;
 		createInfo.MemoryTypeIndex = mMemoryTypeIndex;
 		createInfo.Dedicated = mDedicated;

@@ -4,6 +4,7 @@
 #include <Cocktail/Core/Flags.hpp>
 
 #include <Cocktail/Renderer/Buffer/BufferUsage.hpp>
+#include <Cocktail/Renderer/Memory/MemoryPriority.hpp>
 #include <Cocktail/Renderer/Memory/MemoryType.hpp>
 
 namespace Ck::Renderer
@@ -29,6 +30,11 @@ namespace Ck::Renderer
          * \brief Specifies the type of memory where store Buffer's data
          */
         MemoryType MemoryType = MemoryType::Static;
+
+        /**
+         * \brief Specifies the priority of the memory in the VRAM
+         */
+        MemoryPriority Priority = MemoryPriority::Medium;
 
 	    /**
          * \brief Specifies whether the buffer to create should be queue exclusive

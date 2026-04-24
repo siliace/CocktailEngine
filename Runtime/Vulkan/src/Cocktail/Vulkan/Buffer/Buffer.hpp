@@ -51,6 +51,8 @@ namespace Ck::Vulkan
 		 */
 		bool IsExclusive() const override;
 
+	    Renderer::MemoryPriority GetPriority() const override;
+
 		/**
 		 * \brief 
 		 * \return 
@@ -101,6 +103,7 @@ namespace Ck::Vulkan
 		VkBuffer mHandle;
 		Renderer::BufferUsageFlags mUsage;
 		Renderer::MemoryType mMemoryType;
+	    Renderer::MemoryPriority mMemoryPriority;
 		std::size_t mSize;
 		bool mExclusive;
 		DeviceMemoryBlock* mMemoryBlock;

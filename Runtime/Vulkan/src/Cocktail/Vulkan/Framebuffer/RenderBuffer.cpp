@@ -52,7 +52,12 @@ namespace Ck::Vulkan
 		return true;
 	}
 
-	Renderer::MemoryType RenderBuffer::GetMemoryType() const
+    Renderer::MemoryPriority RenderBuffer::GetPriority() const
+    {
+	    return Renderer::MemoryPriority::Critical;
+    }
+
+    Renderer::MemoryType RenderBuffer::GetMemoryType() const
 	{
 		return Renderer::MemoryType::Static;
 	}

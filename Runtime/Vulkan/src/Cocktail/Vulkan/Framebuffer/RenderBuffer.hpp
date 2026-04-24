@@ -36,6 +36,12 @@ namespace Ck::Vulkan
 		 */
 		bool IsExclusive() const override;
 
+        /**
+         * \brief
+         * \return
+         */
+	    Renderer::MemoryPriority GetPriority() const override;
+
 		/**
 		 * \brief 
 		 * \return 

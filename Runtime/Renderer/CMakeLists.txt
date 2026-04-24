@@ -78,6 +78,7 @@ cocktail_source_directory(RENDERER_FILES
 cocktail_source_directory(RENDERER_FILES    
     FOLDER "Memory"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Memory/MemoryPriority.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Memory/MemoryResource.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Memory/MemoryType.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Memory/ResourceState.hpp
@@ -109,6 +110,7 @@ cocktail_source_directory(RENDERER_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/Texture.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureCreateInfo.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureSubResource.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureSwizzle.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureView.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Renderer/Texture/TextureViewCreateInfo.hpp
     SRC

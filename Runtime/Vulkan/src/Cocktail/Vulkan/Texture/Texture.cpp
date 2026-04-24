@@ -11,6 +11,8 @@ namespace Ck::Vulkan
 		mFormat(createInfo.Format),
 		mSize(createInfo.Size),
 		mExclusive(createInfo.Exclusive),
+        mMemoryPriority(createInfo.Priority),
+        mMemoryType(createInfo.MemoryType),
 		mMipMapCount(createInfo.MipMapsCount),
 		mArrayLayerCount(createInfo.ArrayLayerCount),
 		mAllocationCallbacks(allocationCallbacks)
@@ -114,9 +116,14 @@ namespace Ck::Vulkan
 		return mExclusive;
 	}
 
-	Renderer::MemoryType Texture::GetMemoryType() const
+    Renderer::MemoryPriority Texture::GetPriority() const
+    {
+        return mMemoryPriority;
+    }
+
+    Renderer::MemoryType Texture::GetMemoryType() const
 	{
-		return Renderer::MemoryType::Static;
+		return mMemoryType;
 	}
 
 	Renderer::TextureType Texture::GetType() const

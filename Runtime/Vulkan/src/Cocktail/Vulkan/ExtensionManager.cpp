@@ -116,6 +116,20 @@ namespace Ck::Vulkan
 		};
 	};
 
+    template <>
+    struct ExtensionRequirement<Renderer::RenderDeviceExtension::MemoryPriority>
+    {
+        inline static unsigned int InstanceExtensionCount = 1;
+        inline static const AnsiChar* InstanceExtensions[] = {
+            VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+        };
+
+        inline static unsigned int DeviceExtensionCount = 1;
+        inline static const AnsiChar* DeviceExtensions[] = {
+            VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME,
+        };
+    };
+
 	template <RenderDeviceFeature>
 	struct FeatureRequirement
 	{
@@ -273,16 +287,19 @@ namespace Ck::Vulkan
 		}
 #undef CASE_FEATURE
 
-		if (!CheckExtensionsInstanceSupport(extensionCount, extensionNames))
-			return false;
+	    if (extensionNames)
+	    {
+	        if (!CheckExtensionsInstanceSupport(extensionCount, extensionNames))
+	            return false;
 
-		for (unsigned int i = 0; i < extensionCount; i++)
-		{
-			if (mInstanceExtensions.Contains(extensionNames[i]))
-				continue;
+	        for (unsigned int i = 0; i < extensionCount; i++)
+	        {
+	            if (mInstanceExtensions.Contains(extensionNames[i]))
+	                continue;
 
-			mInstanceExtensions.Add(extensionNames[i]);
-		}
+	            mInstanceExtensions.Add(extensionNames[i]);
+	        }
+	    }
 
 		return true;
 	}
@@ -309,19 +326,23 @@ namespace Ck::Vulkan
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::TextureView2DArrayCompatible)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::ByteIndexType)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::VariableShadingRate)
+		CASE_EXTENSION(Renderer::RenderDeviceExtension::MemoryPriority)
 		}
 #undef CASE_EXTENSION
 
-		if (!CheckExtensionsInstanceSupport(extensionCount, extensionNames))
-			return false;
+	    if (extensionNames)
+	    {
+	        if (!CheckExtensionsInstanceSupport(extensionCount, extensionNames))
+	            return false;
 
-		for (unsigned int i = 0; i < extensionCount; i++)
-		{
-			if (mInstanceExtensions.Contains(extensionNames[i]))
-				continue;
+	        for (unsigned int i = 0; i < extensionCount; i++)
+	        {
+	            if (mInstanceExtensions.Contains(extensionNames[i]))
+	                continue;
 
-			mInstanceExtensions.Add(extensionNames[i]);
-		}
+	            mInstanceExtensions.Add(extensionNames[i]);
+	        }
+	    }
 
 		return true;
 	}
@@ -350,16 +371,19 @@ namespace Ck::Vulkan
 		}
 #undef CASE_FEATURE
 
-		if (!CheckExtensionPhysicalDeviceSupport(physicalDevice, extensionCount, extensionNames))
-			return false;
+	    if (extensionNames)
+	    {
+	        if (!CheckExtensionPhysicalDeviceSupport(physicalDevice, extensionCount, extensionNames))
+	            return false;
 
-		for (unsigned int i = 0; i < extensionCount; i++)
-		{
-			if (mDeviceExtensions.Contains(extensionNames[i]))
-				continue;
+	        for (unsigned int i = 0; i < extensionCount; i++)
+	        {
+	            if (mDeviceExtensions.Contains(extensionNames[i]))
+	                continue;
 
-			mDeviceExtensions.Add(extensionNames[i]);
-		}
+	            mDeviceExtensions.Add(extensionNames[i]);
+	        }
+	    }
 
 		return true;
 	}
@@ -386,19 +410,23 @@ namespace Ck::Vulkan
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::TextureView2DArrayCompatible)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::ByteIndexType)
 		CASE_EXTENSION(Renderer::RenderDeviceExtension::VariableShadingRate)
+		CASE_EXTENSION(Renderer::RenderDeviceExtension::MemoryPriority)
 		}
 #undef CASE_EXTENSION
 
-		if (!CheckExtensionPhysicalDeviceSupport(physicalDevice, extensionCount, extensionNames))
-			return false;
+	    if (extensionNames)
+	    {
+	        if (!CheckExtensionPhysicalDeviceSupport(physicalDevice, extensionCount, extensionNames))
+	            return false;
 
-		for (unsigned int i = 0; i < extensionCount; i++)
-		{
-			if (mDeviceExtensions.Contains(extensionNames[i]))
-				continue;
+	        for (unsigned int i = 0; i < extensionCount; i++)
+	        {
+	            if (mDeviceExtensions.Contains(extensionNames[i]))
+	                continue;
 
-			mDeviceExtensions.Add(extensionNames[i]);
-		}
+	            mDeviceExtensions.Add(extensionNames[i]);
+	        }
+	    }
 
 		return true;
 	}
@@ -451,6 +479,8 @@ namespace Ck::Vulkan
 
 	bool ExtensionManager::CheckExtensionSupport(const Array<VkExtensionProperties>& properties, unsigned int extensionCount, const AnsiChar* const* extensionNames) const
 	{
+	    assert(extensionNames != nullptr);
+
 		bool extensionsSupported = true;
 		for (unsigned int i = 0; i < extensionCount && extensionsSupported; i++)
 		{

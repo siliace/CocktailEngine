@@ -467,21 +467,28 @@ namespace Ck::Vulkan
 		VkPhysicalDeviceFeatures2KHR physicalDeviceFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR, nullptr };
 		VkPhysicalDeviceSynchronization2FeaturesKHR synchronization2Features{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR, nullptr };
 	    VkPhysicalDeviceFragmentShadingRateFeaturesKHR fragmentShadingRateFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADING_RATE_FEATURES_KHR, nullptr };
+	    VkPhysicalDeviceMemoryPriorityFeaturesEXT memoryPriorityFeatures{ VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PRIORITY_FEATURES_EXT, nullptr };
 		if (hasPhysicalDeviceFeatures2)
 		{
-			if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME))
-				Chain(physicalDeviceFeatures, synchronization2Features);
+		    if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME))
+		        Chain(physicalDeviceFeatures, synchronization2Features);
 
 		    if (mExtensionManager.IsSupportedDeviceExtension(VK_KHR_FRAGMENT_SHADING_RATE_EXTENSION_NAME))
 		        Chain(physicalDeviceFeatures, fragmentShadingRateFeatures);
 
-			vkGetPhysicalDeviceFeatures2KHR(mPhysicalDevice, &physicalDeviceFeatures);
+		    if (mExtensionManager.IsSupportedDeviceExtension(VK_EXT_MEMORY_PRIORITY_EXTENSION_NAME))
+		        Chain(physicalDeviceFeatures, memoryPriorityFeatures);
+
+		    vkGetPhysicalDeviceFeatures2KHR(mPhysicalDevice, &physicalDeviceFeatures);
 
 		    if (!fragmentShadingRateFeatures.primitiveFragmentShadingRate || !fragmentShadingRateFeatures.attachmentFragmentShadingRate || !fragmentShadingRateFeatures.pipelineFragmentShadingRate)
 		        mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate];
 
-			if (synchronization2Features.synchronization2 == VK_FALSE)
-				mSupportedFeatures[RenderDeviceFeature::Synchronization2] = false;
+		    if (synchronization2Features.synchronization2 == VK_FALSE)
+		        mSupportedFeatures[RenderDeviceFeature::Synchronization2] = false;
+
+		    if (memoryPriorityFeatures.memoryPriority == VK_FALSE)
+		        mSupportedExtensions[Renderer::RenderDeviceExtension::MemoryPriority] = false;
 		}
 		else
 		{

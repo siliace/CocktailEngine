@@ -33,6 +33,8 @@ namespace Ck::Vulkan
 		 */
 		bool IsExclusive() const override;
 
+	    Renderer::MemoryPriority GetPriority() const override;
+
 		/**
 		 * \brief 
 		 * \return 
@@ -81,6 +83,8 @@ namespace Ck::Vulkan
 		PixelFormat mFormat;
 		Extent3D<unsigned int> mSize;
 		bool mExclusive;
+	    Renderer::MemoryPriority mMemoryPriority;
+	    Renderer::MemoryType mMemoryType;
 		unsigned int mMipMapCount;
 		unsigned int mArrayLayerCount;
 		const VkAllocationCallbacks* mAllocationCallbacks;

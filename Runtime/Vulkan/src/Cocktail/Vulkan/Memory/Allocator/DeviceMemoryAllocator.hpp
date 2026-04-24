@@ -74,44 +74,24 @@ namespace Ck::Vulkan
 		/**
 		 * \brief 
 		 * \tparam T 
-		 * \param resource 
+		 * \param resource
+		 * \param priority
 		 * \param memoryRequirements 
 		 * \param memoryTypeIndex 
 		 * \return 
 		 */
 		template <typename T>
-		DeviceMemoryBlock* AllocateBlock(const T* resource, const VkMemoryRequirements& memoryRequirements, unsigned int memoryTypeIndex)
+		DeviceMemoryBlock* AllocateDedicatedBlock(const T* resource, Renderer::MemoryPriority priority, const VkMemoryRequirements& memoryRequirements, unsigned int memoryTypeIndex)
 		{
-			DeviceMemoryBlock* block = nullptr;
-			if (resource)
-			{
-				auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, resource, memoryRequirements.size, memoryTypeIndex);
-				block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
-				mChunks.Add(std::move(chunk));
-			}
-			else
-			{
-				for (auto& chunk : mChunks)
-				{
-					if (chunk->IsDedicated())
-						continue;
+		    auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, resource, priority, memoryRequirements.size, memoryTypeIndex);
+			auto block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
 
-					if (chunk->GetMemoryTypeIndex() != memoryTypeIndex)
-						continue;
+		    mChunks.Add(std::move(chunk));
 
-					block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
-				}
-
-				if (!block)
-				{
-					auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
-					block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
-					mChunks.Add(std::move(chunk));
-				}
-			}
-
-			return block;
+		    return block;
 		}
+
+	    DeviceMemoryBlock* AllocateBlock(Renderer::MemoryPriority priority, const VkMemoryRequirements& memoryRequirements, unsigned int memoryTypeIndex);
 
 		RenderDevice* mRenderDevice;
 		std::size_t mDefaultChuckSize;
