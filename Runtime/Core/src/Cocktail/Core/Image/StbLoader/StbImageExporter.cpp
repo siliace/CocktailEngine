@@ -31,26 +31,38 @@ namespace Ck
 	void StbImageExporter::SaveToStream(const Image& asset, OutputStream<>& outputStream, const ImageExportParameters& parameters) const
 	{
 		Extent2D<unsigned int> size = asset.GetSize();
-		unsigned int channelCount = ImageRawFormat::GetChannelCount(asset.GetRawFormat());
+        ImageRawFormat::Type rawFormat = asset.GetRawFormat();
+		unsigned int channelCount = ImageRawFormat::GetChannelCount(rawFormat);
 		const void* pixels = asset.GetPixels().GetData();
 
 		int err = 0;
-		if (parameters.Format == CK_TEXT("png"))
-		{
-			err = stbi_write_png_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 0);
-		}
-		else if (parameters.Format == CK_TEXT("bmp"))
-		{
-			err = stbi_write_bmp_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
-		}
-		else if (parameters.Format == CK_TEXT("tga"))
-		{
-			err = stbi_write_tga_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
-		}
-		else if (parameters.Format == CK_TEXT("jpg") || parameters.Format == CK_TEXT("jpeg"))
-		{
-			err = stbi_write_jpg_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 90);
-		}
+	    if (ImageRawFormat::IsHdr(rawFormat))
+	    {
+            err = stbi_write_hdr_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, static_cast<const float*>(pixels));
+	    }
+	    else
+	    {
+	        if (parameters.Format == CK_TEXT("png"))
+	        {
+	            err = stbi_write_png_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 0);
+	        }
+	        else if (parameters.Format == CK_TEXT("bmp"))
+	        {
+	            err = stbi_write_bmp_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
+	        }
+	        else if (parameters.Format == CK_TEXT("tga"))
+	        {
+	            err = stbi_write_tga_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels);
+	        }
+	        else if (parameters.Format == CK_TEXT("jpg") || parameters.Format == CK_TEXT("jpeg"))
+	        {
+	            err = stbi_write_jpg_to_func(imageWriteFunc, &outputStream, size.Width, size.Height, channelCount, pixels, 90);
+	        }
+	        else
+	        {
+	            throw StbExportError(CK_TEXT("Format %s is not supported"), parameters.Format);
+	        }
+	    }
 
 		if (err == 0)
 			throw StbExportError(CK_TEXT("Failed to export image"));
