@@ -12,6 +12,8 @@ if (WIN32)
     cocktail_source_directory(MAIN_FILES    
         FOLDER "Win32"
         SRC
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/Win32/DebuggerLogChannel.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/Win32/DebuggerLogChannel.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/Win32/Win32Application.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/Win32/Win32Application.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Main/Win32/WinMain.cpp
