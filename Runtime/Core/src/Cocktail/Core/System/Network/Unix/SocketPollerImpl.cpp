@@ -18,7 +18,7 @@ namespace Ck
 
 	void SocketPoller::Impl::Remove(Socket::Handle socketHandle)
 	{
-		mDescriptors.FilterInPlace([&](const pollfd& descriptor) {
+		mDescriptors.RemoveIf([&](const pollfd& descriptor) {
 			return descriptor.fd == socketHandle;
 		});
 	}

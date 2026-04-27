@@ -26,7 +26,7 @@ namespace Ck
 
 	void Scene::RemoveCamera(const Camera* camera)
 	{
-		mCameras.FilterInPlace([&](const UniquePtr<Camera>& sceneCamera) {
+		mCameras.RemoveIf([&](const UniquePtr<Camera>& sceneCamera) {
 			return sceneCamera.Get() == camera;
 		});
 	}
@@ -40,7 +40,7 @@ namespace Ck
 
 	void Scene::RemoveLight(const Light* light)
 	{
-		mLights.FilterInPlace([&](const UniquePtr<Light>&sceneLight) {
+		mLights.RemoveIf([&](const UniquePtr<Light>&sceneLight) {
 			return sceneLight.Get() == light;
 		});
 	}

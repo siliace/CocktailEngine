@@ -294,7 +294,7 @@ TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::HeapAllocator, Ck::LargeHea
     SECTION("To another array")
     {
         Ck::Array<int, TestType> results = array.Filter([](int i) {
-            return i % 2 != 0;
+            return i % 2 == 0;
         });
 
         REQUIRE(results.GetSize() == 8);
@@ -304,7 +304,7 @@ TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::HeapAllocator, Ck::LargeHea
     SECTION("In place")
     {
         array.FilterInPlace([](int i) {
-            return i % 2 != 0;
+            return i % 2 == 0;
         });
 
         REQUIRE(array.GetSize() == 8);

@@ -1854,7 +1854,7 @@ namespace Ck
                 if (remove)
                     ++removed;
 
-                return remove;
+                return !remove;
             });
 
             return removed;
@@ -1879,7 +1879,7 @@ namespace Ck
                 if (remove)
                     removed.Add(std::move(element));
 
-                return remove;
+                return !remove;
             });
 
             return removed;
@@ -1923,7 +1923,7 @@ namespace Ck
                 ElementType& readElement = data[readIndex];
                 ElementType& writeElement = data[writeIndex];
 
-                if (!predicate(readElement))
+                if (predicate(readElement))
                 {
                     if (writeIndex != readIndex)
                     {

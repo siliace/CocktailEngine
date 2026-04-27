@@ -251,7 +251,7 @@ namespace Ck::Vulkan
 			return variable.Split(';').Transform([](const String& extensionName) {
 				return AsciiString::Convert(extensionName);
 			}).Filter([](const AsciiString& extensionsName) {
-			    return !extensionsName.IsEmpty();
+			    return extensionsName.IsEmpty();
 			});
 		}).GetOr(Array<AsciiString>());
 

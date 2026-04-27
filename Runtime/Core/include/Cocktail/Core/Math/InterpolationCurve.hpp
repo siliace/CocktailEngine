@@ -177,7 +177,7 @@ namespace Ck
          */
         void RemoveKeyFrame(const KeyType& key)
         {
-            mKeyFrames.FilterInPlace([&](const KeyFrame& keyFrame) {
+            mKeyFrames.RemoveIf([&](const KeyFrame& keyFrame) {
                 return key == keyFrame.Key;
             });
         }
