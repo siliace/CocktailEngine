@@ -2,17 +2,17 @@
 
 namespace Ck
 {
-	Writer<>& Console::GetOutput()
+	LineWriter<> Console::GetOutput()
 	{
 		return ResolveFacadeInstance()->GetOutput();
 	}
 
-	Writer<>& Console::GetError()
+	LineWriter<> Console::GetError()
 	{
 		return ResolveFacadeInstance()->GetError();
 	}
 
-	Reader<>& Console::GetInput()
+	LineReader<> Console::GetInput()
 	{
 		return ResolveFacadeInstance()->GetInput();
 	}

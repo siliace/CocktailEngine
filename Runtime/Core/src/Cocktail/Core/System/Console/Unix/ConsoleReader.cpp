@@ -1,6 +1,8 @@
 #include <Cocktail/Core/System/SystemError.hpp>
 #include <Cocktail/Core/System/Console/Unix/ConsoleReader.hpp>
 
+#include <unistd.h>
+
 #include "Cocktail/Core/Exception.hpp"
 
 namespace Ck::Detail::Unix
@@ -12,7 +14,11 @@ namespace Ck::Detail::Unix
 
 	ConsoleReader::SizeType ConsoleReader::Read(TextChar* buffer, SizeType length)
 	{
-		return 0;
+		ssize_t readSize = read(STDIN_FILENO, &buffer, length);
+	    if (readSize == -1)
+	        throw SystemError::GetLastError();
+
+	    return readSize;
 	}
 
 	bool ConsoleReader::HasCursor() const

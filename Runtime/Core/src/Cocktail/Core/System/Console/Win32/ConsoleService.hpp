@@ -7,63 +7,23 @@
 
 namespace Ck::Detail::Win32
 {
-	/**
-	 * \brief 
-	 */
 	class ConsoleService final : public Ck::ConsoleService
 	{
 	public:
 
-		/**
-		 * \brief 
-		 */
 		ConsoleService();
 
-		/**
-		 * \brief 
-		 */
 		~ConsoleService() override;
 
-	    /**
-		 * \brief 
-		 * \return 
-		 */
-		Writer<>& GetOutput() override;
+		LineWriter<> GetOutput() override;
+		LineWriter<> GetError() override;
+		LineReader<> GetInput() override;
 
-		/**
-		 * \brief
-		 * \return
-		 */
-		Writer<>& GetError() override;
-
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		Reader<>& GetInput() override;
-
-		/**
-		 * \brief 
-		 */
 		void Clear() override;
 
-		/**
-		 * \brief 
-		 * \param text
-		 * \param background
-		 */
 		void SetColors(ConsoleColor text, ConsoleColor background, ConsoleStyle) override;
 
-		/**
-		 * \brief 
-		 */
 		void Beep() const override;
-
-		/**
-		 * \brief 
-		 * \param frequency 
-		 * \param duration 
-		 */
 		void Beep(unsigned int frequency, const Duration& duration) const override;
 
 	private:

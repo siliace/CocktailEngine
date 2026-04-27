@@ -85,19 +85,19 @@ namespace Ck::Detail::Win32
 		SetConsoleTextAttribute(handle, mInitialAttributes);
 	}
 
-	Writer<>& ConsoleService::GetOutput()
+	LineWriter<> ConsoleService::GetOutput()
 	{
-		return mOutput;
+		return LineWriter<>(mOutput);
 	}
 
-	Writer<>& ConsoleService::GetError()
+	LineWriter<> ConsoleService::GetError()
 	{
-		return mError;
+		return LineWriter<>(mError);
 	}
 
 	Reader<>& ConsoleService::GetInput()
 	{
-		return mInput;
+		return LineReader<>(mInput);
 	}
 
 	void ConsoleService::Clear()

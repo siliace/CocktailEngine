@@ -77,19 +77,19 @@ namespace Ck::Detail::Unix
         /// Nothing
 	}
 
-    Writer<>& ConsoleService::GetOutput()
+    LineWriter<> ConsoleService::GetOutput()
 	{
-		return mOutput;
+		return LineWriter<>(mOutput);
 	}
 
-	Writer<>& ConsoleService::GetError()
+	LineWriter<> ConsoleService::GetError()
 	{
-		return mError;
+		return LineWriter<>(mError);
 	}
 
-	Reader<>& ConsoleService::GetInput()
+	LineReader<> ConsoleService::GetInput()
 	{
-		return mInput;
+		return LineReader<>(mInput);
 	}
 
 	void ConsoleService::Clear()

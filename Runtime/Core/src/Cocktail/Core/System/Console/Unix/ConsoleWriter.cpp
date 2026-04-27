@@ -23,7 +23,7 @@ namespace Ck::Detail::Unix
 
 	void ConsoleWriter::Write(const CharType* text, SizeType length)
 	{
-		int err = ::write(mHandle, text, length * sizeof(CharType));
+		ssize_t err = ::write(mHandle, text, length * sizeof(CharType));
 		if (err == -1)
 			throw SystemError::GetLastError();
 	}
