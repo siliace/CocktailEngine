@@ -84,6 +84,11 @@ namespace Ck::Detail::Xlib
 		return XRRGetOutputPrimary(mDisplay, root) == mOutput;
 	}
 
+    Extent2D<int> Monitor::GetPosition() const
+    {
+        return MakeExtent(mCrtcInfo->x, mCrtcInfo->y);
+    }
+
     Extent2D<unsigned int> Monitor::GetSize() const
     {
         return MakeExtent<unsigned int>(mCrtcInfo->width, mCrtcInfo->height);

@@ -32,7 +32,12 @@ namespace Ck::Detail::Win32
 		return mMonitorInfo.dwFlags == MONITORINFOF_PRIMARY;
 	}
 
-	Extent2D<unsigned int> Monitor::GetSize() const
+    Extent2D<int> Monitor::GetPosition() const
+	{
+	    return MakeExtent(mMonitorInfo.rcMonitor.left, mMonitorInfo.rcMonitor.top);
+	}
+
+    Extent2D<unsigned int> Monitor::GetSize() const
 	{
 		unsigned int width = mMonitorInfo.rcMonitor.right - mMonitorInfo.rcMonitor.left;
 		unsigned int height = mMonitorInfo.rcMonitor.bottom - mMonitorInfo.rcMonitor.top;

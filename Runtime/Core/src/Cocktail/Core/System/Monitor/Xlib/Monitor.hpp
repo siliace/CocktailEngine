@@ -32,10 +32,12 @@ namespace Ck::Detail::Xlib
 		 */
 		bool IsPrimary() const override;
 
-		/**
-		 * \brief Get the physical size (in pixel) of the monitor
-		 * \return The size of the monitor
-		 */
+        Extent2D<int> GetPosition() const override;
+
+        /**
+         * \brief Get the physical size (in pixel) of the monitor
+         * \return The size of the monitor
+         */
 		Extent2D<unsigned int> GetSize() const override;
 
 		Orientation GetOrientation() const override;

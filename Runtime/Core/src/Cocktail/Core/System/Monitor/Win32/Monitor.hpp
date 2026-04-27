@@ -23,7 +23,13 @@ namespace Ck::Detail::Win32
 		 * \brief 
 		 * \return 
 		 */
-		bool IsPrimary() const override;
+	    bool IsPrimary() const override;
+
+	    /**
+         * \brief
+         * \return
+         */
+	    Extent2D<int> GetPosition() const override;
 
 		/**
 		 * \brief 

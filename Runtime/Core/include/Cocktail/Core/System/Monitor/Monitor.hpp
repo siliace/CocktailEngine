@@ -8,120 +8,148 @@
 
 namespace Ck
 {
-	/**
-	 * \brief 
-	 */
-	class COCKTAIL_CORE_API Monitor : public ServiceFacade<MonitorService>
-	{
-	public:
+    /**
+     * \brief Represents a physical display monitor and provides access to monitor services
+     *
+     * This class acts both as an abstraction of a physical monitor and as a static
+     * entry point to query available monitors through the underlying MonitorService.
+     *
+     * Platform behavior may vary depending on the underlying windowing system
+     * (e.g. Win32, X11, Wayland).
+     */
+    class COCKTAIL_CORE_API Monitor : public ServiceFacade<MonitorService>
+    {
+    public:
 
-		/**
-		 * \brief Enumerator of possible orientations of a Monitor
-		 */
-		enum class Orientation
-		{
-			/**
-			 * \brief The monitor is horizontal
-			 */
-			Landscape,
-
-			/**
-			 * \brief The monitor is horizontal but reversed
-			 */
-			UpsideDownLandscape,
-
-			/**
-			 * \brief The monitor is vertical on the right
-			 */
-			RightPortrait,
-
-			/**
-			 * \brief The monitor is vertical on the left
-			 */
-			LeftPortrait
-		};
-
-	    /**
-         * \brief Get the primary monitor of the system
-         * On Windows, the primary monitor is the one where is the start button
-         * On Linux, the primary monitor is usually chosen by the window manager
-         * \return The primary monitor
+        /**
+         * \brief Enumerator of possible monitor orientations
          */
-	    static Monitor* GetPrimaryMonitor();
+        enum class Orientation
+        {
+            /**
+             * \brief Standard horizontal orientation
+             */
+            Landscape,
 
-	    /**
-         * \brief
-         * \return
+            /**
+             * \brief Horizontal orientation rotated 180 degrees
+             */
+            UpsideDownLandscape,
+
+            /**
+             * \brief Vertical orientation rotated clockwise
+             */
+            RightPortrait,
+
+            /**
+             * \brief Vertical orientation rotated counter-clockwise
+             */
+            LeftPortrait
+        };
+
+        /**
+         * \brief Retrieves the primary monitor of the system
+         *
+         * \return A pointer to the primary monitor, or nullptr if unavailable
          */
-	    static unsigned int GetMonitorCount();
+        static Monitor* GetPrimaryMonitor();
 
-	    /**
-         * \brief
-         * \param index
-         * \return
+        /**
+         * \brief Retrieves the number of available monitors
+         *
+         * \return The total number of monitors detected on the system
          */
-	    static Monitor* GetMonitor(unsigned int index);
+        static unsigned int GetMonitorCount();
 
-	    /**
-         * \brief
-         * \param window
-         * \return
+        /**
+         * \brief Retrieves a monitor by index
+         *
+         * \param index Index of the monitor (range: 0 to GetMonitorCount() - 1)
+         *
+         * \return A pointer to the requested monitor, or nullptr if the index is invalid
          */
-	    static Monitor* GetWindowMonitor(const Window& window);
+        static Monitor* GetMonitor(unsigned int index);
 
-		/**
-		 * \brief 
-		 */
-		virtual ~Monitor() = default;
+        /**
+         * \brief Retrieves the monitor associated with a given window
+         *
+         * \param window The window whose monitor is queried
+         *
+         * \return A pointer to the monitor displaying the window, or nullptr if unavailable
+         */
+        static Monitor* GetWindowMonitor(const Window& window);
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual bool IsPrimary() const = 0;
+        /**
+         * \brief Virtual destructor
+         */
+        virtual ~Monitor() = default;
 
-		/**
-		 * \brief Get the physical size (in pixel) of the monitor
-		 * \return The size of the monitor
-		 */
-		virtual Extent2D<unsigned int> GetSize() const = 0;
+        /**
+         * \brief Indicates whether this monitor is the primary display
+         *
+         * \return True if this is the primary monitor, false otherwise
+         */
+        virtual bool IsPrimary() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual Orientation GetOrientation() const = 0;
+        /**
+         * \brief Retrieves the position of the monitor in pixels
+         *
+         * \return The monitor size as a 2D extent (width, height)
+         */
+        virtual Extent2D<int> GetPosition() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual String GetName() const = 0;
+        /**
+         * \brief Retrieves the resolution of the monitor in pixels
+         *
+         * \return The monitor size as a 2D extent (width, height)
+         */
+        virtual Extent2D<unsigned int> GetSize() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual VideoMode GetCurrentVideoMode() const = 0;
+        /**
+         * \brief Retrieves the current orientation of the monitor
+         *
+         * \return The monitor orientation
+         */
+        virtual Orientation GetOrientation() const = 0;
 
-		/**
-		 * \brief
-		 * \param videoMode
-		 */
-		virtual void SetCurrentVideoMode(const VideoMode& videoMode) = 0;
+        /**
+         * \brief Retrieves the human-readable name of the monitor
+         *
+         * \return The monitor name
+         */
+        virtual String GetName() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual Array<VideoMode> GetSupportedVideoModes() const = 0;
+        /**
+         * \brief Retrieves the current video mode of the monitor
+         *
+         * \return The active video mode
+         */
+        virtual VideoMode GetCurrentVideoMode() const = 0;
 
-		/**
-		 * \brief 
-		 * \return 
-		 */
-		virtual void* GetSystemHandle() const = 0;
-	};
+        /**
+         * \brief Sets the current video mode of the monitor
+         *
+         * Changing the video mode may affect resolution, refresh rate,
+         * and color depth depending on the platform.
+         *
+         * \param videoMode The video mode to apply
+         */
+        virtual void SetCurrentVideoMode(const VideoMode& videoMode) = 0;
+
+        /**
+         * \brief Retrieves all video modes supported by the monitor
+         *
+         * \return An array of supported video modes
+         */
+        virtual Array<VideoMode> GetSupportedVideoModes() const = 0;
+
+        /**
+         * \brief Retrieves the underlying system-specific handle
+         *
+         * \return A pointer to the native monitor handle
+         */
+        virtual void* GetSystemHandle() const = 0;
+    };
 }
 
 #endif // COCKTAIL_CORE_SYSTEM_MONITOR_MONITOR_HPP
