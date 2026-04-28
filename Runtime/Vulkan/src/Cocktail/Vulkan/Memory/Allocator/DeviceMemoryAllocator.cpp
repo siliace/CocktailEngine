@@ -4,9 +4,9 @@
 
 namespace Ck::Vulkan
 {
-	DeviceMemoryAllocator::DeviceMemoryAllocator(RenderDevice* renderDevice, std::size_t defaultChuckSize) :
+	DeviceMemoryAllocator::DeviceMemoryAllocator(RenderDevice* renderDevice, std::size_t defaultChunkSize) :
 		mRenderDevice(renderDevice),
-		mDefaultChuckSize(defaultChuckSize)
+		mDefaultChunkSize(defaultChunkSize)
 	{
 		/// Nothing
 	}
@@ -187,7 +187,7 @@ namespace Ck::Vulkan
 	        return block;
 	    }
 
-	    auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, priority, std::max(memoryRequirements.size, mDefaultChuckSize), memoryTypeIndex);
+	    auto chunk = mChunkPool.AllocateUnique(mRenderDevice, mBlockPool, priority, std::max(memoryRequirements.size, mDefaultChunkSize), memoryTypeIndex);
 	    block = chunk->AllocateBlock(memoryRequirements.alignment, memoryRequirements.size);
 
 	    mChunks.Add(std::move(chunk));
