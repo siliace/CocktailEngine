@@ -35,7 +35,7 @@ namespace Ck::Detail::Win32
          *
          * \param handle The underlying file descriptor used for writing
          */
-        explicit ConsoleWriter(int handle);
+        explicit ConsoleWriter(HANDLE handle);
 
         /**
          * \brief Writes a sequence of characters to the console

@@ -95,7 +95,7 @@ namespace Ck::Detail::Win32
 		return LineWriter<>(mError);
 	}
 
-	Reader<>& ConsoleService::GetInput()
+	LineReader<> ConsoleService::GetInput()
 	{
 		return LineReader<>(mInput);
 	}
