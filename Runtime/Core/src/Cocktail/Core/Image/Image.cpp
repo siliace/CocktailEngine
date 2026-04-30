@@ -32,9 +32,9 @@ namespace Ck
         Extent2D<unsigned int> size = GetSize();
         colors.Reserve(mImageInfo.GetPixelCount());
 
-        for (Uint64 j = 0; j < size.Height; j++)
+        for (unsigned int j = 0; j < size.Height; j++)
         {
-            for (Uint64 i = 0; i < size.Width; i++)
+            for (unsigned int i = 0; i < size.Width; i++)
             {
                 const Byte* pixel = GetPixelPointer(j, i);
                 LinearColor color = ImageRawFormat::GetPixelColor(pixel, GetRawFormat(), GetGammaSpace());
