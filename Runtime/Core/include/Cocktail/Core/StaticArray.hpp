@@ -7,44 +7,102 @@
 
 namespace Ck
 {
+    /**
+     * \brief Fixed-size array container with utility algorithms
+     *
+     * StaticArray is a lightweight container storing a fixed number of elements
+     * known at compile time. It provides direct access to its underlying storage
+     * along with a set of utility methods for querying, searching, and transforming
+     * elements.
+     *
+     * Unlike dynamic containers, its size cannot change at runtime.
+     *
+     * \tparam E Element type
+     * \tparam TSize Number of elements in the array
+     */
     template <typename E, unsigned int TSize>
     class StaticArray
     {
     public:
 
-        using ElementType = E;
-        using SizeType = unsigned int;
+        using ElementType = E; /*!< Element type stored in the array */
+        using SizeType = unsigned int; /*!< Type used for indexing */
 
-        using Iterator = ElementType*;
-        using ConstIterator = const ElementType*;
+        using Iterator = ElementType*; /*!< Mutable iterator type */
+        using ConstIterator = const ElementType*; /*!< Const iterator type */
 
-        StaticArray() = default;
+        /**
+         * \brief Default constructor
+         *
+         * Elements are default-initialized.
+         */
+        constexpr StaticArray() = default;
 
+        /**
+         * \brief Constructs the array with an initializer list
+         *
+         * Initializes elements in order using the provided values.
+         * Remaining elements (if any) are default-initialized.
+         *
+         * \tparam U Types of initializer values
+         *
+         * \param values Values used to initialize the array
+         */
         template <typename... U>
-        StaticArray(U&&... values) :
+        explicit constexpr StaticArray(U&&... values) :
             mElements{ std::forward<U>(values)... }
         {
             static_assert(sizeof...(U) <= TSize, "Too many initializers for StaticArray");
         }
 
+        /**
+         * \brief Fills the array with a given value
+         *
+         * \param value Value assigned to all elements
+         */
         void Fill(const ElementType& value)
         {
             for (SizeType i = 0; i < TSize; ++i)
                 mElements[i] = value;
         }
 
+        /**
+         * \brief Accesses an element with bounds checking
+         *
+         * \param index Index of the element
+         *
+         * \return Reference to the element
+         *
+         * \throw OutOfRangeException if index is invalid
+         */
         ElementType& At(SizeType index)
         {
             CheckIndex(index);
             return UncheckedAt(index);
         }
 
+        /**
+         * \brief Accesses an element with bounds checking
+         *
+         * \param index Index of the element
+         *
+         * \return Reference to the element
+         *
+         * \throw OutOfRangeException if index is invalid
+         */
         const ElementType& At(SizeType index) const
         {
             CheckIndex(index);
             return UncheckedAt(index);
         }
 
+        /**
+         * \brief Attempts to access an element safely with bounds checking
+         *
+         * \param index Index of the element
+         *
+         * \return Optional containing the element if valid, otherwise empty
+         */
         Optional<E&> TryAt(SizeType index)
         {
             if (index >= TSize)
@@ -53,6 +111,13 @@ namespace Ck
             return Optional<E&>::Of(UncheckedAt(index));
         }
 
+        /**
+         * \brief Attempts to access an element safely with bounds checking
+         *
+         * \param index Index of the element
+         *
+         * \return Optional containing the element if valid, otherwise empty
+         */
         Optional<const E&> TryAt(SizeType index) const
         {
             if (index >= TSize)
@@ -61,36 +126,71 @@ namespace Ck
             return Optional<const E&>::Of(UncheckedAt(index));
         }
 
-        E& First()
+        /**
+         * \brief Retrieves the first element
+         *
+         * \return Reference to the first element
+         */
+        constexpr E& First()
         {
             return mElements[0];
         }
 
-        const E& First() const
+        /**
+         * \brief Retrieves the first element
+         *
+         * \return Reference to the first element
+         */
+        constexpr const E& First() const
         {
             return mElements[0];
         }
 
+        /**
+         * \brief Safely retrieves the first element
+         *
+         * \return Optional containing the first element
+         */
         Optional<E&> TryFirst()
         {
             return Optional<E&>::Of(mElements[0]);
         }
 
+        /**
+         * \brief Safely retrieves the first element
+         *
+         * \return Optional containing the first element
+         */
         Optional<const E&> TryFirst() const
         {
             return Optional<const E&>::Of(mElements[0]);
         }
 
-        E& Last()
+        /**
+         * \brief Retrieves the last element
+         *
+         * \return Reference to the last element
+         */
+        constexpr E& Last()
         {
             return mElements[TSize - 1];
         }
 
-        const E& Last() const
+        /**
+         * \brief Retrieves the last element
+         *
+         * \return Reference to the last element
+         */
+        constexpr const E& Last() const
         {
             return mElements[TSize - 1];
         }
 
+        /**
+         * \brief Safely retrieves the last element
+         *
+         * \return Optional containing the last element if available
+         */
         Optional<E&> TryLast()
         {
             if (IsEmpty())
@@ -99,6 +199,11 @@ namespace Ck
             return Optional<E&>::Of(At(TSize - 1));
         }
 
+        /**
+         * \brief Safely retrieves the last element
+         *
+         * \return Optional containing the last element if available
+         */
         Optional<const E&> TryLast() const
         {
             if (IsEmpty())
@@ -107,17 +212,38 @@ namespace Ck
             return Optional<const E&>::Of(At(TSize - 1));
         }
 
+        /**
+         * \brief Checks whether the array contains a given element
+         *
+         * \param element Element to search for
+         *
+         * \return True if found, false otherwise
+         */
         bool Contains(const E& element) const
         {
             return !FindIndex(element).IsEmpty();
         }
 
+        /**
+         * \brief Checks whether any element satisfies a predicate
+         *
+         * \param predicate Predicate evaluating elements
+         *
+         * \return True if found, false otherwise
+         */
         template <typename TPredicate>
         bool ContainsIf(TPredicate predicate) const
         {
             return !FindIndexIf(predicate).IsEmpty();
         }
 
+        /**
+         * \brief Checks whether at least one element satisfies a predicate
+         *
+         * \param predicate Predicate evaluating elements
+         *
+         * \return True if an element that satisfies the predicate has been found, false otherwise
+         */
         template <typename TPredicate>
         bool AnyOf(TPredicate predicate) const
         {
@@ -131,6 +257,13 @@ namespace Ck
             return false;
         }
 
+        /**
+         * \brief Checks whether at all elements satisfies a predicate
+         *
+         * \param predicate Predicate evaluating elements
+         *
+         * \return True if all elements satisfies the predicate, false otherwise
+         */
         template <typename TPredicate>
         bool AllOf(TPredicate predicate) const
         {
@@ -144,6 +277,14 @@ namespace Ck
             return true;
         }
 
+        /**
+         * \brief Finds the index of the first occurrence of an element
+         *
+         * \param element Element to search for
+         * \param start Starting index
+         *
+         * \return Optional containing the index if found
+         */
         Optional<SizeType> FindIndex(const E& element, SizeType start = 0) const
         {
             assert(start <= TSize);
@@ -157,6 +298,13 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
+        /**
+         * \brief Finds the index of the last occurrence of an element
+         *
+         * \param element Element to search for
+         *
+         * \return Optional containing the index if found
+         */
         Optional<SizeType> FindLastIndex(const E& element) const
         {
             for (SizeType i = TSize; i-- > 0;)
@@ -168,6 +316,16 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
+
+        /**
+         * \brief Finds the first index matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         * \param start Starting index for the search
+         *
+         * \return Optional containing the index if found, otherwise empty
+         */
         template <typename TPredicate>
         Optional<SizeType> FindIndexIf(TPredicate predicate, SizeType start = 0) const
         {
@@ -183,6 +341,14 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
+        /**
+         * \brief Finds the last index matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         *
+         * \return Optional containing the last index if found, otherwise empty
+         */
         template <typename TPredicate>
         Optional<SizeType> FindLastIndexIf(TPredicate predicate) const
         {
@@ -196,6 +362,15 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
+        /**
+         * \brief Finds the first element matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         * \param start Starting index for the search
+         *
+         * \return Optional containing a reference to the element if found
+         */
         template <typename TPredicate>
         Optional<E&> FindIf(TPredicate predicate, SizeType start = 0)
         {
@@ -211,6 +386,15 @@ namespace Ck
             return Optional<E&>::Empty();
         }
 
+        /**
+         * \brief Finds the first element matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         * \param start Starting index for the search
+         *
+         * \return Optional containing a reference to the element if found
+         */
         template <typename TPredicate>
         Optional<const E&> FindIf(TPredicate predicate, SizeType start = 0) const
         {
@@ -226,6 +410,14 @@ namespace Ck
             return Optional<const E&>::Empty();
         }
 
+        /**
+         * \brief Finds the last element matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         *
+         * \return Optional containing a reference to the element if found
+         */
         template <typename TPredicate>
         Optional<E&> FindLastIf(TPredicate predicate)
         {
@@ -239,6 +431,14 @@ namespace Ck
             return Optional<E&>::Empty();
         }
 
+        /**
+         * \brief Finds the last element matching a predicate
+         *
+         * \tparam TPredicate Predicate type
+         * \param predicate Function used to test elements
+         *
+         * \return Optional containing a reference to the element if found
+         */
         template <typename TPredicate>
         Optional<const E&> FindLastIf(TPredicate predicate) const
         {
@@ -252,6 +452,18 @@ namespace Ck
             return Optional<const E&>::Empty();
         }
 
+        /**
+         * \brief Transforms the array using a mapping function
+         *
+         * The function can take:
+         * - no parameters
+         * - the element
+         * - the element and its index
+         *
+         * \param transformer Transformation function
+         *
+         * \return A new StaticArray containing transformed elements
+         */
         template <typename TFunction>
         StaticArray<typename FunctionTraits<TFunction>::Return, TSize> Map(TFunction transformer) const
         {
@@ -278,6 +490,16 @@ namespace Ck
             return transformed;
         }
 
+        /**
+         * \brief Applies a function to each element
+         *
+         * The function can take:
+         * - no parameters
+         * - the element
+         * - the element and its index
+         *
+         * \param function Function applied to each element
+         */
         template <typename TFunction>
         void ForEach(TFunction function) const
         {
@@ -300,6 +522,11 @@ namespace Ck
             }
         }
 
+        /**
+         * \brief Reverse the array
+         *
+         * \return The created reversed array
+         */
         StaticArray Reverse() const
         {
             StaticArray result;
@@ -309,6 +536,9 @@ namespace Ck
             return result;
         }
 
+        /**
+         * \brief Returns the number of elements
+         */
         constexpr SizeType GetSize() const noexcept
         {
             return TSize;
@@ -334,21 +564,36 @@ namespace Ck
             return &mElements[TSize - 1];
         }
 
+        /**
+         * \brief Indicates whether the array is empty
+         *
+         * \return Always false since the size is fixed at compile time
+         */
         constexpr bool IsEmpty() const noexcept
         {
             return false;
         }
 
+        /**
+         * \brief Returns a pointer to the underlying data
+         */
         constexpr E* GetData() noexcept
         {
             return mElements;
         }
 
+        /**
+         * \brief Returns a pointer to the underlying data
+         */
         constexpr const E* GetData() const noexcept
         {
             return mElements;
         }
 
+
+        /**
+         * \brief Equality comparison operator
+         */
         bool operator==(const StaticArray& other) const
         {
             if (this == &other)
@@ -386,12 +631,12 @@ namespace Ck
                 ExceptionUtils::ThrowOutOfRange(index, TSize);
         }
 
-        E& UncheckedAt(SizeType index)
+        constexpr E& UncheckedAt(SizeType index)
         {
             return mElements[index];
         }
 
-        const E& UncheckedAt(SizeType index) const
+        constexpr const E& UncheckedAt(SizeType index) const
         {
             return mElements[index];
         }
@@ -645,6 +890,28 @@ namespace Ck
     typename StaticArray<E, TSize>::ConstIterator end(const StaticArray<E, TSize>& array)
     {
         return array.GetIterator() + TSize;
+    }
+
+    /**
+     * \brief Creates a StaticArray from a variadic list of values
+     *
+     * This helper function constructs a StaticArray whose size is automatically
+     * deduced from the number of provided arguments.
+     *
+     * \tparam E Element type of the array
+     * \tparam TArgs Types of the provided arguments
+     *
+     * \param args Values used to initialize the array
+     *
+     * \return A StaticArray containing the provided values
+     *
+     * \note The number of arguments determines the size of the resulting array
+     * \note All arguments must be convertible to E
+     */
+    template <typename E, typename... TArgs>
+    constexpr StaticArray<E, sizeof...(TArgs)> MakeStaticArray(TArgs&&... args)
+    {
+        return StaticArray<E, sizeof...(TArgs)>(std::forward<TArgs>(args)...);
     }
 }
 

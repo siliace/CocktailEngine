@@ -39,7 +39,7 @@ namespace Ck
          */
         static const BasicStringView Empty;
 
-        BasicStringView() :
+        constexpr BasicStringView() :
             mString(nullptr),
             mLength(0)
         {
@@ -53,13 +53,13 @@ namespace Ck
             /// Nothing
         }
 
-        BasicStringView(const CharType* string) :
+        constexpr BasicStringView(const CharType* string) :
             BasicStringView(string, StringUtils<CharType, SizeType>::GetLength(string))
         {
             /// Nothing
         }
 
-        BasicStringView(const CharType* string, SizeType length) :
+        constexpr BasicStringView(const CharType* string, SizeType length) :
             mString(string),
             mLength(length)
         {

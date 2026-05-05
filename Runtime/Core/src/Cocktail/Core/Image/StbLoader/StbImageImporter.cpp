@@ -66,9 +66,6 @@ namespace Ck
         }
     }
 
-    const Array<String, LinearAllocator<16>> StbImageImporter::SupportedExtensions = { CK_TEXT(".jpg"), CK_TEXT(".jpeg"), CK_TEXT(".png"), CK_TEXT(".tga"), CK_TEXT(".bmp"),
-                                                                                       CK_TEXT(".psd"), CK_TEXT(".hdr"),  CK_TEXT(".pic"), CK_TEXT(".gif") };
-
     StbImageImporter::StbImageImporter() :
         mCallbacks()
     {
@@ -126,8 +123,10 @@ namespace Ck
 
     bool StbImageImporter::SupportExtension(StringView extension) const
     {
-        return SupportedExtensions.ContainsIf([&](const String& supportedExtension) {
-            return supportedExtension == extension;
+        static const auto SupportedExtensions = MakeStaticArray<const TextChar*>(CK_TEXT(".jpg"), CK_TEXT(".jpeg"), CK_TEXT(".png"), CK_TEXT(".tga"), CK_TEXT(".bmp"),
+                                                                                 CK_TEXT(".psd"), CK_TEXT(".hdr"), CK_TEXT(".pic"), CK_TEXT(".gif"));
+        return SupportedExtensions.ContainsIf([&extension](const TextChar* supportedExtension) {
+            return extension == supportedExtension;
         });
     }
 
