@@ -62,13 +62,16 @@ namespace Ck
     {
     public:
 
+        using AllocatorType = TAllocator;
+        using TypedAllocatorType = typename AllocatorType::template ForType<T>;
+
         AllocatorAwareDeleter() :
             mAllocator(nullptr)
         {
             /// Nothing
         }
 
-        explicit AllocatorAwareDeleter(TAllocator& allocator) :
+        explicit AllocatorAwareDeleter(TypedAllocatorType& allocator) :
             mAllocator(&allocator)
         {
             /// Nothing
@@ -82,7 +85,7 @@ namespace Ck
 
     private:
 
-        TAllocator* mAllocator;
+        TypedAllocatorType* mAllocator;
     };
 
     /**
@@ -704,7 +707,7 @@ namespace Ck
      * \return A new UniquePtr managing the constructed object
      */
     template <typename T, typename TAllocator, typename... TArgs, typename = std::enable_if_t<!std::is_array_v<T>>>
-    UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>> MakeUniqueWithAllocator(TAllocator& allocator, TArgs&&... args)
+    UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>> MakeUniqueWithAllocator(typename TAllocator::template ForType<T>& allocator, TArgs&&... args)
     {
         T* pointer = allocator.Allocate(1);
         return UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>>(
@@ -745,7 +748,7 @@ namespace Ck
      * \return A new UniquePtr managing the allocated array
      */
     template <typename T, typename TAllocator, typename = std::enable_if_t<std::is_array_v<T>>>
-    UniquePtr<T, AllocatorAwareDeleter<std::remove_extent_t<T>, TAllocator>> MakeUniqueWithAllocator(TAllocator& allocator, Uint64 size)
+    UniquePtr<T, AllocatorAwareDeleter<std::remove_extent_t<T>, TAllocator>> MakeUniqueWithAllocator(typename TAllocator::template ForType<std::remove_extent_t<T>>& allocator, Uint64 size)
     {
         using BaseType = std::remove_extent_t<T>;
 

@@ -31,6 +31,7 @@ namespace Ck
     {
     public:
 
+        using AllocatorType = TAllocator;
         using SizeType = typename TAllocator::SizeType;
         using ElementAllocatorType = typename TAllocator::template ForType<Byte>;
 
@@ -61,7 +62,7 @@ namespace Ck
         {
             assert(mSize);
 
-            mData = MakeUniqueWithAllocator<Byte[], ElementAllocatorType>(mAllocator, mSize);
+            mData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, mSize);
             Memory::Set(mData.Get(), value, mSize);
         }
 
@@ -91,7 +92,7 @@ namespace Ck
                 length *= sizeof(T);
 
             mSize = length;
-            mData = MakeUniqueWithAllocator<Byte[]>(mAllocator, mSize);
+            mData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, mSize);
 
             Memory::Copy(mData.Get(), data, mSize);
         }
@@ -142,7 +143,7 @@ namespace Ck
 
                 if (mSize)
                 {
-                    mData = MakeUniqueWithAllocator<Byte[], ElementAllocatorType>(mAllocator, mSize);
+                    mData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, mSize);
                     Memory::Copy(mData.Get(), other.GetData(), mSize);
                 }
             }
@@ -313,7 +314,7 @@ namespace Ck
             assert(length > 0);
 
             SizeType fullSize = mSize + length;
-            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], ElementAllocatorType>(mAllocator, fullSize);
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
 
             if (mSize)
             {
@@ -412,7 +413,7 @@ namespace Ck
             assert(offset + length <= mSize);
 
             SizeType fullSize = mSize - length;
-            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], ElementAllocatorType>(mAllocator, fullSize);
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
 
             if (offset == 0)
             {
@@ -454,7 +455,7 @@ namespace Ck
                 return;
             }
 
-            auto newData = MakeUniqueWithAllocator<Byte[], ElementAllocatorType>(mAllocator, newSize);
+            auto newData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, newSize);
             if (newSize > mSize)
             {
                 Memory::Copy(newData.Get(), mData.Get(), mSize);
@@ -584,7 +585,7 @@ namespace Ck
     private:
 
         SizeType mSize; /*!< Size in bytes */
-        UniquePtr<Byte[], AllocatorAwareDeleter<Byte, ElementAllocatorType>> mData; /*!< Owned memory */
+        UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> mData; /*!< Owned memory */
         ElementAllocatorType mAllocator; /*!< Allocator instance */
     };
 

@@ -5,15 +5,15 @@
 
 namespace Ck
 {
-    template <typename E>
+    template <typename E, typename TAllocator>
     class LinkedList;
 
     namespace Detail
     {
-        template <typename E>
+        template <typename E, typename TAllocator>
         class LinkedListIterator;
 
-        template <typename E>
+        template <typename E, typename TAllocator>
         class LinkedListConstIterator;
 
         /**
@@ -28,8 +28,9 @@ namespace Ck
          * will also destroy the entire chain that follows it unless `DropNext()` is called.
          *
          * \tparam E The type of the stored value
+         * \tparam TAllocator Allocator used for memory management
          */
-        template <typename E>
+        template <typename E, typename TAllocator>
         class LinkedListNode
         {
         public:
@@ -91,12 +92,12 @@ namespace Ck
              *
              * \return A UniquePtr to the former next node (may be null)
              */
-            UniquePtr<LinkedListNode> DropNext()
+            UniquePtr<LinkedListNode, AllocatorAwareDeleter<LinkedListNode, TAllocator>> DropNext()
             {
                 if (!mNext)
                     return nullptr;
 
-                UniquePtr<LinkedListNode> next = std::move(mNext);
+                UniquePtr<LinkedListNode, AllocatorAwareDeleter<LinkedListNode, TAllocator>> next = std::move(mNext);
                 next->mPrevious = nullptr;
 
                 mNext.Reset();
@@ -151,7 +152,7 @@ namespace Ck
              *
              * \param next A UniquePtr owning the node that will become the next element
              */
-            void SetNext(UniquePtr<LinkedListNode> next)
+            void SetNext(UniquePtr<LinkedListNode, AllocatorAwareDeleter<LinkedListNode, TAllocator>> next)
             {
                 // We don't want you to use SetNext to drop the rest of the chain.
                 // Instead, use DropNext and just ignore the return value.
@@ -167,7 +168,7 @@ namespace Ck
 
             E mValue; /*!< The stored value */
             LinkedListNode* mPrevious; /*!< Pointer to the previous node (non-owned) */
-            UniquePtr<LinkedListNode> mNext; /*!< Owned pointer to the next node in the chain */
+            UniquePtr<LinkedListNode, AllocatorAwareDeleter<LinkedListNode, TAllocator>> mNext; /*!< Owned pointer to the next node in the chain */
         };
 
         /**
@@ -189,11 +190,32 @@ namespace Ck
          * ensuring proper automatic cleanup.
          *
          * \tparam E The type of value stored in each node
+         * \tparam TAllocator Allocator used for memory management
          */
-        template <typename E>
+        template <typename E, typename TAllocator>
         class LinkedListBase
         {
         protected:
+
+            /**
+             * \brief Allocator type used by this linked list
+             */
+            using AllocatorType = TAllocator;
+
+            /**
+             * \brief Node type linked together in this linked list
+             */
+            using NodeType = LinkedListNode<E, AllocatorType>;
+
+            /**
+             * \brief Allocator rebound to the node type
+             */
+            using NodeAllocatorType = typename AllocatorType::template ForType<NodeType>;
+
+            /**
+             * \brief Specialized unique ptr node with using custom allocator
+             */
+            using NodeUniquePtrType = UniquePtr<NodeType, AllocatorAwareDeleter<NodeType, AllocatorType>>;
 
             /**
              * \brief Default constructor
@@ -212,9 +234,9 @@ namespace Ck
              *
              * \param value The value to copy into the node.
              */
-            void AddHead(const E& value)
+            void AddFront(const E& value)
             {
-                EmplaceHead(value);
+                EmplaceFront(value);
             }
 
             /**
@@ -222,9 +244,9 @@ namespace Ck
              *
              * \param value The value to move into the node.
              */
-            void AddHead(E&& value)
+            void AddFront(E&& value)
             {
-                EmplaceHead(std::move(value));
+                EmplaceFront(std::move(value));
             }
 
             /**
@@ -241,9 +263,9 @@ namespace Ck
              * \return A reference to the newly constructed element
              */
             template <typename... TArgs>
-            E& EmplaceHead(TArgs&&... args)
+            E& EmplaceFront(TArgs&&... args)
             {
-                UniquePtr<LinkedListNode<E>> head = MakeUnique<LinkedListNode<E>>(InPlace, std::forward<TArgs>(args)...);
+                NodeUniquePtrType head = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, InPlace, std::forward<TArgs>(args)...);
                 if (mHead == nullptr)
                 {
                     assert(mTail == nullptr);
@@ -265,9 +287,9 @@ namespace Ck
              *
              * \param value The value to copy into the node
              */
-            void AddTail(const E& value)
+            void AddBack(const E& value)
             {
-                EmplaceTail(value);
+                EmplaceBack(value);
             }
 
             /**
@@ -275,9 +297,9 @@ namespace Ck
              *
              * \param value The value to move into the node
              */
-            void AddTail(E&& value)
+            void AddBack(E&& value)
             {
-                EmplaceTail(std::move(value));
+                EmplaceBack(std::move(value));
             }
 
             /**
@@ -294,9 +316,9 @@ namespace Ck
              * \return A reference to the newly constructed element
              */
             template <typename... TArgs>
-            E& EmplaceTail(TArgs&&... args)
+            E& EmplaceBack(TArgs&&... args)
             {
-                UniquePtr<LinkedListNode<E>> tail = MakeUnique<LinkedListNode<E>>(InPlace, std::forward<TArgs>(args)...);
+                NodeUniquePtrType tail = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, InPlace, std::forward<TArgs>(args)...);
                 if (mHead == nullptr)
                 {
                     assert(mTail == nullptr);
@@ -306,7 +328,7 @@ namespace Ck
                 }
                 else
                 {
-                    LinkedListNode<E>* previousTail = mTail;
+                    NodeType* previousTail = mTail;
 
                     mTail = tail.Get();
                     previousTail->SetNext(std::move(tail));
@@ -335,14 +357,14 @@ namespace Ck
              *
              * \return A raw pointer to the newly inserted node
              */
-            LinkedListNode<E>* Insert(LinkedListNode<E>* where, const E& value)
+            NodeType* Insert(NodeType* where, const E& value)
             {
-                UniquePtr<LinkedListNode<E>> newNode = MakeUnique<LinkedListNode<E>>(value);
-                LinkedListNode<E>* inserted = newNode.Get();
+                NodeUniquePtrType newNode = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, value);
+                NodeType* inserted = newNode.Get();
 
                 if (where)
                 {
-                    if (LinkedListNode<E>* previous = where->GetPrevious())
+                    if (NodeType* previous = where->GetPrevious())
                     {
                         newNode->SetNext(previous->DropNext());
                         previous->SetNext(std::move(newNode));
@@ -373,10 +395,10 @@ namespace Ck
                 return inserted;
             }
 
-            template <typename U>
+            template <typename U, typename TOtherAllocator>
             friend class LinkedListIterator;
 
-            template <typename U>
+            template <typename U, typename TOtherAllocator>
             friend class LinkedListConstIterator;
 
             /**
@@ -394,10 +416,10 @@ namespace Ck
              * \return A pointer to the node that follows the removed one
              *         or nullptr if the removed element was the last
              */
-            LinkedListNode<E>* Unlink(LinkedListNode<E>* node)
+            NodeType* Unlink(NodeType* node)
             {
-                LinkedListNode<E>* previous = node->GetPrevious();
-                LinkedListNode<E>* next = node->GetNext();
+                NodeType* previous = node->GetPrevious();
+                NodeType* next = node->GetNext();
 
                 if (previous)
                 {
@@ -421,7 +443,7 @@ namespace Ck
              *
              * \return A pointer to the head node, or nullptr if the list is empty
              */
-            LinkedListNode<E>* GetHead() const
+            NodeType* GetHead() const
             {
                 return mHead.Get();
             }
@@ -431,15 +453,16 @@ namespace Ck
              *
              * \return A pointer to the tail node, or nullptr if the list is empty
              */
-            LinkedListNode<E>* GetTail() const
+            NodeType* GetTail() const
             {
                 return mTail;
             }
 
         private:
 
-            UniquePtr<LinkedListNode<E>> mHead;
-            LinkedListNode<E>* mTail;
+            NodeUniquePtrType mHead;
+            NodeType* mTail;
+            NodeAllocatorType mNodeAllocator;
         };
 
         /**
@@ -450,8 +473,9 @@ namespace Ck
          * and backward navigation within the list.
          *
          * \tparam E The type of elements stored in the list
+         * \tparam TAllocator Allocator used for memory management
          */
-        template <typename E>
+        template <typename E, typename TAllocator>
         class LinkedListConstIterator
         {
         public:
@@ -482,7 +506,7 @@ namespace Ck
              *
              * \param firstIndex Number of steps to advance from the head
              */
-            explicit LinkedListConstIterator(const LinkedListBase<E>& list, unsigned int firstIndex = 0) :
+            explicit LinkedListConstIterator(const LinkedListBase<E, TAllocator>& list, unsigned int firstIndex = 0) :
                 mNode(list.GetHead())
             {
                 Advance(firstIndex);
@@ -733,7 +757,7 @@ namespace Ck
              *
              * \param node The node to point to
              */
-            explicit LinkedListConstIterator(LinkedListNode<E>* node) :
+            explicit LinkedListConstIterator(LinkedListNode<E, TAllocator>* node) :
                 mNode(node)
             {
                 /// Nothing
@@ -744,14 +768,14 @@ namespace Ck
              *
              * \return The current node
              */
-            LinkedListNode<E>* GetNode() const
+            LinkedListNode<E, TAllocator>* GetNode() const
             {
                 return mNode;
             }
 
         private:
 
-            LinkedListNode<E>* mNode; /*!< Pointer to the current node */
+            LinkedListNode<E, TAllocator>* mNode; /*!< Pointer to the current node */
         };
 
         /**
@@ -762,9 +786,10 @@ namespace Ck
          * while allowing modification of the referenced value.
          *
          * \tparam E The type of elements stored in the list
+         * \tparam TAllocator Allocator used for memory management
          */
-        template <typename E>
-        class LinkedListIterator : public LinkedListConstIterator<E>
+        template <typename E, typename TAllocator>
+        class LinkedListIterator : public LinkedListConstIterator<E, TAllocator>
         {
         public:
 
@@ -778,7 +803,7 @@ namespace Ck
              * when comparing against the end of a range in range-based for loops.
              */
             explicit LinkedListIterator(std::nullptr_t) :
-                LinkedListConstIterator<E>(nullptr)
+                LinkedListConstIterator<E, TAllocator>(nullptr)
             {
                 /// Nothing
             }
@@ -792,8 +817,8 @@ namespace Ck
              * \param list The list to iterate through
              * \param firstIndex Number of steps to advance from the head
              */
-            explicit LinkedListIterator(LinkedListBase<E>& list, unsigned int firstIndex = 0) :
-                LinkedListConstIterator<E>(list, firstIndex)
+            explicit LinkedListIterator(LinkedListBase<E, TAllocator>& list, unsigned int firstIndex = 0) :
+                LinkedListConstIterator<E, TAllocator>(list, firstIndex)
             {
                 /// Nothing
             }
@@ -805,7 +830,7 @@ namespace Ck
              */
             E& GetValue() const
             {
-                return LinkedListConstIterator<E>::GetNode()->GetValue();
+                return LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
             }
 
             /**
@@ -815,7 +840,7 @@ namespace Ck
              */
             LinkedListIterator Previous() const
             {
-                return LinkedListIterator(LinkedListConstIterator<E>::GetNode()->GetPrevious());
+                return LinkedListIterator(LinkedListConstIterator<E, TAllocator>::GetNode()->GetPrevious());
             }
 
             /**
@@ -825,7 +850,7 @@ namespace Ck
              */
             LinkedListIterator Next() const
             {
-                return LinkedListIterator(LinkedListConstIterator<E>::GetNode()->GetNext());
+                return LinkedListIterator(LinkedListConstIterator<E, TAllocator>::GetNode()->GetNext());
             }
 
             /**
@@ -876,7 +901,7 @@ namespace Ck
              */
             LinkedListIterator& operator++()
             {
-                LinkedListConstIterator<E>::Advance(1);
+                LinkedListConstIterator<E, TAllocator>::Advance(1);
                 return *this;
             }
 
@@ -906,7 +931,7 @@ namespace Ck
              */
             LinkedListIterator& operator--()
             {
-                LinkedListConstIterator<E>::Rewind(1);
+                LinkedListConstIterator<E, TAllocator>::Rewind(1);
                 return *this;
             }
 
@@ -936,7 +961,7 @@ namespace Ck
              */
             E* operator->() const
             {
-                return &LinkedListConstIterator<E>::GetNode()->GetValue();
+                return &LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
             }
 
             /**
@@ -950,7 +975,7 @@ namespace Ck
              */
             E& operator*() const
             {
-                return LinkedListConstIterator<E>::GetNode()->GetValue();
+                return LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
             }
 
         protected:
@@ -965,8 +990,8 @@ namespace Ck
              *
              * \param node The node to point to
              */
-            explicit LinkedListIterator(LinkedListNode<E>* node) :
-                LinkedListConstIterator<E>(node)
+            explicit LinkedListIterator(LinkedListNode<E, TAllocator>* node) :
+                LinkedListConstIterator<E, TAllocator>(node)
             {
                 /// Nothing
             }
@@ -982,17 +1007,37 @@ namespace Ck
      * removal, indexed access, iteration, and search operations.
      *
      * \tparam E The type of elements stored in the list
+     * \tparam TAllocator Allocator used for memory management
      */
-    template <typename E>
-    class LinkedList : public Detail::LinkedListBase<E>
+    template <typename E, typename TAllocator = HeapAllocator>
+    class LinkedList : public Detail::LinkedListBase<E, TAllocator>
     {
     public:
 
-        using SizeType = unsigned int;
+        /**
+         * \brief Type of elements stored in the LinkedList
+         */
         using ElementType = E;
 
-        using Iterator = Detail::LinkedListIterator<E>;
-        using ConstIterator = Detail::LinkedListConstIterator<E>;
+        /**
+         * \brief Allocator type used by this linked list
+         */
+        using AllocatorType = TAllocator;
+
+        /**
+         * \brief Type used for sizes and indices
+         */
+        using SizeType = typename AllocatorType::SizeType;
+
+        /**
+         * \brief Iterator used to traverse a LinkedList instance
+         */
+        using Iterator = Detail::LinkedListIterator<E, TAllocator>;
+
+        /**
+         * \brief Constant iterator used to traverse a LinkedList instance
+         */
+        using ConstIterator = Detail::LinkedListConstIterator<E, TAllocator>;
 
         /**
          * \brief Default constructor
@@ -1092,7 +1137,7 @@ namespace Ck
 
                 for (ConstIterator it(other); it.IsValid(); it.Advance())
                 {
-                    AddTail(std::move(it.GetValue()));
+                    AddBack(std::move(it.GetValue()));
                     it = other.Remove(it);
                 }
             }
@@ -1108,7 +1153,7 @@ namespace Ck
         void AddFront(const E& value)
         {
             ++mSize;
-            Detail::LinkedListBase<E>::AddHead(value);
+            Detail::LinkedListBase<E, TAllocator>::AddFront(value);
         }
 
         /**
@@ -1119,7 +1164,7 @@ namespace Ck
         void AddFront(E&& value)
         {
             ++mSize;
-            Detail::LinkedListBase<E>::AddHead(std::move(value));
+            Detail::LinkedListBase<E, TAllocator>::AddFront(std::move(value));
         }
 
         /**
@@ -1137,7 +1182,7 @@ namespace Ck
         E& EmplaceFront(TArgs&&... args)
         {
             ++mSize;
-            return Detail::LinkedListBase<E>::EmplaceHead(std::forward<TArgs>(args)...);
+            return Detail::LinkedListBase<E, TAllocator>::EmplaceFront(std::forward<TArgs>(args)...);
         }
 
         /**
@@ -1148,7 +1193,7 @@ namespace Ck
         void AddBack(const E& value)
         {
             ++mSize;
-            Detail::LinkedListBase<E>::AddTail(value);
+            Detail::LinkedListBase<E, TAllocator>::AddBack(value);
         }
 
         /**
@@ -1159,7 +1204,7 @@ namespace Ck
         void AddBack(E&& value)
         {
             ++mSize;
-            Detail::LinkedListBase<E>::AddTail(std::move(value));
+            Detail::LinkedListBase<E, TAllocator>::AddBack(std::move(value));
         }
 
         /**
@@ -1177,7 +1222,7 @@ namespace Ck
         E& EmplaceBack(TArgs&&... args)
         {
             ++mSize;
-            return Detail::LinkedListBase<E>::EmplaceTail(std::forward<TArgs>(args)...);
+            return Detail::LinkedListBase<E, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
         }
 
         /**
@@ -1199,7 +1244,7 @@ namespace Ck
         Iterator Insert(Iterator where, const E& value)
         {
             ++mSize;
-            auto node = Detail::LinkedListBase<E>::Insert(where.GetNode(), value);
+            auto node = Detail::LinkedListBase<E, TAllocator>::Insert(where.GetNode(), value);
 
             return Iterator(node);
         }
@@ -1325,7 +1370,7 @@ namespace Ck
         {
             assert(where.IsValid());
 
-            Detail::LinkedListNode<E>* node = Detail::LinkedListBase<E>::Unlink(where.GetNode());
+            Detail::LinkedListNode<E, TAllocator>* node = Detail::LinkedListBase<E, TAllocator>::Unlink(where.GetNode());
 
             --mSize;
 
@@ -1343,7 +1388,7 @@ namespace Ck
          */
         Iterator GetIterator()
         {
-            return Iterator(Detail::LinkedListBase<E>::GetHead());
+            return Iterator(Detail::LinkedListBase<E, TAllocator>::GetHead());
         }
 
         /**
@@ -1357,7 +1402,7 @@ namespace Ck
          */
         ConstIterator GetIterator() const
         {
-            return ConstIterator(Detail::LinkedListBase<E>::GetHead());
+            return ConstIterator(Detail::LinkedListBase<E, TAllocator>::GetHead());
         }
 
         /**
@@ -1371,7 +1416,7 @@ namespace Ck
          */
         Iterator GetLastIterator()
         {
-            return Iterator(Detail::LinkedListBase<E>::GetTail());
+            return Iterator(Detail::LinkedListBase<E, TAllocator>::GetTail());
         }
 
         /**
@@ -1385,7 +1430,7 @@ namespace Ck
          */
         ConstIterator GetLastIterator() const
         {
-            return Iterator(Detail::LinkedListBase<E>::GetTail());
+            return Iterator(Detail::LinkedListBase<E, TAllocator>::GetTail());
         }
 
         /**

@@ -82,8 +82,8 @@ TEST_CASE("Access to an element of an array", "[StaticArray]")
 
 TEST_CASE("Check whether an array contains a value", "[StaticArray]")
 {
-    Ck::StaticArray<int, 4> odds = { 1, 3, 5, 7 };
-    Ck::StaticArray<int, 4> evens = { 2, 4, 6, 8 };
+    Ck::StaticArray<int, 4> odds{ 1, 3, 5, 7 };
+    Ck::StaticArray<int, 4> evens{ 2, 4, 6, 8 };
 
     SECTION("By value")
     {
@@ -116,8 +116,8 @@ TEST_CASE("Check whether an array contains a value", "[StaticArray]")
 
 TEST_CASE("Check whether any element of an array matches a predicate", "[StaticArray]")
 {
-    Ck::StaticArray<int, 4> odds = { 1, 3, 5, 7 };
-    Ck::StaticArray<int, 4> evens = { 2, 4, 6, 8 };
+    Ck::StaticArray<int, 4> odds{ 1, 3, 5, 7 };
+    Ck::StaticArray<int, 4> evens{ 2, 4, 6, 8 };
 
     REQUIRE(odds.AnyOf([](int i) {
         return i == 3;
@@ -138,8 +138,8 @@ TEST_CASE("Check whether any element of an array matches a predicate", "[StaticA
 
 TEST_CASE("Check whether all elements of an array matches a predicate", "[StaticArray]")
 {
-    Ck::StaticArray<int, 4> odds = { 1, 3, 5, 7 };
-    Ck::StaticArray<int, 4> evens = { 2, 4, 6, 8 };
+    Ck::StaticArray<int, 4> odds{ 1, 3, 5, 7 };
+    Ck::StaticArray<int, 4> evens{ 2, 4, 6, 8 };
 
     REQUIRE(odds.AllOf([](int i) {
         return i % 2 != 0;
@@ -160,7 +160,7 @@ TEST_CASE("Check whether all elements of an array matches a predicate", "[Static
 
 TEST_CASE("Transform an array", "[StaticArray]")
 {
-    Ck::StaticArray<int, 4> array = { 1, 3, 5, 7 };
+    Ck::StaticArray<int, 4> array{ 1, 3, 5, 7 };
     array = array.Map([](int i) {
         return i * 2;
     });
@@ -170,6 +170,6 @@ TEST_CASE("Transform an array", "[StaticArray]")
 
 TEST_CASE("Reverse an array", "[StaticArray]")
 {
-    Ck::StaticArray<int, 4> array = { 1, 3, 5, 7 };
+    Ck::StaticArray<int, 4> array{ 1, 3, 5, 7 };
     REQUIRE(array.Reverse() == Ck::StaticArray<int, 4>{ 7, 5, 3, 1 });
 }
