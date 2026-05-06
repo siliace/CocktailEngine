@@ -32,7 +32,7 @@ namespace Ck
 		 * \param color
 		 * \param intensity 
 		 */
-		PointLight(TransformationNode* transformationNode, String name,  float range, LinearColor color, float intensity = 100.f);
+		PointLight(TransformationNode* transformationNode, String name, float range, LinearColor color, float intensity = 100.f);
 
 		/**
 		 * \brief 

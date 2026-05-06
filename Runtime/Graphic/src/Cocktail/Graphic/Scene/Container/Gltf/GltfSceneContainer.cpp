@@ -45,6 +45,11 @@ namespace Ck
             mMaterials.Add(ProcessMaterial(model, gltfMaterial));
         }
 
+        for (const tinygltf::Light& gltfLight: model.lights)
+        {
+            mLights.Add(ProcessLight(model, gltfLight));
+        }
+
         for (unsigned int i = 0; i < model.meshes.size(); i++)
             ProcessMesh(model, i, model.meshes[i]);
 
@@ -99,6 +104,23 @@ namespace Ck
         }
 
         return materialInfo;
+    }
+
+    SceneContainer::LightInfo GltfSceneContainer::ProcessLight(const tinygltf::Model& model, const tinygltf::Light& gltfLight) const
+    {
+        LightInfo lightInfo;
+        lightInfo.Name = String::ConvertFrom<Encoders::Ascii>(gltfLight.name.c_str());
+        lightInfo.Color = GltfUtils::ConvertLinearColor(gltfLight.color);
+        lightInfo.Intensity = static_cast<float>(gltfLight.intensity) * 100.f;
+        lightInfo.Range = gltfLight.range == 0. ? FLT_MAX : static_cast<float>(gltfLight.range);
+        lightInfo.Type = GltfUtils::ConvertLightType(gltfLight.type.c_str());
+        if (lightInfo.Type == Light::Type::Spot)
+        {
+            lightInfo.Spot.InnerConeAngle = Angle<float>::Radian(gltfLight.spot.innerConeAngle);
+            lightInfo.Spot.OuterConeAngle = Angle<float>::Radian(gltfLight.spot.outerConeAngle);
+        }
+
+        return lightInfo;
     }
 
     void GltfSceneContainer::ProcessMesh(const tinygltf::Model& model, unsigned int meshIndex, const tinygltf::Mesh& gltfMesh)
@@ -292,12 +314,16 @@ namespace Ck
             localTransformation = Transformation::Decompose(matrix);
         }
 
-        SceneContainer::NodeInfo nodeInfo;
+        NodeInfo nodeInfo;
         nodeInfo.Children = std::move(childrenNodes);
         nodeInfo.MeshIndices = mMeshIndirections[gltfNode.mesh];
         nodeInfo.LocalTransformation = localTransformation;
+
         if (int cameraIndex = gltfNode.camera; cameraIndex != -1)
             nodeInfo.Camera = &mCameras[cameraIndex];
+
+        if (int lightIndex = gltfNode.light; lightIndex != -1)
+            nodeInfo.Light = &mLights[lightIndex];
 
         return nodeInfo;
     }

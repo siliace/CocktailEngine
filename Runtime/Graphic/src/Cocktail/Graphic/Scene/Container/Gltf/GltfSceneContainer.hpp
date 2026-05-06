@@ -20,6 +20,7 @@ namespace Ck
     private:
 
         MaterialInfo ProcessMaterial(const tinygltf::Model& model, const tinygltf::Material& gltfMaterial) const;
+        LightInfo ProcessLight(const tinygltf::Model& model, const tinygltf::Light& gltfLight) const;
         void ProcessMesh(const tinygltf::Model& model, unsigned int meshIndex, const tinygltf::Mesh& gltfMesh);
         NodeInfo ProcessNode(const tinygltf::Model& model, const tinygltf::Node& gltfNode);
 

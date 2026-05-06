@@ -12,6 +12,8 @@
 #include <Cocktail/Renderer/Renderer.hpp>
 #include <Cocktail/Renderer/Buffer/IndexType.hpp>
 
+#include "Cocktail/Graphic/Scene/Light/Light.hpp"
+
 namespace Ck
 {
 	/**
@@ -29,6 +31,7 @@ namespace Ck
 		static Quaternion<float> ConvertQuaternion(const std::vector<double>& values);
 		static LinearColor ConvertLinearColor(const std::vector<double>& values);
 		static Material::AlphaMode ConvertAlphaMode(const AnsiChar* value);
+	    static Light::Type ConvertLightType(const AnsiChar* value);
 	};
 }
 

@@ -2,6 +2,7 @@
 #define COCKTAIL_GRAPHIC_SCENE_CONTAINER_SCENECONTAINER_HPP
 
 #include <Cocktail/Graphic/Scene/Scene.hpp>
+#include <Cocktail/Graphic/Scene/Light/Light.hpp>
 
 namespace Ck
 {
@@ -30,17 +31,41 @@ namespace Ck
 			Vector2<float> DepthBounds;
 		};
 
+	    struct LightInfo
+	    {
+	        struct SpotInfo
+	        {
+	            Angle<float> InnerConeAngle;
+	            Angle<float> OuterConeAngle;
+	        };
+
+	        String Name;
+	        LinearColor Color;
+	        float Intensity = 100.f;
+	        float Range = 0.f;
+	        Light::Type Type;
+	        SpotInfo Spot;
+	    };
+
 		/**
 		 * \brief 
 		 * \return 
 		 */
 		const Array<CameraInfo>& GetCameras() const;
 
-		/**
-		 * \brief Add the content of the SceneContainer into an existing scene
-		 * \param scene 
-		 * \return 
-		 */
+	    /**
+         * \brief
+         * \return
+         */
+	    const Array<LightInfo>& GetLights() const;
+
+        /**
+         * \brief Add the content of the SceneContainer into an existing scene
+         *
+         * \param scene
+         *
+         * \return
+         */
 		SceneNode* AddToScene(Scene& scene);
 
 	protected:
@@ -80,6 +105,7 @@ namespace Ck
 			Array<unsigned int> MeshIndices;
 			Transformation LocalTransformation = Transformation::Identity();
 			CameraInfo* Camera = nullptr;
+		    LightInfo* Light = nullptr;
 		};
 
 		SceneContainer();
@@ -89,23 +115,28 @@ namespace Ck
 		Array<MeshInfo> mMeshes;
 		Array<std::shared_ptr<MipMaps>> mMipMaps;
 		Array<MaterialInfo> mMaterials;
+	    Array<LightInfo> mLights;
 
 	private:
 
 		/**
 		 * \brief Create a material to be served a default one for shape that have none (like point or line shapes)
+		 *
 		 * \param baseColor The base color of the material to create
+		 *
 		 * \return The created material
 		 */
 		static MaterialInfo CreateDefaultMaterial(LinearColor baseColor);
 
 		/**
-		 * \brief 
+		 * \brief
+		 *
 		 * \param scene 
 		 * \param parent 
 		 * \param nodeInfo
 		 * \param meshes 
-		 * \param materials 
+		 * \param materials
+		 *
 		 * \return 
 		 */
 		SceneNode* ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials);

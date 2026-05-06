@@ -145,4 +145,18 @@ namespace Ck
 
 		COCKTAIL_UNREACHABLE();
 	}
+
+    Light::Type GltfUtils::ConvertLightType(const AnsiChar* value)
+	{
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "directional"))
+	        return Light::Type::Directional;
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "point"))
+	        return Light::Type::Point;
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "spot"))
+	        return Light::Type::Spot;
+
+	    COCKTAIL_UNREACHABLE();
+    }
 }

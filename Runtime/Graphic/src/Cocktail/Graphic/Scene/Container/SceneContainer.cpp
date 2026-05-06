@@ -1,6 +1,9 @@
 #include <Cocktail/Graphic/Scene/Camera/OrhtographicCamera.hpp>
 #include <Cocktail/Graphic/Scene/Camera/PerspectiveCamera.hpp>
 #include <Cocktail/Graphic/Scene/Container/SceneContainer.hpp>
+#include <Cocktail/Graphic/Scene/Light/DirectionalLight.hpp>
+#include <Cocktail/Graphic/Scene/Light/PointLight.hpp>
+#include <Cocktail/Graphic/Scene/Light/SpotLight.hpp>
 #include <Cocktail/Graphic/Scene/Shape/StaticMeshShape.hpp>
 
 namespace Ck
@@ -10,7 +13,12 @@ namespace Ck
 		return mCameras;
 	}
 
-	SceneNode* SceneContainer::AddToScene(Scene& scene)
+    const Array<SceneContainer::LightInfo>& SceneContainer::GetLights() const
+    {
+        return mLights;
+    }
+
+    SceneNode* SceneContainer::AddToScene(Scene& scene)
 	{
 		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
@@ -138,6 +146,27 @@ namespace Ck
 
 			scene.AddCamera(std::move(camera));
 		}
+
+	    if (LightInfo* lightInfo = nodeInfo.Light)
+	    {
+	        UniquePtr<Light> light;
+	        switch (lightInfo->Type)
+	        {
+                case Light::Type::Directional:
+	                light = MakeUnique<DirectionalLight>(lightInfo->Name, -sceneNode->GetFront(), lightInfo->Color, lightInfo->Intensity);
+	                break;
+
+                case Light::Type::Point:
+	                light = MakeUnique<PointLight>(sceneNode->GetTransformationNode(), lightInfo->Name, lightInfo->Range, lightInfo->Color, lightInfo->Intensity);
+	                break;
+
+                case Light::Type::Spot:
+	                light = MakeUnique<SpotLight>(sceneNode->GetTransformationNode(), lightInfo->Name, lightInfo->Range, lightInfo->Color, lightInfo->Intensity);
+	                break;
+            }
+
+            scene.AddLight(std::move(light));
+	    }
 
 		return sceneNode;
 	}
