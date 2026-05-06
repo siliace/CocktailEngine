@@ -6,7 +6,7 @@ namespace Ck
 {
     ShaderBindingTable::ShaderBindingTable()
     {
-        mEntries.reserve(32);
+        mEntries.Reserve(32);
     }
 
     void ShaderBindingTable::BindBuffer(ShaderBindingDomain domain, BindingSlot slot, const Renderer::Buffer* buffer, unsigned int arrayIndex, std::size_t offset, std::size_t range)
@@ -29,7 +29,7 @@ namespace Ck
         FindOrCreateEntry<TextureSamplerEntry>(domain, slot)->SetTextureAndSampler(arrayIndex, textureView, sampler);
     }
 
-    const std::unordered_map<ShaderBindingTable::Entry::Key, UniquePtr<ShaderBindingTable::Entry>>& ShaderBindingTable::GetEntries() const
+    const HashMap<ShaderBindingTable::Entry::Key, UniquePtr<ShaderBindingTable::Entry>>& ShaderBindingTable::GetEntries() const
     {
         return mEntries;
     }

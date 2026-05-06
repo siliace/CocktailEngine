@@ -747,7 +747,7 @@ namespace Ck
 
         protected:
 
-            template <typename U>
+            template <typename U, typename TOtherAllocator>
             friend class Ck::LinkedList;
 
             /**
@@ -980,7 +980,7 @@ namespace Ck
 
         protected:
 
-            template <typename U>
+            template <typename U, typename TOtherAllocator>
             friend class Ck::LinkedList;
 
             /**

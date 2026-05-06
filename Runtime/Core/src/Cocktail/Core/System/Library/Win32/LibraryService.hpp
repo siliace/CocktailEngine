@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_LIBRARY_WIN32_LIBRARYSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_LIBRARY_WIN32_LIBRARYSERVICE_HPP
 
-#include <unordered_map>
-
+#include <Cocktail/Core/HashMap.hpp>
 #include <Cocktail/Core/System/Library/LibraryService.hpp>
 #include <Cocktail/Core/System/Win32/Windows.hpp>
 
@@ -20,7 +19,7 @@ namespace Ck::Detail::Win32
 
 	private:
 
-		std::unordered_map<Path, DLL_DIRECTORY_COOKIE> mDirectoryCookies;
+		HashMap<Path, DLL_DIRECTORY_COOKIE> mDirectoryCookies;
 	};
 }
 

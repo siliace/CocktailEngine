@@ -12,13 +12,13 @@ namespace Ck
 
     namespace
     {
-        std::unordered_map<String, EnumMap<Renderer::ShaderType, ByteArray>> ParseVariantsBinaries(const Path& basePath, FileSystemDriver* driver)
+        HashMap<String, EnumMap<Renderer::ShaderType, ByteArray>> ParseVariantsBinaries(const Path& basePath, FileSystemDriver* driver)
         {
             Array<Path> filenames = Finder().WithExtension(CK_TEXT("spv")).From(basePath).Get(driver).Transform([](const Path& path) {
                 return path.GetFilename();
             });
 
-            std::unordered_map<String, EnumMap<Renderer::ShaderType, ByteArray>> binariesMap;
+            HashMap<String, EnumMap<Renderer::ShaderType, ByteArray>> binariesMap;
             for (const Path& filename : filenames)
             {
                 Path shaderName = filename.GetFilename();

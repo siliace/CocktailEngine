@@ -66,7 +66,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
 		std::shared_ptr<ShaderProgram> mShaderProgram;
-		std::unordered_map<std::shared_ptr<TextureView>, std::shared_ptr<Framebuffer>> mFramebuffers;
+		HashMap<std::shared_ptr<TextureView>, std::shared_ptr<Framebuffer>> mFramebuffers;
 	};
 	
 }

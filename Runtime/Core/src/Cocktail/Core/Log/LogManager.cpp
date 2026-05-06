@@ -13,7 +13,7 @@ namespace Ck
 
 	void LogManager::RegisterChannel(const String& name, UniquePtr<LogChannel> logChannel)
 	{
-		mChannels.insert_or_assign(name, std::move(logChannel));
+		mChannels.Put(name, std::move(logChannel));
 	}
 
 	const Array<LogEntry*>& LogManager::GetEntries() const

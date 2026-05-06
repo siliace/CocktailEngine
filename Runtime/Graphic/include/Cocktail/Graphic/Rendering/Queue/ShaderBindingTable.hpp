@@ -37,7 +37,6 @@ namespace Ck
         };
 
         ShaderBindingTable();
-
         ShaderBindingTable(const ShaderBindingTable& other) = delete;
         ShaderBindingTable(ShaderBindingTable&& other) = default;
         ShaderBindingTable& operator=(const ShaderBindingTable& other) = delete;
@@ -46,31 +45,21 @@ namespace Ck
         void BindBuffer(ShaderBindingDomain domain, BindingSlot slot, const Renderer::Buffer* buffer, unsigned int arrayIndex, std::size_t offset, std::size_t range);
         void BindSampler(ShaderBindingDomain domain, BindingSlot slot, const Renderer::Sampler* sampler, unsigned int arrayIndex = 0);
         void BindTexture(ShaderBindingDomain domain, BindingSlot slot, const Renderer::TextureView* textureView, unsigned int arrayIndex = 0);
-        void BindTextureSampler(ShaderBindingDomain domain, BindingSlot slot, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler,
-                                unsigned int arrayIndex = 0);
+        void BindTextureSampler(ShaderBindingDomain domain, BindingSlot slot, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler, unsigned int arrayIndex = 0);
 
-        const std::unordered_map<Entry::Key, UniquePtr<Entry>>& GetEntries() const;
+        const HashMap<Entry::Key, UniquePtr<Entry>>& GetEntries() const;
 
     private:
 
         template <typename T>
         T* FindOrCreateEntry(ShaderBindingDomain domain, BindingSlot slot)
         {
-            T* entry;
             Entry::Key key{ domain, slot };
-            if (auto it = mEntries.find(key); it != mEntries.end())
-            {
-                entry = static_cast<T*>(it->second.Get());
-            }
-            else
-            {
-                UniquePtr<T> newEntry = MakeUnique<T>();
-                entry = newEntry.Get();
+            UniquePtr<Entry>& entry = mEntries.ComputeIfMissing(key, [](const Entry::Key&) -> UniquePtr<Entry> {
+                return MakeUnique<T>();
+            });
 
-                mEntries[key] = std::move(newEntry);
-            }
-
-            return entry;
+            return static_cast<T*>(entry.Get());
         }
 
         class BufferEntry : public Entry
@@ -194,7 +183,7 @@ namespace Ck
             Array<const Renderer::Sampler*, LinearAllocator<4>> mSamplers;
         };
 
-        std::unordered_map<Entry::Key, UniquePtr<Entry>> mEntries;
+        HashMap<Entry::Key, UniquePtr<Entry>> mEntries;
     };
 }
 

@@ -120,7 +120,7 @@ namespace Ck
 				materialTextures |= textureType;
 			}
 
-			mVariants.insert_or_assign(VariantKey(vertexAttributes, materialTextures), std::move(variant));
+			mVariants.Put(VariantKey(vertexAttributes, materialTextures), std::move(variant));
 		}
 	}
 

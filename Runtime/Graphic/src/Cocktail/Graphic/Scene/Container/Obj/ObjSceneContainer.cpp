@@ -1,5 +1,3 @@
-#include <unordered_map>
-
 #include <Cocktail/Core/Application/App.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
 #include <Cocktail/Core/Image/ImageLoader.hpp>
@@ -39,39 +37,36 @@ namespace Ck
         if (path.IsEmpty())
             return nullptr;
 
-		if (auto it = mMipMaps.find(path); it != mMipMaps.end())
-			return it->second;
+	    return mMipMaps.ComputeIfMissing(path, [this](const Path& path) -> std::shared_ptr<MipMaps> {
+	        ImageLoader* imageLoader = App::Resolve<ImageLoader>();
+            MipMapsLoader* mipMapLoader = App::Resolve<MipMapsLoader>();
 
-        ImageLoader* imageLoader = App::Resolve<ImageLoader>();
-        MipMapsLoader* mipMapLoader = App::Resolve<MipMapsLoader>();
+            String extension(path.GetExtension());
+            Path fullpath = mImportParameters.BaseDirectory.Join(path);
+            if (!Storage::IsFile(fullpath))
+            {
+                CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("File %s not found"), path.ToString());
+                return nullptr;
+            }
 
-        String extension(path.GetExtension());
-        Path fullpath = mImportParameters.BaseDirectory.Join(path);
-        if (!Storage::IsFile(fullpath))
-        {
-            CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("File %s not found"), path.ToString());
-            return nullptr;
-        }
+            std::shared_ptr<MipMaps> mipMaps;
+            if (mipMapLoader->SupportExtensionImport(extension))
+            {
+                mipMaps = mipMapLoader->LoadFromPath(fullpath, {});
+            }
+            else if (imageLoader->SupportExtensionImport(extension))
+            {
+                std::shared_ptr<Image> image = imageLoader->LoadFromPath(fullpath);
+                mipMaps = MipMaps::FromImage(*image);
+            }
+            else
+            {
+                CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("No loader found for file %s"), path.ToString());
+                return nullptr;
+            }
 
-		std::shared_ptr<MipMaps> mipMaps;
-        if (mipMapLoader->SupportExtensionImport(extension))
-        {
-			mipMaps = mipMapLoader->LoadFromPath(fullpath, {});
-        }
-        else if (imageLoader->SupportExtensionImport(extension))
-        {
-			std::shared_ptr<Image> image = imageLoader->LoadFromPath(fullpath);
-			mipMaps = MipMaps::FromImage(*image);
-        }
-		else
-		{
-			CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("No loader found for file %s"), path.ToString());
-			return nullptr;
-		}
-
-		mMipMaps[path] = mipMaps;
-
-		return mipMaps;
+            return mipMaps;
+	    });
     }
 
 	ObjSceneContainer::MaterialInfo ObjSceneContainer::ProcessMaterial(const tinyobj::material_t& objMaterial)

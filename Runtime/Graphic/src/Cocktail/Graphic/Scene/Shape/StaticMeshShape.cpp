@@ -62,14 +62,16 @@ namespace Ck
                     recordInfo.MaterialTextures[textureType] = texture->GetView();
             }
 
-            for (const Geometry& geometry : mGeometries.at(material.get()))
-            {
-                recordInfo.Count = geometry.Count;
-                recordInfo.FirstVertex = geometry.FirstVertex;
-                recordInfo.FirstIndex = geometry.FirstIndex;
+            mGeometries.TryGet(material.get()).Then([&](const Array<Geometry>& geometries) {
+                for (const Geometry& geometry : geometries)
+                {
+                    recordInfo.Count = geometry.Count;
+                    recordInfo.FirstVertex = geometry.FirstVertex;
+                    recordInfo.FirstIndex = geometry.FirstIndex;
 
-                EmitRecord(queue, recordInfo, material->GetShadingMode(), distanceToCamera);
-            }
+                    EmitRecord(queue, recordInfo, material->GetShadingMode(), distanceToCamera);
+                }
+            });
         }
     }
 

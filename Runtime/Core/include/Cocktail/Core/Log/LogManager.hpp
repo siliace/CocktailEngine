@@ -2,10 +2,10 @@
 #define COCKTAIL_CORE_LOG_LOGMANAGER_HPP
 
 #include <memory>
-#include <unordered_map>
 
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
+#include <Cocktail/Core/HashMap.hpp>
 #include <Cocktail/Core/Log/LogCategory.hpp>
 #include <Cocktail/Core/Log/LogChannel.hpp>
 #include <Cocktail/Core/Log/LogEntry.hpp>
@@ -87,7 +87,7 @@ namespace Ck
 
 	private:
 
-		std::unordered_map<String, UniquePtr<LogChannel>> mChannels;
+		HashMap<String, UniquePtr<LogChannel>> mChannels;
 		Array<LogEntry*> mEntries;
 		Signal<LogEntry*> mOnTraceEntry;
 		ObjectPool<LogEntry> mEntryPool;

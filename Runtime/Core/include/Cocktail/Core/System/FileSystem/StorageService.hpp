@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_CORE_SYSTEM_FILESYSTEM_STORAGESERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_FILESYSTEM_STORAGESERVICE_HPP
 
-#include <unordered_map>
-
+#include <Cocktail/Core/HashMap.hpp>
 #include <Cocktail/Core/System/FileSystem/FileSystemDriver.hpp>
 #include <Cocktail/Core/System/FileSystem/URI.hpp>
 
@@ -260,7 +259,7 @@ namespace Ck
     private:
 
 		String mDefaultScheme;
-		std::unordered_map<String, FileSystemDriver*> mDrivers;
+		HashMap<String, FileSystemDriver*> mDrivers;
 		Array<UniquePtr<FileSystemDriver>> mInternalDrivers;
 	};
 }

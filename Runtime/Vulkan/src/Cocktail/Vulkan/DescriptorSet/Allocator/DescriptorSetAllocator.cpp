@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 
 	DescriptorSetAllocator::~DescriptorSetAllocator()
 	{
-		mAcquiredSets.clear();
+		mAcquiredSets.Clear();
 		mVacantSets.Clear();
 		for (const std::shared_ptr<DescriptorPool>& descriptorPool : mDescriptorPools)
 			descriptorPool->Reset();
@@ -22,8 +22,9 @@ namespace Ck::Vulkan
 	std::shared_ptr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo, Uint64 stateHash, bool& cached)
 	{
 		cached = true;
-		if (auto it = mAcquiredSets.find(stateHash); it != mAcquiredSets.end())
-			return it->second;
+        Optional<std::shared_ptr<DescriptorSet>&> set = mAcquiredSets.TryGet(stateHash);
+        if (!set.IsEmpty())
+            return set.Get();
 
 		cached = false;
 		std::shared_ptr<DescriptorSet> descriptorSet = mVacantSets.FindIndexIf([&](const std::shared_ptr<DescriptorSet> &set) {
@@ -43,7 +44,7 @@ namespace Ck::Vulkan
 			return descriptorSets[0];
 		});
 
-		mAcquiredSets.insert({ stateHash, descriptorSet });
+		mAcquiredSets.Put(stateHash, descriptorSet);
 
 		return descriptorSet;
 	}

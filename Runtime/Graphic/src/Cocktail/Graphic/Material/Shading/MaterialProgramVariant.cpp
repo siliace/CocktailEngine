@@ -71,7 +71,7 @@ namespace Ck
                     if (slot->GetDescriptorType() != slotInterface.Type)
                         continue;
 
-                    mSlots.insert_or_assign(SlotIdentifier{ domain, i }, slot);
+                    mSlots.Put(SlotIdentifier{ domain, i }, slot);
                 }
             }
         }
@@ -89,8 +89,7 @@ namespace Ck
         if (!slotInterfaceIndex.IsEmpty())
         {
             SlotIdentifier id{ domain, slotInterfaceIndex.Get() };
-            if (auto it = mSlots.find(id); it != mSlots.end())
-                return it->second;
+            return mSlots.TryGet(id).GetOr(nullptr);
         }
 
         return nullptr;

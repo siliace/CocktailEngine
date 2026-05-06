@@ -42,19 +42,15 @@ namespace Ck::Vulkan
 
 	Framebuffer* FrameContext::AcquireNextFramebuffer(const RenderSurface* renderSurface)
 	{
-		auto it = mAcquiredImages.find(renderSurface);
-		if (it == mAcquiredImages.end())
-		{
-			RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
+	    AcquiredImage& acquiredImage = mAcquiredImages.ComputeIfMissing(renderSurface, [this](const RenderSurface*) {
+	        RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
 
-			AcquiredImage acquiredImage;
-			acquiredImage.ImageAvailable = renderDevice->CreateSemaphore({});
-			acquiredImage.ImagePresentable = renderDevice->CreateSemaphore({});
+            AcquiredImage acquiredImage;
+            acquiredImage.ImageAvailable = renderDevice->CreateSemaphore({});
+            acquiredImage.ImagePresentable = renderDevice->CreateSemaphore({});
+            return acquiredImage;
+	    });
 
-			it = mAcquiredImages.insert(std::make_pair(renderSurface, std::move(acquiredImage))).first;
-		}
-
-		AcquiredImage& acquiredImage = it->second;
 		if (acquiredImage.ImageIndex.IsEmpty())
 		{
 			acquiredImage.ImageIndex = renderSurface->AcquireNextFramebuffer(Duration::Infinite(), acquiredImage.ImageAvailable, nullptr);
@@ -119,12 +115,12 @@ namespace Ck::Vulkan
 		// Effectively submit everything on GPU
 		mRenderContext->Submit();
 
-		if (!mAcquiredImages.empty())
+		if (!mAcquiredImages.IsEmpty())
 		{
-			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mAcquiredImages.size());
-			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mAcquiredImages.size());
-			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mAcquiredImages.size());
-			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.size());
+			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mAcquiredImages.GetSize());
+			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mAcquiredImages.GetSize());
+			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mAcquiredImages.GetSize());
+			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.GetSize());
 
 			unsigned int acquiredImageCount = 0;
 			for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)

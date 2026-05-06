@@ -7,24 +7,24 @@ namespace Ck
 		if (abstract == concrete)
 			return;
 
-		mAliases.insert_or_assign(abstract, concrete);
+		mAliases.Put(abstract, concrete);
 	}
 
 	void ServiceContainer::Clear()
 	{
-		mBindings.clear();
-		mAliases.clear();
+		mBindings.Clear();
+		mAliases.Clear();
 	}
 
 	void ServiceContainer::RegisterBinding(UniquePtr<Detail::ServiceBindingBase>&& binding)
 	{
-		mBindings.insert_or_assign(binding->GetResolvedType(), std::move(binding));
+		mBindings.Put(binding->GetResolvedType(), std::move(binding));
 	}
 
 	const std::type_info& ServiceContainer::GetConcrete(const std::type_info& abstract) const
 	{
-		if (auto it = mAliases.find(abstract); it != mAliases.end())
-			return GetConcrete(it->second);
+		if (Optional<const std::reference_wrapper<const std::type_info>&> concrete = mAliases.TryGet(abstract); !concrete.IsEmpty())
+			return GetConcrete(concrete.Get());
 
 		return abstract;  // NOLINT(bugprone-return-const-ref-from-parameter)
 	}

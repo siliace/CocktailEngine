@@ -51,7 +51,7 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		Array<std::shared_ptr<DescriptorPool>> mDescriptorPools;
-		std::unordered_map<Uint64, std::shared_ptr<DescriptorSet>> mAcquiredSets;
+		HashMap<Uint64, std::shared_ptr<DescriptorSet>> mAcquiredSets;
 		Array<std::shared_ptr<DescriptorSet>> mVacantSets;
 		TlsObjectPool<DescriptorSet> mDescriptorSetPool;
 	};

@@ -2,7 +2,7 @@
 
 namespace Ck::Detail::Xlib
 {
-    AtomManager::AtomManager(::Display *display) :
+    AtomManager::AtomManager(::Display* display) :
         mDisplay(display)
     {
         /// Nothing
@@ -10,15 +10,12 @@ namespace Ck::Detail::Xlib
 
     Atom AtomManager::GetAtom(const String& name, bool mustExists)
     {
-        if (auto it = mAtoms.find(name); it != mAtoms.end())
-            return it->second;
+        return mAtoms.ComputeIfMissing(name, [this, mustExists](const String& name) {
+            XLockDisplay(mDisplay);
+            Atom atom = XInternAtom(mDisplay, reinterpret_cast<const AnsiChar*>(name.GetData()), mustExists ? True : False);
+            XUnlockDisplay(mDisplay);
 
-        XLockDisplay(mDisplay);
-        Atom atom = XInternAtom(mDisplay, reinterpret_cast<const AnsiChar*>(name.GetData()), mustExists ? True : False);
-        XUnlockDisplay(mDisplay);
-
-        mAtoms[name] = atom;
-
-        return atom;
+            return atom;
+        });
     }
 }

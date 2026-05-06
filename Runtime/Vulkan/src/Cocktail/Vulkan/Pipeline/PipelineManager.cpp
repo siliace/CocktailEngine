@@ -163,30 +163,22 @@ namespace Ck::Vulkan
 
 	std::shared_ptr<ComputePipeline> PipelineManager::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 	{
-		PipelineStateHash stateHash = HashComputeState(createInfo.ComputeState);
-		if (auto it = mComputePipelines.find(stateHash); it != mComputePipelines.end())
-			return it->second;
+	    auto pipeline = mComputePipelines.ComputeIfMissing(HashComputeState(createInfo.ComputeState), [this, &createInfo](PipelineStateHash stateHash) {
+            CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created ComputePipeline with hash %llu"), stateHash);
+            return mRenderDevice->CreateComputePipeline(mCache.get(), createInfo);
+	    });
 
-		std::shared_ptr<ComputePipeline> pipeline = mRenderDevice->CreateComputePipeline(mCache.get(), createInfo);
-		mComputePipelines[stateHash] = pipeline;
-
-		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created ComputePipeline with hash %llu"), stateHash);
-
-		return pipeline;
+	    return std::static_pointer_cast<ComputePipeline>(pipeline);
 	}
 
 	std::shared_ptr<GraphicPipeline> PipelineManager::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
 	{
-		PipelineStateHash stateHash = HashGraphicState(createInfo.GraphicState);
-		if (auto it = mGraphicPipelines.find(stateHash); it != mGraphicPipelines.end())
-			return it->second;
+	    auto pipeline = mGraphicPipelines.ComputeIfMissing(HashGraphicState(createInfo.GraphicState), [this, &createInfo](PipelineStateHash stateHash) {
+		    CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created GraphicPipeline with hash %llu"), stateHash);
+            return mRenderDevice->CreateGraphicPipeline(mCache.get(), createInfo);
+        });
 
-		std::shared_ptr<GraphicPipeline> pipeline = mRenderDevice->CreateGraphicPipeline(mCache.get(), createInfo);
-		mGraphicPipelines[stateHash] = pipeline;
-
-		CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created GraphicPipeline with hash %llu"), stateHash);
-
-		return pipeline;
+	    return std::static_pointer_cast<GraphicPipeline>(pipeline);
 	}
 
 	std::shared_ptr<PipelineCache> PipelineManager::GetCache() const

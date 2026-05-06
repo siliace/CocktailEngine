@@ -25,7 +25,7 @@ namespace Ck
 
 		std::shared_ptr<VertexLayout> mVertexLayout;
 		SceneImportParameters mImportParameters;
-		std::unordered_map<Path, std::shared_ptr<MipMaps>> mMipMaps;
+		HashMap<Path, std::shared_ptr<MipMaps>> mMipMaps;
 	};
 }
 

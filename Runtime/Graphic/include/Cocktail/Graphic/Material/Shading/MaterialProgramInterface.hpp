@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMINTERFACE_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAMINTERFACE_HPP
 
+#include <Cocktail/Core/HashMap.hpp>
+
 #include <Cocktail/Graphic/Geometry/Vertex/VertexAttributeSemantic.hpp>
 #include <Cocktail/Graphic/Material/Material.hpp>
 
@@ -253,7 +255,7 @@ namespace Ck
 
     private:
 
-        std::unordered_map<VertexAttributeSemantic, VertexInterface> mVertexAttributes; /*!< Vertex attributes */
+        HashMap<VertexAttributeSemantic, VertexInterface> mVertexAttributes; /*!< Vertex attributes */
         EnumMap<ShaderBindingDomain, UniquePtr<BindingDomainInterface>> mDomainInterfaces; /*!< Domain interfaces */
     };
 }

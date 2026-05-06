@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_CORE_MEMORY_UNIQUEPTR_HPP
 #define COCKTAIL_CORE_MEMORY_UNIQUEPTR_HPP
 
-#include <Cocktail/Core/Cocktail.hpp>
+#include <Cocktail/Core/Memory/ObjectMemoryUtils.hpp>
 
 namespace Ck
 {
@@ -80,12 +80,48 @@ namespace Ck
         void operator()(T* ptr) noexcept
         {
             assert(mAllocator || !ptr);
+            ObjectMemoryUtils::Destroy(ptr);
             mAllocator->Deallocate(ptr);
         }
 
     private:
 
         TypedAllocatorType* mAllocator;
+    };
+
+    template <typename T, typename TAllocator>
+    class AllocatorAwareDeleter<T[], TAllocator>
+    {
+    public:
+
+        using AllocatorType = TAllocator;
+        using TypedAllocatorType = typename AllocatorType::template ForType<T>;
+
+        AllocatorAwareDeleter() :
+            mAllocator(nullptr),
+            mRange(0)
+        {
+            /// Nothing
+        }
+
+        explicit AllocatorAwareDeleter(TypedAllocatorType& allocator, typename AllocatorType::SizeType range) :
+            mAllocator(&allocator),
+            mRange(range)
+        {
+            /// Nothing
+        }
+
+        void operator()(T* ptr) noexcept
+        {
+            assert(mAllocator || !ptr);
+            ObjectMemoryUtils::DestroyRange(mRange, ptr);
+            mAllocator->Deallocate(ptr);
+        }
+
+    private:
+
+        TypedAllocatorType* mAllocator;
+        typename AllocatorType::SizeType mRange;
     };
 
     /**
@@ -710,10 +746,8 @@ namespace Ck
     UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>> MakeUniqueWithAllocator(typename TAllocator::template ForType<T>& allocator, TArgs&&... args)
     {
         T* pointer = allocator.Allocate(1);
-        return UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>>(
-            new (pointer) T(std::forward<TArgs>(args)...),
-            AllocatorAwareDeleter<T, TAllocator>(allocator)
-        );
+        ObjectMemoryUtils::Construct(pointer, std::forward<TArgs>(args)...);
+        return UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>>(pointer, AllocatorAwareDeleter<T, TAllocator>(allocator));
     }
 
     /**
@@ -748,17 +782,16 @@ namespace Ck
      * \return A new UniquePtr managing the allocated array
      */
     template <typename T, typename TAllocator, typename = std::enable_if_t<std::is_array_v<T>>>
-    UniquePtr<T, AllocatorAwareDeleter<std::remove_extent_t<T>, TAllocator>> MakeUniqueWithAllocator(typename TAllocator::template ForType<std::remove_extent_t<T>>& allocator, Uint64 size)
+    UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>> MakeUniqueWithAllocator(typename TAllocator::template ForType<std::remove_extent_t<T>>& allocator, Uint64 size)
     {
         using BaseType = std::remove_extent_t<T>;
 
         BaseType* pointer = allocator.Allocate(size);
-        for (Uint64 i = 0; i < size; i++)
-            new (&pointer[i]) BaseType();
+        ObjectMemoryUtils::ConstructRange(size, pointer);
 
-        return UniquePtr<T, AllocatorAwareDeleter<BaseType, TAllocator>>(
+        return UniquePtr<T, AllocatorAwareDeleter<T, TAllocator>>(
             pointer,
-            AllocatorAwareDeleter<BaseType, TAllocator>(allocator)
+            AllocatorAwareDeleter<T, TAllocator>(allocator, size)
         );
     }
 }

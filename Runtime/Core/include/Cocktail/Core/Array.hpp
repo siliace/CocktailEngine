@@ -48,7 +48,7 @@ namespace Ck
         /**
          * \brief Iterator used to traverse an Array instance
          *
-         * This iterator provides read-only access to the elements of an Array.
+         * This iterator provides access to the elements of an Array.
          * It internally stores a pointer to an index and allows forward
          * and backward navigation within the Array.
          */
@@ -105,7 +105,7 @@ namespace Ck
              *
              * \return A reference to this iterator after rewinding
              */
-            Iterator& Rewind(unsigned int count = 1)
+            Iterator& Rewind(SizeType count = 1)
             {
                 mValue -= count;
 
@@ -122,7 +122,7 @@ namespace Ck
              *
              * \return A reference to this iterator after advancing
              */
-            Iterator& Advance(unsigned int count = 1)
+            Iterator& Advance(SizeType count = 1)
             {
                 mValue += count;
 
@@ -550,7 +550,7 @@ namespace Ck
              *
              * \return A reference to this iterator after rewinding
              */
-            ConstIterator& Rewind(unsigned int count = 1)
+            ConstIterator& Rewind(SizeType count = 1)
             {
                 mValue -= count;
 
@@ -567,7 +567,7 @@ namespace Ck
              *
              * \return A reference to this iterator after advancing
              */
-            ConstIterator& Advance(unsigned int count = 1)
+            ConstIterator& Advance(SizeType count = 1)
             {
                 mValue += count;
 

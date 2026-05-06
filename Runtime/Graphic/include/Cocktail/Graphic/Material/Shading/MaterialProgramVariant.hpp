@@ -6,6 +6,7 @@
 #include <Cocktail/Graphic/Material/Shading/MaterialProgramInterface.hpp>
 
 #include <Cocktail/Renderer/Shader/ShaderProgram.hpp>
+#include <Cocktail/Renderer/Shader/UniformSlot.hpp>
 #include <Cocktail/Renderer/Shader/VertexAttributeLocation.hpp>
 
 namespace Ck
@@ -29,7 +30,7 @@ namespace Ck
         std::shared_ptr<MaterialProgramInterface> mInterface;
         std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
         EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
-        std::unordered_map<SlotIdentifier, Renderer::UniformSlot*> mSlots;
+        HashMap<SlotIdentifier, Renderer::UniformSlot*> mSlots;
     };
 }
 

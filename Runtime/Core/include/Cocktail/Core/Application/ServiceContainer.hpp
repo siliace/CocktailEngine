@@ -3,12 +3,12 @@
 
 #include <memory>
 #include <typeindex>
-#include <unordered_map>
 
-#include <Cocktail/Core/Export.hpp>
 #include <Cocktail/Core/Application/Detail/InstanceServiceBinding.hpp>
 #include <Cocktail/Core/Application/Detail/SingletonServiceBinding.hpp>
 #include <Cocktail/Core/Application/Detail/ThreadLocalSingletonServiceBinding.hpp>
+#include <Cocktail/Core/Export.hpp>
+#include <Cocktail/Core/HashMap.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
 
 namespace Ck
@@ -139,15 +139,13 @@ namespace Ck
 		{
 			const std::type_info& abstract = typeid(Abstract);
 			const std::type_info& concrete = GetConcrete(abstract);
-			if (auto itBinding = mBindings.find(concrete); itBinding != mBindings.end())
-			{
-				auto binding = static_cast<Detail::ServiceBinding<Abstract>*>(itBinding->second.Get());
-				if (binding->IsCallable())
-				{
-					auto callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(binding);
-					callableBinding->Decorate(std::move(extender));
-				}
-			}
+		    mBindings.TryGet(concrete).Then([&](const UniquePtr<Detail::ServiceBindingBase>& binding) {
+                if (binding->IsCallable())
+                {
+                    auto callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(binding);
+                    callableBinding->Decorate(std::move(extender));
+                }
+		    });
 		}
 
 		template <typename T>
@@ -155,13 +153,9 @@ namespace Ck
 		{
 			const std::type_info& abstract = typeid(T);
 			const std::type_info& concrete = GetConcrete(abstract);
-			if (auto itBinding = mBindings.find(concrete); itBinding != mBindings.end())
-			{
-				auto binding = static_cast<Detail::ServiceBinding<T>*>(itBinding->second.Get());
-				return binding->Resolve();
-			}
-
-			return nullptr;
+		    return mBindings.TryGet(concrete).Map([](const UniquePtr<Detail::ServiceBindingBase>& binding) {
+		        return static_cast<Detail::ServiceBinding<T>*>(binding.Get())->Resolve();
+		    }).GetOr(nullptr);
 		}
 
 		/**
@@ -261,8 +255,8 @@ namespace Ck
 		 */
 		const std::type_info& GetConcrete(const std::type_info& abstract) const;
 
-		std::unordered_map<std::type_index, UniquePtr<Detail::ServiceBindingBase>> mBindings;
-		std::unordered_map<std::type_index, std::reference_wrapper<const std::type_info>> mAliases;
+		HashMap<std::type_index, UniquePtr<Detail::ServiceBindingBase>> mBindings;
+		HashMap<std::type_index, std::reference_wrapper<const std::type_info>> mAliases;
 	};
 }
 

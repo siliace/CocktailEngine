@@ -50,7 +50,7 @@ namespace Ck
         void Register(RenderableType renderableType, UniquePtr<MaterialProgram> materialProgram);
 
         Renderer::RenderDevice* mRenderDevice;
-        std::unordered_map<RenderableType, Array<UniquePtr<MaterialProgram>>> mMaterialPrograms;
+        HashMap<RenderableType, Array<UniquePtr<MaterialProgram>>> mMaterialPrograms;
     };
 }
 

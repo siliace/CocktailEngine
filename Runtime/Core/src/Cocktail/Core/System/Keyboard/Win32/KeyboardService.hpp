@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_KEYBOARD_WIN32_KEYBOARDSERVICE_HPP
 #define COCKTAIL_CORE_SYSTEM_KEYBOARD_WIN32_KEYBOARDSERVICE_HPP
 
-#include <unordered_map>
-
 #include <Cocktail/Core/Application/Application.hpp>
 #include <Cocktail/Core/System/Keyboard/KeyboardService.hpp>
 
@@ -73,6 +71,7 @@ namespace Ck::Detail::Win32
          * from pressed to released.
          *
          * \param key The keyboard key
+         *
          * \return The Signal
          */
 		Signal<KeyboardEvent>& OnKeyReleased(KeyboardKey key) override;
@@ -80,9 +79,9 @@ namespace Ck::Detail::Win32
 	private:
 
 		Signal<KeyboardEvent> mOnKeyboardEvent;
-		std::unordered_map<KeyboardKey, Signal<KeyboardEvent>> mOnKeyEvents;
-		std::unordered_map<KeyboardKey, Signal<KeyboardEvent>> mOnKeyPressedEvents;
-		std::unordered_map<KeyboardKey, Signal<KeyboardEvent>> mOnKeyReleasedEvents;
+		HashMap<KeyboardKey, Signal<KeyboardEvent>> mOnKeyEvents;
+		HashMap<KeyboardKey, Signal<KeyboardEvent>> mOnKeyPressedEvents;
+		HashMap<KeyboardKey, Signal<KeyboardEvent>> mOnKeyReleasedEvents;
 	};
 }
 

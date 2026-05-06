@@ -33,11 +33,11 @@ namespace Ck
          */
         void AddVertex(const T& vertex)
         {
-            auto [it, inserted] = mVertices.insert({ vertex, mCurrentIndex });
+            bool inserted = mVertices.PutIfMissing(vertex, mCurrentIndex);
+            mIndices.Add(mCurrentIndex);
+
             if (inserted)
                 ++mCurrentIndex;
-
-            mIndices.Add(it->second);
         }
 
         /**
@@ -57,7 +57,7 @@ namespace Ck
          */
         std::shared_ptr<IndexArray> CreateIndexArray() const
         {
-            const bool useShortIndices = mVertices.size() < std::numeric_limits<Uint16>::max();
+            const bool useShortIndices = mVertices.GetSize() < std::numeric_limits<Uint16>::max();
             const Renderer::IndexType indexType = useShortIndices ? Renderer::IndexType::Short : Renderer::IndexType::Integer;
 
             std::shared_ptr<IndexArray> indices = std::make_shared<IndexArray>(indexType, mIndices.GetSize());
@@ -84,7 +84,7 @@ namespace Ck
          */
         std::shared_ptr<VertexArray> CreateVertexArray() const
         {
-            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(mVertexLayout, mVertices.size());
+            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(mVertexLayout, mVertices.GetSize());
             for (const auto& [vertex, index] : mVertices)
                 HydrateVertexRef(vertices->At(index), vertex);
 
@@ -127,7 +127,7 @@ namespace Ck
 
         std::shared_ptr<VertexLayout> mVertexLayout;
         unsigned int mCurrentIndex;
-        std::unordered_map<T, unsigned int, Hasher, Equal> mVertices;
+        HashMap<T, unsigned int, Hasher, Equal> mVertices;
         Array<unsigned int> mIndices;
     };
 }

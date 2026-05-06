@@ -92,7 +92,7 @@ namespace Ck
         std::shared_ptr<VertexBuffer> mVertexBuffer;
         std::shared_ptr<IndexBuffer> mIndexBuffer;
         std::unordered_set<std::shared_ptr<Material>> mMaterials;
-        std::unordered_map<const Material*, Array<Geometry>> mGeometries;
+        HashMap<const Material*, Array<Geometry>> mGeometries;
     };
 }
 

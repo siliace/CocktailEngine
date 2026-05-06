@@ -112,7 +112,7 @@ namespace Ck
         lightInfo.Name = String::ConvertFrom<Encoders::Ascii>(gltfLight.name.c_str());
         lightInfo.Color = GltfUtils::ConvertLinearColor(gltfLight.color);
         lightInfo.Intensity = static_cast<float>(gltfLight.intensity) * 100.f;
-        lightInfo.Range = gltfLight.range == 0. ? FLT_MAX : static_cast<float>(gltfLight.range);
+        lightInfo.Range = gltfLight.range == 0. ? std::numeric_limits<float>::max() : static_cast<float>(gltfLight.range);
         lightInfo.Type = GltfUtils::ConvertLightType(gltfLight.type.c_str());
         if (lightInfo.Type == Light::Type::Spot)
         {
@@ -129,7 +129,7 @@ namespace Ck
         for (const tinygltf::Primitive& primitive: gltfMesh.primitives)
         {
             VertexLayout::Builder vertexLayoutBuilder;
-            std::unordered_map<VertexAttributeSemantic, const tinygltf::Accessor*> attributeAccessors;
+            HashMap<VertexAttributeSemantic, const tinygltf::Accessor*> attributeAccessors;
 
             for (const auto& [name, index]: primitive.attributes)
             {

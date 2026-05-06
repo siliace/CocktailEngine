@@ -314,7 +314,7 @@ namespace Ck
             assert(length > 0);
 
             SizeType fullSize = mSize + length;
-            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte[], AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
 
             if (mSize)
             {
@@ -413,7 +413,7 @@ namespace Ck
             assert(offset + length <= mSize);
 
             SizeType fullSize = mSize - length;
-            UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
+            UniquePtr<Byte[], AllocatorAwareDeleter<Byte[], AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);
 
             if (offset == 0)
             {
@@ -585,7 +585,7 @@ namespace Ck
     private:
 
         SizeType mSize; /*!< Size in bytes */
-        UniquePtr<Byte[], AllocatorAwareDeleter<Byte, AllocatorType>> mData; /*!< Owned memory */
+        UniquePtr<Byte[], AllocatorAwareDeleter<Byte[], AllocatorType>> mData; /*!< Owned memory */
         ElementAllocatorType mAllocator; /*!< Allocator instance */
     };
 

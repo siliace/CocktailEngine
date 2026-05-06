@@ -48,8 +48,8 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		std::unordered_map<PipelineStateHash, std::shared_ptr<GraphicPipeline>> mGraphicPipelines;
-		std::unordered_map<PipelineStateHash, std::shared_ptr<ComputePipeline>> mComputePipelines;
+		HashMap<PipelineStateHash, std::shared_ptr<GraphicPipeline>> mGraphicPipelines;
+		HashMap<PipelineStateHash, std::shared_ptr<ComputePipeline>> mComputePipelines;
 		std::shared_ptr<PipelineCache> mCache;
 	};
 }

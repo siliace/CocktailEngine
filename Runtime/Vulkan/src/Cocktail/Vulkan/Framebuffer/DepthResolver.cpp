@@ -81,14 +81,10 @@ namespace Ck::Vulkan
 
 	Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment)
 	{
-		if (auto it = mFramebuffers.find(attachment); it != mFramebuffers.end())
-			return it->second.get();
-
-		Renderer::FramebufferCreateInfo createInfo;
-		createInfo.DepthStencilAttachment = attachment;
-		std::shared_ptr<Framebuffer> framebuffer = std::static_pointer_cast<Framebuffer>(mRenderDevice->CreateFramebuffer(createInfo));
-		mFramebuffers[attachment] = framebuffer;
-
-		return framebuffer.get();
+	    return mFramebuffers.ComputeIfMissing(attachment, [this](const std::shared_ptr<TextureView>& attachment) {
+	        Renderer::FramebufferCreateInfo createInfo;
+            createInfo.DepthStencilAttachment = attachment;
+            return std::static_pointer_cast<Framebuffer>(mRenderDevice->CreateFramebuffer(createInfo));
+	    }).get();
 	}
 }

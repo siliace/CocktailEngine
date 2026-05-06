@@ -31,10 +31,9 @@ namespace Ck
 
     const VertexInterface* MaterialProgramInterface::GetVertexInterface(VertexAttributeSemantic semantic)
     {
-        if (auto it = mVertexAttributes.find(semantic); it != mVertexAttributes.end())
-            return &it->second;
-
-        return nullptr;
+        return mVertexAttributes.TryGet(semantic).Map([](const VertexInterface& interface) {
+            return &interface;
+        }).GetOr(nullptr);
     }
 
     const BindingDomainInterface* MaterialProgramInterface::GetBindingDomainInterface(ShaderBindingDomain domain) const

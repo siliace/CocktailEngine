@@ -120,18 +120,18 @@ namespace Ck
 
     void StorageService::Mount(String scheme, UniquePtr<FileSystemDriver> fileSystemDriver)
     {
-        mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver.Get());
+        mDrivers.Put(std::move(scheme), fileSystemDriver.Get());
         mInternalDrivers.Add(std::move(fileSystemDriver));
     }
 
     void StorageService::MountExternal(String scheme, FileSystemDriver* fileSystemDriver)
     {
-        mDrivers.insert_or_assign(std::move(scheme), fileSystemDriver);
+        mDrivers.Put(std::move(scheme), fileSystemDriver);
     }
 
     void StorageService::UnMount(const String& scheme)
     {
-        mDrivers.erase(scheme);
+        mDrivers.Remove(scheme);
     }
 
     const String& StorageService::GetDefaultScheme() const
@@ -141,12 +141,6 @@ namespace Ck
 
     FileSystemDriver* StorageService::ResolveDriver(const String& scheme) const
     {
-        if (scheme.IsEmpty())
-            return ResolveDriver(mDefaultScheme);
-
-        if (auto it = mDrivers.find(scheme); it != mDrivers.end())
-            return it->second;
-
-        return nullptr;
+        return mDrivers.TryGet(scheme.IsEmpty() ? mDefaultScheme : scheme).GetOr(nullptr);
     }
 }

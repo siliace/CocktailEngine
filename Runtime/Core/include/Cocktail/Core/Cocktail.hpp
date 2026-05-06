@@ -299,7 +299,7 @@ namespace Ck
 	}
 
 	template <typename T>
-	T NextPowerOfTwo(T n)
+	constexpr T NextPowerOfTwo(T n)
 	{
 		--n;
 

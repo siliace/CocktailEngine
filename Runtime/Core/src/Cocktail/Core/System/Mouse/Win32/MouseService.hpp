@@ -41,10 +41,10 @@ namespace Ck::Detail::Win32
 
 		Signal<MouseMovedEvent> mOnMouseMovedEvent;
 		Signal<MouseButtonEvent> mOnMouseButtonEvent;
-		std::unordered_map<MouseButton, Signal<MouseButtonEvent>> mOnButtonPressedEvents;
-		std::unordered_map<MouseButton, Signal<MouseButtonEvent>> mOnButtonReleasedEvents;
+		HashMap<MouseButton, Signal<MouseButtonEvent>> mOnButtonPressedEvents;
+		HashMap<MouseButton, Signal<MouseButtonEvent>> mOnButtonReleasedEvents;
 		Signal<MouseWheelEvent> mOnMouseWheelEvent;
-		std::unordered_map<MouseWheel, Signal<MouseWheelEvent>> mOnMouseWheelEvents;
+		HashMap<MouseWheel, Signal<MouseWheelEvent>> mOnMouseWheelEvents;
 	};
 }
 
