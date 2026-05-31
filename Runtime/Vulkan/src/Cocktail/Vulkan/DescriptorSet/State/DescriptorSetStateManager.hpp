@@ -225,7 +225,6 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		DescriptorSetAllocator* mDescriptorSetAllocator;
-		std::shared_ptr<DescriptorSet> mLastSet;
 		Array<DescriptorState> mBindingStates;
 		unsigned int mBindingDirtyFlags;
 	};
