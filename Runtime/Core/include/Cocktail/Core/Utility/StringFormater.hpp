@@ -38,35 +38,68 @@ namespace Ck
         {
             area.Clear();
 
+            auto parameters = std::make_tuple(Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+
+            auto ComputeSizeFunction = [&](auto&& formatter) {
+                return std::apply(
+                    [&](auto const&... p) {
+                        return formatter(p...);
+                    },
+                    parameters);
+            };
+
+            auto WriteBufferFunction = [&](auto&& formatter, CharType* buffer) {
+                std::apply(
+                    [&](auto const&... p) {
+                        formatter(buffer, p...);
+                    },
+                    parameters);
+            };
+
             if constexpr (std::is_same_v<CharType, AnsiChar>)
             {
-                std::size_t size = std::snprintf(nullptr, 0, format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
-                if (size <= 0)
+                auto size = ComputeSizeFunction([&](auto const&... p) {
+                    return std::snprintf(nullptr, 0, format, p...);
+                }) + 1;
+
+                if (size == 0)
                     return;
 
                 area.Resize(size);
 
-                std::snprintf(area.GetData(), area.GetSize(), format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+                WriteBufferFunction([&](CharType* buffer, auto const&... p) {
+                    std::snprintf(buffer, area.GetSize(), format, p...);
+                }, area.GetData());
             }
             else if constexpr (std::is_same_v<CharType, WildChar>)
             {
-                std::size_t size = std::swprintf(nullptr, 0, format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
+                auto size = ComputeSizeFunction([&](auto const&... p) {
+                    return std::swprintf(nullptr, 0, format, p...);
+                }) + 1;
+
                 if (size <= 0)
                     return;
 
                 area.Resize(size);
 
-                std::swprintf(area.GetData(), area.GetSize(), format, Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+                WriteBufferFunction([&](CharType* buffer, auto const&... p) {
+                    std::swprintf(buffer, area.GetSize(), format, p...);
+                }, area.GetData());
             }
             else if constexpr (std::is_same_v<CharType, Utf8Char>)
             {
-                std::size_t size = std::snprintf(nullptr, 0, reinterpret_cast<const char*>(format), Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...) + 1;
+                auto size = ComputeSizeFunction([&](auto const&... p) {
+                    return std::snprintf(nullptr, 0, reinterpret_cast<const AnsiChar*>(format), p...);
+                }) + 1;
+
                 if (size <= 0)
                     return;
 
                 area.Resize(size);
 
-                std::snprintf(reinterpret_cast<char*>(area.GetData()), area.GetSize(), reinterpret_cast<const char*>(format), Formatter<std::decay_t<Args>>().Apply(std::forward<Args>(args))...);
+                WriteBufferFunction([&](CharType* buffer, auto const&... p) {
+                    std::snprintf(reinterpret_cast<AnsiChar*>(buffer), area.GetSize(), reinterpret_cast<const AnsiChar*>(format), p...);
+                }, area.GetData());
             }
         }
     };
