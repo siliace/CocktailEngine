@@ -14,7 +14,7 @@ namespace Ck::Detail::Unix
 
 	ConsoleReader::SizeType ConsoleReader::Read(TextChar* buffer, SizeType length)
 	{
-		ssize_t readSize = read(STDIN_FILENO, &buffer, length);
+		ssize_t readSize = read(STDIN_FILENO, buffer, length);
 	    if (readSize == -1)
 	        throw SystemError::GetLastError();
 
