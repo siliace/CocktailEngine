@@ -20,7 +20,7 @@
 			return ::Ck::String::Format(                                                              \
 						CK_TEXT("%s : %s"),                                                           \
 						CK_TEXT(#__Name),                                                             \
-						::Ck::String::Format(format, std::forward<Args>(args))...                     \
+						::Ck::String::Format(format, std::forward<Args>(args)...)                     \
 			);                                                                                        \
 		}                                                                                             \
 		                                                                                              \
