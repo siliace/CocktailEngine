@@ -64,7 +64,7 @@ namespace Ck
 		mMask = 0;
 	}
 
-	Uint64 AffinityMaskBuilder::GetAffinityMask() const
+	Uint32 AffinityMaskBuilder::GetAffinityMask() const
 	{
 		return mMask;
 	}

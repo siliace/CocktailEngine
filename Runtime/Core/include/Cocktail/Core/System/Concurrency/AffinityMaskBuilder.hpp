@@ -72,11 +72,11 @@ namespace Ck
          * \brief Returns the constructed affinity mask as a bitmask
          * \return Affinity bitmask
          */
-        Uint64 GetAffinityMask() const;
+        Uint32 GetAffinityMask() const;
 
     private:
 
-        Uint64 mMask; /*! Internal bitmask representing included CPU cores */
+        Uint32 mMask; /*! Internal bitmask representing included CPU cores */
     };
 }
 
