@@ -228,6 +228,92 @@ namespace Ck
             {
                 /// Nothing
             }
+            
+            /**
+             * \brief Copy constructor
+             *
+             * \param other LinkedListBase to copy from
+             */
+            LinkedListBase(const LinkedListBase& other) :
+                mTail(nullptr)
+            {
+                for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
+                    EmplaceBack(it.GetValue());
+            }
+            
+            /**
+             * \brief Move constructor
+             *
+             * \param other LinkedListBase to move from
+             */
+            LinkedListBase(LinkedListBase&& other) noexcept :
+                mTail(nullptr)
+            {
+                if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                {
+                    mHead = std::move(other.mHead);
+                    mTail = std::exchange(other.mTail, nullptr);
+                    mNodeAllocator = std::move(other.mNodeAllocator);
+                }
+                else
+                {
+                    for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
+                        EmplaceBack(std::move(source.GetValue()));
+                        
+                    other.Clear();
+                }
+            }
+            
+            /**
+             * \brief Copy assignment operator
+             *
+             * \param other LinkedListBase to copy from
+             *
+             * \return Reference to *this
+             */
+            LinkedListBase& operator=(const LinkedListBase& other)
+            {
+                if (this != &other)
+                {         
+                    Clear();
+                    
+                    for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
+                        EmplaceBack(it.GetValue());
+                }  
+                
+                return *this;
+            }
+            
+            /**
+             * \brief Move assignment operator
+             *
+             * \param other LinkedListBase to move from
+             *
+             * \return Reference to *this
+             */
+            LinkedListBase& operator=(LinkedListBase&& other) noexcept
+            {
+                if (this != &other)
+                {                
+                    if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                    {
+                        mHead = std::move(other.mHead);
+                        mTail = std::exchange(other.mTail, nullptr);
+                        mNodeAllocator = std::move(other.mNodeAllocator);
+                    }
+                    else
+                    {
+                        Clear();
+                        
+                        for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
+                            EmplaceBack(std::move(source.GetValue()));
+                        
+                        other.Clear();
+                    }
+                }
+                
+                return *this;
+            }
 
             /**
              * \brief Insert a value at the head of the list.
@@ -372,7 +458,8 @@ namespace Ck
                     else
                     {
                         const bool headIsTail = mHead.Get() == mTail;
-
+                        
+                        inserted->SetNext(std::move(mHead));
                         mHead = std::move(newNode);
                         if (headIsTail)
                             mTail = mHead.Get();
@@ -393,6 +480,15 @@ namespace Ck
                 }
 
                 return inserted;
+            }
+            
+            /**
+             * \brief Remove all elements from the list
+             */
+            void Clear()
+            {
+                mHead = nullptr;
+                mTail = nullptr;
             }
 
             template <typename U, typename TOtherAllocator>
@@ -525,7 +621,12 @@ namespace Ck
             LinkedListConstIterator& Rewind(unsigned int count = 1)
             {
                 for (unsigned int i = 0; i < count; i++)
+                {
+                    if (mNode == nullptr)
+                        break;
+
                     mNode = mNode->GetPrevious();
+                }
 
                 return *this;
             }
@@ -543,7 +644,12 @@ namespace Ck
             LinkedListConstIterator& Advance(unsigned int count = 1)
             {
                 for (unsigned int i = 0; i < count; i++)
+                {
+                    if (mNode == nullptr)
+                        break;
+
                     mNode = mNode->GetNext();
+                }
 
                 return *this;
             }
@@ -575,7 +681,7 @@ namespace Ck
              */
             LinkedListConstIterator Previous() const
             {
-                return LinkedListConstIterator(GetNode()->GetPrevious());
+                return LinkedListConstIterator(mNode->GetPrevious());
             }
 
             /**
@@ -585,7 +691,7 @@ namespace Ck
              */
             LinkedListConstIterator Next() const
             {
-                return LinkedListConstIterator(GetNode()->GetNext());
+                return LinkedListConstIterator(mNode->GetNext());
             }
 
             /**
@@ -683,7 +789,10 @@ namespace Ck
              */
             LinkedListConstIterator operator++(int)
             {
-                return Next();
+                LinkedListConstIterator old = *this;
+                Advance();
+                
+                return old;
             }
 
             /**
@@ -712,7 +821,10 @@ namespace Ck
              */
             LinkedListConstIterator operator--(int)
             {
-                return Previous();
+                LinkedListConstIterator old = *this;
+                Rewind();
+                
+                return old;
             }
 
             /**
@@ -763,18 +875,6 @@ namespace Ck
                 /// Nothing
             }
 
-            /**
-             * \brief Get the underlying node pointer
-             *
-             * \return The current node
-             */
-            LinkedListNode<E, TAllocator>* GetNode() const
-            {
-                return mNode;
-            }
-
-        private:
-
             LinkedListNode<E, TAllocator>* mNode; /*!< Pointer to the current node */
         };
 
@@ -824,13 +924,59 @@ namespace Ck
             }
 
             /**
+             * \brief Move the iterator backward
+             *
+             * Moves the iterator to the previous node \p count times. If the beginning
+             * of the list is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move backward
+             *
+             * \return A reference to this iterator after rewinding
+             */
+            LinkedListIterator& Rewind(unsigned int count = 1)
+            {
+                for (unsigned int i = 0; i < count; i++)
+                {
+                    if (this->mNode == nullptr)
+                        break;
+
+                    this->mNode = this->mNode->GetPrevious();
+                }
+
+                return *this;
+            }
+
+            /**
+             * \brief Move the iterator forward
+             *
+             * Moves the iterator to the next node \p count times. If the end of the
+             * list is reached, the iterator becomes invalid.
+             *
+             * \param count Number of steps to move forward
+             *
+             * \return A reference to this iterator after advancing
+             */
+            LinkedListIterator& Advance(unsigned int count = 1)
+            {
+                for (unsigned int i = 0; i < count; i++)
+                {
+                    if (this->mNode == nullptr)
+                        break;
+
+                    this->mNode = this->mNode->GetNext();
+                }
+
+                return *this;
+            }
+
+            /**
              * \brief Get a mutable reference to the current value
              *
              * \return A reference to the stored value
              */
             E& GetValue() const
             {
-                return LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
+                return this->mNode->GetValue();
             }
 
             /**
@@ -840,7 +986,7 @@ namespace Ck
              */
             LinkedListIterator Previous() const
             {
-                return LinkedListIterator(LinkedListConstIterator<E, TAllocator>::GetNode()->GetPrevious());
+                return LinkedListIterator(this->mNode->GetPrevious());
             }
 
             /**
@@ -850,7 +996,7 @@ namespace Ck
              */
             LinkedListIterator Next() const
             {
-                return LinkedListIterator(LinkedListConstIterator<E, TAllocator>::GetNode()->GetNext());
+                return LinkedListIterator(this->mNode->GetNext());
             }
 
             /**
@@ -916,7 +1062,10 @@ namespace Ck
              */
             LinkedListIterator operator++(int)
             {
-                return Next();
+                LinkedListIterator old = *this;
+                Advance();
+                
+                return old;
             }
 
             /**
@@ -945,7 +1094,10 @@ namespace Ck
              */
             LinkedListIterator operator--(int)
             {
-                return Previous();
+                LinkedListIterator old = *this;
+                Rewind();
+                
+                return old;
             }
 
             /**
@@ -961,7 +1113,7 @@ namespace Ck
              */
             E* operator->() const
             {
-                return &LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
+                return &this->mNode->GetValue();
             }
 
             /**
@@ -975,7 +1127,7 @@ namespace Ck
              */
             E& operator*() const
             {
-                return LinkedListConstIterator<E, TAllocator>::GetNode()->GetValue();
+                return this->mNode->GetValue();
             }
 
         protected:
@@ -1073,10 +1225,10 @@ namespace Ck
          * \param other The list to copy
          */
         LinkedList(const LinkedList& other) :
-            mSize(0)
+            Detail::LinkedListBase<E, TAllocator>(other),
+            mSize(other.mSize)
         {
-            for (ConstIterator it(other); it.IsValid(); it.Advance())
-                LinkedList::Add(it.GetValue());
+            /// Nothing
         }
 
         /**
@@ -1088,13 +1240,9 @@ namespace Ck
          * \param other The list to move from
          */
         LinkedList(LinkedList&& other) noexcept :
-            mSize(0)
+            Detail::LinkedListBase<E, TAllocator>(std::move(other))
         {
-            for (Iterator it(other); it.IsValid();)
-            {
-                Add(std::move(it.GetValue()));
-                it = other.Remove(it);
-            }
+            mSize = std::exchange(other.mSize, 0);
         }
 
         /**
@@ -1110,10 +1258,8 @@ namespace Ck
         {
             if (this != &other)
             {
-                Clear();
-
-                for (ConstIterator it(other); it.IsValid(); it.Advance())
-                    Add(it.GetValue());
+                Detail::LinkedListBase<E, TAllocator>::operator=(other);
+                mSize = other.mSize;
             }
 
             return *this;
@@ -1133,13 +1279,8 @@ namespace Ck
         {
             if (this != &other)
             {
-                Clear();
-
-                for (ConstIterator it(other); it.IsValid(); it.Advance())
-                {
-                    AddBack(std::move(it.GetValue()));
-                    it = other.Remove(it);
-                }
+                Detail::LinkedListBase<E, TAllocator>::operator=(std::move(other));
+                mSize = std::exchange(other.mSize, 0);
             }
 
             return *this;
@@ -1152,8 +1293,8 @@ namespace Ck
          */
         void AddFront(const E& value)
         {
-            ++mSize;
             Detail::LinkedListBase<E, TAllocator>::AddFront(value);
+            ++mSize;
         }
 
         /**
@@ -1163,8 +1304,8 @@ namespace Ck
          */
         void AddFront(E&& value)
         {
-            ++mSize;
             Detail::LinkedListBase<E, TAllocator>::AddFront(std::move(value));
+            ++mSize;
         }
 
         /**
@@ -1181,8 +1322,10 @@ namespace Ck
         template <typename... TArgs>
         E& EmplaceFront(TArgs&&... args)
         {
+            E& value = Detail::LinkedListBase<E, TAllocator>::EmplaceFront(std::forward<TArgs>(args)...);
             ++mSize;
-            return Detail::LinkedListBase<E, TAllocator>::EmplaceFront(std::forward<TArgs>(args)...);
+            
+            return value;
         }
 
         /**
@@ -1192,8 +1335,8 @@ namespace Ck
          */
         void AddBack(const E& value)
         {
-            ++mSize;
             Detail::LinkedListBase<E, TAllocator>::AddBack(value);
+            ++mSize;
         }
 
         /**
@@ -1203,8 +1346,8 @@ namespace Ck
          */
         void AddBack(E&& value)
         {
-            ++mSize;
             Detail::LinkedListBase<E, TAllocator>::AddBack(std::move(value));
+            ++mSize;
         }
 
         /**
@@ -1221,8 +1364,10 @@ namespace Ck
         template <typename... TArgs>
         E& EmplaceBack(TArgs&&... args)
         {
+            E& value = Detail::LinkedListBase<E, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
             ++mSize;
-            return Detail::LinkedListBase<E, TAllocator>::EmplaceBack(std::forward<TArgs>(args)...);
+            
+            return value;
         }
 
         /**
@@ -1243,8 +1388,8 @@ namespace Ck
          */
         Iterator Insert(Iterator where, const E& value)
         {
+            auto node = Detail::LinkedListBase<E, TAllocator>::Insert(where.mNode, value);
             ++mSize;
-            auto node = Detail::LinkedListBase<E, TAllocator>::Insert(where.GetNode(), value);
 
             return Iterator(node);
         }
@@ -1291,7 +1436,7 @@ namespace Ck
          */
         ConstIterator FindFirst(const E& value) const
         {
-            Iterator it(this->GetHead());
+            ConstIterator it(this->GetHead());
             while (it.IsValid())
             {
                 if (it.GetValue() == value)
@@ -1300,7 +1445,7 @@ namespace Ck
                 it.Advance();
             }
 
-            return Iterator(nullptr);
+            return ConstIterator(nullptr);
         }
 
         /**
@@ -1345,7 +1490,7 @@ namespace Ck
          */
         ConstIterator FindLast(const E& value) const
         {
-            Iterator it(this->GetTail());
+            ConstIterator it(this->GetTail());
             while (it.IsValid())
             {
                 if (it.GetValue() == value)
@@ -1354,7 +1499,7 @@ namespace Ck
                 it.Rewind();
             }
 
-            return Iterator(nullptr);
+            return ConstIterator(nullptr);
         }
 
         /**
@@ -1370,7 +1515,7 @@ namespace Ck
         {
             assert(where.IsValid());
 
-            Detail::LinkedListNode<E, TAllocator>* node = Detail::LinkedListBase<E, TAllocator>::Unlink(where.GetNode());
+            Detail::LinkedListNode<E, TAllocator>* node = Detail::LinkedListBase<E, TAllocator>::Unlink(where.mNode);
 
             --mSize;
 
@@ -1430,7 +1575,7 @@ namespace Ck
          */
         ConstIterator GetLastIterator() const
         {
-            return Iterator(Detail::LinkedListBase<E, TAllocator>::GetTail());
+            return ConstIterator(Detail::LinkedListBase<E, TAllocator>::GetTail());
         }
 
         /**
@@ -1438,9 +1583,8 @@ namespace Ck
          */
         void Clear()
         {
-            Iterator it(*this);
-            while (it.IsValid())
-                it = Remove(it);
+            Detail::LinkedListBase<E, TAllocator>::Clear();
+            mSize = 0;
         }
 
         /**

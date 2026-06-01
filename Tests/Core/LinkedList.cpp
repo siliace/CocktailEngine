@@ -2,24 +2,113 @@
 
 #include <Cocktail/Core/Exception.hpp>
 #include <Cocktail/Core/LinkedList.hpp>
+#include <Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp>
 
-TEST_CASE("Create an empty linked list", "[LinkedList]")
+TEMPLATE_TEST_CASE("Create an empty linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     REQUIRE(list.IsEmpty());
     REQUIRE(list.GetSize() == 0);
 }
 
-TEST_CASE("Create a linked list with repeated values", "[LinkedList]")
+TEMPLATE_TEST_CASE("Copy a linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list(5, 10);
+    Ck::LinkedList<int, TestType> list1;
+    list1.AddBack(1);
+    list1.AddBack(2);
+    list1.AddBack(3);
+
+    SECTION ("By constructor")
+    {
+        Ck::LinkedList<int, TestType> list2(list1);
+    
+        REQUIRE_FALSE(list2.IsEmpty());
+        REQUIRE(list2.GetSize() == 3);
+
+        typename Ck::LinkedList<int, TestType>::ConstIterator lhs = list1.GetIterator();
+        typename Ck::LinkedList<int, TestType>::ConstIterator rhs = list2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::LinkedList<int, TestType> list2 = list1;
+    
+        REQUIRE_FALSE(list2.IsEmpty());
+        REQUIRE(list2.GetSize() == 3);
+
+        typename Ck::LinkedList<int, TestType>::ConstIterator lhs = list1.GetIterator();
+        typename Ck::LinkedList<int, TestType>::ConstIterator rhs = list2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE("Move a linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::LinkedList<int, TestType> list1;
+    list1.AddBack(1);
+    list1.AddBack(2);
+    list1.AddBack(3);
+
+    SECTION ("By constructor")
+    {
+        Ck::LinkedList<int, TestType> list2(std::move(list1));
+    
+        REQUIRE(list1.IsEmpty());
+        REQUIRE_FALSE(list2.IsEmpty());
+        
+        REQUIRE(list1.GetSize() == 0);
+        REQUIRE(list2.GetSize() == 3);
+
+        typename Ck::LinkedList<int, TestType>::ConstIterator it = list2.GetIterator();
+        REQUIRE(it.GetValue() == 1); it.Advance();
+        REQUIRE(it.GetValue() == 2); it.Advance();
+        REQUIRE(it.GetValue() == 3);
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::LinkedList<int, TestType> list2 = std::move(list1);
+    
+        REQUIRE(list1.IsEmpty());
+        REQUIRE_FALSE(list2.IsEmpty());
+        
+        REQUIRE(list1.GetSize() == 0);
+        REQUIRE(list2.GetSize() == 3);
+
+        typename Ck::LinkedList<int, TestType>::ConstIterator it = list2.GetIterator();
+        REQUIRE(it.GetValue() == 1); it.Advance();
+        REQUIRE(it.GetValue() == 2); it.Advance();
+        REQUIRE(it.GetValue() == 3);
+    }
+}
+
+TEMPLATE_TEST_CASE("Create a linked list with repeated values", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::LinkedList<int, TestType> list(5, 10);
 
     REQUIRE_FALSE(list.IsEmpty());
 
     unsigned int count = 0;
 
-    Ck::LinkedList<int>::Iterator it(list);
+    typename Ck::LinkedList<int, TestType>::Iterator it(list);
     while (it.IsValid())
     {
         REQUIRE(it.GetValue() == 10);
@@ -31,9 +120,9 @@ TEST_CASE("Create a linked list with repeated values", "[LinkedList]")
     REQUIRE(count == 5);
 }
 
-TEST_CASE("Add elements to the linked list", "[LinkedList]")
+TEMPLATE_TEST_CASE("Add elements to the linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     list.AddBack(2);
     list.AddBack(3);
@@ -85,9 +174,9 @@ TEST_CASE("Add elements to the linked list", "[LinkedList]")
     }
 }
 
-TEST_CASE("Check if list contains an element", "[LinkedList]")
+TEMPLATE_TEST_CASE("Check if list contains an element", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     list.AddBack(2);
     list.AddBack(3);
@@ -104,9 +193,9 @@ TEST_CASE("Check if list contains an element", "[LinkedList]")
     }
 }
 
-TEST_CASE("Remove an element from the linked list", "[LinkedList]")
+TEMPLATE_TEST_CASE("Remove an element from the linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     list.AddBack(1);
     list.AddBack(2);
@@ -116,7 +205,7 @@ TEST_CASE("Remove an element from the linked list", "[LinkedList]")
 
     SECTION("With a valid iterator")
     {
-        Ck::LinkedList<int>::Iterator it = list.FindFirst(3);
+        typename Ck::LinkedList<int, TestType>::Iterator it = list.FindFirst(3);
         REQUIRE(it.IsValid());
 
         it = list.Remove(it);
@@ -127,14 +216,14 @@ TEST_CASE("Remove an element from the linked list", "[LinkedList]")
 
     SECTION("With a value that does not exists in the list")
     {
-        Ck::LinkedList<int>::Iterator it = list.FindFirst(42);
+        typename Ck::LinkedList<int, TestType>::Iterator it = list.FindFirst(42);
         REQUIRE_FALSE(it.IsValid());
     }
 }
 
-TEST_CASE("Clear a linked list", "[LinkedList]")
+TEMPLATE_TEST_CASE("Clear a linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     list.AddBack(1);
     list.AddBack(2);
@@ -148,9 +237,9 @@ TEST_CASE("Clear a linked list", "[LinkedList]")
     REQUIRE_FALSE(list.GetIterator().IsValid());
 }
 
-TEST_CASE("Iterate over elements of a linked list", "[LinkedList]")
+TEMPLATE_TEST_CASE("Iterate over elements of a linked list", "[LinkedList]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
-    Ck::LinkedList<int> list;
+    Ck::LinkedList<int, TestType> list;
 
     list.AddBack(1);
     list.AddBack(2);
@@ -161,7 +250,7 @@ TEST_CASE("Iterate over elements of a linked list", "[LinkedList]")
     SECTION("In normal order")
     {
         int previous = 0;
-        for (Ck::LinkedList<int>::Iterator it = list.GetIterator(); it.IsValid(); it = it.Next())
+        for (typename Ck::LinkedList<int, TestType>::Iterator it = list.GetIterator(); it.IsValid(); it = it.Next())
         {
             REQUIRE(previous + 1 == *it);
 
@@ -172,7 +261,7 @@ TEST_CASE("Iterate over elements of a linked list", "[LinkedList]")
     SECTION("In revered order")
     {
         int previous = 6;
-        for (Ck::LinkedList<int>::Iterator it = list.GetLastIterator(); it.IsValid(); it = it.Previous())
+        for (typename Ck::LinkedList<int, TestType>::Iterator it = list.GetLastIterator(); it.IsValid(); it = it.Previous())
         {
             REQUIRE(previous - 1 == *it);
 
