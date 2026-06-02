@@ -38,10 +38,18 @@ namespace Ck
 	    {
 	        using ValueType = T;
 
+            /**
+             * \brief Indicates whether all instances of this allocator type are always equal
+             */
+            static constexpr bool AlwaysEqual = true;
+
+	        /**
+             * \brief Flag indicating whether the allocator can be copied from a container to another
+             */
+	        static constexpr bool PropagateOnContainerCopy = false;
+
 	        /**
              * \brief Flag indicating whether the allocator can be moved from a container to another
-             *
-             * Heap allocators does not own any data so we allow the move to improve performances.
              */
             static constexpr bool PropagateOnContainerMove = true;
 
@@ -65,6 +73,16 @@ namespace Ck
 	        void Deallocate(T* pointer)
 	        {
 	            AllocationHandler::Free(pointer);
+	        }
+
+	        bool operator==(const ForType& other) const
+	        {
+	            return true;
+	        }
+
+	        bool operator!=(const ForType& other) const
+	        {
+	            return true;
 	        }
 	    };
 	};

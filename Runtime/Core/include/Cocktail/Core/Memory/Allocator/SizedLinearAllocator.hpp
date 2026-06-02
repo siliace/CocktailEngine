@@ -38,12 +38,26 @@ namespace Ck
         {
         public:
 
-	        using ValueType = T;
+            using ValueType = T;
+
+            /**
+             * \brief Indicates whether all instances of this allocator type are always equal
+             */
+            static constexpr bool AlwaysEqual = false;
+
+            /**
+             * \brief Flag indicating whether the allocator can be copied from a container to another
+             *
+             * Inline allocators contain embedded storage whose address is part of their observable state. 
+             * Copying or moving the allocator would invalidate existing allocations.
+             */
+            static constexpr bool PropagateOnContainerCopy = false;
 
             /**
              * \brief Flag indicating whether the allocator can be moved from a container to another
-             *
-             * Linear allocators are owning data so they shall not be copied or moved.
+            *
+             * Inline allocators contain embedded storage whose address is part of their observable state. 
+             * Copying or moving the allocator would invalidate existing allocations.
              */
             static constexpr bool PropagateOnContainerMove = false;
 
@@ -62,9 +76,9 @@ namespace Ck
             }
 
             ForType(const ForType&) = delete;
-            ForType(ForType&&) noexcept = default;
+            ForType(ForType&&) noexcept = delete;
             ForType& operator=(const ForType&) = delete;
-            ForType& operator=(ForType&&) noexcept = default;
+            ForType& operator=(ForType&&) noexcept = delete;
 
             /**
              * \brief Allocates memory for \p size elements of type T
@@ -104,6 +118,16 @@ namespace Ck
                     return;
 
                 mSecondaryAllocator.Deallocate(pointer);
+            }
+
+            bool operator==(const ForType& other) const
+            {
+                return false;
+            }
+
+            bool operator!=(const ForType& other) const
+            {
+                return false;
             }
 
         private:

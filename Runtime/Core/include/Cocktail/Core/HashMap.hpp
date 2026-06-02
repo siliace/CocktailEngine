@@ -205,6 +205,9 @@ namespace Ck
 
     public:
 
+        class Iterator;
+        class ConstIterator;
+
         /**
          * \brief Forward iterator used to traverse all entries in the hash map
          *
@@ -369,6 +372,8 @@ namespace Ck
 
         private:
 
+            friend class ConstIterator;
+
             /**
              * \brief Moves backward until a valid entry is found
              */
@@ -401,7 +406,7 @@ namespace Ck
 
             HashMap* mOwner; ///< Hash map being iterated
             SizeType mBucketIndex; ///< Current bucket index
-            BucketIterator mBucketIterator;  ///< Iterator within the current bucket
+            BucketIterator mBucketIterator; ///< Iterator within the current bucket
         };
 
         /**
@@ -627,7 +632,7 @@ namespace Ck
 
             const HashMap* mOwner; ///< Hash map being iterated.
             SizeType mBucketIndex; ///< Current bucket index.
-            BucketIterator mBucketIterator;  ///< Iterator within the current bucket.
+            BucketIterator mBucketIterator; ///< Iterator within the current bucket.
         };
 
         /**
@@ -981,6 +986,104 @@ namespace Ck
             }
 
             return false;
+        }
+        /**
+         * \brief Applies a function to all entries in the map
+         *
+         * \tparam TFunction Type of the function
+         * \param function Function to apply to each element
+         *
+         * \warning The \p function should be read-only.
+         *          Any insertion/deletion of an element will cause an unpredictable iteration behavior.
+         */
+        template <typename TFunction>
+        void ForEach(TFunction function) const
+        {
+            static_assert(FunctionTraits<TFunction>::Arity <= 2, "Transform function takes only 0, 1 or 2 parameters");
+
+            for (SizeType i = 0; i < mBucketCount; i++)
+            {
+                Detail::LinkedListIterator<Entry, AllocatorType> it(mBuckets[i]);
+                while (it.IsValid())
+                {
+                    if constexpr (FunctionTraits<TFunction>::Arity == 0)
+                    {
+                        function();
+                    }
+                    else if constexpr (FunctionTraits<TFunction>::Arity == 1)
+                    {
+                        function(it->Value);
+                    }
+                    else if constexpr (FunctionTraits<TFunction>::Arity == 2)
+                    {
+                        function(it->Value, it->Key);
+                    }
+
+                    it.Advance();
+                }
+            }
+        }
+
+        /**
+         * \brief Returns an iterator pointing to the first element of the map
+         *
+         * This function provides a convenient way to manually obtain a mutable iterator
+         * to the beginning of the hash map. If the map is empty, the returned iterator
+         * will be invalid (i.e., \c IsValid() will return false).
+         *
+         * \return An iterator positioned at the head of the map
+         */
+        Iterator GetIterator()
+        {
+            return Iterator(*this);
+        }
+
+        /**
+         * \brief Returns a constant iterator pointing to the first element of the map
+         *
+         * This overload is used when the map is accessed through a const reference.
+         * It provides read-only traversal of the container. If the map is empty,
+         * the returned iterator will be invalid.
+         *
+         * \return A const iterator positioned at the head of the map
+         */
+        ConstIterator GetIterator() const
+        {
+            return ConstIterator(*this);
+        }
+
+        /**
+         * \brief Returns an iterator pointing to the last element of the map
+         *
+         * This function provides a convenient way to manually obtain a mutable iterator
+         * to the beginning of the hash map. If the map is empty, the returned iterator
+         * will be invalid (i.e., \c IsValid() will return false).
+         *
+         * \return An iterator positioned at the last element of the map
+         */
+        Iterator GetLastIterator()
+        {
+            Iterator it(*this, mBucketCount);
+            it.Rewind();
+
+            return it;
+        }
+
+        /**
+         * \brief Returns a constant iterator pointing to the last element of the map
+         *
+         * This overload is used when the map is accessed through a const reference.
+         * It provides read-only traversal of the container. If the map is empty,
+         * the returned iterator will be invalid.
+         *
+         * \return A const iterator positioned at the last element of the map
+         */
+        ConstIterator GetLastIterator() const
+        {
+            ConstIterator it(*this, mBucketCount);
+            it.Rewind();
+
+            return it;
         }
 
         /**

@@ -13,6 +13,22 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+	<Type Name="Ck::Array&lt;*&gt;::Iterator">
+		<DisplayString Condition="mValue &lt; mOwner->mData &amp;&amp; mValue &gt;= mOwner->mData + mOwner->mSize">Invalid</DisplayString>
+		<DisplayString Condition="mValue &gt;= mOwner->mData &amp;&amp; mValue &lt; mOwner->mData + mOwner->mSize">{{ Index={mValue - mOwner->mData}, Value={*mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[index]" ExcludeView="simple">mValue - mOwner->mData</Item>
+			<Item Name="[value]" ExcludeView="simple">*mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Array&lt;*&gt;::ConstIterator">
+		<DisplayString Condition="mValue &lt; mOwner->mData &amp;&amp; mValue &gt;= mOwner->mData + mOwner->mSize">Invalid</DisplayString>
+		<DisplayString Condition="mValue &gt;= mOwner->mData &amp;&amp; mValue &lt; mOwner->mData + mOwner->mSize">{{ Index={mValue - mOwner->mData}, Value={*mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[index]" ExcludeView="simple">mValue - mOwner->mData</Item>
+			<Item Name="[value]" ExcludeView="simple">*mValue</Item>
+		</Expand>
+	</Type>
 	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;">
 		<DisplayString Condition="mSize == 0 &amp;&amp; mBucketCount == 0">Empty</DisplayString>
 		<DisplayString Condition="mSize == 0 &amp;&amp; mBucketCount &gt; 0">Empty, BucketCount={mBucketCount}</DisplayString>
@@ -40,6 +56,24 @@
 			</CustomListItems>
 		</Expand>
 	</Type>
+	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;::Iterator">
+		<DisplayString Condition="mBucketIterator.mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mBucketIterator.mNode != nullptr">{{ Key={mBucketIterator.mNode->mValue.Key}, Value={mBucketIterator.mNode->mValue.Value} }}</DisplayString>
+		<Expand>
+			<Item Name="[key]" ExcludeView="simple">mBucketIterator.mNode->mValue.Key</Item>
+			<Item Name="[value]" ExcludeView="simple">mBucketIterator.mNode->mValue.Value</Item>
+			<Item Name="[hash]" ExcludeView="simple">mBucketIterator.mNode->mValue.HashCode</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;::ConstIterator">
+		<DisplayString Condition="mBucketIterator.mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mBucketIterator.mNode != nullptr">{{ Key={mBucketIterator.mNode->mValue.Key}, Value={mBucketIterator.mNode->mValue.Value} }}</DisplayString>
+		<Expand>
+			<Item Name="[key]" ExcludeView="simple">mBucketIterator.mNode->mValue.Key</Item>
+			<Item Name="[value]" ExcludeView="simple">mBucketIterator.mNode->mValue.Value</Item>
+			<Item Name="[hash]" ExcludeView="simple">mBucketIterator.mNode->mValue.HashCode</Item>
+		</Expand>
+	</Type>
 	<Type Name="Ck::LinkedList&lt;*,*&gt;">
 		<DisplayString Condition="mSize == 0">Empty</DisplayString>
 		<DisplayString Condition="mSize &gt; 0">{{ Size={mSize} }}</DisplayString>
@@ -57,6 +91,20 @@
 					<Break Condition="node == nullptr"/>
 				</Loop>
 			</CustomListItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Detail::LinkedListIterator&lt;*,*&gt;">
+		<DisplayString Condition="mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mNode != nullptr">{{ Value={mNode->mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[value]" ExcludeView="simple">mNode->mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Detail::LinkedListConstIterator&lt;*,*&gt;">
+		<DisplayString Condition="mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mNode != nullptr">{{ Value={mNode->mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[value]" ExcludeView="simple">mNode->mValue</Item>
 		</Expand>
 	</Type>
 	<Type Name="Ck::StaticArray&lt;*,*&gt;">

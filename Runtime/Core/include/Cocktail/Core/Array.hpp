@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_ARRAY_HPP
 #define COCKTAIL_CORE_ARRAY_HPP
 
+#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 #include <Cocktail/Core/Memory/ObjectMemoryUtils.hpp>
 #include <Cocktail/Core/Utility/FunctionTraits.hpp>
@@ -25,6 +26,9 @@ namespace Ck
 
     public:
 
+        class Iterator;
+        class ConstIterator;
+
         /**
          * \brief Type of elements stored in the array.
          */
@@ -43,7 +47,7 @@ namespace Ck
         /**
          * \brief Allocator rebound to the element type.
          */
-        using AllocatorElementType = typename TAllocator::template ForType<E>;
+        using ElementAllocatorType = typename TAllocator::template ForType<E>;
 
         /**
          * \brief Iterator used to traverse an Array instance
@@ -136,7 +140,7 @@ namespace Ck
              */
             bool IsValid() const
             {
-                return mValue <= mOwner->GetData() && mValue <= mOwner->GetData() + mOwner->GetSize();
+                return mValue >= mOwner->GetData() && mValue < mOwner->GetData() + mOwner->GetSize();
             }
 
             /**
@@ -456,7 +460,6 @@ namespace Ck
 
         private:
 
-            template <typename, typename>
             friend class ConstIterator;
 
             Array* mOwner;
@@ -581,7 +584,7 @@ namespace Ck
              */
             bool IsValid() const
             {
-                return mValue <= mOwner->GetData() && mValue <= mOwner->GetData() + mOwner->GetSize();
+                return mValue >= mOwner->GetData() && mValue < mOwner->GetData() + mOwner->GetSize();
             }
 
             /**
@@ -898,10 +901,11 @@ namespace Ck
         /**
          * \brief Default constructor. Creates an empty array
          */
-        Array() :
+        explicit Array(const ElementAllocatorType& allocator = ElementAllocatorType()) :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::CopyPropagateAllocator(allocator))
         {
             /// Nothing
         }
@@ -925,11 +929,13 @@ namespace Ck
          * Initializing elements are default constructed.
          *
          * \param initialSize Number of elements initially allocated
+         * \param allocator The allocator to use to handle dynamic memory allocation
          */
-        explicit Array(SizeType initialSize) :
+        explicit Array(SizeType initialSize, const ElementAllocatorType& allocator = ElementAllocatorType()) :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::CopyPropagateAllocator(allocator))
         {
             Resize(initialSize);
         }
@@ -938,14 +944,15 @@ namespace Ck
          * \brief Constructs the array with an initial size, initializing elements with a given value
          *
          * \param initialSize Number of elements initially allocated
-         *
-         * \param initialContent Value to initialize each element with (default constructed if omitted)
+         * \param initialContent Value to initialize each element with
+         * \param allocator The allocator to use to handle dynamic memory allocation
          */
         template <typename U, typename = std::enable_if_t<std::is_constructible_v<E, U>>>
-        Array(SizeType initialSize, const U& initialContent) :
+        Array(SizeType initialSize, const U& initialContent, const ElementAllocatorType& allocator = ElementAllocatorType()) :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::CopyPropagateAllocator(allocator))
         {
             Resize(initialSize, initialContent);
         }
@@ -954,13 +961,14 @@ namespace Ck
          * \brief Constructs the array from a raw pointer and element count
          *
          * \param elements Pointer to the array of elements
-         *
          * \param elementCount Number of elements to copy
+         * \param allocator The allocator to use to handle dynamic memory allocation
          */
-        Array(const E* elements, SizeType elementCount) :
+        Array(const E* elements, SizeType elementCount, const ElementAllocatorType& allocator = ElementAllocatorType()) :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::CopyPropagateAllocator(allocator))
         {
             Append(elements, elementCount);
         }
@@ -973,9 +981,16 @@ namespace Ck
         Array(const Array& other) :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::CopyPropagateAllocator(other.mAllocator))
         {
-            Append(other);
+            if (!other.IsEmpty())
+            {
+                Reserve(other.GetSize());
+                ObjectMemoryUtils::CopyRange(other.mSize, mData, other.mData);
+                
+                mSize = other.mSize;
+            }
         }
 
         /**
@@ -986,9 +1001,26 @@ namespace Ck
         Array(Array&& other) noexcept :
             mSize(0),
             mCapacity(0),
-            mData(nullptr)
+            mData(nullptr),
+            mAllocator(AllocatorUtils::MovePropagateAllocator(other.mAllocator))
         {
-            *this = std::move(other);
+            if (!other.IsEmpty())
+            {
+                if constexpr (ElementAllocatorType::PropagateOnContainerMove)
+                {
+                    mSize = std::exchange(other.mSize, 0);
+                    mCapacity = std::exchange(other.mCapacity, 0);
+                    mData = std::exchange(other.mData, nullptr);
+                }
+                else
+                {
+                    Reserve(other.GetSize());
+                    ObjectMemoryUtils::MoveRange(other.mSize, mData, other.mData);
+
+                    mSize = other.mSize;
+                    other.Clear();
+                }
+            }
         }
 
         /**
@@ -1013,7 +1045,25 @@ namespace Ck
                 return *this;
 
             Clear();
-            Append(other);
+
+            if constexpr (ElementAllocatorType::PropagateOnContainerCopy)
+            {
+                if constexpr (!ElementAllocatorType::AlwaysEqual)
+                {
+                    if (mAllocator != other.mAllocator)
+                        Shrink();
+                }
+
+                mAllocator = other.mAllocator;
+            }
+
+            if (!other.IsEmpty())
+            {
+                Reserve(other.mSize);
+
+                ObjectMemoryUtils::CopyRange(other.mSize, mData, other.mData);
+                mSize = other.mSize;
+            }
 
             return *this;
         }
@@ -1030,9 +1080,11 @@ namespace Ck
             if (this == &other)
                 return *this;
 
-            if constexpr (AllocatorElementType::PropagateOnContainerMove)
+            Clear();
+
+            if constexpr (ElementAllocatorType::PropagateOnContainerMove)
             {
-                Clear();
+                Shrink();
 
                 mSize = std::exchange(other.mSize, 0);
                 mCapacity = std::exchange(other.mCapacity, 0);
@@ -1041,13 +1093,29 @@ namespace Ck
             }
             else
             {
-                if (!other.IsEmpty())
+                if constexpr (ElementAllocatorType::AlwaysEqual)
                 {
-                    if (mCapacity < other.GetSize())
-                        Reserve(other.GetSize() - mCapacity);
+                    mSize = std::exchange(other.mSize, 0);
+                    mCapacity = std::exchange(other.mCapacity, 0);
+                    mData = std::exchange(other.mData, nullptr);
+                }
+                else
+                {
+                    if (mAllocator == other.mAllocator)
+                    {
+                        mSize = std::exchange(other.mSize, 0);
+                        mCapacity = std::exchange(other.mCapacity, 0);
+                        mData = std::exchange(other.mData, nullptr);
+                    }
+                    else
+                    {
+                        Reserve(other.mSize);
 
-                    mSize = other.GetSize();
-                    ObjectMemoryUtils::MoveRange(mSize, GetData(), other.GetData());
+                        ObjectMemoryUtils::MoveRange(other.mSize, GetData(), other.GetData());
+                        mSize = other.mSize;
+
+                        other.Clear();
+                    }
                 }
             }
 
@@ -2344,11 +2412,14 @@ namespace Ck
         /**
          * \brief Reserves additional capacity for at least the specified size
          *
-         * \param size Capacity to reserve
+         * \param capacity Capacity to reserve
          */
-        void Reserve(SizeType size)
+        void Reserve(SizeType capacity)
         {
-            SizeType nextCapacity = NextPowerOfTwo(mSize + size);
+            if (capacity <= mCapacity)
+                return;
+
+            SizeType nextCapacity = NextPowerOfTwo(capacity);
             ResizeAllocation(nextCapacity);
 
             mCapacity = nextCapacity;
@@ -2626,7 +2697,7 @@ namespace Ck
         SizeType mSize;
         SizeType mCapacity;
         E* mData;
-        AllocatorElementType mAllocator;
+        ElementAllocatorType mAllocator;
     };
 
     template <typename E, typename TAllocator>

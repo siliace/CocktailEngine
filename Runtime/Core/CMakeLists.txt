@@ -228,6 +228,7 @@ cocktail_source_directory(CORE_FILES
 cocktail_source_directory(CORE_FILES
     FOLDER "Memory/Allocator"
     INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MallocAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MemoryAllocator.hpp

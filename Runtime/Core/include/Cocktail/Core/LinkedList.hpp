@@ -2,6 +2,7 @@
 #define COCKTAIL_CORE_CONTAINER_LINKEDLIST_HPP
 
 #include <Cocktail/Core/Memory/UniquePtr.hpp>
+#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
 
 namespace Ck
 {
@@ -223,8 +224,9 @@ namespace Ck
              * Initializes an empty linked structure.
              * Both head and tail pointers are set to nullptr.
              */
-            LinkedListBase() :
-                mTail(nullptr)
+            explicit LinkedListBase(const NodeAllocatorType& allocator = NodeAllocatorType()) :
+                mTail(nullptr),
+                mAllocator(AllocatorUtils::CopyPropagateAllocator(allocator))
             {
                 /// Nothing
             }
@@ -235,10 +237,14 @@ namespace Ck
              * \param other LinkedListBase to copy from
              */
             LinkedListBase(const LinkedListBase& other) :
-                mTail(nullptr)
+                mTail(nullptr),
+                mAllocator(AllocatorUtils::CopyPropagateAllocator(other.mAllocator))
             {
-                for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
-                    EmplaceBack(it.GetValue());
+                if (other.mHead != nullptr)
+                {
+                    for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
+                        EmplaceBack(it.GetValue());
+                }
             }
             
             /**
@@ -247,20 +253,23 @@ namespace Ck
              * \param other LinkedListBase to move from
              */
             LinkedListBase(LinkedListBase&& other) noexcept :
-                mTail(nullptr)
+                mTail(nullptr),
+                mAllocator(AllocatorUtils::MovePropagateAllocator(other.mAllocator))
             {
-                if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                if (other.mHead != nullptr)
                 {
-                    mHead = std::move(other.mHead);
-                    mTail = std::exchange(other.mTail, nullptr);
-                    mNodeAllocator = std::move(other.mNodeAllocator);
-                }
-                else
-                {
-                    for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
-                        EmplaceBack(std::move(source.GetValue()));
-                        
-                    other.Clear();
+                    if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                    {
+                        mHead = std::move(other.mHead);
+                        mTail = std::exchange(other.mTail, nullptr);
+                    }
+                    else
+                    {
+                        for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
+                            EmplaceBack(std::move(source.GetValue()));
+
+                        other.Clear();
+                    }
                 }
             }
             
@@ -273,14 +282,17 @@ namespace Ck
              */
             LinkedListBase& operator=(const LinkedListBase& other)
             {
-                if (this != &other)
-                {         
-                    Clear();
-                    
-                    for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
-                        EmplaceBack(it.GetValue());
-                }  
-                
+                if (this == &other)
+                    return *this;
+
+                Clear();
+
+                if constexpr (NodeAllocatorType::PropagateOnContainerCopy)
+                    mAllocator = other.mAllocator;
+
+                for (LinkedListConstIterator<E, AllocatorType> it(other); it.IsValid(); it.Advance())
+                    EmplaceBack(it.GetValue());
+
                 return *this;
             }
             
@@ -293,23 +305,39 @@ namespace Ck
              */
             LinkedListBase& operator=(LinkedListBase&& other) noexcept
             {
-                if (this != &other)
-                {                
-                    if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                if (this == &other)
+                    return *this;
+
+                Clear();
+
+                if constexpr (NodeAllocatorType::PropagateOnContainerMove)
+                {
+                    mHead = std::move(other.mHead);
+                    mTail = std::exchange(other.mTail, nullptr);
+                    mAllocator = std::move(other.mAllocator);
+                }
+                else
+                {
+                    if constexpr (NodeAllocatorType::AlwaysEqual)
                     {
                         mHead = std::move(other.mHead);
                         mTail = std::exchange(other.mTail, nullptr);
-                        mNodeAllocator = std::move(other.mNodeAllocator);
                     }
                     else
                     {
-                        Clear();
-                        
-                        for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
-                            EmplaceBack(std::move(source.GetValue()));
-                        
-                        other.Clear();
+                        if (mAllocator == other.mAllocator)
+                        {
+                            mHead = std::move(other.mHead);
+                            mTail = std::exchange(other.mTail, nullptr);
+                        }
+                        else
+                        {
+                            for (LinkedListIterator<E, AllocatorType> source(other); source.IsValid(); source.Advance())
+                                EmplaceBack(std::move(source.GetValue()));
+                        }
                     }
+
+                    other.Clear();
                 }
                 
                 return *this;
@@ -351,7 +379,7 @@ namespace Ck
             template <typename... TArgs>
             E& EmplaceFront(TArgs&&... args)
             {
-                NodeUniquePtrType head = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, InPlace, std::forward<TArgs>(args)...);
+                NodeUniquePtrType head = MakeUniqueWithAllocator<NodeType, AllocatorType>(mAllocator, InPlace, std::forward<TArgs>(args)...);
                 if (mHead == nullptr)
                 {
                     assert(mTail == nullptr);
@@ -404,7 +432,7 @@ namespace Ck
             template <typename... TArgs>
             E& EmplaceBack(TArgs&&... args)
             {
-                NodeUniquePtrType tail = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, InPlace, std::forward<TArgs>(args)...);
+                NodeUniquePtrType tail = MakeUniqueWithAllocator<NodeType, AllocatorType>(mAllocator, InPlace, std::forward<TArgs>(args)...);
                 if (mHead == nullptr)
                 {
                     assert(mTail == nullptr);
@@ -445,7 +473,7 @@ namespace Ck
              */
             NodeType* Insert(NodeType* where, const E& value)
             {
-                NodeUniquePtrType newNode = MakeUniqueWithAllocator<NodeType, AllocatorType>(mNodeAllocator, value);
+                NodeUniquePtrType newNode = MakeUniqueWithAllocator<NodeType, AllocatorType>(mAllocator, value);
                 NodeType* inserted = newNode.Get();
 
                 if (where)
@@ -558,7 +586,7 @@ namespace Ck
 
             NodeUniquePtrType mHead;
             NodeType* mTail;
-            NodeAllocatorType mNodeAllocator;
+            NodeAllocatorType mAllocator;
         };
 
         /**
@@ -1551,7 +1579,7 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an iterator pointing to the first element of the last
+         * \brief Returns an iterator pointing to the last element of the list
          *
          * This function provides a convenient way to manually obtain a mutable iterator
          * to the beginning of the linked list. If the list is empty, the returned iterator
@@ -1565,7 +1593,7 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a constant iterator pointing to the first element of the last
+         * \brief Returns a constant iterator pointing to the last element of the list
          *
          * This overload is used when the list is accessed through a const reference.
          * It provides read-only traversal of the container. If the list is empty,
@@ -1612,28 +1640,28 @@ namespace Ck
         unsigned int mSize; /*!< The number of node in the chain */
     };
 
-    template <typename E>
-    typename LinkedList<E>::Iterator begin(LinkedList<E>& list)
+    template <typename E, typename TAllocator>
+    typename LinkedList<E, TAllocator>::Iterator begin(LinkedList<E, TAllocator>& list)
     {
         return list.GetIterator();
     }
 
-    template <typename E>
-    typename LinkedList<E>::Iterator end(LinkedList<E>&)
+    template <typename E, typename TAllocator>
+    typename LinkedList<E, TAllocator>::Iterator end(LinkedList<E, TAllocator>&)
     {
-        return typename LinkedList<E>::Iterator(nullptr);
+        return typename LinkedList<E, TAllocator>::Iterator(nullptr);
     }
 
-    template <typename E>
-    typename LinkedList<E>::ConstIterator begin(const LinkedList<E>& list)
+    template <typename E, typename TAllocator>
+    typename LinkedList<E, TAllocator>::ConstIterator begin(const LinkedList<E, TAllocator>& list)
     {
         return list.GetIterator();
     }
 
-    template <typename E>
-    typename LinkedList<E>::ConstIterator end(const LinkedList<E>&)
+    template <typename E, typename TAllocator>
+    typename LinkedList<E, TAllocator>::ConstIterator end(const LinkedList<E, TAllocator>&)
     {
-        return typename LinkedList<E>::ConstIterator(nullptr);
+        return typename LinkedList<E, TAllocator>::ConstIterator(nullptr);
     }
 }
 

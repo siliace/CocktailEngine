@@ -58,6 +58,76 @@ TEMPLATE_TEST_CASE("Construct an Array", "[Array]", Ck::HeapAllocator, Ck::Large
     }
 }
 
+TEMPLATE_TEST_CASE("Copy an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array1 = { 1, 2, 3 };
+    
+    SECTION("By construction")
+    {
+        Ck::Array<int, TestType> array2(array1);
+        
+        REQUIRE(array1.GetSize() == array2.GetSize());
+        
+        typename Ck::Array<int, TestType>::ConstIterator lhs = array1.GetIterator();
+        typename Ck::Array<int, TestType>::ConstIterator rhs = array2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::Array<int, TestType> array2 = { 4, 5, 6 };
+        array2 = array1;
+
+        REQUIRE(array1.GetSize() == array2.GetSize());
+        
+        typename Ck::Array<int, TestType>::ConstIterator lhs = array1.GetIterator();
+        typename Ck::Array<int, TestType>::ConstIterator rhs = array2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE("Move an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array1 = { 1, 2, 3 };
+    
+    SECTION("By construction")
+    {
+        Ck::Array<int, TestType> array2(std::move(array1));
+        
+        REQUIRE(array1.GetSize() == 0);
+        
+        REQUIRE(array2.GetSize() == 3);
+        REQUIRE(array2 == Ck::Array<int, TestType>{ 1, 2, 3 });
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::Array<int, TestType> array2 = { 4, 5, 6 };
+        array2 = std::move(array1);
+        
+        REQUIRE(array1.GetSize() == 0);
+        
+        REQUIRE(array2.GetSize() == 3);
+        REQUIRE(array2 == Ck::Array<int, TestType>{ 1, 2, 3 });
+    }
+}
+
 TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::Array<int, TestType> array;
