@@ -185,13 +185,22 @@
 			</Item>
 		</Expand>
 	</Type>
-	<Type Name="Optional&lt;*&gt;">
+	<Type Name="Ck::Optional&lt;*&gt;">
 		<DisplayString>{mEmpty ? "Empty" : "{value}"}</DisplayString>
 		<Expand>
 			<Item Name="Value">
 				*(($T1*)$address(mStorage))
 			</Item>
 			<Item Name="IsEmpty">mEmpty</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::UniquePtr&lt;*,*&gt;">
+		<DisplayString Condition="mPtr == nullptr">Empty</DisplayString>
+		<DisplayString Condition="mPtr != nullptr">{*mPtr}</DisplayString>
+		<Expand>
+			<Item Name="[pointer]">mPtr</Item>
+			<Item Name="[deleter]">mDeleter</Item>
+			<ExpandedItem Condition="mPtr != nullptr">*mPtr</ExpandedItem>
 		</Expand>
 	</Type>
 </AutoVisualizer>

@@ -899,9 +899,26 @@ namespace Ck
         };
 
         /**
-         * \brief Default constructor. Creates an empty array
+         * \brief Default constructor
+         * 
+         *  Creates a new empty instance of array
          */
-        explicit Array(const ElementAllocatorType& allocator = ElementAllocatorType()) :
+        Array() :
+            mSize(0),
+            mCapacity(0),
+            mData(nullptr)
+        {
+            /// Nothing
+        }
+        
+        /**
+         * \brief Constructor
+         * 
+         * Creates a new instance of array with a provided allocator
+         * 
+         * \param allocator The allocator to use to handle dynamic memory allocation
+         */
+        explicit Array(const ElementAllocatorType& allocator) :
             mSize(0),
             mCapacity(0),
             mData(nullptr),

@@ -20,6 +20,7 @@ namespace Ck
 	    if (mCurrentMaterialProgram != materialProgramVariant)
 	    {
 	        mCurrentMaterialProgram = materialProgramVariant;
+	        mBindingTable.Invalidate();
 	    }
 
 	    /// TODO: move this to the if when moving the command list in the context
@@ -115,31 +116,13 @@ namespace Ck
 
     void RecordDrawContext::Draw(Renderer::CommandList& commandList, unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance) const
     {
-	    for (const auto& [key, entry] : mBindingTable.GetEntries())
-	    {
-	        ShaderBindingDomain domain = std::get<0>(key);
-	        unsigned int index = std::get<1>(key);
-
-	        const Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetSlot(domain, index);
-	        if (slot != nullptr)
-	            entry->Bind(commandList, slot);
-	    }
-
+	    mBindingTable.Bind(commandList, *mCurrentMaterialProgram);
 	    commandList.Draw(vertexCount, instanceCount, firstVertex, firstInstance);
     }
 
     void RecordDrawContext::DrawIndexed(Renderer::CommandList& commandList, unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance) const
 	{
-	    for (const auto& [key, entry] : mBindingTable.GetEntries())
-	    {
-	        ShaderBindingDomain domain = std::get<0>(key);
-	        unsigned int index = std::get<1>(key);
-
-	        const Renderer::UniformSlot* slot = mCurrentMaterialProgram->GetSlot(domain, index);
-	        if (slot != nullptr)
-	            entry->Bind(commandList, slot);
-	    }
-
+	    mBindingTable.Bind(commandList, *mCurrentMaterialProgram);
 	    commandList.DrawIndexed(indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
     }
 
