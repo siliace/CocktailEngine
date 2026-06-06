@@ -52,6 +52,12 @@ namespace Ck
         if (StringUtils<AnsiChar, Uint32>::Equal(name, "TANGENT"))
             return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Tangent);
 
+	    if (StringUtils<AnsiChar, Uint32>::Equal(name, "JOINTS_0"))
+	        return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Joints);
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(name, "WEIGHTS_0"))
+	        return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Weights);
+
 	    return Optional<VertexAttributeSemantic>::Empty();
 	}
 

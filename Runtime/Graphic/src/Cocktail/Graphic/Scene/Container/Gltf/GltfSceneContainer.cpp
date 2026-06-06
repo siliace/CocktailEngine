@@ -140,13 +140,14 @@ namespace Ck
                     size = accessor.type;
 
                 DataType dataType = GltfUtils::ConvertComponentType(accessor.componentType);
-                VertexAttributeSemantic attributeSemantic = GltfUtils::ConvertAttributeName(name.c_str());
-                if (attributeSemantic == VertexAttributeSemantic::Tangent)
-                    vertexLayoutBuilder.AddAttribute(VertexAttributeSemantic::BiTangent, dataType, 3, 1, accessor.normalized);
+                GltfUtils::ConvertAttributeName(name.c_str()).Then([&](VertexAttributeSemantic attributeSemantic) {
+                    if (attributeSemantic == VertexAttributeSemantic::Tangent)
+                        vertexLayoutBuilder.AddAttribute(VertexAttributeSemantic::BiTangent, dataType, 3, 1, accessor.normalized);
 
-                vertexLayoutBuilder.AddAttribute(attributeSemantic, dataType, size, 1, accessor.normalized);
+                    vertexLayoutBuilder.AddAttribute(attributeSemantic, dataType, size, 1, accessor.normalized);
 
-                attributeAccessors[attributeSemantic] = &accessor;
+                    attributeAccessors[attributeSemantic] = &accessor;
+                });
             }
 
             std::shared_ptr<VertexLayout> vertexLayout = vertexLayoutBuilder.Get();

@@ -39,6 +39,16 @@ namespace Ck
 		 * \brief 
 		 */
 		BiTangent = Bit(5),
+
+	    /**
+	     * \brief
+	     */
+	    Joints = Bit(6),
+
+        /**
+         * \brief
+         */
+	    Weights = Bit(7),
 	};
 }
 
