@@ -56,6 +56,8 @@ namespace Ck
 
         void EnableVertexBindings(Renderer::CommandList& commandList, unsigned int firstBinding, unsigned int bindingsCount, bool enable);
 
+        void Reset() const;
+
         RenderingModifiers GetModifiers() const;
 
     private:
@@ -70,6 +72,7 @@ namespace Ck
         Renderer::RenderContext* mRenderContext;
         RenderingModifiers mModifiers;
         ShaderBindingTable mBindingTable;
+        Flags<ShaderBindingDomain> mDirtyDomains;
         const MaterialProgramVariant* mCurrentMaterialProgram;
     };
 }

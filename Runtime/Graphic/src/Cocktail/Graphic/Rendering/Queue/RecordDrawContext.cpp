@@ -132,6 +132,11 @@ namespace Ck
 	        commandList.EnableVertexBinding(i, enable);
     }
 
+    void RecordDrawContext::Reset() const
+    {
+	    mBindingTable.Invalidate();
+    }
+
     RecordDrawContext::RenderingModifiers RecordDrawContext::GetModifiers() const
 	{
 		return mModifiers;

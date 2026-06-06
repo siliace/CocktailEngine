@@ -28,6 +28,7 @@ namespace Ck
 		Renderer::CommandList* commandList = graphicEngine->GetRenderContext()->CreateCommandList(commandListCreateInfo);
 
 		commandList->Begin(nullptr);
+        mDrawContext.Reset();
 
 		struct SceneInfo
 		{
