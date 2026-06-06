@@ -24,7 +24,7 @@ namespace Ck
 	public:
 
 		static DataType ConvertComponentType(int componentType);
-		static VertexAttributeSemantic ConvertAttributeName(const AnsiChar* name);
+		static Optional<VertexAttributeSemantic> ConvertAttributeName(const AnsiChar* name);
 		static Renderer::PrimitiveTopology ConvertPrimitiveTopology(int primitiveMode);
 		static Renderer::IndexType ConvertIndexType(int componentType);
 	    static Vector3<float> ConvertVector3(const std::vector<double>& values);

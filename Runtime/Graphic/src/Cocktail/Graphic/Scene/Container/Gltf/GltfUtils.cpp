@@ -38,21 +38,21 @@ namespace Ck
         COCKTAIL_UNREACHABLE();
 	}
 
-	VertexAttributeSemantic GltfUtils::ConvertAttributeName(const AnsiChar* name)
+	Optional<VertexAttributeSemantic> GltfUtils::ConvertAttributeName(const AnsiChar* name)
 	{
         if (StringUtils<AnsiChar, Uint32>::Equal(name, "POSITION"))
-            return VertexAttributeSemantic::Position;
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Position);
 
 		if (StringUtils<AnsiChar, Uint32>::Equal(name, "NORMAL"))
-            return VertexAttributeSemantic::Normal;
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Normal);
         
         if (StringUtils<AnsiChar, Uint32>::Equal(name, "TEXCOORD_0"))
-            return VertexAttributeSemantic::TexCoord;
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::TexCoord);
         
         if (StringUtils<AnsiChar, Uint32>::Equal(name, "TANGENT"))
-            return VertexAttributeSemantic::Tangent;
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Tangent);
 
-        COCKTAIL_UNREACHABLE();
+	    return Optional<VertexAttributeSemantic>::Empty();
 	}
 
 	Renderer::PrimitiveTopology GltfUtils::ConvertPrimitiveTopology(int primitiveMode)
