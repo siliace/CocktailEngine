@@ -365,6 +365,20 @@ cocktail_add_shader(GRAPHIC_FILES
 )
 
 cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-no-normal.vert.spv
+        TYPE vert
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic_mesh.vert
+        MACRO COCKTAIL_VERTEX_HAS_UV COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE
+)
+
+cocktail_add_shader(GRAPHIC_FILES
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-no-normal.frag.spv
+        TYPE frag
+        FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic_mesh.frag
+        MACRO COCKTAIL_VERTEX_HAS_UV COCKTAIL_MATERIAL_HAS_BASECOLOR_TEXTURE
+)
+
+cocktail_add_shader(GRAPHIC_FILES
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured.vert.spv
         TYPE vert
         FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic_mesh.vert
@@ -630,6 +644,8 @@ cocktail_add_runtime_library(
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/colored.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured.frag.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured.vert.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-no-normal.frag.spv
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-no-normal.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-pbr.frag.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-pbr.vert.spv
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/shaders/mesh/lit/basic/textured-blended.frag.spv
