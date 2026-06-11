@@ -49,7 +49,7 @@ namespace Ck::Vulkan
 	}
 
 	DebugMessenger::DebugMessenger(RenderDevice* renderDevice, const DebugMessengerCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{

@@ -6,7 +6,7 @@
 namespace Ck::Vulkan
 {
 	DescriptorSet::DescriptorSet(RenderDevice* renderDevice, SharedPtr<DescriptorPool> pool, const DescriptorSetCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mPool(pool),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)

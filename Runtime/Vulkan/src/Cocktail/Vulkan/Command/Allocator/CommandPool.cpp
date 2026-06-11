@@ -6,7 +6,7 @@
 namespace Ck::Vulkan
 {
 	CommandPool::CommandPool(RenderDevice* renderDevice, const CommandPoolCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
 		mQueueType(createInfo.QueueType),

@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	QueueSubmitter::QueueSubmitter(RenderDevice* renderDevice, SubmitScheduler* scheduler, Renderer::CommandQueueType queueType, unsigned int queueIndex) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mScheduler(scheduler),
 		mQueueType(queueType),
 		mQueueIndex(queueIndex),

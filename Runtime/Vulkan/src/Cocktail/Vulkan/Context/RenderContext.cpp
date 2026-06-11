@@ -9,7 +9,7 @@
 namespace Ck::Vulkan
 {
 	RenderContext::RenderContext(RenderDevice* renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mPresentationQueue(VK_NULL_HANDLE),
 		mCurrentFrameContext(0),
 		mFrameContexts(createInfo.ConcurrentFrameCount)

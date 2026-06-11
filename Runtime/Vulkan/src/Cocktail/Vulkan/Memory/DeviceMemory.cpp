@@ -5,7 +5,7 @@
 namespace Ck::Vulkan
 {
 	DeviceMemory::DeviceMemory(RenderDevice* renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
 		mSize(createInfo.Size)

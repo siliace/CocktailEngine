@@ -94,7 +94,7 @@ namespace Ck::Vulkan
 	}
 
 	RenderPass::RenderPass(RenderDevice* renderDevice, const RenderPassCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks)
 	{
 		mColorAttachmentCount = createInfo.FramebufferLayout.ColorAttachmentCount;

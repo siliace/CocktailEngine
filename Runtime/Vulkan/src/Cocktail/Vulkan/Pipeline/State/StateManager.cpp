@@ -8,7 +8,7 @@
 namespace Ck::Vulkan
 {
 	StateManager::StateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mDescriptorSetAllocator(std::move(descriptorSetAllocator)),
 		mDescriptorSetDirtyFlags(0)
 	{

@@ -46,7 +46,7 @@ namespace Ck::Vulkan
 	}
 
 	ShaderProgram::ShaderProgram(RenderDevice* renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks)
 	{
 		mType = createInfo.Type;

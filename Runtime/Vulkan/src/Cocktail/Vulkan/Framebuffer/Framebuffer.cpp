@@ -7,7 +7,7 @@
 namespace Ck::Vulkan
 {
 	Framebuffer::Framebuffer(RenderDevice* renderDevice, SharedPtr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mRenderPass(renderPass),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)

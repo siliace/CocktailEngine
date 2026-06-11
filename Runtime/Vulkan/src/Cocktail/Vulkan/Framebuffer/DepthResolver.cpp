@@ -11,7 +11,7 @@
 namespace Ck::Vulkan
 {
 	DepthResolver::DepthResolver(RenderDevice* renderDevice) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mDepthSamplerSlot(nullptr)
 	{
 		Renderer::ShaderProgramCreateInfo shaderProgramCreateInfo;

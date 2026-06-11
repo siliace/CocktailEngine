@@ -43,7 +43,7 @@ namespace Ck::Vulkan
 	}
 
 	DescriptorSetStateManager::DescriptorSetStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mDescriptorSetAllocator(descriptorSetAllocator),
 		mBindingDirtyFlags(0)
 	{

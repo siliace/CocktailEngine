@@ -66,7 +66,7 @@ namespace Ck::Vulkan
 	}
 
 	PresentationContext::PresentationContext(RenderDevice* renderDevice, RenderSurface* surface, unsigned int bufferCount, DisplayColorDepth colorDepth, DisplayAlphaDepth alphaDepth, Renderer::ColorSpace colorSpace) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mSurface(surface),
 		mSurfaceColorSpace(colorSpace)
 	{

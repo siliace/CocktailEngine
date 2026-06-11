@@ -7,7 +7,7 @@
 namespace Ck::Vulkan
 {
 	ComputeStateManager::ComputeStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator) :
-		StateManager(std::move(renderDevice), std::move(descriptorSetAllocator)),
+		StateManager(renderDevice, std::move(descriptorSetAllocator)),
 		mShaderProgram(nullptr)
 	{
 		/// Nothing

@@ -7,7 +7,7 @@
 namespace Ck::Vulkan
 {
 	DescriptorUpdateTemplate::DescriptorUpdateTemplate(RenderDevice* renderDevice, const DescriptorUpdateTemplateCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mHandle(VK_NULL_HANDLE),
 		mAllocationCallbacks(allocationCallbacks)
 	{
