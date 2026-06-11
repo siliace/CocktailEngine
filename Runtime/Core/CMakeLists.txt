@@ -219,8 +219,11 @@ cocktail_source_directory(CORE_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Memory.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/ObjectMemoryUtils.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/SharedFromThis.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/SharedPtr.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/SizeType.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/UniquePtr.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/WeakPtr.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Memory.cpp
 )

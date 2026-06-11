@@ -43,7 +43,7 @@ namespace Ck
          * \param materialProgramManager Manager used to retrieve GPU programs compatible with the selected shading mode
          * \param blendingMode The blending mode filter applied to this queue
          */
-        RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, BlendingMode blendingMode = BlendingMode::Ignore);
+        RenderQueue(SharedPtr<MaterialProgramManager> materialProgramManager, BlendingMode blendingMode = BlendingMode::Ignore);
 
         /**
          * \brief Pushes a custom render record into the queue
@@ -113,7 +113,7 @@ namespace Ck
          */
         struct RecordInfo
         {
-            std::shared_ptr<RenderRecord> Record; /*!< The render record to execute */
+            SharedPtr<RenderRecord> Record; /*!< The render record to execute */
             Uint64 SortingKey = 0; /*!< Sorting key used to order records before flushing */
         };
 
@@ -123,12 +123,12 @@ namespace Ck
          * \param record The render record to store.
          * \param sortingKey Key used to sort the record.
          */
-        void Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey);
+        void Emplace(SharedPtr<RenderRecord> record, Uint64 sortingKey);
 
         MaterialProgramVariant* FindMaterialProgramVariant(RenderableType renderable, Material::ShadingMode shadingMode, Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
 
         BlendingMode mBlendingMode; /*!< Blending mode filter applied to this queue */
-        std::shared_ptr<MaterialProgramSet> mMaterialProgramSet; /*!< Set of material programs compatible with the queue configuration */
+        SharedPtr<MaterialProgramSet> mMaterialProgramSet; /*!< Set of material programs compatible with the queue configuration */
         Array<RecordInfo> mRecords; /*!< Collected render records waiting to be flushed */
     };
 }

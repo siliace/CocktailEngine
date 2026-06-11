@@ -122,7 +122,7 @@ namespace Ck::Vulkan
 		mBindingDirtyFlags = 0;
 	}
 
-	unsigned int DescriptorSetStateManager::CompileDescriptors(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
+	unsigned int DescriptorSetStateManager::CompileDescriptors(SharedPtr<DescriptorSetLayout> descriptorSetLayout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
 	{
 		unsigned int descriptorCount = 0;
 		unsigned int descriptorImageCount = 0;
@@ -198,7 +198,7 @@ namespace Ck::Vulkan
 		return descriptorCount;
 	}
 
-	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors)
+	void DescriptorSetStateManager::CompileDescriptorsWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors)
 	{
 		unsigned int k = 0;
 		const std::size_t elementStride = descriptorUpdateTemplate->GetElementStride();
@@ -245,7 +245,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSet(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout)
+	SharedPtr<DescriptorSet> DescriptorSetStateManager::CompileSet(SharedPtr<DescriptorSetLayout> descriptorSetLayout)
 	{
 		DescriptorSetCreateInfo createInfo;
 		createInfo.Layout = descriptorSetLayout;
@@ -254,7 +254,7 @@ namespace Ck::Vulkan
 
 		bool cached;
 		Uint64 hash = ComputeBindingStateHash(mBindingStates);
-		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
+		SharedPtr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
 		if (cached)
 			return descriptorSet;
 
@@ -332,7 +332,7 @@ namespace Ck::Vulkan
 		return descriptorSet;
 	}
 
-	std::shared_ptr<DescriptorSet> DescriptorSetStateManager::CompileSetWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate)
+	SharedPtr<DescriptorSet> DescriptorSetStateManager::CompileSetWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate)
 	{
 		DescriptorSetCreateInfo createInfo;
 		createInfo.Layout = descriptorSetLayout;
@@ -341,7 +341,7 @@ namespace Ck::Vulkan
 
 		bool cached = false;
 		Uint64 hash = ComputeBindingStateHash(mBindingStates);
-		std::shared_ptr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
+		SharedPtr<DescriptorSet> descriptorSet = mDescriptorSetAllocator->CreateDescriptorSet(createInfo, hash, cached);
 		if (cached)
 			return descriptorSet;
 

@@ -34,7 +34,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<PipelineLayout> GetLayout() const override;
+		SharedPtr<PipelineLayout> GetLayout() const override;
 
 		/**
 		 * \brief 
@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<PipelineLayout> mLayout;
+		SharedPtr<PipelineLayout> mLayout;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipeline mHandle;
 	};

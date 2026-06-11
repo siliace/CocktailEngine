@@ -32,13 +32,13 @@ namespace Ck::Vulkan
 
 		SemaphoreCreateInfo semaphoreCreateInfo;
 
-		std::shared_ptr<Semaphore> semaphore = mRenderDevice->CreateSemaphore(semaphoreCreateInfo);
+		SharedPtr<Semaphore> semaphore = mRenderDevice->CreateSemaphore(semaphoreCreateInfo);
 		mSubmits[mSubmitCount - 1].SignalSemaphore(semaphore);
 
 		return { std::move(semaphore), waitDstStages };
 	}
 
-	void QueueSubmitBatch::WaitSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages)
+	void QueueSubmitBatch::WaitSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages)
 	{
 		if (!mCurrentSubmit || mCurrentSubmit->GetWaitSemaphoreCount() == QueueSubmit::MaxWaitSemaphore)
 			PushSubmit();
@@ -53,11 +53,11 @@ namespace Ck::Vulkan
 			if (!mCurrentSubmit || mCurrentSubmit->GetCommandListCount() == QueueSubmit::MaxCommandList)
 				PushSubmit();
 
-			mCurrentSubmit->ExecuteCommandList(commandLists[i]->shared_from_this());
+			mCurrentSubmit->ExecuteCommandList(commandLists[i]->AsShared());
 		}
 	}
 
-	void QueueSubmitBatch::SignalSemaphore(std::shared_ptr<Semaphore> semaphore)
+	void QueueSubmitBatch::SignalSemaphore(SharedPtr<Semaphore> semaphore)
 	{
 		if (!mCurrentSubmit || mCurrentSubmit->GetWaitSemaphoreCount() == QueueSubmit::MaxWaitSemaphore)
 			PushSubmit();
@@ -65,7 +65,7 @@ namespace Ck::Vulkan
 		mCurrentSubmit->SignalSemaphore(semaphore);
 	}
 
-	void QueueSubmitBatch::AssignFence(std::shared_ptr<Fence> fence)
+	void QueueSubmitBatch::AssignFence(SharedPtr<Fence> fence)
 	{
 		if (mFence != nullptr)
 			throw std::runtime_error("Cannot assign two fences to the same submit batch");

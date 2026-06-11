@@ -1,8 +1,7 @@
 #ifndef COCKTAIL_CORE_SIGNAL_CONNECTION_HPP
 #define COCKTAIL_CORE_SIGNAL_CONNECTION_HPP
 
-#include <memory>
-
+#include <Cocktail/Core/Memory/WeakPtr.hpp>
 #include <Cocktail/Core/Signal/Detail/SlotState.hpp>
 
 namespace Ck
@@ -95,9 +94,9 @@ namespace Ck
 		 * \brief Constructor
 		 * \param state The Slot to manage
 		 */
-		explicit Connection(std::weak_ptr<Detail::SlotState> state);
+		explicit Connection(WeakPtr<Detail::SlotState> state);
 
-		std::weak_ptr<Detail::SlotState> mState;
+		WeakPtr<Detail::SlotState> mState;
 	};
 }
 

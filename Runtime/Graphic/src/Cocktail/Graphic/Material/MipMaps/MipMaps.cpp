@@ -4,27 +4,27 @@
 
 namespace Ck
 {
-	std::shared_ptr<MipMaps> MipMaps::FromImage(const Image& image)
+	SharedPtr<MipMaps> MipMaps::FromImage(const Image& image)
 	{
 		Extent3D<unsigned int> baseLevelSize = MakeExtent(image.GetSize(), 1u);
 
 		unsigned int levelCount = Renderer::ComputeTextureLevelCount(baseLevelSize);
 
 	    PixelFormat pixelFormat = PixelFormat::FromImageRawFormat(image.GetRawFormat(), image.GetGammaSpace());
-		std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, pixelFormat, 1, levelCount);
+		SharedPtr<MipMaps> mipMaps = MakeShared<MipMaps>(baseLevelSize, pixelFormat, 1, levelCount);
 		mipMaps->GetLevel(0, 0).CopyPixels(image.GetPixels().GetData());
 
 		return mipMaps;
 	}
 
-    std::shared_ptr<MipMaps> MipMaps::FromImageArray(const ImageArray& imageArray)
+    SharedPtr<MipMaps> MipMaps::FromImageArray(const ImageArray& imageArray)
 	{
 	    Extent3D<unsigned int> baseLevelSize = MakeExtent(imageArray.GetSize(), 1u);
 
 	    unsigned int levelCount = Renderer::ComputeTextureLevelCount(baseLevelSize);
 
 	    PixelFormat pixelFormat = PixelFormat::FromImageRawFormat(imageArray.GetRawFormat(), imageArray.GetGammaSpace());
-	    std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseLevelSize, pixelFormat, imageArray.GetSliceCount(), levelCount);
+	    SharedPtr<MipMaps> mipMaps = MakeShared<MipMaps>(baseLevelSize, pixelFormat, imageArray.GetSliceCount(), levelCount);
 	    for (unsigned int slice = 0; slice < imageArray.GetSliceCount(); slice++)
 	        mipMaps->GetLevel(slice, 0).CopyPixels(imageArray.GetSlice(slice).GetPixels().GetData());
 

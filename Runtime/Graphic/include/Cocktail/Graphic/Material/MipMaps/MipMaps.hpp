@@ -1,10 +1,9 @@
 #ifndef COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 #define COCKTAIL_GRAPHIC_MATERIAL_MIPMAPS_MIPMAPS_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Image/ImageArray.hpp>
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 
 #include <Cocktail/Graphic/Material/MipMaps/MipMapLevel.hpp>
 
@@ -34,14 +33,14 @@ namespace Ck
 		 * \param image
 		 * \return 
 		 */
-		static std::shared_ptr<MipMaps> FromImage(const Image& image);
+		static SharedPtr<MipMaps> FromImage(const Image& image);
 
         /**
          * \brief
          * \param imageArray
          * \return
          */
-	    static std::shared_ptr<MipMaps> FromImageArray(const ImageArray& imageArray);
+	    static SharedPtr<MipMaps> FromImageArray(const ImageArray& imageArray);
 
 		/**
 		 * \brief

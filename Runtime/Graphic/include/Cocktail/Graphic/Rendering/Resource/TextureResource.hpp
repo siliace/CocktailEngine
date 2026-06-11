@@ -12,14 +12,14 @@ namespace Ck
 	/**
 	 * \brief 
 	 */
-	class COCKTAIL_GRAPHIC_API TextureResource : public GraphicResource, public std::enable_shared_from_this<TextureResource>
+	class COCKTAIL_GRAPHIC_API TextureResource : public GraphicResource, public SharedFromThis<TextureResource>
 	{
 	public:
 
 		/**
 		 * \brief Constructor
 		 */
-		TextureResource(std::shared_ptr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube = false, const AnsiChar* name = "");
+		TextureResource(SharedPtr<GraphicEngine> graphicEngine, Extent3D<unsigned int> size, PixelFormat format, unsigned int layerCount, unsigned int levelCount, bool isCube = false, const AnsiChar* name = "");
 
 		/**
 		 * \brief 
@@ -31,7 +31,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::TextureView> GetView() const;
+		SharedPtr<Renderer::TextureView> GetView() const;
 
 		/**
 		 * \brief Get the TextureType the Texture was created with
@@ -78,13 +78,13 @@ namespace Ck
 		 * \brief
 		 * \return 
 		 */
-		std::shared_ptr<GraphicEngine> GetGraphicEngine() const override;
+		SharedPtr<GraphicEngine> GetGraphicEngine() const override;
 
 	private:
 
-		std::shared_ptr<GraphicEngine> mGraphicEngine;
-		std::shared_ptr<Renderer::Texture> mTexture;
-		std::shared_ptr<Renderer::TextureView> mView;
+		SharedPtr<GraphicEngine> mGraphicEngine;
+		SharedPtr<Renderer::Texture> mTexture;
+		SharedPtr<Renderer::TextureView> mView;
 	};
 }
 

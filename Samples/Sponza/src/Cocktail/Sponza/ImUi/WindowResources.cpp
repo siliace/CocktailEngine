@@ -45,16 +45,16 @@ namespace Ck::ImUi
         commandList->Begin(nullptr);
         {
             Renderer::GpuBarrier barriers[] = {
-                Renderer::GpuBarrier::Of(mFontTexture.get(), Renderer::ResourceState::Undefined, Renderer::ResourceState::CopyDestination, fontSubResource)
+                Renderer::GpuBarrier::Of(mFontTexture.Get(), Renderer::ResourceState::Undefined, Renderer::ResourceState::CopyDestination, fontSubResource)
             };
             commandList->Barrier(1, barriers);
         }
 
-        commandList->UploadTextureLevel(mFontTexture.get(), Renderer::ResourceState::CopyDestination, 0, 0, mFontTexturePixels.GetData());
+        commandList->UploadTextureLevel(mFontTexture.Get(), Renderer::ResourceState::CopyDestination, 0, 0, mFontTexturePixels.GetData());
 
         {
             Renderer::GpuBarrier barriers[] = {
-                Renderer::GpuBarrier::Of(mFontTexture.get(), Renderer::ResourceState::CopyDestination, Renderer::ResourceState::GraphicShaderResource, fontSubResource)
+                Renderer::GpuBarrier::Of(mFontTexture.Get(), Renderer::ResourceState::CopyDestination, Renderer::ResourceState::GraphicShaderResource, fontSubResource)
             };
             commandList->Barrier(1, barriers);
         }
@@ -75,11 +75,11 @@ namespace Ck::ImUi
 
     Renderer::Texture* WindowResources::GetFontTexture() const
     {
-        return mFontTexture.get();
+        return mFontTexture.Get();
     }
 
     Renderer::TextureView* WindowResources::GetFontTextureView() const
     {
-        return mFontTextureView.get();
+        return mFontTextureView.Get();
     }
 }

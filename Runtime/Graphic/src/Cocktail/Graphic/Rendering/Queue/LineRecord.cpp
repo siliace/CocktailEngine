@@ -1,10 +1,11 @@
 #include <Cocktail/Graphic/Rendering/Queue/LineRecord.hpp>
+#include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 
 namespace Ck
 {
     ObjectPool<LineRecord> LineRecord::sRecordPool;
 
-    std::shared_ptr<LineRecord> LineRecord::New(const LineRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+    SharedPtr<LineRecord> LineRecord::New(const LineRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
     {
         return sRecordPool.Allocate(recordInfo, materialProgramVariant);
     }

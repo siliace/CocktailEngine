@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	PerspectiveCamera* PerspectiveCamera::Create(std::shared_ptr<Scene> scene, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds)
+	PerspectiveCamera* PerspectiveCamera::Create(SharedPtr<Scene> scene, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds)
 	{
 		TransformationNode* transformationNode = scene->CreateTransformationNode();
 

@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-	MaterialProgramSet::MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager) :
+	MaterialProgramSet::MaterialProgramSet(SharedPtr<MaterialProgramManager> materialProgramManager) :
 		mMaterialProgramManager(std::move(materialProgramManager))
 	{
 		mMaterialProgramManager->SelectMaterialPrograms([&](RenderableType renderableType, MaterialProgram* materialProgram) {

@@ -20,7 +20,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<MipMaps> LoadFromPath(const Path& path, const MipMapsImportParameters& parameters) override;
+		SharedPtr<MipMaps> LoadFromPath(const Path& path, const MipMapsImportParameters& parameters) override;
 
 		/**
 		 * \brief 
@@ -28,7 +28,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<MipMaps> LoadFromStream(InputStream<>& inputStream, const MipMapsImportParameters& parameters) override;
+		SharedPtr<MipMaps> LoadFromStream(InputStream<>& inputStream, const MipMapsImportParameters& parameters) override;
 
 		/**
     	 * \brief 

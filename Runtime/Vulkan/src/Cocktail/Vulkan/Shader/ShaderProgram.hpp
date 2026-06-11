@@ -52,7 +52,7 @@ namespace Ck::Vulkan
 		 * \param type 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
+		SharedPtr<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
 
 		/**
 		 * \brief 
@@ -74,7 +74,7 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<PipelineLayout> GetPipelineLayout() const;
+		SharedPtr<PipelineLayout> GetPipelineLayout() const;
 
 	private:
 
@@ -93,9 +93,9 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		Renderer::ShaderProgramType mType;
-		EnumMap<Renderer::ShaderType, std::shared_ptr<Shader>> mShaders;
+		EnumMap<Renderer::ShaderType, SharedPtr<Shader>> mShaders;
 		Array<UniquePtr<UniformSlot>> mUniformSlots;
-		std::shared_ptr<PipelineLayout> mPipelineLayout;
+		SharedPtr<PipelineLayout> mPipelineLayout;
 	};
 }
 

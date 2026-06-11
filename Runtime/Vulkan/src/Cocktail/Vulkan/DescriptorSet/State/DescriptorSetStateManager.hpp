@@ -152,7 +152,7 @@ namespace Ck::Vulkan
 		 * \param writes 
 		 * \return 
 		 */
-		unsigned int CompileDescriptors(std::shared_ptr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
+		unsigned int CompileDescriptors(SharedPtr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
 
 		/**
 		 * \brief 
@@ -160,14 +160,14 @@ namespace Ck::Vulkan
 		 * \param descriptorUpdateTemplate 
 		 * \param descriptors 
 		 */
-		void CompileDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
+		void CompileDescriptorsWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
 
 		/**
 		 * \brief 
 		 * \param descriptorSetLayout 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorSet> CompileSet(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout);
+		SharedPtr<DescriptorSet> CompileSet(SharedPtr<DescriptorSetLayout> descriptorSetLayout);
 
 		/**
 		 * \brief 
@@ -175,7 +175,7 @@ namespace Ck::Vulkan
 		 * \param descriptorUpdateTemplate 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorSet> CompileSetWithTemplate(std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate);
+		SharedPtr<DescriptorSet> CompileSetWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate);
 
 		/**
 		 * \brief 

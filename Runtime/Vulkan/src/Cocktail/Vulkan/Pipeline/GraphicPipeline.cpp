@@ -253,7 +253,7 @@ namespace Ck::Vulkan
 		vkDestroyPipeline(mRenderDevice->GetHandle(), mHandle, mAllocationCallbacks);
 	}
 
-	std::shared_ptr<PipelineLayout> GraphicPipeline::GetLayout() const
+	SharedPtr<PipelineLayout> GraphicPipeline::GetLayout() const
 	{
 		return mLayout;
 	}

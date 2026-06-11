@@ -200,13 +200,13 @@ namespace Ck
         }
     }
 
-    std::shared_ptr<MipMaps> DDSImporter::LoadFromPath(const Path& path, const MipMapsImportParameters& parameters)
+    SharedPtr<MipMaps> DDSImporter::LoadFromPath(const Path& path, const MipMapsImportParameters& parameters)
     {
         CK_LOG(MipMapsLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading mipmaps from %s"), path.ToString());
         return AssetImporter<MipMaps, MipMapsImportParameters>::LoadFromPath(path, parameters);
     }
 
-    std::shared_ptr<MipMaps> DDSImporter::LoadFromStream(InputStream<>& inputStream, const MipMapsImportParameters& parameters)
+    SharedPtr<MipMaps> DDSImporter::LoadFromStream(InputStream<>& inputStream, const MipMapsImportParameters& parameters)
     {
         static Flags RequiredFileFlags = DDSHeader::FlagBits::Caps | DDSHeader::FlagBits::Height | DDSHeader::FlagBits::Width | DDSHeader::FlagBits::PixelFormat;
 
@@ -250,7 +250,7 @@ namespace Ck
             if (!(header.Caps2 & RequiredCubeFlags))
                 throw DDSImportException(CK_TEXT("Missing face in DDS cubemap"));
 
-            std::shared_ptr<CubeMipMaps> mipMaps = std::make_shared<CubeMipMaps>(MakeExtent(baseSize.Width, baseSize.Height), pixelFormat, arrayLayerCount, mipMapCount);
+            SharedPtr<CubeMipMaps> mipMaps = MakeShared<CubeMipMaps>(MakeExtent(baseSize.Width, baseSize.Height), pixelFormat, arrayLayerCount, mipMapCount);
             for (unsigned int slice = 0; slice < arrayLayerCount; slice++)
             {
                 for (CubeMipMaps::Face face : Enum<CubeMipMaps::Face>::Values)
@@ -272,7 +272,7 @@ namespace Ck
             return mipMaps;
         }
 
-        std::shared_ptr<MipMaps> mipMaps = std::make_shared<MipMaps>(baseSize, pixelFormat, arrayLayerCount, mipMapCount);
+        SharedPtr<MipMaps> mipMaps = MakeShared<MipMaps>(baseSize, pixelFormat, arrayLayerCount, mipMapCount);
         for (unsigned int slice = 0; slice < arrayLayerCount; slice++)
         {
             for (unsigned level = 0; level < mipMapCount; level++)

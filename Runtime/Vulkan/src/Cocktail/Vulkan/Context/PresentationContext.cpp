@@ -91,7 +91,7 @@ namespace Ck::Vulkan
 		mBufferCount = std::clamp(bufferCount, surfaceCapabilities.minImageCount, surfaceCapabilities.maxImageCount);
 	}
 
-	std::shared_ptr<Swapchain> PresentationContext::CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const
+	SharedPtr<Swapchain> PresentationContext::CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const
 	{
 		if (!IsPresentationModeSupported(presentMode))
 			throw std::invalid_argument("PresentMode not supported by the PresentationContext");

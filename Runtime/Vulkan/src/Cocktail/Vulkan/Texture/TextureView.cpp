@@ -7,11 +7,11 @@
 namespace Ck::Vulkan
 {
 	TextureView::TextureView(RenderDevice* renderDevice, const Renderer::TextureViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
-		mRenderDevice(std::move(renderDevice)),
+		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE)
 	{
-		mTexture = std::static_pointer_cast<AbstractTexture>(createInfo.Texture);
+		mTexture = createInfo.Texture.StaticCast<AbstractTexture>();
 
 		if (mTexture->HasMutableFormat())
 		{
@@ -98,7 +98,7 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::shared_ptr<Renderer::Texture> TextureView::GetTexture() const
+	SharedPtr<Renderer::Texture> TextureView::GetTexture() const
 	{
 		return mTexture;
 	}

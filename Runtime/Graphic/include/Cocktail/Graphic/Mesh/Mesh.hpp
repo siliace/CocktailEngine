@@ -61,7 +61,7 @@ namespace Ck
 		 * \param indices 
 		 * \param subMeshes 
 		 */
-		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Array<SubMesh> subMeshes);
+		Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Array<SubMesh> subMeshes);
 
 		/**
 		 * \brief
@@ -69,7 +69,7 @@ namespace Ck
 		 * \param indices
 		 * \param primitiveTopology
 		 */
-		Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology = Renderer::PrimitiveTopology::Triangle);
+		Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology = Renderer::PrimitiveTopology::Triangle);
 
 		/**
 		 * \brief 
@@ -81,13 +81,13 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::shared_ptr<VertexArray>& GetVertices() const;
+		const SharedPtr<VertexArray>& GetVertices() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const std::shared_ptr<IndexArray>& GetIndices() const;
+		const SharedPtr<IndexArray>& GetIndices() const;
 
 		/**
 		 * \brief 
@@ -114,8 +114,8 @@ namespace Ck
 		 */
 		void GenerateBoundingBox();
 
-		std::shared_ptr<VertexArray> mVertices;
-		std::shared_ptr<IndexArray> mIndices;
+		SharedPtr<VertexArray> mVertices;
+		SharedPtr<IndexArray> mIndices;
 		Array<SubMesh> mSubMeshes;
 		std::unordered_set<unsigned int> mMaterialIndices;
 		Box<float> mBoundingBox;

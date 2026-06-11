@@ -44,7 +44,7 @@ namespace Ck
 
 	ObjectPool<StaticMeshRecord> StaticMeshRecord::sRecordPool;
 
-	std::shared_ptr<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+	SharedPtr<StaticMeshRecord> StaticMeshRecord::New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
 	{
 		return sRecordPool.Allocate(recordInfo, materialProgramVariant);
 	}
@@ -80,7 +80,7 @@ namespace Ck
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-		    std::shared_ptr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
+		    SharedPtr<Renderer::TextureView> textureView = mRecordInfo.MaterialTextures[textureType];
 		    if (!textureView)
 		        continue;
 
@@ -88,7 +88,7 @@ namespace Ck
 		    if (slot == InvalidBindingSlot)
 		        continue;
 
-		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.get(), nullptr);
+		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.Get(), nullptr);
 		}
 
 		for (unsigned int i = 0; i < mRecordInfo.VertexBufferCount; i++)

@@ -119,7 +119,7 @@ namespace Ck::Vulkan
          *
          * \return Shared pointer to the DeviceMemory wrapper
          */
-		std::shared_ptr<DeviceMemory> GetDeviceMemory() const;
+		SharedPtr<DeviceMemory> GetDeviceMemory() const;
 
 	private:
 		
@@ -141,7 +141,7 @@ namespace Ck::Vulkan
 		unsigned int mMemoryTypeIndex; /*!< Heap memory type index */
 		bool mDedicated; /*!< Indicates whether this is a dedicated allocation */
 		void* mPtr; /*!< Pointer to mapped memory (if host-visible) */
-		std::shared_ptr<DeviceMemory> mDeviceMemory; /*!< Underlying Vulkan device memory wrapper */
+		SharedPtr<DeviceMemory> mDeviceMemory; /*!< Underlying Vulkan device memory wrapper */
 		Array<ObjectPool<DeviceMemoryBlock>::Unique> mBlocks; /*!< List of sub-allocated memory blocks */
 	};
 }

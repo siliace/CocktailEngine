@@ -75,7 +75,7 @@ namespace Ck
 			AsciiString Name;
 			Material::Parameters Parameters;
 			Material::ShadingMode ShadingMode;
-			EnumMap<Material::TextureType, std::shared_ptr<MipMaps>> Textures;
+			EnumMap<Material::TextureType, SharedPtr<MipMaps>> Textures;
 			bool DoubleSided = false;
 			Material::AlphaMode AlphaMode = Material::AlphaMode::Opaque;
 			float AlphaCutoff = 0.f;
@@ -94,8 +94,8 @@ namespace Ck
 		struct MeshInfo
 		{
 			AsciiString Name;
-			std::shared_ptr<VertexArray> Vertices;
-			std::shared_ptr<IndexArray> Indices;
+			SharedPtr<VertexArray> Vertices;
+			SharedPtr<IndexArray> Indices;
 			Array<SubMeshInfo> SubMeshes;
 		};
 
@@ -113,7 +113,7 @@ namespace Ck
 		NodeInfo mRoot;
 		Array<CameraInfo> mCameras;
 		Array<MeshInfo> mMeshes;
-		Array<std::shared_ptr<MipMaps>> mMipMaps;
+		Array<SharedPtr<MipMaps>> mMipMaps;
 		Array<MaterialInfo> mMaterials;
 	    Array<LightInfo> mLights;
 
@@ -139,7 +139,7 @@ namespace Ck
 		 *
 		 * \return 
 		 */
-		SceneNode* ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials);
+		SceneNode* ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<SharedPtr<Mesh>>& meshes, const Array<SharedPtr<Material>>& materials);
 	};
 }
 

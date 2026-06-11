@@ -37,7 +37,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		virtual std::shared_ptr<PipelineLayout> GetLayout() const = 0;
+		virtual SharedPtr<PipelineLayout> GetLayout() const = 0;
 		
 		/**
 		 * \brief 

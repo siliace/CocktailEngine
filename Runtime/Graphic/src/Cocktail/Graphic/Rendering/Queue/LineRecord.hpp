@@ -1,12 +1,12 @@
 #ifndef COCKTAILENGINE_LINERECORD_HPP
 #define COCKTAILENGINE_LINERECORD_HPP
 
+#include <Cocktail/Core/Math/Matrix/Matrix4.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
+#include <Cocktail/Graphic/Material/Shading/MaterialProgramVariant.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/LineRecordInfo.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/RenderRecord.hpp>
-
-#include "Cocktail/Core/Math/Matrix/Matrix4.hpp"
 
 namespace Ck
 {
@@ -14,7 +14,7 @@ namespace Ck
     {
     public:
 
-        static std::shared_ptr<LineRecord> New(const LineRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
+        static SharedPtr<LineRecord> New(const LineRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
 
         LineRecord(const LineRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
 

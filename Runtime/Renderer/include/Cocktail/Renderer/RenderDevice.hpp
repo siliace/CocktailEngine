@@ -89,7 +89,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Buffer
          */
-        virtual std::shared_ptr<Buffer> CreateBuffer(const BufferCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Buffer> CreateBuffer(const BufferCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new BufferView
@@ -98,7 +98,7 @@ namespace Ck::Renderer
          *
          * \return The newly created BufferView
          */
-        virtual std::shared_ptr<BufferView> CreateBufferView(const BufferViewCreateInfo& createInfo) = 0;
+        virtual SharedPtr<BufferView> CreateBufferView(const BufferViewCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new Fence synchronization object
@@ -107,7 +107,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Fence
          */
-        virtual std::shared_ptr<Fence> CreateFence(const FenceCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Fence> CreateFence(const FenceCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new Framebuffer
@@ -116,7 +116,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Framebuffer
          */
-        virtual std::shared_ptr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new RenderContext
@@ -128,7 +128,7 @@ namespace Ck::Renderer
          *
          * \return The newly created RenderContext
          */
-        virtual std::shared_ptr<RenderContext> CreateRenderContext(const RenderContextCreateInfo& createInfo) = 0;
+        virtual SharedPtr<RenderContext> CreateRenderContext(const RenderContextCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new RenderSurface
@@ -140,7 +140,7 @@ namespace Ck::Renderer
          *
          * \return The newly created RenderSurface
          */
-        virtual std::shared_ptr<RenderSurface> CreateRenderSurface(const RenderSurfaceCreateInfo& createInfo) = 0;
+        virtual SharedPtr<RenderSurface> CreateRenderSurface(const RenderSurfaceCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new Sampler object
@@ -149,7 +149,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Sampler
          */
-        virtual std::shared_ptr<Sampler> CreateSampler(const SamplerCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Sampler> CreateSampler(const SamplerCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new Shader
@@ -158,7 +158,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Shader
          */
-        virtual std::shared_ptr<Shader> CreateShader(const ShaderCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Shader> CreateShader(const ShaderCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new ShaderProgram
@@ -170,7 +170,7 @@ namespace Ck::Renderer
          *
          * \return The newly created ShaderProgram
          */
-        virtual std::shared_ptr<ShaderProgram> CreateShaderProgram(const ShaderProgramCreateInfo& createInfo) = 0;
+        virtual SharedPtr<ShaderProgram> CreateShaderProgram(const ShaderProgramCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new Texture resource
@@ -179,7 +179,7 @@ namespace Ck::Renderer
          *
          * \return The newly created Texture
          */
-        virtual std::shared_ptr<Texture> CreateTexture(const TextureCreateInfo& createInfo) = 0;
+        virtual SharedPtr<Texture> CreateTexture(const TextureCreateInfo& createInfo) = 0;
 
         /**
          * \brief Creates a new TextureView
@@ -188,7 +188,7 @@ namespace Ck::Renderer
          *
          * \return The newly created TextureView
          */
-        virtual std::shared_ptr<TextureView> CreateTextureView(const TextureViewCreateInfo& createInfo) = 0;
+        virtual SharedPtr<TextureView> CreateTextureView(const TextureViewCreateInfo& createInfo) = 0;
 
         /**
          * \brief Checks whether a specific RenderDevice extension is supported

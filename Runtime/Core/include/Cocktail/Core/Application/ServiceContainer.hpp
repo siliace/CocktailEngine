@@ -1,7 +1,6 @@
 #ifndef COCKTAIL_CORE_APPLICATION_SERVICECONTAINER_HPP
 #define COCKTAIL_CORE_APPLICATION_SERVICECONTAINER_HPP
 
-#include <memory>
 #include <typeindex>
 
 #include <Cocktail/Core/Application/Detail/InstanceServiceBinding.hpp>

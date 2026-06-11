@@ -2,6 +2,7 @@
 #define COCKTAIL_VULKAN_RENDERDEVICE_HPP
 
 #include <Cocktail/Core/Application/ServiceContainer.hpp>
+#include <Cocktail/Core/Memory/SharedFromThis.hpp>
 #include <Cocktail/Core/Utility/EnumMap.hpp>
 #include <Cocktail/Core/Utility/ObjectPool.hpp>
 
@@ -55,7 +56,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class RenderDevice : public Renderer::RenderDevice, public ServiceContainer, public std::enable_shared_from_this<RenderDevice>
+	class RenderDevice : public Renderer::RenderDevice, public ServiceContainer, public SharedFromThis<RenderDevice>
 	{
 	public:
 
@@ -80,14 +81,14 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Buffer> CreateBuffer(const Renderer::BufferCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Buffer> CreateBuffer(const Renderer::BufferCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::BufferView> CreateBufferView(const Renderer::BufferViewCreateInfo& createInfo) override;
+		SharedPtr<Renderer::BufferView> CreateBufferView(const Renderer::BufferViewCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
@@ -96,55 +97,55 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<CommandList> CreateCommandList(std::shared_ptr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		SharedPtr<CommandList> CreateCommandList(SharedPtr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<ComputePipeline> CreateComputePipeline(const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo);
+		SharedPtr<ComputePipeline> CreateComputePipeline(const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief
 		 * \param createInfo
 		 * \return
 		 */
-		std::shared_ptr<DescriptorPool> CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo);
+		SharedPtr<DescriptorPool> CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorSetLayout> CreateDescriptorSetLayout(const DescriptorSetLayoutCreateInfo& createInfo);
+		SharedPtr<DescriptorSetLayout> CreateDescriptorSetLayout(const DescriptorSetLayoutCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorUpdateTemplate> CreateDescriptorUpdateTemplate(const DescriptorUpdateTemplateCreateInfo& createInfo);
+		SharedPtr<DescriptorUpdateTemplate> CreateDescriptorUpdateTemplate(const DescriptorUpdateTemplateCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<DeviceMemory> CreateDeviceMemory(const DeviceMemoryCreateInfo& createInfo);
+		SharedPtr<DeviceMemory> CreateDeviceMemory(const DeviceMemoryCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Fence> CreateFence(const Renderer::FenceCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Fence> CreateFence(const Renderer::FenceCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Framebuffer> CreateFramebuffer(const Renderer::FramebufferCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Framebuffer> CreateFramebuffer(const Renderer::FramebufferCreateInfo& createInfo) override;
 
 		/**
 		 * \brief
@@ -152,97 +153,97 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \return
 		 */
-		std::shared_ptr<Renderer::Framebuffer> CreateFramebuffer(std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo);
+		SharedPtr<Renderer::Framebuffer> CreateFramebuffer(SharedPtr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<GraphicPipeline> CreateGraphicPipeline(const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo);
+		SharedPtr<GraphicPipeline> CreateGraphicPipeline(const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<PipelineLayout> CreatePipelineLayout(const PipelineLayoutCreateInfo& createInfo);
+		SharedPtr<PipelineLayout> CreatePipelineLayout(const PipelineLayoutCreateInfo& createInfo);
 
 		/**
 		 * \brief
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<RenderBuffer> CreateRenderBuffer(const RenderBufferCreateInfo& createInfo);
+		SharedPtr<RenderBuffer> CreateRenderBuffer(const RenderBufferCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderContext> CreateRenderContext(const Renderer::RenderContextCreateInfo& createInfo) override;
+		SharedPtr<Renderer::RenderContext> CreateRenderContext(const Renderer::RenderContextCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::RenderSurface> CreateRenderSurface(const Renderer::RenderSurfaceCreateInfo& createInfo) override;
+		SharedPtr<Renderer::RenderSurface> CreateRenderSurface(const Renderer::RenderSurfaceCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<RenderPass> CreateRenderPass(const RenderPassCreateInfo& createInfo);
+		SharedPtr<RenderPass> CreateRenderPass(const RenderPassCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Sampler> CreateSampler(const Renderer::SamplerCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Sampler> CreateSampler(const Renderer::SamplerCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Semaphore> CreateSemaphore(const SemaphoreCreateInfo& createInfo);
+		SharedPtr<Semaphore> CreateSemaphore(const SemaphoreCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Shader> CreateShader(const Renderer::ShaderCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Shader> CreateShader(const Renderer::ShaderCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::ShaderProgram> CreateShaderProgram(const Renderer::ShaderProgramCreateInfo& createInfo) override;
+		SharedPtr<Renderer::ShaderProgram> CreateShaderProgram(const Renderer::ShaderProgramCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Swapchain> CreateSwapchain(const SwapchainCreateInfo& createInfo);
+		SharedPtr<Swapchain> CreateSwapchain(const SwapchainCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Texture> CreateTexture(const Renderer::TextureCreateInfo& createInfo) override;
+		SharedPtr<Renderer::Texture> CreateTexture(const Renderer::TextureCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 
 		 * \param createInfo 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::TextureView> CreateTextureView(const Renderer::TextureViewCreateInfo& createInfo) override;
+		SharedPtr<Renderer::TextureView> CreateTextureView(const Renderer::TextureViewCreateInfo& createInfo) override;
 
 		/**
 		 * \brief 

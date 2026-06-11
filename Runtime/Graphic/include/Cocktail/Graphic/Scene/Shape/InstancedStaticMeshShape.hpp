@@ -24,7 +24,7 @@ namespace Ck
          * \param mesh The static mesh to render
          * \param materials The set of materials applied to the mesh
          */
-        InstancedStaticMeshShape(GraphicEngine& graphicEngine, const Array<Transformation>& instances, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials);
+        InstancedStaticMeshShape(GraphicEngine& graphicEngine, const Array<Transformation>& instances, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials);
 
         /**
          * \brief
@@ -40,7 +40,7 @@ namespace Ck
     private:
 
         Array<Transformation> mInstances;
-        std::shared_ptr<TypedStorageBuffer<InstanceInfo>> mInstanceBuffer;
+        SharedPtr<TypedStorageBuffer<InstanceInfo>> mInstanceBuffer;
     };
 }
 

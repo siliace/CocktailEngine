@@ -15,7 +15,7 @@ namespace Ck
     {
     public:
 
-        MaterialProgramVariant(std::shared_ptr<MaterialProgramInterface>, std::shared_ptr<Renderer::ShaderProgram> shaderProgram);
+        MaterialProgramVariant(SharedPtr<MaterialProgramInterface>, SharedPtr<Renderer::ShaderProgram> shaderProgram);
 
         Renderer::VertexAttributeLocation* GetVertexAttributeLocation(VertexAttributeSemantic semantic) const;
 
@@ -27,8 +27,8 @@ namespace Ck
 
         using SlotIdentifier = CompositeKey<ShaderBindingDomain, BindingSlot>;
 
-        std::shared_ptr<MaterialProgramInterface> mInterface;
-        std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
+        SharedPtr<MaterialProgramInterface> mInterface;
+        SharedPtr<Renderer::ShaderProgram> mShaderProgram;
         EnumMap<VertexAttributeSemantic, Renderer::VertexAttributeLocation*> mVertexAttributeLocations;
         HashMap<SlotIdentifier, Renderer::UniformSlot*> mSlots;
     };

@@ -25,9 +25,9 @@ namespace Ck
 		return *this;
 	}
 
-	std::shared_ptr<VertexLayout> VertexLayout::Builder::Get()
+	SharedPtr<VertexLayout> VertexLayout::Builder::Get()
 	{
-		return std::make_shared<VertexLayout>(mCreateInfo);
+		return MakeShared<VertexLayout>(mCreateInfo);
 	}
 
 	const VertexLayoutCreateInfo& VertexLayout::Builder::ToCreateInfo() const

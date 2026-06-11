@@ -21,7 +21,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class CommandListPool : public std::enable_shared_from_this<CommandListPool>
+	class CommandListPool : public SharedFromThis<CommandListPool>
 	{
 	public:
 
@@ -50,7 +50,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param createInfo 
 		 */
-		std::shared_ptr<CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo);
+		SharedPtr<CommandList> CreateCommandList(const Renderer::CommandListCreateInfo& createInfo);
 
 		/**
 		 * \brief 
@@ -79,10 +79,10 @@ namespace Ck::Vulkan
 		 * \param queueType 
 		 * \return 
 		 */
-		std::shared_ptr<CommandPool> GetCommandPool(Renderer::CommandQueueType queueType) const;
+		SharedPtr<CommandPool> GetCommandPool(Renderer::CommandQueueType queueType) const;
 
 		RenderDevice* mRenderDevice;
-		EnumMap<Renderer::CommandQueueType, std::shared_ptr<CommandPool>> mCommandPools;
+		EnumMap<Renderer::CommandQueueType, SharedPtr<CommandPool>> mCommandPools;
 		DescriptorSetAllocator mDescriptorSetAllocator;
 		UniquePtr<StagingAllocator> mStagingAllocator;
 		bool mTransient;

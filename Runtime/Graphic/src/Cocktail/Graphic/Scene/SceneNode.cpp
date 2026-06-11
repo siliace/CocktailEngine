@@ -12,7 +12,7 @@ namespace Ck
 		/// Nothing
 	}
 
-	void SceneNode::AddShape(std::shared_ptr<Shape> shape)
+	void SceneNode::AddShape(SharedPtr<Shape> shape)
 	{
         shape->ExtendBoundingVolume(mBoundingBox);
 		mShapes.Add(std::move(shape));
@@ -25,7 +25,7 @@ namespace Ck
 		const Transformation& cameraTransformation = camera->GetWorldTransformation();
 		const Transformation& worldTransformation = GetTransformationNode()->GetWorldTransformation();
 
-		for (const std::shared_ptr<Shape>& shape : mShapes)
+		for (const SharedPtr<Shape>& shape : mShapes)
             shape->AddToQueue(queue, cameraTransformation, worldTransformation);
 	}
 

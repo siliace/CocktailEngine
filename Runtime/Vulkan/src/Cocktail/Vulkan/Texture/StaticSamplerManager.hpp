@@ -33,7 +33,7 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		EnumMap<Renderer::StaticSampler, std::shared_ptr<Sampler>> mSamplers;
+		EnumMap<Renderer::StaticSampler, SharedPtr<Sampler>> mSamplers;
 	};
 }
 

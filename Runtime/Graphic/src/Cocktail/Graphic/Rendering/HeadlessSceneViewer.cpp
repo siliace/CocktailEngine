@@ -7,7 +7,7 @@
 
 namespace Ck
 {
-	HeadlessSceneViewer::HeadlessSceneViewer(std::shared_ptr<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters) :
+	HeadlessSceneViewer::HeadlessSceneViewer(SharedPtr<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters) :
 		SceneViewer(std::move(scene)),
 		mCurrentFramebuffer(0)
 	{
@@ -20,14 +20,14 @@ namespace Ck
 			colorAttachmentCreateInfo.Format = PixelFormat::Color(PixelFormat::Layout::RGBA, DataType::UnsignedInt8);
 			colorAttachmentCreateInfo.Size = MakeExtent(size, 1u);
 			colorAttachmentCreateInfo.Usage = Renderer::TextureUsageFlagBits::Attachment;
-			std::shared_ptr<Renderer::Texture> colorAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
+			SharedPtr<Renderer::Texture> colorAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
 
 			Renderer::TextureViewCreateInfo colorAttachmentViewCreateInfo;
 			colorAttachmentViewCreateInfo.Texture = std::move(colorAttachment);
 			colorAttachmentViewCreateInfo.Type = Renderer::TextureViewType::e2D;
-			std::shared_ptr<Renderer::TextureView> colorAttachmentView = renderDevice->CreateTextureView(colorAttachmentViewCreateInfo);
+			SharedPtr<Renderer::TextureView> colorAttachmentView = renderDevice->CreateTextureView(colorAttachmentViewCreateInfo);
 
-			std::shared_ptr<Renderer::TextureView> depthStencilAttachmentView;
+			SharedPtr<Renderer::TextureView> depthStencilAttachmentView;
 			if (parameters.DepthStencilFormat != PixelFormat::Undefined())
 			{
 				Renderer::TextureCreateInfo depthStencilAttachmentCreateInfo;
@@ -35,7 +35,7 @@ namespace Ck
 				depthStencilAttachmentCreateInfo.Format = PixelFormat::DepthStencil(24, 8);
 				depthStencilAttachmentCreateInfo.Size = MakeExtent(size, 1u);
 				depthStencilAttachmentCreateInfo.Usage = Renderer::TextureUsageFlagBits::Attachment;
-				std::shared_ptr<Renderer::Texture> depthStencilAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
+				SharedPtr<Renderer::Texture> depthStencilAttachment = renderDevice->CreateTexture(colorAttachmentCreateInfo);
 
 				Renderer::TextureViewCreateInfo depthStencilAttachmentViewCreateInfo;
 				depthStencilAttachmentViewCreateInfo.Texture = std::move(depthStencilAttachment);
@@ -58,6 +58,6 @@ namespace Ck
 	Renderer::Framebuffer* HeadlessSceneViewer::AcquireNextFramebuffer(Renderer::RenderContext&) const
 	{
 		mCurrentFramebuffer = (mCurrentFramebuffer + 1) % mFramebuffers.GetSize();
-		return mFramebuffers[mCurrentFramebuffer].get();
+		return mFramebuffers[mCurrentFramebuffer].Get();
 	}
 }

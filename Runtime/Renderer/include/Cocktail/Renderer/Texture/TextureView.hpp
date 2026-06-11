@@ -24,7 +24,7 @@ namespace Ck::Renderer
 	     * \brief Get the underling Texture
 	     * \return The underlying Texture
 		 */
-		virtual std::shared_ptr<Texture> GetTexture() const = 0;
+		virtual SharedPtr<Texture> GetTexture() const = 0;
 		
 		/**
 		 * \brief Get the format used to interpret Texture data

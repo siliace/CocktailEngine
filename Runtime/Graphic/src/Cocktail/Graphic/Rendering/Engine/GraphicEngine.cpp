@@ -54,8 +54,8 @@ namespace Ck
 
 		mRenderContext = mRenderDevice->CreateRenderContext({ 3, "" });
 
-		mResourceUploader = std::make_shared<ResourceUploader>();
-		mMaterialProgramManager = std::make_shared<MaterialProgramManager>(mRenderDevice.Get());
+		mResourceUploader = MakeShared<ResourceUploader>();
+		mMaterialProgramManager = MakeShared<MaterialProgramManager>(mRenderDevice.Get());
 	}
 
     GraphicEngine::~GraphicEngine()
@@ -64,30 +64,30 @@ namespace Ck
 		mRenderContext->Synchronize();
     }
 
-    std::shared_ptr<VertexBuffer> GraphicEngine::CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable, const AnsiChar* name)
+    SharedPtr<VertexBuffer> GraphicEngine::CreateVertexBuffer(SharedPtr<VertexArray> vertices, bool updatable, const AnsiChar* name)
     {
-		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>(shared_from_this(), std::move(vertices), name);
+		SharedPtr<VertexBuffer> vertexBuffer = MakeShared<VertexBuffer>(AsShared(), std::move(vertices), name);
 		vertexBuffer->Upload();
 
 		return vertexBuffer;
 	}
 
-	std::shared_ptr<IndexBuffer> GraphicEngine::CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable, const AnsiChar* name)
+	SharedPtr<IndexBuffer> GraphicEngine::CreateIndexBuffer(SharedPtr<IndexArray> indices, bool updatable, const AnsiChar* name)
 	{
-		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(shared_from_this(), std::move(indices), name);
+		SharedPtr<IndexBuffer> indexBuffer = MakeShared<IndexBuffer>(AsShared(), std::move(indices), name);
 		indexBuffer->Upload();
 
 		return indexBuffer;
 	}
 
-    std::shared_ptr<StorageBuffer> GraphicEngine::CreateStorageBuffer(std::size_t size, bool updatable, const AnsiChar* name)
+    SharedPtr<StorageBuffer> GraphicEngine::CreateStorageBuffer(std::size_t size, bool updatable, const AnsiChar* name)
     {
-	    return std::make_shared<StorageBuffer>(shared_from_this(), size, name);
+	    return MakeShared<StorageBuffer>(AsShared(), size, name);
     }
 
-    std::shared_ptr<TextureResource> GraphicEngine::CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name)
+    SharedPtr<TextureResource> GraphicEngine::CreateTextureSampler(SharedPtr<MipMaps> mipMaps, const AnsiChar* name)
 	{
-		std::shared_ptr<MipMapsTextureResource> textureResource = std::make_shared<MipMapsTextureResource>(shared_from_this(), mipMaps, name);
+		SharedPtr<MipMapsTextureResource> textureResource = MakeShared<MipMapsTextureResource>(AsShared(), mipMaps, name);
 		for (unsigned int layer = 0; layer < mipMaps->GetArrayLayerCount(); layer++)
 			textureResource->LoadLevels(layer, 0, mipMaps->GetMipMapCount() - 1);
 
@@ -97,12 +97,12 @@ namespace Ck
 		return textureResource;
 	}
 
-	void GraphicEngine::UploadBuffer(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
+	void GraphicEngine::UploadBuffer(SharedPtr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data)
 	{
 		mResourceUploader->RequestBufferUpload(buffer, offset, length, data);
 	}
 
-	void GraphicEngine::UploadTexture(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
+	void GraphicEngine::UploadTexture(SharedPtr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data)
 	{
 		mResourceUploader->RequestTextureUpload(texture, arrayLayer, mipMapLevel, data);
 	}
@@ -127,7 +127,7 @@ namespace Ck
 			Renderer::CommandList* commandList = mRenderContext->CreateCommandList({ Renderer::CommandListUsageBits::Graphic });
 
 			commandList->Begin(nullptr);
-			for (std::shared_ptr<TextureResource> generatingMipMap : mGeneratingMipMaps)
+			for (SharedPtr<TextureResource> generatingMipMap : mGeneratingMipMaps)
 				generatingMipMap->GenerateMipMaps(*commandList);
 			commandList->End();
 
@@ -148,12 +148,12 @@ namespace Ck
 		return mRenderDevice.Get();
 	}
 
-	std::shared_ptr<Renderer::RenderContext> GraphicEngine::GetRenderContext() const
+	SharedPtr<Renderer::RenderContext> GraphicEngine::GetRenderContext() const
 	{
 		return mRenderContext;
 	}
 
-	std::shared_ptr<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const
+	SharedPtr<MaterialProgramManager> GraphicEngine::GetMaterialProgramManager() const
 	{
 		return mMaterialProgramManager;
 	}

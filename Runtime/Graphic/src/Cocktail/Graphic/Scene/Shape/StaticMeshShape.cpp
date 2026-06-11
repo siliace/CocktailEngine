@@ -2,7 +2,7 @@
 
 namespace Ck
 {
-    StaticMeshShape::StaticMeshShape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials) :
+    StaticMeshShape::StaticMeshShape(GraphicEngine& graphicEngine, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials) :
         mMesh(std::move(mesh))
     {
         mMaterials.reserve(materials.GetSize());
@@ -15,10 +15,10 @@ namespace Ck
         {
             unsigned int materialIndex = subMesh.MaterialIndex;
 
-            std::shared_ptr<Material> material = materials[materialIndex];
+            SharedPtr<Material> material = materials[materialIndex];
 
             mMaterials.insert(material);
-            mGeometries[material.get()].Add({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
+            mGeometries[material.Get()].Add({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
         }
     }
 
@@ -39,9 +39,9 @@ namespace Ck
         recordInfo.VertexBufferCount = 1;
         recordInfo.VertexBuffers[0].Buffer = mVertexBuffer->GetUnderlyingResource();
         recordInfo.VertexBuffers[0].Offset = 0;
-        recordInfo.VertexBuffers[0].VertexLayout = mVertexBuffer->GetVertexArray()->GetVertexLayout().get();
+        recordInfo.VertexBuffers[0].VertexLayout = mVertexBuffer->GetVertexArray()->GetVertexLayout().Get();
 
-        for (const std::shared_ptr<Material>& material : mMaterials)
+        for (const SharedPtr<Material>& material : mMaterials)
         {
             if (material->GetAlphaMode() == Material::AlphaMode::Opaque && queue.GetBlendingMode() == RenderQueue::BlendingMode::Transparent)
                 continue;
@@ -58,11 +58,11 @@ namespace Ck
             recordInfo.MaterialRoughness = material->GetParameters().Roughness;
             for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
             {
-                if (std::shared_ptr<TextureResource> texture = material->GetTexture(textureType))
+                if (SharedPtr<TextureResource> texture = material->GetTexture(textureType))
                     recordInfo.MaterialTextures[textureType] = texture->GetView();
             }
 
-            mGeometries.TryGet(material.get()).Then([&](const Array<Geometry>& geometries) {
+            mGeometries.TryGet(material.Get()).Then([&](const Array<Geometry>& geometries) {
                 for (const Geometry& geometry : geometries)
                 {
                     recordInfo.Count = geometry.Count;
@@ -77,8 +77,8 @@ namespace Ck
 
     void StaticMeshShape::ExtendBoundingVolume(Volume<float>& volume)
     {
-        std::shared_ptr<VertexArray> vertices = mVertexBuffer->GetVertexArray();
-        const std::shared_ptr<VertexLayout>& vertexLayout = vertices->GetVertexLayout();
+        SharedPtr<VertexArray> vertices = mVertexBuffer->GetVertexArray();
+        const SharedPtr<VertexLayout>& vertexLayout = vertices->GetVertexLayout();
 
         const VertexAttribute* positionAttribute = vertexLayout->FindAttribute(VertexAttributeSemantic::Position);
         if (positionAttribute)

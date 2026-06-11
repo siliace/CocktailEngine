@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	OrthographicCamera* OrthographicCamera::Create(std::shared_ptr<Scene> scene, String name, const Rectangle<float>& area, Vector2<float> zBounds)
+	OrthographicCamera* OrthographicCamera::Create(SharedPtr<Scene> scene, String name, const Rectangle<float>& area, Vector2<float> zBounds)
 	{
 		TransformationNode* transformationNode = scene->CreateTransformationNode();
 

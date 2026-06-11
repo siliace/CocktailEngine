@@ -4,7 +4,7 @@
 
 namespace Ck
 {
-	Scene::Scene(std::shared_ptr<GraphicEngine> graphicEngine) :
+	Scene::Scene(SharedPtr<GraphicEngine> graphicEngine) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
 		mTransformationGraph = MakeUnique<TransformationGraph>();
@@ -96,7 +96,7 @@ namespace Ck
 	    return mLights;
     }
 
-    std::shared_ptr<GraphicEngine> Scene::GetGraphicEngine() const
+    SharedPtr<GraphicEngine> Scene::GetGraphicEngine() const
 	{
 		return mGraphicEngine;
 	}

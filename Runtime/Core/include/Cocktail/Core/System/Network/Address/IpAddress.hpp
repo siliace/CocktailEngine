@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESS_HPP
 #define COCKTAIL_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESS_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/String.hpp>
 
 namespace Ck

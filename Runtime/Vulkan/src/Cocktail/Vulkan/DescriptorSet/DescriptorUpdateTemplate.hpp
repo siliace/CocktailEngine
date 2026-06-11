@@ -54,7 +54,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		VkDescriptorUpdateTemplateKHR mHandle;
 		const VkAllocationCallbacks* mAllocationCallbacks;
-		std::shared_ptr<DescriptorSetLayout> mDescriptorSetLayout;
+		SharedPtr<DescriptorSetLayout> mDescriptorSetLayout;
 	};
 }
 

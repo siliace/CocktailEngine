@@ -5,25 +5,25 @@
 
 namespace Ck::Vulkan
 {
-	AttachmentBuffer::AttachmentBuffer(RenderDevice& renderDevice, std::shared_ptr<TextureView> resolveAttachment, Renderer::RasterizationSamples samples) :
+	AttachmentBuffer::AttachmentBuffer(RenderDevice& renderDevice, SharedPtr<TextureView> resolveAttachment, Renderer::RasterizationSamples samples) :
 		mResolveAttachments(std::move(resolveAttachment))
 	{
 		if (samples == Renderer::RasterizationSamples::e1)
 			return;
 		
-		std::shared_ptr<AbstractTexture> texture = std::static_pointer_cast<AbstractTexture>(mResolveAttachments->GetTexture());
+		SharedPtr<AbstractTexture> texture = mResolveAttachments->GetTexture().StaticCast<AbstractTexture>();
 		Extent3D<unsigned int> textureSize = texture->GetSize();
 
 		RenderBufferCreateInfo renderBufferCreateInfo;
 		renderBufferCreateInfo.Format = texture->GetFormat();
 		renderBufferCreateInfo.Size = MakeExtent(textureSize.Width, textureSize.Height);
 		renderBufferCreateInfo.Samples = samples;
-		std::shared_ptr<RenderBuffer> renderBuffer = renderDevice.CreateRenderBuffer(renderBufferCreateInfo);
+		SharedPtr<RenderBuffer> renderBuffer = renderDevice.CreateRenderBuffer(renderBufferCreateInfo);
 
 		Renderer::TextureViewCreateInfo viewCreateInfo;
 		viewCreateInfo.Texture = renderBuffer;
 		viewCreateInfo.Type = Renderer::TextureViewType::e2D;
-		mMultisampleAttachment = std::static_pointer_cast<TextureView>(renderDevice.CreateTextureView(viewCreateInfo));
+		mMultisampleAttachment = renderDevice.CreateTextureView(viewCreateInfo).StaticCast<TextureView>();
 	}
 
 	bool AttachmentBuffer::IsMultisample() const
@@ -31,12 +31,12 @@ namespace Ck::Vulkan
 		return mMultisampleAttachment != nullptr;
 	}
 
-	std::shared_ptr<TextureView> AttachmentBuffer::GetMultisampleAttachment() const
+	SharedPtr<TextureView> AttachmentBuffer::GetMultisampleAttachment() const
 	{
 		return mMultisampleAttachment;
 	}
 
-	std::shared_ptr<TextureView> AttachmentBuffer::GetResolveAttachment() const
+	SharedPtr<TextureView> AttachmentBuffer::GetResolveAttachment() const
 	{
 		return mResolveAttachments;
 	}

@@ -61,12 +61,12 @@ namespace Ck::Vulkan
 		mSubmitters[commandQueue]->NextSubmit();
 	}
 
-	void RenderContext::SignalFence(Renderer::CommandQueueType commandQueue, std::shared_ptr<Fence> fence)
+	void RenderContext::SignalFence(Renderer::CommandQueueType commandQueue, SharedPtr<Fence> fence)
 	{
 		mSubmitters[commandQueue]->SignalFence(std::move(fence));
 	}
 
-	void RenderContext::SignalSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore)
+	void RenderContext::SignalSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore)
 	{
 		mSubmitters[commandQueue]->SignalSemaphore(std::move(semaphore));
 	}
@@ -100,7 +100,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	void RenderContext::WaitSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
+	void RenderContext::WaitSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
 	{
 		mSubmitters[commandQueue]->WaitExternalSemaphore(std::move(semaphore), waitStages);
 	}

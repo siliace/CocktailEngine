@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 		{
 			mTextureCount = swapchainImageCount;
 			for (unsigned int i = 0; i < mTextureCount; i++)
-				mTextures[i] = std::make_shared<SwapchainTexture>(mRenderDevice, createInfo.Format, createInfo.Size, swapchainImages[i]);
+				mTextures[i] = MakeShared<SwapchainTexture>(mRenderDevice, createInfo.Format, createInfo.Size, swapchainImages[i]);
 		}
 
 	    mSize = createInfo.Size;
@@ -114,7 +114,7 @@ namespace Ck::Vulkan
 		return mTextureCount;
 	}
 
-	std::shared_ptr<SwapchainTexture> Swapchain::GetTexture(unsigned int index) const
+	SharedPtr<SwapchainTexture> Swapchain::GetTexture(unsigned int index) const
 	{
 		if (index >= mTextureCount)
 			return nullptr;

@@ -42,7 +42,7 @@ namespace Ck::Vulkan
 
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-				mState.ShaderStages[shaderType].Shader = mShaderStages[shaderType].get();
+				mState.ShaderStages[shaderType].Shader = mShaderStages[shaderType].Get();
 		}
 	}
 
@@ -236,7 +236,7 @@ namespace Ck::Vulkan
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
 	}
 
-	void GraphicStateManager::SetRenderPass(const std::shared_ptr<RenderPass>& renderPass)
+	void GraphicStateManager::SetRenderPass(const SharedPtr<RenderPass>& renderPass)
 	{
 		assert(renderPass);
 
@@ -287,7 +287,7 @@ namespace Ck::Vulkan
 		mIndexBufferBinding = {};
 	}
 
-	std::shared_ptr<Pipeline> GraphicStateManager::CompilePipeline()
+	SharedPtr<Pipeline> GraphicStateManager::CompilePipeline()
 	{
 		assert(mShaderProgram);
 		assert(mRenderPass);

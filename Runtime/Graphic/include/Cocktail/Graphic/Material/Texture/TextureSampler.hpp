@@ -28,9 +28,9 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<MipMaps> mMipMaps;
+		SharedPtr<MipMaps> mMipMaps;
 		bool mGenerateMipMaps;
-		std::shared_ptr<TextureResource> mTextureResource;
+		SharedPtr<TextureResource> mTextureResource;
 	};
 }
 

@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 		 * \param createInfo 
 		 * \param allocationCallbacks 
 		 */
-		Framebuffer(RenderDevice* renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+		Framebuffer(RenderDevice* renderDevice, SharedPtr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
 
 		/**
 		 * \brief 
@@ -58,14 +58,14 @@ namespace Ck::Vulkan
 		 * \param index
 		 * \return
 		 */
-		std::shared_ptr<Renderer::TextureView> GetColorMultisampleAttachment(unsigned index) const;
+		SharedPtr<Renderer::TextureView> GetColorMultisampleAttachment(unsigned index) const;
 
 		/**
 		 * \brief 
 		 * \param index 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::TextureView> GetColorAttachment(unsigned index) const override;
+		SharedPtr<Renderer::TextureView> GetColorAttachment(unsigned index) const override;
 
 		/**
 		 * \brief 
@@ -77,19 +77,19 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<Renderer::TextureView> GetDepthStencilMultisampleAttachment() const;
+		SharedPtr<Renderer::TextureView> GetDepthStencilMultisampleAttachment() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::TextureView> GetDepthStencilAttachment() const override;
+		SharedPtr<Renderer::TextureView> GetDepthStencilAttachment() const override;
 
 		/**
 		 * \brief
 		 * \return 
 		 */
-		std::shared_ptr<RenderPass> GetRenderPass() const;
+		SharedPtr<RenderPass> GetRenderPass() const;
 
 		/**
 		 * \brief 
@@ -100,7 +100,7 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		std::shared_ptr<RenderPass> mRenderPass;
+		SharedPtr<RenderPass> mRenderPass;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkFramebuffer mHandle;
 		Extent3D<unsigned int> mSize;

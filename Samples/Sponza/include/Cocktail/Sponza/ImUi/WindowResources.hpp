@@ -25,8 +25,8 @@ namespace Ck::ImUi
 
         bool mNeedInitialization;
         ByteArray mFontTexturePixels;
-        std::shared_ptr<Renderer::Texture> mFontTexture;
-        std::shared_ptr<Renderer::TextureView> mFontTextureView;
+        SharedPtr<Renderer::Texture> mFontTexture;
+        SharedPtr<Renderer::TextureView> mFontTextureView;
     };
 }
 

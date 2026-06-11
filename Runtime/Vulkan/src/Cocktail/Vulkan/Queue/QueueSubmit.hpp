@@ -28,19 +28,19 @@ namespace Ck::Vulkan
 		 * \param semaphore
 		 * \param pipelineWaitStages
 		 */
-		void WaitSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages);
+		void WaitSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages);
 
 		/**
 		 * \brief Add a command lists to be executed when this submit will be sent to a queue
 		 * \param commandList
 		 */
-		void ExecuteCommandList(std::shared_ptr<CommandList> commandList);
+		void ExecuteCommandList(SharedPtr<CommandList> commandList);
 
 		/**
 		 * \brief Add a Semaphore to be waited when this submit will be sent to a queue
 		 * \param semaphore
 		 */
-		void SignalSemaphore(std::shared_ptr<Semaphore> semaphore);
+		void SignalSemaphore(SharedPtr<Semaphore> semaphore);
 
 		/**
 		 * \brief
@@ -77,14 +77,14 @@ namespace Ck::Vulkan
 	private:
 
 		unsigned int mWaitSemaphoreCount;
-		std::shared_ptr<Semaphore> mWaitSemaphores[MaxWaitSemaphore];
+		SharedPtr<Semaphore> mWaitSemaphores[MaxWaitSemaphore];
 		VkPipelineStageFlags mPipelineWaitStages[MaxWaitSemaphore];
 
 		unsigned int mCommandListCount;
-		std::shared_ptr<CommandList> mCommandLists[MaxCommandList];
+		SharedPtr<CommandList> mCommandLists[MaxCommandList];
 
 		unsigned int mSignalSemaphoreCount;
-		std::shared_ptr<Semaphore> mSignalSemaphores[MaxWaitSemaphore];
+		SharedPtr<Semaphore> mSignalSemaphores[MaxWaitSemaphore];
 	};
 }
 

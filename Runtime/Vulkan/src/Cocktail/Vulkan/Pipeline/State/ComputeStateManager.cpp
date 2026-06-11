@@ -22,7 +22,7 @@ namespace Ck::Vulkan
 			StateManager::SetShaderProgram(mShaderProgram);
 
 			mDirtyFlags |= DirtyFlagBits::Pipeline;
-			mState.ComputeStageState.Shader = mShaderStages[Renderer::ShaderType::Compute].get();
+			mState.ComputeStageState.Shader = mShaderStages[Renderer::ShaderType::Compute].Get();
 		}
 	}
 
@@ -32,7 +32,7 @@ namespace Ck::Vulkan
 		mState.ComputeStageState.EntryPoint = name;
 	}
 
-	std::shared_ptr<Pipeline> ComputeStateManager::CompilePipeline()
+	SharedPtr<Pipeline> ComputeStateManager::CompilePipeline()
 	{
 		assert(mShaderProgram);
 

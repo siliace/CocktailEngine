@@ -14,7 +14,7 @@ namespace Ck::Vulkan
 	{
 		mBindPoint = createInfo.BindPoint;
 
-		Array<VkDescriptorSetLayout> descriptorSetLayoutHandles = mDescriptorSetLayouts.Transform([](std::shared_ptr<DescriptorSetLayout> descriptorSetLayout) {
+		Array<VkDescriptorSetLayout> descriptorSetLayoutHandles = mDescriptorSetLayouts.Transform([](SharedPtr<DescriptorSetLayout> descriptorSetLayout) {
 			return descriptorSetLayout->GetHandle();
 		});
 
@@ -51,7 +51,7 @@ namespace Ck::Vulkan
 
 		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::DescriptorUpdateTemplate))
 		{
-			mUpdateTemplates = mDescriptorSetLayouts.Transform([&](std::shared_ptr<DescriptorSetLayout> descriptorSetLayout, unsigned int index) -> std::shared_ptr<DescriptorUpdateTemplate> {
+			mUpdateTemplates = mDescriptorSetLayouts.Transform([&](SharedPtr<DescriptorSetLayout> descriptorSetLayout, unsigned int index) -> SharedPtr<DescriptorUpdateTemplate> {
 				if (descriptorSetLayout->GetDescriptorCount() == 0)
 					return nullptr;
 
@@ -94,7 +94,7 @@ namespace Ck::Vulkan
 		return mDescriptorSetLayouts.GetSize();
 	}
 
-	std::shared_ptr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(unsigned int set) const
+	SharedPtr<DescriptorSetLayout> PipelineLayout::GetDescriptorSetLayout(unsigned int set) const
 	{
 		if (set >= mDescriptorSetLayouts.GetSize())
 			return nullptr;
@@ -102,12 +102,12 @@ namespace Ck::Vulkan
 		return mDescriptorSetLayouts[set];
 	}
 
-	const Array<std::shared_ptr<DescriptorSetLayout>>& PipelineLayout::GetDescriptorSetLayouts()
+	const Array<SharedPtr<DescriptorSetLayout>>& PipelineLayout::GetDescriptorSetLayouts()
 	{
 		return mDescriptorSetLayouts;
 	}
 
-	std::shared_ptr<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
+	SharedPtr<DescriptorUpdateTemplate> PipelineLayout::GetDescriptorUpdateTemplate(unsigned int set) const
 	{
 		if (set >= mUpdateTemplates.GetSize())
 			return nullptr;

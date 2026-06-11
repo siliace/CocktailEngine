@@ -49,7 +49,7 @@ namespace Ck::Vulkan
 		 * \param semaphore
 		 * \param pipelineWaitStages
 		 */
-		void WaitSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages);
+		void WaitSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags pipelineWaitStages);
 
 		/**
 		 * \brief
@@ -62,13 +62,13 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \param semaphore
 		 */
-		void SignalSemaphore(std::shared_ptr<Semaphore> semaphore);
+		void SignalSemaphore(SharedPtr<Semaphore> semaphore);
 
 		/**
 		 * \brief
 		 * \param fence
 		 */
-		void AssignFence(std::shared_ptr<Fence> fence);
+		void AssignFence(SharedPtr<Fence> fence);
 
 		/**
 		 * \brief
@@ -108,7 +108,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		Renderer::CommandQueueType mQueue;
 		unsigned int mQueueIndex;
-		std::shared_ptr<Fence> mFence;
+		SharedPtr<Fence> mFence;
 		unsigned int mSubmitCount;
 		QueueSubmit mSubmits[MaxSubmit];
 		QueueSubmit* mCurrentSubmit;

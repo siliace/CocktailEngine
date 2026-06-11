@@ -21,7 +21,7 @@ namespace Ck
 		 * \param parameters 
 		 * \param vSync 
 		 */
-		WindowSceneViewer(std::shared_ptr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync);
+		WindowSceneViewer(SharedPtr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync);
 
 	protected:
 
@@ -34,7 +34,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<Renderer::RenderSurface> mRenderSurface;
+		SharedPtr<Renderer::RenderSurface> mRenderSurface;
 	};
 }
 

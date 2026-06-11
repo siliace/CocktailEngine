@@ -53,7 +53,7 @@ namespace Ck::Vulkan
 
 		for (unsigned int i = 0; i < createInfo.ShaderCount; i++)
 		{
-			std::shared_ptr<Shader> shader = std::static_pointer_cast<Shader>(createInfo.Shaders[i]);
+			SharedPtr<Shader> shader = createInfo.Shaders[i].StaticCast<Shader>();
 			if (!shader)
 				continue;
 
@@ -83,7 +83,7 @@ namespace Ck::Vulkan
 		return mType;
 	}
 
-	std::shared_ptr<Renderer::Shader> ShaderProgram::GetStage(Renderer::ShaderType type) const
+	SharedPtr<Renderer::Shader> ShaderProgram::GetStage(Renderer::ShaderType type) const
 	{
 		return mShaders[type];
 	}
@@ -119,7 +119,7 @@ namespace Ck::Vulkan
 	    return slotAvailable;
     }
 
-    std::shared_ptr<PipelineLayout> ShaderProgram::GetPipelineLayout() const
+    SharedPtr<PipelineLayout> ShaderProgram::GetPipelineLayout() const
 	{
 		return mPipelineLayout;
 	}
@@ -151,7 +151,7 @@ namespace Ck::Vulkan
 
 		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
 		{
-			std::shared_ptr<Shader> shader = mShaders[shaderType];
+			SharedPtr<Shader> shader = mShaders[shaderType];
 			if (!shader)
 				continue;
 
@@ -212,7 +212,7 @@ namespace Ck::Vulkan
 			layoutCreateInfo.BindingCount = layoutBindings.GetSize();
 			layoutCreateInfo.Bindings = layoutBindings.GetData();
 
-			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mRenderDevice->CreateDescriptorSetLayout(layoutCreateInfo);
+			SharedPtr<DescriptorSetLayout> descriptorSetLayout = mRenderDevice->CreateDescriptorSetLayout(layoutCreateInfo);
 			pipelineLayoutCreateInfo.DescriptorSetLayouts.Add(descriptorSetLayout);
 		}
 
@@ -223,7 +223,7 @@ namespace Ck::Vulkan
 	{
 		for (unsigned int i = 0; i < mPipelineLayout->GetDescriptorSetLayoutCount(); i++)
 		{
-			std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
+			SharedPtr<DescriptorSetLayout> descriptorSetLayout = mPipelineLayout->GetDescriptorSetLayout(i);
 
 			for (const DescriptorSetLayoutBinding& binding : descriptorSetLayout->GetBindings())
 			{
@@ -232,7 +232,7 @@ namespace Ck::Vulkan
 				Array<BlockMember> members;
 				for (Renderer::ShaderType type : Enum<Renderer::ShaderType>::Values)
 				{
-					std::shared_ptr<Shader> shader = mShaders[type];
+					SharedPtr<Shader> shader = mShaders[type];
 					if (!shader)
 						continue;
 

@@ -18,7 +18,7 @@ namespace Ck
 
     void SceneViewer::Render()
 	{
-		std::shared_ptr<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
+		SharedPtr<GraphicEngine> graphicEngine = mScene->GetGraphicEngine();
 		Renderer::Framebuffer* framebuffer = AcquireNextFramebuffer(*graphicEngine->GetRenderContext());
 		if (!framebuffer)
 			return;
@@ -119,7 +119,7 @@ namespace Ck
 		mOnRendered.Emit(*graphicEngine->GetRenderContext(), *framebuffer);
 	}
 
-	SceneViewer::SceneViewer(std::shared_ptr<Scene> scene) :
+	SceneViewer::SceneViewer(SharedPtr<Scene> scene) :
 		mScene(std::move(scene)),
 		mDrawContext(*mScene->GetGraphicEngine()->GetRenderContext())
 	{
@@ -127,7 +127,7 @@ namespace Ck
 		mBlendingRenderQueue = MakeUnique<RenderQueue>(mScene->GetGraphicEngine()->GetMaterialProgramManager(), RenderQueue::BlendingMode::Transparent);
 	}
 
-	std::shared_ptr<Scene> SceneViewer::GetScene() const
+	SharedPtr<Scene> SceneViewer::GetScene() const
 	{
 		return mScene;
 	}

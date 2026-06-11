@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_RENDERER_RENDERTARGET_FRAMEBUFFER_HPP
 #define COCKTAIL_RENDERER_RENDERTARGET_FRAMEBUFFER_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/Extent3D.hpp>
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 #include <Cocktail/Renderer/RenderDeviceObject.hpp>
@@ -42,7 +41,7 @@ namespace Ck::Renderer
          * \param index
          * \return
          */
-        virtual std::shared_ptr<TextureView> GetColorAttachment(unsigned int index) const = 0;
+        virtual SharedPtr<TextureView> GetColorAttachment(unsigned int index) const = 0;
 
         /**
          * \brief
@@ -54,7 +53,7 @@ namespace Ck::Renderer
          * \brief
          * \return
          */
-        virtual std::shared_ptr<TextureView> GetDepthStencilAttachment() const = 0;
+        virtual SharedPtr<TextureView> GetDepthStencilAttachment() const = 0;
     };
 }
 

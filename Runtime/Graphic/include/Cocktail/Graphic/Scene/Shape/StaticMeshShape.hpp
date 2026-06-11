@@ -30,7 +30,7 @@ namespace Ck
          * \param mesh The static mesh to render
          * \param materials The set of materials applied to the mesh
          */
-        StaticMeshShape(GraphicEngine& graphicEngine, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials);
+        StaticMeshShape(GraphicEngine& graphicEngine, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials);
 
         /**
          * \brief Submits the mesh geometries to the render queue
@@ -88,10 +88,10 @@ namespace Ck
             Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
         };
 
-        std::shared_ptr<Mesh> mMesh;
-        std::shared_ptr<VertexBuffer> mVertexBuffer;
-        std::shared_ptr<IndexBuffer> mIndexBuffer;
-        std::unordered_set<std::shared_ptr<Material>> mMaterials;
+        SharedPtr<Mesh> mMesh;
+        SharedPtr<VertexBuffer> mVertexBuffer;
+        SharedPtr<IndexBuffer> mIndexBuffer;
+        std::unordered_set<SharedPtr<Material>> mMaterials;
         HashMap<const Material*, Array<Geometry>> mGeometries;
     };
 }

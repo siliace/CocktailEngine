@@ -18,7 +18,7 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		std::shared_ptr<PipelineLayout> PipelineLayout;
+		SharedPtr<PipelineLayout> PipelineLayout;
 
 		/**
 		 * \brief Specifies the name of the Pipeline to create

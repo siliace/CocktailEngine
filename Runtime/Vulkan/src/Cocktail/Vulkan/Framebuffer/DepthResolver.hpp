@@ -37,7 +37,7 @@ namespace Ck::Vulkan
 		 * \param attachment
 		 * \param depthResolveMode 
 		 */
-		void Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<TextureView> multisampleAttachment, std::shared_ptr<TextureView> attachment, Renderer::ResolveMode depthResolveMode);
+		void Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, SharedPtr<TextureView> multisampleAttachment, SharedPtr<TextureView> attachment, Renderer::ResolveMode depthResolveMode);
 
 	private:
 
@@ -54,19 +54,19 @@ namespace Ck::Vulkan
 		 * \param shaderType 
 		 * \return 
 		 */
-		static std::shared_ptr<Shader> LoadShader(RenderDevice& renderDevice, const URI& uri, Renderer::ShaderType shaderType);
+		static SharedPtr<Shader> LoadShader(RenderDevice& renderDevice, const URI& uri, Renderer::ShaderType shaderType);
 
 		/**
 		 * \brief 
 		 * \param attachment 
 		 * \return 
 		 */
-		Framebuffer* GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment);
+		Framebuffer* GetOrCreateFramebuffer(SharedPtr<TextureView> attachment);
 
 		RenderDevice* mRenderDevice;
 		Renderer::UniformSlot* mDepthSamplerSlot;
-		std::shared_ptr<ShaderProgram> mShaderProgram;
-		HashMap<std::shared_ptr<TextureView>, std::shared_ptr<Framebuffer>> mFramebuffers;
+		SharedPtr<ShaderProgram> mShaderProgram;
+		HashMap<SharedPtr<TextureView>, SharedPtr<Framebuffer>> mFramebuffers;
 	};
 	
 }

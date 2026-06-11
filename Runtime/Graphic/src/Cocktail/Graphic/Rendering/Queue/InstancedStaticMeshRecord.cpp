@@ -1,6 +1,6 @@
 #include <Cocktail/Core/Math/Matrix/Matrix3.hpp>
-#include <Cocktail/Core/Utility/ObjectPool.hpp>
 
+#include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
 #include <Cocktail/Graphic/Rendering/Queue/InstancedStaticMeshRecord.hpp>
 
 #include <Cocktail/Renderer/RenderDevice.hpp>
@@ -44,7 +44,7 @@ namespace Ck
 
 	ObjectPool<InstancedStaticMeshRecord> InstancedStaticMeshRecord::sRecordPool;
 
-	std::shared_ptr<InstancedStaticMeshRecord> InstancedStaticMeshRecord::New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+	SharedPtr<InstancedStaticMeshRecord> InstancedStaticMeshRecord::New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
 	{
 		return sRecordPool.Allocate(recordInfo, materialProgramVariant);
 	}
@@ -82,7 +82,7 @@ namespace Ck
 		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
 		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 		{
-		    std::shared_ptr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
+		    SharedPtr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
 		    if (!textureView)
 		        continue;
 
@@ -90,7 +90,7 @@ namespace Ck
 		    if (slot == InvalidBindingSlot)
 		        continue;
 
-		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.get(), nullptr);
+		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.Get(), nullptr);
 		}
 
 	    drawContext.BindBuffer(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, mRecordInfo.InstancesBuffer);

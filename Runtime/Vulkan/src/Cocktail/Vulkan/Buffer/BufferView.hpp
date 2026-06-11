@@ -46,7 +46,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Buffer> GetBuffer() const override;
+		SharedPtr<Renderer::Buffer> GetBuffer() const override;
 
 		/**
 		 * \brief 
@@ -75,7 +75,7 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		std::shared_ptr<Buffer> mBuffer;
+		SharedPtr<Buffer> mBuffer;
 		PixelFormat mFormat;
 		std::size_t mOffset;
 		std::size_t mRange;

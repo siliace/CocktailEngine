@@ -1,9 +1,7 @@
 #ifndef COCKTAIL_VULKAN_TEXTURE_ABSTRACTTEXTURE_HPP
 #define COCKTAIL_VULKAN_TEXTURE_ABSTRACTTEXTURE_HPP
 
-#include <memory>
-
-#include <Cocktail/Core/Memory/UniquePtr.hpp>
+#include <Cocktail/Core/Memory/SharedFromThis.hpp>
 
 #include <Cocktail/Renderer/RasterizationSamples.hpp>
 #include <Cocktail/Renderer/Texture/Texture.hpp>
@@ -17,7 +15,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class AbstractTexture : public Renderer::Texture, public std::enable_shared_from_this<AbstractTexture>
+	class AbstractTexture : public Renderer::Texture, public SharedFromThis<AbstractTexture>
 	{
 	public:
 

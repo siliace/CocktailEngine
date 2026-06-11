@@ -18,7 +18,7 @@ namespace Ck
          * \brief Constructor
          * \param vertexLayout
          */
-        explicit VertexCache(std::shared_ptr<VertexLayout> vertexLayout) :
+        explicit VertexCache(SharedPtr<VertexLayout> vertexLayout) :
             mVertexLayout(std::move(vertexLayout)),
             mCurrentIndex(0)
         {
@@ -55,12 +55,12 @@ namespace Ck
          * \brief
          * \return
          */
-        std::shared_ptr<IndexArray> CreateIndexArray() const
+        SharedPtr<IndexArray> CreateIndexArray() const
         {
             const bool useShortIndices = mVertices.GetSize() < std::numeric_limits<Uint16>::max();
             const Renderer::IndexType indexType = useShortIndices ? Renderer::IndexType::Short : Renderer::IndexType::Integer;
 
-            std::shared_ptr<IndexArray> indices = std::make_shared<IndexArray>(indexType, mIndices.GetSize());
+            SharedPtr<IndexArray> indices = MakeShared<IndexArray>(indexType, mIndices.GetSize());
             for (std::size_t i = 0; i < mIndices.GetSize(); i++)
             {
                 IndexRef indexRef = indices->At(i);
@@ -82,16 +82,16 @@ namespace Ck
          * \brief
          * \return
          */
-        std::shared_ptr<VertexArray> CreateVertexArray() const
+        SharedPtr<VertexArray> CreateVertexArray() const
         {
-            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(mVertexLayout, mVertices.GetSize());
+            SharedPtr<VertexArray> vertices = MakeShared<VertexArray>(mVertexLayout, mVertices.GetSize());
             for (const auto& [vertex, index] : mVertices)
                 HydrateVertexRef(vertices->At(index), vertex);
 
             return vertices;
         }
 
-        std::shared_ptr<VertexLayout> GetVertexLayout() const
+        SharedPtr<VertexLayout> GetVertexLayout() const
         {
             return mVertexLayout;
         }
@@ -125,7 +125,7 @@ namespace Ck
 
     private:
 
-        std::shared_ptr<VertexLayout> mVertexLayout;
+        SharedPtr<VertexLayout> mVertexLayout;
         unsigned int mCurrentIndex;
         HashMap<T, unsigned int, Hasher, Equal> mVertices;
         Array<unsigned int> mIndices;

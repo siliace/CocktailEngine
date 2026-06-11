@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 	void StateManager::SetShaderProgram(const ShaderProgram* shaderProgram)
 	{
 		for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
-			mShaderStages[shaderType] = std::static_pointer_cast<Shader>(shaderProgram->GetStage(shaderType));
+			mShaderStages[shaderType] = shaderProgram->GetStage(shaderType).StaticCast<Shader>();
 	}
 
 	void StateManager::BindSampler(unsigned int set, unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler)
@@ -93,7 +93,7 @@ namespace Ck::Vulkan
 
 	void StateManager::UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int size, const void* data)
 	{
-		if (std::shared_ptr<Shader> shader = mShaderStages[shaderType])
+		if (SharedPtr<Shader> shader = mShaderStages[shaderType])
 		{
 			if (const PushConstantBlockInfo* pushConstantBlock = shader->GetPushConstantBlock(0))
 			{
@@ -144,7 +144,7 @@ namespace Ck::Vulkan
 		return pipelineConstantRange;
 	}
 
-	unsigned int StateManager::CompilePushDescriptors(std::shared_ptr<DescriptorSetLayout> setLayout, unsigned int set, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
+	unsigned int StateManager::CompilePushDescriptors(SharedPtr<DescriptorSetLayout> setLayout, unsigned int set, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes)
 	{
 		unsigned int descriptorWriteCount = 0;
 		if (IsDescriptorSetDirty(set))
@@ -160,7 +160,7 @@ namespace Ck::Vulkan
 		return descriptorWriteCount;
 	}
 
-	void StateManager::CompilePushDescriptorsWithTemplate(std::shared_ptr<DescriptorSetLayout> setLayout, std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned int set, unsigned char* descriptors)
+	void StateManager::CompilePushDescriptorsWithTemplate(SharedPtr<DescriptorSetLayout> setLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned int set, unsigned char* descriptors)
 	{
 		if (IsDescriptorSetDirty(set))
 		{
@@ -173,7 +173,7 @@ namespace Ck::Vulkan
 			mDirtyFlags &= ~DirtyFlagBits::DescriptorSet;
 	}
 
-	DescriptorSetRange StateManager::CompileDescriptorSets(std::shared_ptr<PipelineLayout> pipelineLayout, unsigned int set)
+	DescriptorSetRange StateManager::CompileDescriptorSets(SharedPtr<PipelineLayout> pipelineLayout, unsigned int set)
 	{
 		unsigned int descriptorSetCount = 0;
 		DescriptorSetRange range;
@@ -182,13 +182,13 @@ namespace Ck::Vulkan
 		{
 			mDescriptorSetDirtyFlags &= ~Bit(set);
 
-			const std::shared_ptr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
+			const SharedPtr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
 			if (setLayout->SupportPushDescriptor())
 				continue;
 
-			std::shared_ptr<DescriptorSet> descriptorSet;
+			SharedPtr<DescriptorSet> descriptorSet;
 			DescriptorSetStateManager& stateManager = mDescriptorSetStateManagers[set];
-			if (std::shared_ptr<DescriptorUpdateTemplate> descriptorUpdateTemplate = pipelineLayout->GetDescriptorUpdateTemplate(set))
+			if (SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate = pipelineLayout->GetDescriptorUpdateTemplate(set))
 			{
 				descriptorSet = stateManager.CompileSetWithTemplate(setLayout, descriptorUpdateTemplate);
 			}

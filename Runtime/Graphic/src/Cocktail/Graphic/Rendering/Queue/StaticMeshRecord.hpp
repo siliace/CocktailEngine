@@ -17,7 +17,7 @@ namespace Ck
 		 * \param recordInfo 
 		 * \return 
 		 */
-		static std::shared_ptr<StaticMeshRecord> New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
+		static SharedPtr<StaticMeshRecord> New(const StaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
 
 		/**
 		 * \brief 

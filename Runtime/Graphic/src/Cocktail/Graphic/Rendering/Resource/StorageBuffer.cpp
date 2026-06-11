@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-    StorageBuffer::StorageBuffer(const std::shared_ptr<GraphicEngine>& graphicEngine, std::size_t size, const AnsiChar* name) :
+    StorageBuffer::StorageBuffer(const SharedPtr<GraphicEngine>& graphicEngine, std::size_t size, const AnsiChar* name) :
         BufferResource(graphicEngine, Renderer::BufferUsageFlagBits::Storage, size, name)
     {
         /// Nothing
@@ -11,6 +11,6 @@ namespace Ck
 
     void StorageBuffer::Upload(std::size_t offset, std::size_t length, const void* data)
     {
-        GetGraphicEngine()->UploadBuffer(shared_from_this(), offset, length, data);
+        GetGraphicEngine()->UploadBuffer(AsShared(), offset, length, data);
     }
 }

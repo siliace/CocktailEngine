@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 		return mCurrentBatch->CreateDependency(waitDstStages);
 	}
 
-	void QueueSubmitter::SignalFence(std::shared_ptr<Fence> fence)
+	void QueueSubmitter::SignalFence(SharedPtr<Fence> fence)
 	{
 		if (!mCurrentBatch || mCurrentBatch && mCurrentBatch->HasFence())
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -36,7 +36,7 @@ namespace Ck::Vulkan
 		mScheduler->ConnectFence(mCurrentBatch, fence);
 	}
 
-	void QueueSubmitter::SignalSemaphore(std::shared_ptr<Semaphore> semaphore)
+	void QueueSubmitter::SignalSemaphore(SharedPtr<Semaphore> semaphore)
 	{
 		if (!mCurrentBatch)
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		mCurrentBatch->SignalSemaphore(semaphore);
 	}
 
-	void QueueSubmitter::WaitExternalSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
+	void QueueSubmitter::WaitExternalSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
 	{
 		if (!mCurrentBatch)
 			mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
@@ -74,7 +74,7 @@ namespace Ck::Vulkan
 		}
 
 		if (fence)
-			mScheduler->ConnectFence(mCurrentBatch, fence->shared_from_this());
+			mScheduler->ConnectFence(mCurrentBatch, fence->AsShared());
 
 		mCurrentBatch->ExecuteCommandLists(commandListCount, commandLists);
 	}

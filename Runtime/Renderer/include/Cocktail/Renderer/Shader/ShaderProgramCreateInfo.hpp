@@ -46,7 +46,7 @@ namespace Ck::Renderer
          * Every ShaderType must be compatible with the \p Type of the ShaderProgram to create
          * \see ProgramSupportShader
          */
-        std::shared_ptr<Shader> Shaders[Enum<ShaderType>::ValueCount];
+        SharedPtr<Shader> Shaders[Enum<ShaderType>::ValueCount];
 
         /**
          * \brief Specifies the number of static samplers

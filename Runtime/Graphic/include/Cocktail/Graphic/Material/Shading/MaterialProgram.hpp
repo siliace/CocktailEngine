@@ -37,7 +37,7 @@ namespace Ck
 
 		String mName;
 	    Material::ShadingMode mShadingMode;
-	    std::shared_ptr<MaterialProgramInterface> mInterface;
+	    SharedPtr<MaterialProgramInterface> mInterface;
 		HashMap<VariantKey, UniquePtr<MaterialProgramVariant>> mVariants;
 	};
 }

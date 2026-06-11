@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_CORE_LOG_LOGMANAGER_HPP
 #define COCKTAIL_CORE_LOG_LOGMANAGER_HPP
 
-#include <memory>
-
 #include <Cocktail/Core/Array.hpp>
 #include <Cocktail/Core/Enum.hpp>
 #include <Cocktail/Core/HashMap.hpp>

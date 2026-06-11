@@ -6,7 +6,7 @@ namespace Ck
 {
 	ObjectPool<CustomRecord> CustomRecord::sRecordPool;
 
-	std::shared_ptr<CustomRecord> CustomRecord::New(const CustomRecordInfo& recordInfo)
+	SharedPtr<CustomRecord> CustomRecord::New(const CustomRecordInfo& recordInfo)
 	{
 		return sRecordPool.Allocate(recordInfo);
 	}

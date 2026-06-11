@@ -150,13 +150,13 @@ namespace Ck
                 });
             }
 
-            std::shared_ptr<VertexLayout> vertexLayout = vertexLayoutBuilder.Get();
+            SharedPtr<VertexLayout> vertexLayout = vertexLayoutBuilder.Get();
 
             std::size_t vertexCount = 0;
             for (const auto& [attributeSemantic, accessor]: attributeAccessors)
                 vertexCount = std::max(vertexCount, accessor->count);
 
-            std::shared_ptr<VertexArray> vertices = std::make_shared<VertexArray>(vertexLayout, vertexCount);
+            SharedPtr<VertexArray> vertices = MakeShared<VertexArray>(vertexLayout, vertexCount);
             for (const auto& [attributeSemantic, accessor]: attributeAccessors)
             {
                 assert(accessor->count == vertexCount);
@@ -191,12 +191,12 @@ namespace Ck
                 }
             }
 
-            std::shared_ptr<IndexArray> indices;
+            SharedPtr<IndexArray> indices;
             if (primitive.indices != -1)
             {
                 const tinygltf::Accessor& indexAccessor = model.accessors[primitive.indices];
 
-                indices = std::make_shared<IndexArray>(GltfUtils::ConvertIndexType(indexAccessor.componentType), indexAccessor.count);
+                indices = MakeShared<IndexArray>(GltfUtils::ConvertIndexType(indexAccessor.componentType), indexAccessor.count);
 
                 const tinygltf::BufferView& bufferView = model.bufferViews[indexAccessor.bufferView];
                 const tinygltf::Buffer& buffer = model.buffers[bufferView.buffer];

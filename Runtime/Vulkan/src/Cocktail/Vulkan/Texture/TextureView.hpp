@@ -46,7 +46,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Renderer::Texture> GetTexture() const override;
+		SharedPtr<Renderer::Texture> GetTexture() const override;
 
 		/**
 		 * \brief 
@@ -63,7 +63,7 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		std::shared_ptr<AbstractTexture> mTexture;
+		SharedPtr<AbstractTexture> mTexture;
 		PixelFormat mFormat;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkImageView mHandle;

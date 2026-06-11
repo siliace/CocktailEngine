@@ -75,14 +75,14 @@ namespace Ck::Vulkan
 		 * \param commandQueue The command queue where signal the Fence
 		 * \param fence The fence to signal
 		 */
-		void SignalFence(Renderer::CommandQueueType commandQueue, std::shared_ptr<Fence> fence);
+		void SignalFence(Renderer::CommandQueueType commandQueue, SharedPtr<Fence> fence);
 
 		/**
 		 * \brief Add a Semaphore to be signaled by the current submit
 		 * \param commandQueue The command queue where signal the Semaphore
 		 * \param semaphore The Semaphore to signal
 		 */
-		void SignalSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore);
+		void SignalSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore);
 
 		/**
 		 * \brief 
@@ -97,7 +97,7 @@ namespace Ck::Vulkan
 		 * \param semaphore The Semaphore to wait
 		 * \param waitStages The pipeline stages blocked by the wait operation
 		 */
-		void WaitSemaphore(Renderer::CommandQueueType commandQueue, std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
+		void WaitSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
 
 		/**
 		 * \brief 

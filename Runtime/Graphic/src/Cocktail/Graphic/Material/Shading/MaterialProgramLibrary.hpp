@@ -39,7 +39,7 @@ namespace Ck
 			/**
 			 * \brief Specifies the interface of the program
 			 */
-			std::shared_ptr<MaterialProgramInterface> Interface;
+			SharedPtr<MaterialProgramInterface> Interface;
 
 			/**
 			 * \brief An array of binaries per shader stage

@@ -24,20 +24,20 @@ namespace Ck::Vulkan
 		 * \param createInfo
 		 * \return
 		 */
-		std::shared_ptr<ComputePipeline> CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
+		SharedPtr<ComputePipeline> CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief
 		 * \param createInfo
 		 * \return
 		 */
-		std::shared_ptr<GraphicPipeline> CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo);
+		SharedPtr<GraphicPipeline> CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo);
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<PipelineCache> GetCache() const;
+		SharedPtr<PipelineCache> GetCache() const;
 
 		/**
 		 * \brief 
@@ -48,9 +48,9 @@ namespace Ck::Vulkan
 	private:
 
 		RenderDevice* mRenderDevice;
-		HashMap<PipelineStateHash, std::shared_ptr<GraphicPipeline>> mGraphicPipelines;
-		HashMap<PipelineStateHash, std::shared_ptr<ComputePipeline>> mComputePipelines;
-		std::shared_ptr<PipelineCache> mCache;
+		HashMap<PipelineStateHash, SharedPtr<GraphicPipeline>> mGraphicPipelines;
+		HashMap<PipelineStateHash, SharedPtr<ComputePipeline>> mComputePipelines;
+		SharedPtr<PipelineCache> mCache;
 	};
 }
 

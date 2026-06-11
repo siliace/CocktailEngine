@@ -4,7 +4,7 @@ namespace Ck
 {
     MaterialProgramInterface::Builder::Builder()
     {
-        mInterface = std::make_shared<MaterialProgramInterface>();
+        mInterface = MakeShared<MaterialProgramInterface>();
     }
 
     MaterialProgramInterface::Builder& MaterialProgramInterface::Builder::SetVertexAttribute(VertexAttributeSemantic attribute, AsciiString name)
@@ -24,7 +24,7 @@ namespace Ck
         return *this;
     }
 
-    std::shared_ptr<MaterialProgramInterface> MaterialProgramInterface::Builder::Get() const
+    SharedPtr<MaterialProgramInterface> MaterialProgramInterface::Builder::Get() const
     {
         return mInterface;
     }

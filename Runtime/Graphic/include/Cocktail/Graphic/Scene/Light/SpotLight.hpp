@@ -21,7 +21,7 @@ namespace Ck
          * \param intensity
          * \return
          */
-        static SpotLight* Create(std::shared_ptr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
+        static SpotLight* Create(SharedPtr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
 
         /**
          * \brief

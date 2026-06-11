@@ -26,7 +26,7 @@ namespace Ck
 		 *
 		 * \return 
 		 */
-		static DirectionalLight* Create(std::shared_ptr<Scene> scene, String name, Vector3<float> direction, LinearColor color,  float intensity = 100.f);
+		static DirectionalLight* Create(SharedPtr<Scene> scene, String name, Vector3<float> direction, LinearColor color,  float intensity = 100.f);
 
 		/**
 		 * \brief

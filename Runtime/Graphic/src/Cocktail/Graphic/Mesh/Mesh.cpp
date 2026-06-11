@@ -4,7 +4,7 @@
 
 namespace Ck
 {
-	Mesh::Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Array<SubMesh> subMeshes) :
+	Mesh::Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Array<SubMesh> subMeshes) :
 		mVertices(std::move(vertices)),
 		mIndices(std::move(indices)),
 		mSubMeshes(std::move(subMeshes))
@@ -18,7 +18,7 @@ namespace Ck
 		GenerateBoundingBox();
 	}
 
-	Mesh::Mesh(std::shared_ptr<VertexArray> vertices, std::shared_ptr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology) :
+	Mesh::Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology) :
 		mVertices(std::move(vertices)),
 		mIndices(std::move(indices))
 	{
@@ -40,12 +40,12 @@ namespace Ck
 		return mIndices != nullptr;
 	}
 
-	const std::shared_ptr<VertexArray>& Mesh::GetVertices() const
+	const SharedPtr<VertexArray>& Mesh::GetVertices() const
 	{
 		return mVertices;
 	}
 
-	const std::shared_ptr<IndexArray>& Mesh::GetIndices() const
+	const SharedPtr<IndexArray>& Mesh::GetIndices() const
 	{
 		return mIndices;
 	}
@@ -67,7 +67,7 @@ namespace Ck
 
 	void Mesh::GenerateBoundingBox()
 	{
-		std::shared_ptr<VertexLayout> vertexLayout = mVertices->GetVertexLayout();
+		SharedPtr<VertexLayout> vertexLayout = mVertices->GetVertexLayout();
 		const VertexAttribute* positionAttribute = vertexLayout->FindAttribute(VertexAttributeSemantic::Position);
 		if (!positionAttribute)
 			return;

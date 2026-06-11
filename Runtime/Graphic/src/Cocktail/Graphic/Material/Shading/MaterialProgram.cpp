@@ -98,7 +98,7 @@ namespace Ck
 			shaderProgramCreateInfo.StaticSamplerCount = staticSamplers.GetSize();
 			shaderProgramCreateInfo.StaticSamplers = staticSamplers.GetData();
 
-			std::shared_ptr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
+			SharedPtr<Renderer::ShaderProgram> shaderProgram = renderDevice->CreateShaderProgram(shaderProgramCreateInfo);
 			UniquePtr<MaterialProgramVariant> variant = MakeUnique<MaterialProgramVariant>(createInfo.Interface, std::move(shaderProgram));
 
 			Flags<VertexAttributeSemantic> vertexAttributes;

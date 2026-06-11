@@ -12,8 +12,8 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<VertexArray> mVertices;
-		std::shared_ptr<IndexArray> mIndices;
+		SharedPtr<VertexArray> mVertices;
+		SharedPtr<IndexArray> mIndices;
 	};
 }
 

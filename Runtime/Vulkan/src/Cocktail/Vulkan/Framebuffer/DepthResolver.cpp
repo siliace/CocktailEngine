@@ -20,31 +20,31 @@ namespace Ck::Vulkan
 		shaderProgramCreateInfo.Shaders[0] = LoadShader(*mRenderDevice, CK_TEXT("builtin://vulkan/resources/depth_resolve.vert.spv"), Renderer::ShaderType::Vertex);
 		shaderProgramCreateInfo.Shaders[1] = LoadShader(*mRenderDevice, CK_TEXT("builtin://vulkan/resources/depth_resolve.frag.spv"), Renderer::ShaderType::Fragment);
 
-		mShaderProgram = std::static_pointer_cast<ShaderProgram>(mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo));
+		mShaderProgram = mRenderDevice->CreateShaderProgram(shaderProgramCreateInfo).StaticCast<ShaderProgram>();
 
 		mDepthSamplerSlot = mShaderProgram->FindUniformSlot("inTexture");
 		assert(mDepthSamplerSlot);
 	}
 
-	void DepthResolver::Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, std::shared_ptr<TextureView> multisampleAttachment, std::shared_ptr<TextureView> attachment, Renderer::ResolveMode depthResolveMode)
+	void DepthResolver::Resolve(CommandList& commandList, Renderer::RenderPassMode renderPassMode, SharedPtr<TextureView> multisampleAttachment, SharedPtr<TextureView> attachment, Renderer::ResolveMode depthResolveMode)
 	{
 		Renderer::RenderPassBeginInfo renderPassBeginInfo;
 		renderPassBeginInfo.Mode = renderPassMode;
 		renderPassBeginInfo.Framebuffer = GetOrCreateFramebuffer(attachment);
 		renderPassBeginInfo.DepthClearValue = 1.f;
 
-		std::shared_ptr<AbstractTexture> multisampleTexture = std::static_pointer_cast<AbstractTexture>(multisampleAttachment->GetTexture());
+		SharedPtr<AbstractTexture> multisampleTexture = multisampleAttachment->GetTexture().StaticCast<AbstractTexture>();
 		assert(multisampleTexture->GetSamples() != Renderer::RasterizationSamples::e1);
 
 		Renderer::GpuBarrier preBarriers[] = {
-			Renderer::GpuBarrier::Of(multisampleTexture.get(), Renderer::ResourceState::FramebufferAttachment, Renderer::ResourceState::GraphicShaderResource, Renderer::TextureSubResource::All(*multisampleTexture)),
+			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::FramebufferAttachment, Renderer::ResourceState::GraphicShaderResource, Renderer::TextureSubResource::All(*multisampleTexture)),
 		};
 		commandList.Barrier(1, preBarriers);
 
 		commandList.BeginRenderPass(renderPassBeginInfo);
 
-		commandList.BindShaderProgram(mShaderProgram.get());
-		commandList.BindTexture(mDepthSamplerSlot, 0, multisampleAttachment.get());
+		commandList.BindShaderProgram(mShaderProgram.Get());
+		commandList.BindTexture(mDepthSamplerSlot, 0, multisampleAttachment.Get());
 
 		ResolveInfo resolveInfo;
 		resolveInfo.SampleCount = static_cast<unsigned int>(multisampleTexture->GetSamples());
@@ -63,12 +63,12 @@ namespace Ck::Vulkan
 		commandList.EndRenderPass();
 
 		Renderer::GpuBarrier postBarriers[] = {
-			Renderer::GpuBarrier::Of(multisampleTexture.get(), Renderer::ResourceState::GraphicShaderResource, Renderer::ResourceState::FramebufferAttachment, Renderer::TextureSubResource::All(*multisampleTexture)),
+			Renderer::GpuBarrier::Of(multisampleTexture.Get(), Renderer::ResourceState::GraphicShaderResource, Renderer::ResourceState::FramebufferAttachment, Renderer::TextureSubResource::All(*multisampleTexture)),
 		};
 		commandList.Barrier(1, postBarriers);
 	}
 
-	std::shared_ptr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const URI& uri, Renderer::ShaderType shaderType)
+	SharedPtr<Shader> DepthResolver::LoadShader(RenderDevice& renderDevice, const URI& uri, Renderer::ShaderType shaderType)
 	{
 		ByteArray shaderCode = StorageUtils::ReadFile(uri);
 
@@ -76,15 +76,15 @@ namespace Ck::Vulkan
 		createInfo.Type = shaderType;
 		createInfo.Code = shaderCode;
 
-		return std::static_pointer_cast<Shader>(renderDevice.CreateShader(createInfo));
+		return renderDevice.CreateShader(createInfo).StaticCast<Shader>();
 	}
 
-	Framebuffer* DepthResolver::GetOrCreateFramebuffer(std::shared_ptr<TextureView> attachment)
+	Framebuffer* DepthResolver::GetOrCreateFramebuffer(SharedPtr<TextureView> attachment)
 	{
-	    return mFramebuffers.ComputeIfMissing(attachment, [this](const std::shared_ptr<TextureView>& attachment) {
+	    return mFramebuffers.ComputeIfMissing(std::move(attachment), [this](const SharedPtr<TextureView>& attachment) {
 	        Renderer::FramebufferCreateInfo createInfo;
             createInfo.DepthStencilAttachment = attachment;
-            return std::static_pointer_cast<Framebuffer>(mRenderDevice->CreateFramebuffer(createInfo));
-	    }).get();
+            return mRenderDevice->CreateFramebuffer(createInfo).StaticCast<Framebuffer>();
+	    }).Get();
 	}
 }

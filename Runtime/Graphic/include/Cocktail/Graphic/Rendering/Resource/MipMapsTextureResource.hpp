@@ -16,7 +16,7 @@ namespace Ck
          * \param mipMaps 
          * \param name 
          */
-        MipMapsTextureResource(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name = "");
+        MipMapsTextureResource(SharedPtr<GraphicEngine> graphicEngine, SharedPtr<MipMaps> mipMaps, const AnsiChar* name = "");
 
 	    /**
          * \brief
@@ -30,11 +30,11 @@ namespace Ck
          * 
          * @return 
          */
-        std::shared_ptr<MipMaps> GetMipMaps() const;
+        SharedPtr<MipMaps> GetMipMaps() const;
 
     private:    
 
-        std::shared_ptr<MipMaps> mMipMaps;
+        SharedPtr<MipMaps> mMipMaps;
     };
 }
 

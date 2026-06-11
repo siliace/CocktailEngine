@@ -41,7 +41,7 @@ namespace Ck::Vulkan
 		 * \param fence
 		 * \return
 		 */
-		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, std::shared_ptr<Semaphore> semaphore, std::shared_ptr<Fence> fence) const;
+		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence) const;
 
 		/**
 		 * \brief 
@@ -102,13 +102,13 @@ namespace Ck::Vulkan
 		 * \param framebufferIndex
 		 * \return
 		 */
-		std::shared_ptr<Framebuffer> GetFramebuffer(unsigned int framebufferIndex) const;
+		SharedPtr<Framebuffer> GetFramebuffer(unsigned int framebufferIndex) const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Swapchain> GetSwapchain() const;
+		SharedPtr<Swapchain> GetSwapchain() const;
 
 		/**
 		 * \brief 
@@ -138,9 +138,9 @@ namespace Ck::Vulkan
 		VkSurfaceKHR mHandle;
 		PixelFormat mDepthStencilFormat;
 		UniquePtr<PresentationContext> mPresentationContext;
-		std::shared_ptr<RenderPass> mRenderPass;
-		std::shared_ptr<Swapchain> mSwapchain;
-		std::shared_ptr<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];
+		SharedPtr<RenderPass> mRenderPass;
+		SharedPtr<Swapchain> mSwapchain;
+		SharedPtr<Framebuffer> mFramebuffers[Framebuffer::MaxColorAttachmentCount];
 		bool mVSyncEnable;
 	};
 }

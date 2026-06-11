@@ -13,7 +13,7 @@ namespace Ck
 {
 	COCKTAIL_DECLARE_EXCEPTION(ObjParseError);
 
-	std::shared_ptr<SceneContainer> ObjImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
+	SharedPtr<SceneContainer> ObjImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
 	{
 		SceneImportParameters importParameters = parameters;
 		importParameters.BaseDirectory = path.GetParent();
@@ -28,10 +28,10 @@ namespace Ck
 		if (!reader.ParseFromFile(reinterpret_cast<const char*>(p.GetData()), readerConfig))
 			throw ObjParseError(String::ConvertFrom<Encoders::Utf8>(reinterpret_cast<const Utf8Char*>(reader.Error().c_str())));
 
-		return std::make_shared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
+		return MakeShared<ObjSceneContainer>(importParameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
 
-	std::shared_ptr<SceneContainer> ObjImporter::LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters)
+	SharedPtr<SceneContainer> ObjImporter::LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters)
 	{
 		tinyobj::ObjReaderConfig readerConfig;
 		readerConfig.vertex_color = false;
@@ -65,7 +65,7 @@ namespace Ck
 		if (!reader.ParseFromString(objText.GetData(), mtlText.GetData(), readerConfig))
 			throw ObjParseError(String::ConvertFrom<Encoders::Ascii>(reader.Error().c_str()));
 
-		return std::make_shared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
+		return MakeShared<ObjSceneContainer>(parameters, reader.GetAttrib(), reader.GetShapes(), reader.GetMaterials());
 	}
 
 	bool ObjImporter::SupportExtension(StringView extension) const

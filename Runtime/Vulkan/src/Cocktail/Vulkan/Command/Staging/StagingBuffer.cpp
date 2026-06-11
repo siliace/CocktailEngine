@@ -15,7 +15,7 @@ namespace Ck::Vulkan
 		createInfo.MemoryType = Renderer::MemoryType::Dynamic;
 		createInfo.Exclusive = true;
 
-		mBuffer = std::static_pointer_cast<Buffer>(renderDevice->CreateBuffer(createInfo));
+		mBuffer = renderDevice->CreateBuffer(createInfo).StaticCast<Buffer>();
 	}
 
 	std::size_t StagingBuffer::PushData(std::size_t alignment, std::size_t length, const void* data)
@@ -51,7 +51,7 @@ namespace Ck::Vulkan
 
 		return 0;
 	}
-		
+
 	void StagingBuffer::Reset()
 	{
 		mRemainingCapacity = mBuffer->GetSize();
@@ -59,7 +59,7 @@ namespace Ck::Vulkan
 
 	Buffer* StagingBuffer::GetBuffer() const
 	{
-		return mBuffer.get();
+		return mBuffer.Get();
 	}
 
 	std::size_t StagingBuffer::GetRemainingCapacity() const

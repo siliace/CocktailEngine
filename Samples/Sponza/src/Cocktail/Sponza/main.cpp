@@ -43,8 +43,8 @@ Main::ExitCode ApplicationMain(Application* application)
 		return windowFactory->CreateWindow(windowCreateInfo);
 	});
 
-	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
+	SharedPtr<GraphicEngine> graphicEngine = MakeShared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
+	SharedPtr<Scene> scene = MakeShared<Scene>(graphicEngine);
 
 	SceneNode* sceneNode = application->Invoke([&](SceneLoader* sceneLoader) {
 		return sceneLoader->LoadFromPath(CK_TEXT("./resources/Models/Sponza/Sponza.gltf"), {})->AddToScene(*scene);
@@ -110,8 +110,8 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
-    UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.get(), camera);
+	SharedPtr<SceneViewer> viewer = MakeShared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
+    UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.Get(), camera);
 	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
 	viewer->AttachViewport(std::move(viewport));
 
@@ -125,7 +125,7 @@ Main::ExitCode ApplicationMain(Application* application)
     });
 
     ImUi::MenuBarManager* menuBarManager = windowContainer.GetMenuBarManager();
-    menuBarManager->CreateMenu<SceneMenuModule>(scene.get());
+    menuBarManager->CreateMenu<SceneMenuModule>(scene.Get());
     menuBarManager->CreateMenu<SystemMenuModule>();
 
 	Duration lastFrameBegin = application->Uptime();

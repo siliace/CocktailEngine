@@ -20,12 +20,12 @@ namespace Ck
 
     SceneNode* SceneContainer::AddToScene(Scene& scene)
 	{
-		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
+		SharedPtr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
-		Array<std::shared_ptr<Mesh>> meshes;
+		Array<SharedPtr<Mesh>> meshes;
 		meshes.Reserve(mMeshes.GetSize());
 
-		Array<std::shared_ptr<Material>> materials;
+		Array<SharedPtr<Material>> materials;
 		materials.Resize(mMaterials.GetSize());
 
 		for (const MeshInfo& meshInfo : mMeshes)
@@ -46,7 +46,7 @@ namespace Ck
 				{
 					const MaterialInfo& materialInfo = mMaterials[subMeshInfo.MaterialIndex];
 
-					std::shared_ptr<Material> material = std::make_shared<Material>(materialInfo.Name, materialInfo.ShadingMode, materialInfo.DoubleSided);
+					SharedPtr<Material> material = MakeShared<Material>(materialInfo.Name, materialInfo.ShadingMode, materialInfo.DoubleSided);
 					material->SetBaseColor(materialInfo.Parameters.Base);
 					material->SetEmissiveColor(materialInfo.Parameters.Emission);
                     material->SetRoughness(materialInfo.Parameters.Roughness);
@@ -54,11 +54,11 @@ namespace Ck
 
 					for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
 					{
-						std::shared_ptr<MipMaps> mipMaps = materialInfo.Textures[textureType];
+						SharedPtr<MipMaps> mipMaps = materialInfo.Textures[textureType];
 						if (!mipMaps)
 							continue;
 
-						std::shared_ptr<TextureResource> sampler = graphicEngine->CreateTextureSampler(std::move(mipMaps));
+						SharedPtr<TextureResource> sampler = graphicEngine->CreateTextureSampler(std::move(mipMaps));
 						material->SetTexture(textureType, sampler);
 					}
 
@@ -69,7 +69,7 @@ namespace Ck
 				}
 			}
 
-			std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meshInfo.Vertices, meshInfo.Indices, std::move(subMeshes));
+			SharedPtr<Mesh> mesh = MakeShared<Mesh>(meshInfo.Vertices, meshInfo.Indices, std::move(subMeshes));
 			meshes.Add(std::move(mesh));
 		}
 
@@ -96,10 +96,10 @@ namespace Ck
 		return material;
 	}
 
-	SceneNode* SceneContainer::ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<std::shared_ptr<Mesh>>& meshes, const Array<std::shared_ptr<Material>>& materials)
+	SceneNode* SceneContainer::ProcessNode(Scene& scene, SceneNode* parent, NodeInfo& nodeInfo, const Array<SharedPtr<Mesh>>& meshes, const Array<SharedPtr<Material>>& materials)
 	{
 		SceneNode* sceneNode = scene.CreateSceneNode();
-		std::shared_ptr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
+		SharedPtr<GraphicEngine> graphicEngine = scene.GetGraphicEngine();
 
 		if (parent)
 		{
@@ -109,7 +109,7 @@ namespace Ck
 		sceneNode->SetLocalTransformation(nodeInfo.LocalTransformation);
 
 		for (unsigned int meshIndex : nodeInfo.MeshIndices)
-			sceneNode->AddShape(std::make_shared<StaticMeshShape>(*graphicEngine, meshes[meshIndex], materials));
+			sceneNode->AddShape(MakeShared<StaticMeshShape>(*graphicEngine, meshes[meshIndex], materials));
 
 		for (NodeInfo& childNodeInfo : nodeInfo.Children)
 			ProcessNode(scene, sceneNode, childNodeInfo, meshes, materials);

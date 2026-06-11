@@ -9,7 +9,7 @@ namespace Ck
 	{
 	public:
 
-		HeadlessSceneViewer(std::shared_ptr<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters);
+		HeadlessSceneViewer(SharedPtr<Scene> scene, Extent2D<unsigned int> size, SceneViewerParameters parameters);
 
 	protected:
 
@@ -18,7 +18,7 @@ namespace Ck
 	private:
 
 		mutable unsigned int mCurrentFramebuffer;
-		Array<std::shared_ptr<Renderer::Framebuffer>> mFramebuffers;
+		Array<SharedPtr<Renderer::Framebuffer>> mFramebuffers;
 	};
 }
 

@@ -6,7 +6,7 @@
 
 namespace Ck::Vulkan
 {
-	Framebuffer::Framebuffer(RenderDevice* renderDevice, std::shared_ptr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+	Framebuffer::Framebuffer(RenderDevice* renderDevice, SharedPtr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
 		mRenderDevice(std::move(renderDevice)),
 		mRenderPass(renderPass),
 		mAllocationCallbacks(allocationCallbacks),
@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		{
 			UniquePtr<AttachmentBuffer> buffer = MakeUnique<AttachmentBuffer>(
 				*mRenderDevice, 
-				std::static_pointer_cast<TextureView>(createInfo.ColorAttachments[i]), 
+				createInfo.ColorAttachments[i].StaticCast<TextureView>(),
 				samples
 			);
 
@@ -34,8 +34,8 @@ namespace Ck::Vulkan
 		if (createInfo.DepthStencilAttachment)
 		{
 			mDepthStencilBuffer = MakeUnique<AttachmentBuffer>(
-				*mRenderDevice, 
-				std::static_pointer_cast<TextureView>(createInfo.DepthStencilAttachment),
+				*mRenderDevice,
+				createInfo.DepthStencilAttachment.StaticCast<TextureView>(),
 				samples
 			);
 
@@ -111,7 +111,7 @@ namespace Ck::Vulkan
 		return mRenderPass->GetSamples();
 	}
 
-	std::shared_ptr<Renderer::TextureView> Framebuffer::GetColorMultisampleAttachment(unsigned index) const
+	SharedPtr<Renderer::TextureView> Framebuffer::GetColorMultisampleAttachment(unsigned index) const
 	{
 		if (index >= mColorBufferCount)
 			return nullptr;
@@ -119,7 +119,7 @@ namespace Ck::Vulkan
 		return mColorBuffers[index]->GetMultisampleAttachment();
 	}
 
-	std::shared_ptr<Renderer::TextureView> Framebuffer::GetColorAttachment(unsigned int index) const
+	SharedPtr<Renderer::TextureView> Framebuffer::GetColorAttachment(unsigned int index) const
 	{
 		if (index >= mColorBufferCount)
 			return nullptr;
@@ -132,7 +132,7 @@ namespace Ck::Vulkan
 		return mColorBufferCount;
 	}
 
-	std::shared_ptr<Renderer::TextureView> Framebuffer::GetDepthStencilMultisampleAttachment() const
+	SharedPtr<Renderer::TextureView> Framebuffer::GetDepthStencilMultisampleAttachment() const
 	{
 		if (!mDepthStencilBuffer)
 			return nullptr;
@@ -140,7 +140,7 @@ namespace Ck::Vulkan
 		return mDepthStencilBuffer->GetMultisampleAttachment();
 	}
 
-	std::shared_ptr<Renderer::TextureView> Framebuffer::GetDepthStencilAttachment() const
+	SharedPtr<Renderer::TextureView> Framebuffer::GetDepthStencilAttachment() const
 	{
 		if (!mDepthStencilBuffer)
 			return nullptr;
@@ -148,7 +148,7 @@ namespace Ck::Vulkan
 		return mDepthStencilBuffer->GetResolveAttachment();
 	}
 
-	std::shared_ptr<RenderPass> Framebuffer::GetRenderPass() const
+	SharedPtr<RenderPass> Framebuffer::GetRenderPass() const
 	{
 		return mRenderPass;
 	}

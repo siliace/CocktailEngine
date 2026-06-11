@@ -22,7 +22,7 @@ namespace Ck
             builder.AddAttribute(VertexAttributeSemantic::Color, DataType::Float32, 4);
         }
 
-        std::shared_ptr<VertexArray> vertexArray = std::make_shared<VertexArray>(builder.Get(), mPointCount);
+        SharedPtr<VertexArray> vertexArray = MakeShared<VertexArray>(builder.Get(), mPointCount);
         for (std::size_t i = 0; i < vertexArray->GetVertexCount(); i++)
         {
             VertexRef vertex = vertexArray->At(i);
@@ -54,7 +54,7 @@ namespace Ck
         if (volume.IsNull())
             volume.Extend(Vector3<float>::Epsilon());
 
-        std::shared_ptr<VertexArray> vertexArray = mVertexBuffer->GetVertexArray();
+        SharedPtr<VertexArray> vertexArray = mVertexBuffer->GetVertexArray();
         for (std::size_t i = 0; i < vertexArray->GetVertexCount(); i++)
         {
             VertexRef vertex = vertexArray->At(i);

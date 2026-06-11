@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-	VertexBuffer::VertexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<VertexArray> vertices, const AnsiChar* name) :
+	VertexBuffer::VertexBuffer(SharedPtr<GraphicEngine> graphicEngine, SharedPtr<VertexArray> vertices, const AnsiChar* name) :
 		BufferResource(std::move(graphicEngine), Renderer::BufferUsageFlagBits::Vertex, vertices->GetVertices().GetSize(), name),
 		mVertices(std::move(vertices))
 	{
@@ -20,10 +20,10 @@ namespace Ck
 		const unsigned int vertexStride = mVertices->GetVertexLayout()->GetStride();
 		std::size_t firstVertexOffset = firstVertex * vertexStride;
 		std::size_t length = vertexCount * vertexStride;
-		GetGraphicEngine()->UploadBuffer(shared_from_this(), firstVertexOffset, length, mVertices->GetVertices().GetData() + firstVertexOffset);
+		GetGraphicEngine()->UploadBuffer(AsShared(), firstVertexOffset, length, mVertices->GetVertices().GetData() + firstVertexOffset);
 	}
 
-	std::shared_ptr<VertexArray> VertexBuffer::GetVertexArray() const
+	SharedPtr<VertexArray> VertexBuffer::GetVertexArray() const
 	{
 		return mVertices;
 	}

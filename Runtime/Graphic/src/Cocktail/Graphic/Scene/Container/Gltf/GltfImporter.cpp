@@ -82,7 +82,7 @@ namespace Ck
         mLoader.SetImageLoader(GltfImporter::LoadImageData, this);
     }
 
-    std::shared_ptr<SceneContainer> GltfImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
+    SharedPtr<SceneContainer> GltfImporter::LoadFromPath(const Path& path, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
@@ -97,10 +97,10 @@ namespace Ck
         if (!warnings.empty())
             CK_LOG(SceneLoaderLogCategory, LogLevel::Error, CK_TEXT("Scene %s loaded with warnings: %hs"), path.ToString(), warnings.c_str());
 
-        return std::make_shared<GltfSceneContainer>(model);
+        return MakeShared<GltfSceneContainer>(model);
     }
 
-    std::shared_ptr<SceneContainer> GltfImporter::LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters)
+    SharedPtr<SceneContainer> GltfImporter::LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters)
     {
         tinygltf::Model model;
         std::string errors, warnings;
@@ -124,7 +124,7 @@ namespace Ck
         if (!success)
             return nullptr;
 
-        return std::make_shared<GltfSceneContainer>(model);
+        return MakeShared<GltfSceneContainer>(model);
     }
     
     bool GltfImporter::SupportExtension(StringView extension) const
@@ -141,7 +141,7 @@ namespace Ck
     {
         GltfImporter* self = static_cast<GltfImporter*>(userData);
 
-        std::shared_ptr<Image> image;
+        SharedPtr<Image> image;
         try 
         {
             image = self->mImageLoader->LoadFromMemory(data, size);

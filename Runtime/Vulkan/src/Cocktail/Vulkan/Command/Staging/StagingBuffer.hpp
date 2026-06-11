@@ -55,7 +55,7 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<Buffer> mBuffer;
+		SharedPtr<Buffer> mBuffer;
 		std::size_t mRemainingCapacity;
 	};
 }

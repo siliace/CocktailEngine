@@ -48,7 +48,7 @@ namespace Ck
     /**
      * \brief
      */
-    class COCKTAIL_GRAPHIC_API Scene : public std::enable_shared_from_this<Scene>
+    class COCKTAIL_GRAPHIC_API Scene : public SharedFromThis<Scene>
     {
     public:
 
@@ -56,7 +56,7 @@ namespace Ck
          * \brief
          * \param graphicEngine
          */
-        explicit Scene(std::shared_ptr<GraphicEngine> graphicEngine);
+        explicit Scene(SharedPtr<GraphicEngine> graphicEngine);
 
         /**
          * \brief
@@ -127,11 +127,11 @@ namespace Ck
          * \brief
          * \return
          */
-        std::shared_ptr<GraphicEngine> GetGraphicEngine() const;
+        SharedPtr<GraphicEngine> GetGraphicEngine() const;
 
     private:
 
-        std::shared_ptr<GraphicEngine> mGraphicEngine;
+        SharedPtr<GraphicEngine> mGraphicEngine;
         UniquePtr<TransformationGraph> mTransformationGraph;
         UniquePtr<SceneGraph> mSceneGraph;
         Array<UniquePtr<Camera>> mCameras;

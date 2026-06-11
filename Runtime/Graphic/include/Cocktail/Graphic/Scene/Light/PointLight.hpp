@@ -22,7 +22,7 @@ namespace Ck
 		 *
 		 * \return 
 		 */
-		static PointLight* Create(std::shared_ptr<Scene> scene, String name, float range, LinearColor color = LinearColor(1.f, 1.f, 1.f), Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
+		static PointLight* Create(SharedPtr<Scene> scene, String name, float range, LinearColor color = LinearColor(1.f, 1.f, 1.f), Vector3<float> position = Vector3<float>::Zero(), float intensity = 100.f);
 
 		/**
 		 * \brief

@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_VULKAN_COMMAND_COMMANDLIST_HPP
 #define COCKTAIL_VULKAN_COMMAND_COMMANDLIST_HPP
 
+#include <Cocktail/Core/Memory/SharedFromThis.hpp>
 #include <Cocktail/Core/Signal/Observable.hpp>
 
 #include <Cocktail/Renderer/Command/CommandList.hpp>
@@ -20,11 +21,11 @@ namespace Ck::Vulkan
 	class Pipeline;
 	class RenderDevice;
 
-	class CommandList : public Renderer::CommandList, public Observable, public std::enable_shared_from_this<CommandList>
+	class CommandList : public Renderer::CommandList, public Observable, public SharedFromThis<CommandList>
 	{
 	public:
 
-		CommandList(RenderDevice* renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+		CommandList(RenderDevice* renderDevice, SharedPtr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
 
 		~CommandList() override;
 
@@ -128,7 +129,7 @@ namespace Ck::Vulkan
 		void FlushState(Renderer::ShaderProgramType programType);
 
 		RenderDevice* mRenderDevice;
-		std::shared_ptr<CommandListPool> mAllocator;
+		SharedPtr<CommandListPool> mAllocator;
 		DescriptorSetAllocator* mDescriptorSetAllocator;
 		VkCommandBuffer mHandle;
 		bool mOneShot;
@@ -137,7 +138,7 @@ namespace Ck::Vulkan
 		Renderer::CommandListUsageBits mUsage;
 		const Framebuffer* mCurrentFramebuffer;
 		Optional<Renderer::RenderPassMode> mCurrentRenderPassMode;
-		EnumMap<Renderer::ShaderProgramType, std::shared_ptr<Pipeline>> mCurrentPipelines;
+		EnumMap<Renderer::ShaderProgramType, SharedPtr<Pipeline>> mCurrentPipelines;
 		EnumMap<Renderer::ShaderProgramType, UniquePtr<StateManager>> mStateManagers;
 	};
 }

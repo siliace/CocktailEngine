@@ -38,7 +38,7 @@ namespace Ck::Vulkan
 		 * \param batch 
 		 * \param fence 
 		 */
-		void ConnectFence(QueueSubmitBatch* batch, std::shared_ptr<Fence> fence);
+		void ConnectFence(QueueSubmitBatch* batch, SharedPtr<Fence> fence);
 
 		/**
 		 * \brief 

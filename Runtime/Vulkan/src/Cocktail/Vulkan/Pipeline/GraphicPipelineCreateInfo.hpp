@@ -21,12 +21,12 @@ namespace Ck::Vulkan
 		/**
 		 * \brief
 		 */
-		std::shared_ptr<PipelineLayout> PipelineLayout;
+		SharedPtr<PipelineLayout> PipelineLayout;
 
 		/**
 		 * \brief 
 		 */
-		std::shared_ptr<RenderPass> RenderPass;
+		SharedPtr<RenderPass> RenderPass;
 
 		/**
 		 * \brief 

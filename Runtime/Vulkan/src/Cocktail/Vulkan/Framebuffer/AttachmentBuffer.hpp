@@ -23,7 +23,7 @@ namespace Ck::Vulkan
 		 * \param resolveAttachment
 		 * \param samples
 		 */
-		AttachmentBuffer(RenderDevice& renderDevice, std::shared_ptr<TextureView> resolveAttachment, Renderer::RasterizationSamples samples);
+		AttachmentBuffer(RenderDevice& renderDevice, SharedPtr<TextureView> resolveAttachment, Renderer::RasterizationSamples samples);
 
 		/**
 		 * \brief
@@ -35,13 +35,13 @@ namespace Ck::Vulkan
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<TextureView> GetMultisampleAttachment() const;
+		SharedPtr<TextureView> GetMultisampleAttachment() const;
 
 		/**
 		 * \brief
 		 * \return
 		 */
-		std::shared_ptr<TextureView> GetResolveAttachment() const;
+		SharedPtr<TextureView> GetResolveAttachment() const;
 
 		/**
 		 * \brief
@@ -51,8 +51,8 @@ namespace Ck::Vulkan
 
 	private:
 
-		std::shared_ptr<TextureView> mMultisampleAttachment;
-		std::shared_ptr<TextureView> mResolveAttachments;
+		SharedPtr<TextureView> mMultisampleAttachment;
+		SharedPtr<TextureView> mResolveAttachments;
 	};
 }
 

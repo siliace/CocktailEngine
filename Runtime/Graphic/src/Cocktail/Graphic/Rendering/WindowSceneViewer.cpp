@@ -46,7 +46,7 @@ namespace Ck
 		}
 	}
 
-	WindowSceneViewer::WindowSceneViewer(std::shared_ptr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync) :
+	WindowSceneViewer::WindowSceneViewer(SharedPtr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync) :
 		SceneViewer(std::move(scene))
 	{
 		Renderer::RenderDevice* renderDevice = GetScene()->GetGraphicEngine()->GetRenderDevice();
@@ -70,6 +70,6 @@ namespace Ck
 
 	Renderer::Framebuffer* WindowSceneViewer::AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const
 	{
-		return renderContext.AcquireFramebuffer(mRenderSurface.get());
+		return renderContext.AcquireFramebuffer(mRenderSurface.Get());
 	}
 }

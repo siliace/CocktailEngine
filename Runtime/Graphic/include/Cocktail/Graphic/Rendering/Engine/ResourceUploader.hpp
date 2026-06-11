@@ -17,9 +17,9 @@ namespace Ck
 	{
 	public:
 
-		void RequestBufferUpload(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
+		void RequestBufferUpload(SharedPtr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
 
-		void RequestTextureUpload(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
+		void RequestTextureUpload(SharedPtr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
 
 		/**
 		 * \brief 
@@ -37,13 +37,13 @@ namespace Ck
 
 		struct BufferUploadRequest
 		{
-			std::shared_ptr<BufferResource> Buffer;
+			SharedPtr<BufferResource> Buffer;
 			Array<Renderer::BufferUploadInfo> UploadInfo;
 		};
 
 		struct TextureUploadRequest
 		{
-			std::shared_ptr<TextureResource> Texture;
+			SharedPtr<TextureResource> Texture;
 			Array<Renderer::TextureUploadInfo> UploadInfo;
 		};
 

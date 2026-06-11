@@ -81,7 +81,7 @@ namespace Ck
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
-                .Get();;
+                .Get();
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/line/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -114,7 +114,7 @@ namespace Ck
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
-                .Get();;
+                .Get();
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -147,7 +147,7 @@ namespace Ck
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
-                .Get();;
+                .Get();
 
                 for (auto& [shaderName, binaries] :
                      ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/lit/instanced"), Path::Format::Generic), builtinDriver))
@@ -179,7 +179,7 @@ namespace Ck
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
-                .Get();;
+                .Get();
 
                 for (auto& [shaderName, binaries] : ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/basic"), Path::Format::Generic), builtinDriver))
                     entry.VariantsBinaries.Add(std::move(binaries));
@@ -210,7 +210,7 @@ namespace Ck
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Alpha, "ck_MaterialAlpha", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Material, MaterialBindingSlots::Emission, "ck_MaterialEmission", Renderer::DescriptorType::TextureSampler, Renderer::StaticSampler::TrilinearWrap)
                 .SetBindingSlot(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, "instances", Renderer::DescriptorType::StorageBuffer)
-                .Get();;
+                .Get();
 
                 for (auto& [shaderName, binaries] :
                      ParseVariantsBinaries(Path::Parse(CK_TEXT("graphic/resources/shaders/mesh/unlit/instanced"), Path::Format::Generic), builtinDriver))

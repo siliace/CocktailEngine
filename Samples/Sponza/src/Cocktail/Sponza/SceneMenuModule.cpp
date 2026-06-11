@@ -348,15 +348,15 @@ namespace Ck
                                 switch (lightType)
                                 {
                                     case Light::Type::Directional:
-                                        mCurrentLight = DirectionalLight::Create(mScene->shared_from_this(), mState.Name, mState.Directional.Direction, mState.Color, mState.Intensity);
+                                        mCurrentLight = DirectionalLight::Create(mScene->AsShared(), mState.Name, mState.Directional.Direction, mState.Color, mState.Intensity);
                                         break;
 
                                     case Light::Type::Point:
-                                        mCurrentLight = PointLight::Create(mScene->shared_from_this(), mState.Name, mState.Point.Range, mState.Color, mState.Point.Position, mState.Intensity);
+                                        mCurrentLight = PointLight::Create(mScene->AsShared(), mState.Name, mState.Point.Range, mState.Color, mState.Point.Position, mState.Intensity);
                                         break;
 
                                     case Light::Type::Spot:
-                                        mCurrentLight = SpotLight::Create(mScene->shared_from_this(), mState.Name, mState.Spot.Range, mState.Color, mState.Point.Position, mState.Intensity);
+                                        mCurrentLight = SpotLight::Create(mScene->AsShared(), mState.Name, mState.Spot.Range, mState.Color, mState.Point.Position, mState.Intensity);
                                         break;
                                 }
 

@@ -66,7 +66,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Scene> GetScene() const;
+		SharedPtr<Scene> GetScene() const;
 
 		/**
 		 * \brief 
@@ -80,7 +80,7 @@ namespace Ck
 		 * \brief
 		 * \param scene
 		 */
-		explicit SceneViewer(std::shared_ptr<Scene> scene);
+		explicit SceneViewer(SharedPtr<Scene> scene);
 
 		/**
 		 * \brief 
@@ -91,7 +91,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<Scene> mScene;
+		SharedPtr<Scene> mScene;
 	    RecordDrawContext mDrawContext;
 		Array<UniquePtr<Viewport>> mViewports;
 		UniquePtr<RenderQueue> mOpaqueRenderQueue;

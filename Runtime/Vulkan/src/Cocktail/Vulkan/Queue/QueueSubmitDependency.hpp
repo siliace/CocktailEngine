@@ -7,7 +7,7 @@ namespace Ck::Vulkan
 {
 	struct QueueSubmitDependency
 	{
-		std::shared_ptr<Semaphore> WaitSemaphore;
+		SharedPtr<Semaphore> WaitSemaphore;
 		VkPipelineStageFlags WaitDstStages;
 	};
 }

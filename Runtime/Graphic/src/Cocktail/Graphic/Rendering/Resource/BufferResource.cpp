@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-	BufferResource::BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name) :
+	BufferResource::BufferResource(SharedPtr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name) :
 		mGraphicEngine(std::move(graphicEngine))
 	{
 		Renderer::BufferCreateInfo createInfo;
@@ -17,10 +17,10 @@ namespace Ck
 
 	Renderer::Buffer* BufferResource::GetUnderlyingResource() const
 	{
-		return mBuffer.get();
+		return mBuffer.Get();
 	}
 
-	std::shared_ptr<GraphicEngine> BufferResource::GetGraphicEngine() const
+	SharedPtr<GraphicEngine> BufferResource::GetGraphicEngine() const
 	{
 		return mGraphicEngine;
 	}

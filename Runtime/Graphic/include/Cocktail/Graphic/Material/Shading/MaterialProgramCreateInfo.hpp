@@ -27,7 +27,7 @@ namespace Ck
 		/**
 		 * \brief 
 		 */
-		std::shared_ptr<MaterialProgramInterface> Interface;
+		SharedPtr<MaterialProgramInterface> Interface;
 
 		/**
 		 * \brief 

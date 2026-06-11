@@ -54,20 +54,20 @@ namespace Ck::Vulkan
 		 * \param set 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorSetLayout> GetDescriptorSetLayout(unsigned int set) const;
+		SharedPtr<DescriptorSetLayout> GetDescriptorSetLayout(unsigned int set) const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		const Array<std::shared_ptr<DescriptorSetLayout>>& GetDescriptorSetLayouts();
+		const Array<SharedPtr<DescriptorSetLayout>>& GetDescriptorSetLayouts();
 
 		/**
 		 * \brief 
 		 * \param set 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorUpdateTemplate> GetDescriptorUpdateTemplate(unsigned int set) const;
+		SharedPtr<DescriptorUpdateTemplate> GetDescriptorUpdateTemplate(unsigned int set) const;
 
 		/**
 		 * \brief 
@@ -92,8 +92,8 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkPipelineLayout mHandle;
-		Array<std::shared_ptr<DescriptorSetLayout>> mDescriptorSetLayouts;
-		Array<std::shared_ptr<DescriptorUpdateTemplate>> mUpdateTemplates;
+		Array<SharedPtr<DescriptorSetLayout>> mDescriptorSetLayouts;
+		Array<SharedPtr<DescriptorUpdateTemplate>> mUpdateTemplates;
 		EnumMap<Renderer::ShaderType, Optional<PushConstantBlockInfo>> mPipelineConstantBlocks;
 		VkPipelineBindPoint mBindPoint;
 	};

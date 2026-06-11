@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-    InstancedStaticMeshShape::InstancedStaticMeshShape(GraphicEngine& graphicEngine, const Array<Transformation>& instances, std::shared_ptr<Mesh> mesh, const Array<std::shared_ptr<Material>>& materials) :
+    InstancedStaticMeshShape::InstancedStaticMeshShape(GraphicEngine& graphicEngine, const Array<Transformation>& instances, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials) :
         StaticMeshShape(graphicEngine, std::move(mesh), materials),
         mInstances(instances)
     {

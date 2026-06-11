@@ -5,7 +5,6 @@
 
 #include <Cocktail/Core/Asset/AssetImporter.hpp>
 #include <Cocktail/Core/Image/Image.hpp>
-#include <Cocktail/Core/StaticArray.hpp>
 
 namespace Ck
 {
@@ -29,7 +28,7 @@ namespace Ck
          *
          * \return
          */
-        std::shared_ptr<Image> LoadFromPath(const Path& path, const ImageImportParameters& parameters) override;
+        SharedPtr<Image> LoadFromPath(const Path& path, const ImageImportParameters& parameters) override;
 
         /**
          * \brief
@@ -39,7 +38,7 @@ namespace Ck
          *
          * \return
          */
-        std::shared_ptr<Image> LoadFromStream(InputStream<>& inputStream, const ImageImportParameters& parameters) override;
+        SharedPtr<Image> LoadFromStream(InputStream<>& inputStream, const ImageImportParameters& parameters) override;
 
         /**
          * \brief

@@ -19,7 +19,7 @@ namespace Ck::Vulkan
 		if (queueFamilyContext.IsUnified())
 		{
 			poolCreateInfo.QueueType = Renderer::CommandQueueType::Graphic;
-			std::shared_ptr<CommandPool> commandPool = std::make_shared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
+			SharedPtr<CommandPool> commandPool = MakeShared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
 			for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 				mCommandPools[queueType] = commandPool;
 		}
@@ -28,7 +28,7 @@ namespace Ck::Vulkan
 			for (Renderer::CommandQueueType queueType : Enum<Renderer::CommandQueueType>::Values)
 			{
 				poolCreateInfo.QueueType = queueType;
-				mCommandPools[queueType] = std::make_shared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
+				mCommandPools[queueType] = MakeShared<CommandPool>(mRenderDevice, poolCreateInfo, allocationCallbacks);
 			}
 		}
 
@@ -46,10 +46,10 @@ namespace Ck::Vulkan
 		return mStagingAllocator->AcquireStagingBuffer(alignment, length);
 	}
 	
-	std::shared_ptr<CommandList> CommandListPool::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
+	SharedPtr<CommandList> CommandListPool::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		std::shared_ptr<CommandList> commandList = mRenderDevice->CreateCommandList(shared_from_this(), &mDescriptorSetAllocator, createInfo);
-		commandList->Connect(mOnReset, [self = commandList.get()] {
+		SharedPtr<CommandList> commandList = mRenderDevice->CreateCommandList(AsShared(), &mDescriptorSetAllocator, createInfo);
+		commandList->Connect(mOnReset, [self = commandList.Get()] {
 			self->MarkInitial();
 		});
 
@@ -84,7 +84,7 @@ namespace Ck::Vulkan
 		return mCommandListResetable;
 	}
 
-	std::shared_ptr<CommandPool> CommandListPool::GetCommandPool(Renderer::CommandQueueType queueType) const
+	SharedPtr<CommandPool> CommandListPool::GetCommandPool(Renderer::CommandQueueType queueType) const
 	{
 		return mCommandPools[queueType];
 	}

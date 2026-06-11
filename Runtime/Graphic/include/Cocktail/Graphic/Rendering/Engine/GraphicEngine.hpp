@@ -23,7 +23,7 @@ namespace Ck
 	/**
      * \brief 
      */
-	class COCKTAIL_GRAPHIC_API GraphicEngine : public Observable, public std::enable_shared_from_this<GraphicEngine>
+	class COCKTAIL_GRAPHIC_API GraphicEngine : public Observable, public SharedFromThis<GraphicEngine>
 	{
 	public:
 
@@ -45,7 +45,7 @@ namespace Ck
 	     * \param name 
 	     * \return 
 	     */
-		std::shared_ptr<VertexBuffer> CreateVertexBuffer(std::shared_ptr<VertexArray> vertices, bool updatable = false, const AnsiChar* name = "");
+		SharedPtr<VertexBuffer> CreateVertexBuffer(SharedPtr<VertexArray> vertices, bool updatable = false, const AnsiChar* name = "");
 
 		/**
 		 * \brief
@@ -54,7 +54,7 @@ namespace Ck
 		 * \param name
 		 * \return
 		 */
-		std::shared_ptr<IndexBuffer> CreateIndexBuffer(std::shared_ptr<IndexArray> indices, bool updatable = false, const AnsiChar* name = "");
+		SharedPtr<IndexBuffer> CreateIndexBuffer(SharedPtr<IndexArray> indices, bool updatable = false, const AnsiChar* name = "");
 
         /**
          * \brief
@@ -63,7 +63,7 @@ namespace Ck
          * \param name
          * \return
          */
-	    std::shared_ptr<StorageBuffer> CreateStorageBuffer(std::size_t size, bool updatable = false, const AnsiChar* name = "");
+	    SharedPtr<StorageBuffer> CreateStorageBuffer(std::size_t size, bool updatable = false, const AnsiChar* name = "");
 
 	    /**
 	     * \brief
@@ -77,9 +77,9 @@ namespace Ck
 	     * \return
 	     */
 	    template <typename T>
-	    std::shared_ptr<TypedStorageBuffer<T>> CreateTypedStorageBuffer(unsigned int elementCount, bool updatable = false, const AnsiChar* name = "")
+	    SharedPtr<TypedStorageBuffer<T>> CreateTypedStorageBuffer(unsigned int elementCount, bool updatable = false, const AnsiChar* name = "")
 	    {
-	        return std::make_shared<TypedStorageBuffer<T>>(shared_from_this(), elementCount, name);
+	        return MakeShared<TypedStorageBuffer<T>>(AsShared(), elementCount, name);
 	    }
 
 		/**
@@ -88,7 +88,7 @@ namespace Ck
 		 * \param name 
 		 * \return 
 		 */
-		std::shared_ptr<TextureResource> CreateTextureSampler(std::shared_ptr<MipMaps> mipMaps, const AnsiChar* name = "");
+		SharedPtr<TextureResource> CreateTextureSampler(SharedPtr<MipMaps> mipMaps, const AnsiChar* name = "");
 
 		/**
 	     * \brief 
@@ -97,7 +97,7 @@ namespace Ck
 	     * \param length 
 	     * \param data 
 	     */
-		void UploadBuffer(std::shared_ptr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
+		void UploadBuffer(SharedPtr<BufferResource> buffer, std::size_t offset, std::size_t length, const void* data);
 
 		/**
 		 * \brief 
@@ -106,7 +106,7 @@ namespace Ck
 		 * \param mipMapLevel 
 		 * \param data 
 		 */
-		void UploadTexture(std::shared_ptr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
+		void UploadTexture(SharedPtr<TextureResource> texture, unsigned int arrayLayer, unsigned int mipMapLevel, const void* data);
 
 		/**
 		 * \brief 
@@ -128,22 +128,22 @@ namespace Ck
 	     * \brief 
 	     * \return 
 	     */
-		std::shared_ptr<Renderer::RenderContext> GetRenderContext() const;
+		SharedPtr<Renderer::RenderContext> GetRenderContext() const;
 
 		/**
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<MaterialProgramManager> GetMaterialProgramManager() const;
+		SharedPtr<MaterialProgramManager> GetMaterialProgramManager() const;
 
 	private:
 
 		UniquePtr<Renderer::RenderDevice> mRenderDevice;
-		std::shared_ptr<Renderer::RenderContext> mRenderContext;
-		std::shared_ptr<ResourceUploader> mResourceUploader;
-		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
-		HashMap<std::shared_ptr<Window>, std::shared_ptr<Renderer::RenderSurface>> mWindowRenderSurfaces;
-		Array<std::shared_ptr<TextureResource>> mGeneratingMipMaps;
+		SharedPtr<Renderer::RenderContext> mRenderContext;
+		SharedPtr<ResourceUploader> mResourceUploader;
+		SharedPtr<MaterialProgramManager> mMaterialProgramManager;
+		HashMap<SharedPtr<Window>, SharedPtr<Renderer::RenderSurface>> mWindowRenderSurfaces;
+		Array<SharedPtr<TextureResource>> mGeneratingMipMaps;
 	};
 }
 

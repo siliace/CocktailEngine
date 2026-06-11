@@ -1,12 +1,14 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERRECORD_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_RENDERRECORD_HPP
 
-#include <Cocktail/Graphic/Rendering/Queue/RecordDrawContext.hpp>
+#include <Cocktail/Graphic/Export.hpp>
 
 #include <Cocktail/Renderer/Command/CommandList.hpp>
 
 namespace Ck
 {
+    class RecordDrawContext;
+
 	/**
 	 * \brief 
 	 */

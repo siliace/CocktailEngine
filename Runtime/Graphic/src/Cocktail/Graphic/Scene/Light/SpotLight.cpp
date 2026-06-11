@@ -5,7 +5,7 @@
 
 namespace Ck
 {
-    SpotLight* SpotLight::Create(std::shared_ptr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position, float intensity)
+    SpotLight* SpotLight::Create(SharedPtr<Scene> scene, String name, float range, LinearColor color, Vector3<float> position, float intensity)
     {
         Transformation transformation(position, Quaternion<float>::Identity(), Vector3<float>::Unit());
         TransformationNode* transformationNode = scene->CreateTransformationNode(transformation);

@@ -43,20 +43,20 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \param fence 
 		 */
-		void SignalFence(std::shared_ptr<Fence> fence);
+		void SignalFence(SharedPtr<Fence> fence);
 		
 		/**
 		 * \brief Add a Semaphore to be signaled by the current submit of the current batch 
 		 * \param semaphore 
 		 */
-		void SignalSemaphore(std::shared_ptr<Semaphore> semaphore);
+		void SignalSemaphore(SharedPtr<Semaphore> semaphore);
 		
 		/**
 		 * \brief 
 		 * \param semaphore 
 		 * \param waitStages 
 		 */
-		void WaitExternalSemaphore(std::shared_ptr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
+		void WaitExternalSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
 
 		/**
 		 * \brief 

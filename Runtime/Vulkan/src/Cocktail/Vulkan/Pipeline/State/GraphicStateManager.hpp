@@ -93,14 +93,14 @@ namespace Ck::Vulkan
 		void EnableBlending(unsigned int attachmentIndex, bool enable);
 		void SetBlendingEquation(unsigned int attachmentIndex, Renderer::BlendOp colorBlendOp, Renderer::BlendOp alphaBlendOp);
 		void SetBlendingFunction(unsigned int attachmentIndex, Renderer::BlendFactor sourceColor, Renderer::BlendFactor destinationColor, Renderer::BlendFactor sourceAlpha, Renderer::BlendFactor destinationAlpha);
-		void SetRenderPass(const std::shared_ptr<RenderPass>& renderPass);
+		void SetRenderPass(const SharedPtr<RenderPass>& renderPass);
 
 		void BindIndexBuffer(const Buffer* indexBuffer, std::size_t offset, Renderer::IndexType indexType);
 		void BindVertexBuffer(unsigned int binding, const Buffer* vertexBuffer, std::size_t offset);
 
 		void ResetBindings() override;
 
-		std::shared_ptr<Pipeline> CompilePipeline() override;
+		SharedPtr<Pipeline> CompilePipeline() override;
 		IndexBufferBinding CompileIndexBuffer();
 		VertexBufferBindingRange CompileVertexBuffers(unsigned int binding);
 
@@ -111,7 +111,7 @@ namespace Ck::Vulkan
 
 		GraphicState mState;
 		const ShaderProgram* mShaderProgram;
-		std::shared_ptr<RenderPass> mRenderPass;
+		SharedPtr<RenderPass> mRenderPass;
 		Flags<GraphicDirtyFlagBits> mGraphicDirtyFlags;
 		IndexBufferBindingInfo mIndexBufferBinding;
 		VertexBufferBindingInfo mVertexBufferBindings[MaxInputBindings];

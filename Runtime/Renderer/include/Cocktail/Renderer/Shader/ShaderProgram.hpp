@@ -30,7 +30,7 @@ namespace Ck::Renderer
          *
          * \return 
          */
-        virtual std::shared_ptr<Shader> GetStage(ShaderType type) const = 0;
+        virtual SharedPtr<Shader> GetStage(ShaderType type) const = 0;
 
 	    /**
          * \brief Find a UniformSlot by its name in the shader's sources

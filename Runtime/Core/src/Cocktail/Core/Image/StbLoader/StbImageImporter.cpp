@@ -4,6 +4,7 @@
 #include <Cocktail/Core/Image/ImageLoader.hpp>
 #include <Cocktail/Core/Image/StbLoader/StbImageImporter.hpp>
 #include <Cocktail/Core/Log/Log.hpp>
+#include <Cocktail/Core/StaticArray.hpp>
 
 namespace Ck
 {
@@ -74,13 +75,13 @@ namespace Ck
         mCallbacks.eof = &StbImageImporter::EofCallback;
     }
 
-    std::shared_ptr<Image> StbImageImporter::LoadFromPath(const Path& path, const ImageImportParameters& parameters)
+    SharedPtr<Image> StbImageImporter::LoadFromPath(const Path& path, const ImageImportParameters& parameters)
     {
         CK_LOG(ImageLoaderLogCategory, LogLevel::Info, CK_TEXT("Loading image from %s"), path.ToString());
         return AssetImporter<Image, ImageImportParameters>::LoadFromPath(path, parameters);
     }
 
-    std::shared_ptr<Image> StbImageImporter::LoadFromStream(InputStream<>& inputStream, const ImageImportParameters& parameters)
+    SharedPtr<Image> StbImageImporter::LoadFromStream(InputStream<>& inputStream, const ImageImportParameters& parameters)
     {
         void* pixels;
         int width, height, channels;
@@ -118,7 +119,7 @@ namespace Ck
         LargeByteArray pixelBuffer(static_cast<const Byte*>(pixels), ImageRawFormat::ComputeAllocationSize(size, format));
         stbi_image_free(pixels);
 
-        return std::make_shared<Image>(size, format, isHdr ? GammaSpace::Linear : GammaSpace::sRGB, std::move(pixelBuffer));
+        return MakeShared<Image>(size, format, isHdr ? GammaSpace::Linear : GammaSpace::sRGB, std::move(pixelBuffer));
     }
 
     bool StbImageImporter::SupportExtension(StringView extension) const

@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_BUFFERRESOURCE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_BUFFERRESOURCE_HPP
 
-#include <memory>
+#include <Cocktail/Core/Memory/SharedFromThis.hpp>
  
 #include <Cocktail/Graphic/Export.hpp>
 #include <Cocktail/Graphic/Rendering/Resource/GraphicResource.hpp>
@@ -13,7 +13,7 @@ namespace Ck
 	/**
      * \brief 
      */
-    class COCKTAIL_GRAPHIC_API BufferResource : public GraphicResource, public std::enable_shared_from_this<BufferResource>
+    class COCKTAIL_GRAPHIC_API BufferResource : public GraphicResource, public SharedFromThis<BufferResource>
     {
     public:
 
@@ -24,7 +24,7 @@ namespace Ck
          * \param size 
          * \param name 
          */
-        BufferResource(std::shared_ptr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name = "");
+        BufferResource(SharedPtr<GraphicEngine> graphicEngine, Renderer::BufferUsageFlags usage, std::size_t size, const AnsiChar* name = "");
 
         /**
          * \brief
@@ -36,12 +36,12 @@ namespace Ck
 	     * \brief
 	     * \return 
 	     */
-	    std::shared_ptr<GraphicEngine> GetGraphicEngine() const override;
+	    SharedPtr<GraphicEngine> GetGraphicEngine() const override;
 
     private:
 
-        std::shared_ptr<GraphicEngine> mGraphicEngine;
-        std::shared_ptr<Renderer::Buffer> mBuffer;
+        SharedPtr<GraphicEngine> mGraphicEngine;
+        SharedPtr<Renderer::Buffer> mBuffer;
     };
 }
 

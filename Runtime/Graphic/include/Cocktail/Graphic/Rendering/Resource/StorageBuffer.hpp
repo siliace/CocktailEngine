@@ -19,7 +19,7 @@ namespace Ck
          * \param size
          * \param name
          */
-        StorageBuffer(const std::shared_ptr<GraphicEngine>& graphicEngine, std::size_t size, const AnsiChar* name);
+        StorageBuffer(const SharedPtr<GraphicEngine>& graphicEngine, std::size_t size, const AnsiChar* name);
 
         /**
          * \brief
@@ -36,7 +36,7 @@ namespace Ck
     {
     public:
 
-        TypedStorageBuffer(const std::shared_ptr<GraphicEngine>& graphicEngine, unsigned int elementCount, const AnsiChar* name) :
+        TypedStorageBuffer(const SharedPtr<GraphicEngine>& graphicEngine, unsigned int elementCount, const AnsiChar* name) :
             StorageBuffer(graphicEngine, elementCount * sizeof(T), name),
             mElements(elementCount)
         {

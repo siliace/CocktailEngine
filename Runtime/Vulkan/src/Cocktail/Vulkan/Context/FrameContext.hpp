@@ -22,6 +22,8 @@ namespace Ck::Vulkan
 		 */
 		FrameContext(RenderContext* renderContext, const VkAllocationCallbacks* allocationCallbacks);
 
+        ~FrameContext();
+
 		/**
 		 * \brief
 		 */
@@ -67,16 +69,16 @@ namespace Ck::Vulkan
 		struct AcquiredImage
 		{
 			Optional<unsigned int> ImageIndex;
-			std::shared_ptr<Semaphore> ImageAvailable;
-			std::shared_ptr<Semaphore> ImagePresentable;
+			SharedPtr<Semaphore> ImageAvailable;
+			SharedPtr<Semaphore> ImagePresentable;
 		};
 
 		RenderContext* mRenderContext;
-		std::shared_ptr<CommandListPool> mCommandListPool;
-		Array<std::shared_ptr<CommandList>> mCommandLists;
-		std::shared_ptr<Fence> mFrameFence;
+		SharedPtr<CommandListPool> mCommandListPool;
+		Array<SharedPtr<CommandList>> mCommandLists;
+		SharedPtr<Fence> mFrameFence;
 		HashMap<const RenderSurface*, AcquiredImage> mAcquiredImages;
-		HashMap<BufferAllocatorKey, std::shared_ptr<BufferAllocator>> mBufferAllocators;
+		HashMap<BufferAllocatorKey, SharedPtr<BufferAllocator>> mBufferAllocators;
 		bool mSubmitted;
 	};
 }

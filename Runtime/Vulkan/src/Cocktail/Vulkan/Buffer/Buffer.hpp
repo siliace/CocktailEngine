@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_VULKAN_BUFFER_BUFFER_HPP
 #define COCKTAIL_VULKAN_BUFFER_BUFFER_HPP
 
-#include <memory>
+#include <Cocktail/Core/Memory/SharedFromThis.hpp>
 
 #include <Cocktail/Renderer/Buffer/Buffer.hpp>
 #include <Cocktail/Renderer/Buffer/BufferCreateInfo.hpp>
@@ -16,7 +16,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Buffer : public Renderer::Buffer, public std::enable_shared_from_this<Buffer>
+	class Buffer : public Renderer::Buffer, public SharedFromThis<Buffer>
 	{
 	public:
 

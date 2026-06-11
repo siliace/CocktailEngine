@@ -37,7 +37,7 @@ namespace Ck::Vulkan
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<Pipeline> CompilePipeline() override;
+		SharedPtr<Pipeline> CompilePipeline() override;
 
 	private:
 

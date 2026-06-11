@@ -7,7 +7,7 @@ namespace Ck
 {
     Optional<unsigned int> BindingDomainInterface::GetSlotInterfaceIndex(BindingSlot bindingSlot) const
     {
-        return mBindingSlotInterfaces.FindIndexIf([&](BindingSlotInterface value) {
+        return mBindingSlotInterfaces.FindIndexIf([&](const BindingSlotInterface& value) {
             return value.BindingSlot == bindingSlot;
         });
     }
@@ -42,13 +42,13 @@ namespace Ck
         slotInterface.Sampler = sampler;
     }
 
-    MaterialProgramVariant::MaterialProgramVariant(std::shared_ptr<MaterialProgramInterface> interface, std::shared_ptr<Renderer::ShaderProgram> shaderProgram) :
+    MaterialProgramVariant::MaterialProgramVariant(SharedPtr<MaterialProgramInterface> interface, SharedPtr<Renderer::ShaderProgram> shaderProgram) :
         mInterface(std::move(interface)),
         mShaderProgram(std::move(shaderProgram))
     {
         assert(mShaderProgram);
 
-        std::shared_ptr<Renderer::Shader> vertexStage = mShaderProgram->GetStage(Renderer::ShaderType::Vertex);
+        SharedPtr<Renderer::Shader> vertexStage = mShaderProgram->GetStage(Renderer::ShaderType::Vertex);
         assert(vertexStage);
 
         for (VertexAttributeSemantic vertexAttribute : Enum<VertexAttributeSemantic>::Values)
@@ -102,6 +102,6 @@ namespace Ck
 
     Renderer::ShaderProgram* MaterialProgramVariant::GetShaderProgram() const
     {
-        return mShaderProgram.get();
+        return mShaderProgram.Get();
     }
 }

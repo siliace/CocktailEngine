@@ -26,7 +26,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<SceneContainer> LoadFromPath(const Path& path,	const SceneImportParameters& parameters) override;
+		SharedPtr<SceneContainer> LoadFromPath(const Path& path,	const SceneImportParameters& parameters) override;
 
 		/**
 		 * \brief 
@@ -34,7 +34,7 @@ namespace Ck
 		 * \param parameters 
 		 * \return 
 		 */
-		std::shared_ptr<SceneContainer> LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters) override;
+		SharedPtr<SceneContainer> LoadFromStream(InputStream<>& inputStream, const SceneImportParameters& parameters) override;
 
 		/**
 		 * \brief 

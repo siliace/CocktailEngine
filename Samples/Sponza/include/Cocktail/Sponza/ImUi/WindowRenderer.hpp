@@ -23,7 +23,7 @@ namespace Ck::ImUi
 
         void SetupRenderState(ImGuiContext* context, WindowResources* resources, Renderer::CommandList* commandList, Extent2D<unsigned int> framebufferSize) const;
 
-        std::shared_ptr<Renderer::ShaderProgram> mShaderProgram;
+        SharedPtr<Renderer::ShaderProgram> mShaderProgram;
         Renderer::UniformSlot* mTextureUniformSlot;
     };
 }

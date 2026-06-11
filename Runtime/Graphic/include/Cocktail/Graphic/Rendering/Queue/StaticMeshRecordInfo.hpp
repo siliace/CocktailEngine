@@ -140,7 +140,7 @@ namespace Ck
          *
          * Each texture view must remain valid during rendering.
          */
-        EnumMap<Material::TextureType, std::shared_ptr<Renderer::TextureView>> MaterialTextures;
+        EnumMap<Material::TextureType, SharedPtr<Renderer::TextureView>> MaterialTextures;
 
         /**
          * \brief Alpha blending mode of the material

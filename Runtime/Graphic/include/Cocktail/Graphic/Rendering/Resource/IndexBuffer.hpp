@@ -16,7 +16,7 @@ namespace Ck
 		 * \param indices
 		 * \param name 
 		 */
-		IndexBuffer(std::shared_ptr<GraphicEngine> graphicEngine, std::shared_ptr<IndexArray> indices, const AnsiChar* name = "");
+		IndexBuffer(SharedPtr<GraphicEngine> graphicEngine, SharedPtr<IndexArray> indices, const AnsiChar* name = "");
 
 		/**
 		 * \brief
@@ -32,11 +32,11 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		std::shared_ptr<IndexArray> GetIndexArray() const;
+		SharedPtr<IndexArray> GetIndexArray() const;
 
     private:
 
-        std::shared_ptr<IndexArray> mIndices;
+        SharedPtr<IndexArray> mIndices;
 	};
 }
 

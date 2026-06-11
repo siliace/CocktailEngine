@@ -32,12 +32,12 @@ namespace Ck
         mParameters.Roughness = roughness;
     }
 
-    void Material::SetTexture(TextureType textureType, std::shared_ptr<TextureResource> textureResource)
+    void Material::SetTexture(TextureType textureType, SharedPtr<TextureResource> textureResource)
     {
         mTextures[textureType] = std::move(textureResource);
     }
 
-    std::shared_ptr<TextureResource> Material::GetTexture(TextureType textureType) const
+    SharedPtr<TextureResource> Material::GetTexture(TextureType textureType) const
     {
         return mTextures[textureType];
     }

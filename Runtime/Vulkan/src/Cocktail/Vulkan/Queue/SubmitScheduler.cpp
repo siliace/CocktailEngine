@@ -29,7 +29,7 @@ namespace Ck::Vulkan
 		return batch;
 	}
 
-	void SubmitScheduler::ConnectFence(QueueSubmitBatch* batch, std::shared_ptr<Fence> fence)
+	void SubmitScheduler::ConnectFence(QueueSubmitBatch* batch, SharedPtr<Fence> fence)
 	{
 		batch->AssignFence(std::move(fence));
 		batch->Connect(batch->OnCompleted(), [this, batch = batch]() {

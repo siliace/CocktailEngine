@@ -39,6 +39,14 @@ cocktail_source_directory(CORE_TEST_FILES
 )
 
 cocktail_source_directory(CORE_TEST_FILES
+    FOLDER "Memory"
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Memory/SharedPtr.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Memory/UniquePtr.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Memory/WeakPtr.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Signal"
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Signal/Connection.cpp

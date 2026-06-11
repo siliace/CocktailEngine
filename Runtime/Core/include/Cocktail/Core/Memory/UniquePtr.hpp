@@ -413,7 +413,7 @@ namespace Ck
         /**
          * \brief Conversion to bool indicating whether the pointer is valid
          */
-        explicit operator bool() const
+        explicit operator bool() const noexcept
         {
             return IsValid();
         }

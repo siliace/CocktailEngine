@@ -61,7 +61,7 @@ namespace Ck::Vulkan
 		 * \param index 
 		 * \return 
 		 */
-		std::shared_ptr<SwapchainTexture> GetTexture(unsigned int index) const;
+		SharedPtr<SwapchainTexture> GetTexture(unsigned int index) const;
 
 		/**
 		 * \brief 
@@ -76,7 +76,7 @@ namespace Ck::Vulkan
 		VkSwapchainKHR mHandle;
 	    Extent2D<unsigned int> mSize;
 		unsigned int mTextureCount;
-		std::shared_ptr<SwapchainTexture> mTextures[MaxSwapchainTexture];
+		SharedPtr<SwapchainTexture> mTextures[MaxSwapchainTexture];
 	};
 }
 

@@ -11,7 +11,7 @@ namespace Ck::Vulkan
 		mRange(createInfo.Range),
 		mAllocationCallbacks(allocationCallbacks)
 	{
-		mBuffer = static_cast<Buffer*>(createInfo.Buffer)->shared_from_this();
+		mBuffer = static_cast<Buffer*>(createInfo.Buffer)->AsShared();
 
 		VkBufferViewCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO, nullptr };
 		{
@@ -49,7 +49,7 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	std::shared_ptr<Renderer::Buffer> BufferView::GetBuffer() const
+	SharedPtr<Renderer::Buffer> BufferView::GetBuffer() const
 	{
 		return mBuffer;
 	}

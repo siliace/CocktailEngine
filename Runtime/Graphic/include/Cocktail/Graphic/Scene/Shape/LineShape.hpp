@@ -77,7 +77,7 @@ namespace Ck
         LinearColor mColor; /*!< Default or uniform color used for rendering */
         float mThickness; /*!< Thickness of the rendered lines */
         bool mIsStip; /*!< Indicates whether the lines are rendered as a strip or as segments */
-        std::shared_ptr<VertexBuffer> mVertexBuffer; /*!< GPU vertex buffer containing the line vertices */
+        SharedPtr<VertexBuffer> mVertexBuffer; /*!< GPU vertex buffer containing the line vertices */
     };
 }
 

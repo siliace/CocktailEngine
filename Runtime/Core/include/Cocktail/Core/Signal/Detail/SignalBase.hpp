@@ -3,6 +3,7 @@
 
 #include <map>
 
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 #include <Cocktail/Core/Signal/Connection.hpp>
 #include <Cocktail/Core/Signal/Detail/Slot.hpp>
 #include <Cocktail/Core/Signal/Detail/SlotContainer.hpp>
@@ -74,7 +75,7 @@ namespace Ck::Detail
             using SlotType = CallableSlot<Callable, Args...>;
 
             // Create the slot into the signal
-            std::shared_ptr<Slot<Args...>> slot = CreateSlot<SlotType, Callable>(std::forward<Callable>(callable), groupId);
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, Callable>(std::forward<Callable>(callable), groupId);
 
             // Create a connection to the slot we created
         	return Connection(slot);
@@ -94,7 +95,7 @@ namespace Ck::Detail
             using SlotType = ObjectSlot<T, Args...>;
 
             // Create the slot into the signal
-            std::shared_ptr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
 
             // Create a connection to the slot we created
             return Connection(slot);
@@ -114,7 +115,7 @@ namespace Ck::Detail
             using SlotType = ConstantObjectSlot<T, Args...>;
 
             // Create the slot into the signal
-            std::shared_ptr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
 
             // Create a connection to the slot we created
             return Connection(slot);
@@ -185,7 +186,7 @@ namespace Ck::Detail
 			auto end = beginEndPair.second;
             for (auto it = begin; it != end; ++it)
             {
-	            if (it->second.get() == state)
+	            if (it->second.Get() == state)
 	            {
                     mSlots.erase(it);
                     return;
@@ -202,9 +203,9 @@ namespace Ck::Detail
          * \return The created slot
          */
         template <typename T, typename... SlotArgs>
-        std::shared_ptr<Slot<Args...>> CreateSlot(SlotArgs&&... args, unsigned int groupId)
+        SharedPtr<Slot<Args...>> CreateSlot(SlotArgs&&... args, unsigned int groupId)
         {
-            std::shared_ptr<Slot<Args...>> slot = std::make_shared<T>(std::forward<SlotArgs>(args)..., this, groupId);
+            SharedPtr<Slot<Args...>> slot = MakeShared<T>(std::forward<SlotArgs>(args)..., this, groupId);
 
             {
 				std::lock_guard<Lockable> lg(mSlotLock);
@@ -215,7 +216,7 @@ namespace Ck::Detail
         }
 
         Lockable mSlotLock;
-        std::multimap<unsigned int, std::shared_ptr<Slot<Args...>>> mSlots;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mSlots;
     };
 }
 

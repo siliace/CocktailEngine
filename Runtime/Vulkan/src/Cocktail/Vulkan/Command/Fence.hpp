@@ -13,7 +13,7 @@ namespace Ck::Vulkan
 	/**
 	 * \brief 
 	 */
-	class Fence : public Renderer::Fence, public std::enable_shared_from_this<Fence>
+	class Fence : public Renderer::Fence, public SharedFromThis<Fence>
 	{
 	public:
 

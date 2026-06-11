@@ -38,7 +38,7 @@ namespace Ck::Vulkan
 		 * \param cached 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorSet> CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo, Uint64 stateHash, bool& cached);
+		SharedPtr<DescriptorSet> CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo, Uint64 stateHash, bool& cached);
 
 	private:
 
@@ -47,12 +47,12 @@ namespace Ck::Vulkan
 		 * \param layout 
 		 * \return 
 		 */
-		std::shared_ptr<DescriptorPool> CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout);
+		SharedPtr<DescriptorPool> CreateDescriptorPool(SharedPtr<DescriptorSetLayout> layout);
 
 		RenderDevice* mRenderDevice;
-		Array<std::shared_ptr<DescriptorPool>> mDescriptorPools;
-		HashMap<Uint64, std::shared_ptr<DescriptorSet>> mAcquiredSets;
-		Array<std::shared_ptr<DescriptorSet>> mVacantSets;
+		Array<SharedPtr<DescriptorPool>> mDescriptorPools;
+		HashMap<Uint64, SharedPtr<DescriptorSet>> mAcquiredSets;
+		Array<SharedPtr<DescriptorSet>> mVacantSets;
 		TlsObjectPool<DescriptorSet> mDescriptorSetPool;
 	};
 }

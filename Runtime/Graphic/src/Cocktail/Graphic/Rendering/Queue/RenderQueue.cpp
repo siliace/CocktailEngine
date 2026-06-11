@@ -49,10 +49,10 @@ namespace Ck
 
     COCKTAIL_DEFINE_LOG_CATEGORY(RenderQueueLogCategory);
 
-    RenderQueue::RenderQueue(std::shared_ptr<MaterialProgramManager> materialProgramManager, BlendingMode blendingMode) :
+    RenderQueue::RenderQueue(SharedPtr<MaterialProgramManager> materialProgramManager, BlendingMode blendingMode) :
         mBlendingMode(blendingMode)
     {
-        mMaterialProgramSet = std::make_shared<MaterialProgramSet>(materialProgramManager);
+        mMaterialProgramSet = MakeShared<MaterialProgramSet>(materialProgramManager);
     }
 
     void RenderQueue::PushCustom(const CustomRecordInfo& recordInfo, Uint64 sortingKey)
@@ -114,7 +114,7 @@ namespace Ck
         return mBlendingMode;
     }
 
-    void RenderQueue::Emplace(std::shared_ptr<RenderRecord> record, Uint64 sortingKey)
+    void RenderQueue::Emplace(SharedPtr<RenderRecord> record, Uint64 sortingKey)
     {
         mRecords.Emplace(RecordInfo{ std::move(record), sortingKey });
     }

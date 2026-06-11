@@ -1,10 +1,10 @@
 #ifndef COCKTAIL_CORE_UTILITY_OBJECTPOOL_HPP
 #define COCKTAIL_CORE_UTILITY_OBJECTPOOL_HPP
 
-#include <memory>
 #include <mutex>
 
 #include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 #include <Cocktail/Core/Memory/UniquePtr.hpp>
 #include <Cocktail/Core/System/Concurrency/NullMutex.hpp>
 #include <Cocktail/Core/System/Concurrency/SpinMutex.hpp>
@@ -33,7 +33,7 @@ namespace Ck
 				ObjectPoolBase* Pool;
 			};
 
-			using Shared = std::shared_ptr<T>;
+			using Shared = SharedPtr<T>;
 			using Unique = UniquePtr<T, Deleter>;
 
 			/**

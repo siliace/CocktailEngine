@@ -1,7 +1,7 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_GRAPHICRESOURCE_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_GRAPHICRESOURCE_HPP
 
-#include <memory>
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 
 #include <Cocktail/Renderer/Memory/MemoryResource.hpp>
 
@@ -28,7 +28,7 @@ namespace Ck
          * \brief 
          * \return 
          */
-        virtual std::shared_ptr<GraphicEngine> GetGraphicEngine() const = 0;
+        virtual SharedPtr<GraphicEngine> GetGraphicEngine() const = 0;
     };
 }
 

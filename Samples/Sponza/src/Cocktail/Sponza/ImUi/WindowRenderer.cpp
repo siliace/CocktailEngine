@@ -147,7 +147,7 @@ namespace Ck::ImUi
 
         commandList->EnableBlending(0, true);
 
-        commandList->BindShaderProgram(mShaderProgram.get());
+        commandList->BindShaderProgram(mShaderProgram.Get());
         commandList->BindTextureSampler(mTextureUniformSlot, 0, resources->GetFontTextureView(), nullptr);
 
         struct VertexInfo

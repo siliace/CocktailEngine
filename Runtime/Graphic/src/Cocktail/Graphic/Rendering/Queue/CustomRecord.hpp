@@ -17,7 +17,7 @@ namespace Ck
 		 * \param recordInfo
 		 * \return
 		 */
-		static std::shared_ptr<CustomRecord> New(const CustomRecordInfo& recordInfo);
+		static SharedPtr<CustomRecord> New(const CustomRecordInfo& recordInfo);
 
 		/**
 		 * \brief

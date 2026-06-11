@@ -158,30 +158,30 @@ namespace Ck::Vulkan
 		mRenderDevice(renderDevice)
 	{
 		PipelineCacheCreateInfo cacheCreateInfo;
-		mCache = std::make_shared<PipelineCache>(mRenderDevice, cacheCreateInfo, nullptr);
+		mCache = MakeShared<PipelineCache>(mRenderDevice, cacheCreateInfo, nullptr);
 	}
 
-	std::shared_ptr<ComputePipeline> PipelineManager::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
+	SharedPtr<ComputePipeline> PipelineManager::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 	{
 	    auto pipeline = mComputePipelines.ComputeIfMissing(HashComputeState(createInfo.ComputeState), [this, &createInfo](PipelineStateHash stateHash) {
             CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created ComputePipeline with hash %llu"), stateHash);
-            return mRenderDevice->CreateComputePipeline(mCache.get(), createInfo);
+            return mRenderDevice->CreateComputePipeline(mCache.Get(), createInfo);
 	    });
 
-	    return std::static_pointer_cast<ComputePipeline>(pipeline);
+	    return pipeline.StaticCast<ComputePipeline>();
 	}
 
-	std::shared_ptr<GraphicPipeline> PipelineManager::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
+	SharedPtr<GraphicPipeline> PipelineManager::CreateGraphicPipeline(const GraphicPipelineCreateInfo& createInfo)
 	{
 	    auto pipeline = mGraphicPipelines.ComputeIfMissing(HashGraphicState(createInfo.GraphicState), [this, &createInfo](PipelineStateHash stateHash) {
 		    CK_LOG(VulkanLogCategory, LogLevel::Info, CK_TEXT("Created GraphicPipeline with hash %llu"), stateHash);
-            return mRenderDevice->CreateGraphicPipeline(mCache.get(), createInfo);
+            return mRenderDevice->CreateGraphicPipeline(mCache.Get(), createInfo);
         });
 
-	    return std::static_pointer_cast<GraphicPipeline>(pipeline);
+	    return pipeline.StaticCast<GraphicPipeline>();
 	}
 
-	std::shared_ptr<PipelineCache> PipelineManager::GetCache() const
+	SharedPtr<PipelineCache> PipelineManager::GetCache() const
 	{
 		return mCache;
 	}

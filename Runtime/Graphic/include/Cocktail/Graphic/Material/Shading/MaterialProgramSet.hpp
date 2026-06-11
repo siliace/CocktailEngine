@@ -17,7 +17,7 @@ namespace Ck
 		 * \brief 
 		 * \param materialProgramManager
 		 */
-		MaterialProgramSet(std::shared_ptr<MaterialProgramManager> materialProgramManager);
+		MaterialProgramSet(SharedPtr<MaterialProgramManager> materialProgramManager);
 
 		/**
 		 * \brief 
@@ -28,7 +28,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<MaterialProgramManager> mMaterialProgramManager;
+		SharedPtr<MaterialProgramManager> mMaterialProgramManager;
 		EnumMap<RenderableType, EnumMap<Material::ShadingMode, MaterialProgram*>> mMaterialPrograms;
 	};
 }

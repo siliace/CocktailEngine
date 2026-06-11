@@ -362,7 +362,7 @@ namespace Ck::Vulkan
 		}
 	}
 
-	CommandList::CommandList(RenderDevice* renderDevice, std::shared_ptr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
+	CommandList::CommandList(RenderDevice* renderDevice, SharedPtr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
 		mRenderDevice(renderDevice),
 		mAllocator(std::move(allocator)),
 		mHandle(VK_NULL_HANDLE),
@@ -993,7 +993,7 @@ namespace Ck::Vulkan
 
 		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !mCurrentFramebuffer->GetRenderPass()->ResolveDepthStencil())
 		{
-			std::shared_ptr<TextureView> depthStencilAttachment = std::static_pointer_cast<TextureView>(mCurrentFramebuffer->GetDepthStencilAttachment());
+			SharedPtr<TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment().StaticCast<TextureView>();
 			if (depthStencilAttachment)
 			{
 				PixelFormat attachmentFormat = depthStencilAttachment->GetFormat();
@@ -1005,7 +1005,7 @@ namespace Ck::Vulkan
 				if (shouldResolveDepth)
 				{
 					mRenderDevice->Invoke([&](DepthResolver* depthStencilResolver) {
-						auto depthStencilMultisampleAttachment = std::static_pointer_cast<TextureView>(mCurrentFramebuffer->GetDepthStencilMultisampleAttachment());
+						auto depthStencilMultisampleAttachment = mCurrentFramebuffer->GetDepthStencilMultisampleAttachment().StaticCast<TextureView>();
 						depthStencilResolver->Resolve(*this, mCurrentRenderPassMode.Get(), depthStencilMultisampleAttachment, depthStencilAttachment, depthResolveMode);
 					});
 				}
@@ -1023,15 +1023,15 @@ namespace Ck::Vulkan
 
 		StateManager* stateManager = GetStateManager(programType);
 
-		std::shared_ptr<Pipeline> pipeline = mCurrentPipelines[programType];
+		SharedPtr<Pipeline> pipeline = mCurrentPipelines[programType];
 		if (pipeline)
 		{
-		    std::shared_ptr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
-		    std::shared_ptr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
+		    SharedPtr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
+		    SharedPtr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
 		    for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
 		    {
-		        std::shared_ptr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
-		        std::shared_ptr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
+		        SharedPtr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
+		        SharedPtr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
 		        if (!nextDescriptorSetLayout || !descriptorSetLayout->IsCompatibleWith(*nextDescriptorSetLayout))
 		        {
 		            stateManager->ResetBindings(set);
@@ -1473,11 +1473,11 @@ namespace Ck::Vulkan
 	void CommandList::FlushState(Renderer::ShaderProgramType programType)
 	{
 		StateManager* stateManager = GetStateManager(programType);
-		std::shared_ptr<Pipeline> currentPipeline = mCurrentPipelines[programType];
+		SharedPtr<Pipeline> currentPipeline = mCurrentPipelines[programType];
 
 		if (!currentPipeline || stateManager->IsDirty(StateManager::DirtyFlagBits::Pipeline))
 		{
-			std::shared_ptr<Pipeline> pipeline = stateManager->CompilePipeline();
+			SharedPtr<Pipeline> pipeline = stateManager->CompilePipeline();
 			if (currentPipeline != pipeline)
 			{
 				vkCmdBindPipeline(mHandle, pipeline->GetLayout()->GetBindPoint(), pipeline->GetHandle());
@@ -1486,7 +1486,7 @@ namespace Ck::Vulkan
 			}
 		}
 
-		std::shared_ptr<PipelineLayout> pipelineLayout = currentPipeline->GetLayout();
+		SharedPtr<PipelineLayout> pipelineLayout = currentPipeline->GetLayout();
 
 		if (stateManager->IsDirty(StateManager::DirtyFlagBits::DescriptorSet))
 		{
@@ -1495,7 +1495,7 @@ namespace Ck::Vulkan
 				if (!stateManager->IsDescriptorSetDirty(set))
 					continue;
 
-				std::shared_ptr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
+				SharedPtr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
 				if (setLayout->SupportPushDescriptor())
 				{
 					if (auto descriptorUpdateTemplate = pipelineLayout->GetDescriptorUpdateTemplate(set))

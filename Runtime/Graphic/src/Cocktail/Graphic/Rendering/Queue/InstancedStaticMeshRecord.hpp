@@ -1,6 +1,9 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_QUEUE_INSTANCEDSTATICMESHRECORD_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_QUEUE_INSTANCEDSTATICMESHRECORD_HPP
 
+#include <Cocktail/Core/Math/Matrix/Matrix4.hpp>
+#include <Cocktail/Core/Utility/ObjectPool.hpp>
+
 #include <Cocktail/Graphic/Rendering/Queue/RenderQueue.hpp>
 
 namespace Ck
@@ -18,7 +21,7 @@ namespace Ck
 		 * \param materialProgramVariant
 		 * \return 
 		 */
-		static std::shared_ptr<InstancedStaticMeshRecord> New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
+		static SharedPtr<InstancedStaticMeshRecord> New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant);
 
 		/**
 		 * \brief 

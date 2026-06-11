@@ -27,7 +27,7 @@ namespace Ck
 		 * \brief 
 		 * \param shape 
 		 */
-		void AddShape(std::shared_ptr<Shape> shape);
+		void AddShape(SharedPtr<Shape> shape);
 
 		/**
 		 * \brief
@@ -58,7 +58,7 @@ namespace Ck
 
 		Scene* mScene;
 		bool mVisible;
-		Array<std::shared_ptr<Shape>> mShapes;
+		Array<SharedPtr<Shape>> mShapes;
 		Box<float> mBoundingBox;
 	};
 }

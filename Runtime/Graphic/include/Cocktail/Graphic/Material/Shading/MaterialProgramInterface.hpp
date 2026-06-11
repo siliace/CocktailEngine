@@ -222,11 +222,11 @@ namespace Ck
              * *
              * \return Shared pointer to the constructed interface
              */
-            std::shared_ptr<MaterialProgramInterface> Get() const;
+            SharedPtr<MaterialProgramInterface> Get() const;
 
         private:
 
-            std::shared_ptr<MaterialProgramInterface> mInterface; /*!< Interface being built */
+            SharedPtr<MaterialProgramInterface> mInterface; /*!< Interface being built */
         };
 
         MaterialProgramInterface() = default;

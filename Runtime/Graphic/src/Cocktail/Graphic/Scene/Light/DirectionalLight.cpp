@@ -3,7 +3,7 @@
 
 namespace Ck
 {
-    DirectionalLight* DirectionalLight::Create(std::shared_ptr<Scene> scene, String name, Vector3<float> direction, LinearColor color, float intensity)
+    DirectionalLight* DirectionalLight::Create(SharedPtr<Scene> scene, String name, Vector3<float> direction, LinearColor color, float intensity)
     {
         UniquePtr<DirectionalLight> light = MakeUnique<DirectionalLight>(std::move(name), direction.Normalized(), color, intensity);
         DirectionalLight* lightPtr = light.Get();

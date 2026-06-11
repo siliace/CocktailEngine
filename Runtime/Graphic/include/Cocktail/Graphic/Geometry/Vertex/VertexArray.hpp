@@ -20,7 +20,7 @@ namespace Ck
 		 * \param vertexCount The number of vertices stored
 		 * \param interlaced True if vertices attributes must be stored interlaced, false otherwise
 		 */
-		VertexArray(std::shared_ptr<VertexLayout> layout, std::size_t vertexCount, bool interlaced = true);
+		VertexArray(SharedPtr<VertexLayout> layout, std::size_t vertexCount, bool interlaced = true);
 
 		/**
 		 * \brief 
@@ -46,7 +46,7 @@ namespace Ck
 		 * \brief Get the format of vertices stored
 		 * \return The format
 		 */
-		const std::shared_ptr<VertexLayout>& GetVertexLayout() const;
+		const SharedPtr<VertexLayout>& GetVertexLayout() const;
 
 		/**
 		 * \brief Get the number of vertices stored
@@ -62,7 +62,7 @@ namespace Ck
 
 	private:
 
-		std::shared_ptr<VertexLayout> mVertexLayout;
+		SharedPtr<VertexLayout> mVertexLayout;
 		std::size_t mVertexCount;
 		bool mInterlaced;
 		ByteArray mVertices;

@@ -122,7 +122,7 @@ namespace Ck::Vulkan
 		return mDedicated;
 	}
 
-	std::shared_ptr<DeviceMemory> DeviceMemoryChunk::GetDeviceMemory() const
+	SharedPtr<DeviceMemory> DeviceMemoryChunk::GetDeviceMemory() const
 	{
 		return mDeviceMemory;
 	}

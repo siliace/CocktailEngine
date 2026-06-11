@@ -60,12 +60,12 @@ namespace Ck::Vulkan
 				break;
 			}
 
-			mSamplers[staticSampler] = std::static_pointer_cast<Sampler>(mRenderDevice->CreateSampler(samplerCreateInfo));
+			mSamplers[staticSampler] = mRenderDevice->CreateSampler(samplerCreateInfo).StaticCast<Sampler>();
 		}
 	}
 
 	Sampler* StaticSamplerManager::GetSampler(Renderer::StaticSampler staticSampler) const
 	{
-		return mSamplers[staticSampler].get();
+		return mSamplers[staticSampler].Get();
 	}
 }

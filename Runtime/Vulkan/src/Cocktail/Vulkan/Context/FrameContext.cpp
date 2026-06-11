@@ -17,14 +17,18 @@ namespace Ck::Vulkan
 		RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
 
 		CommandListPoolCreateInfo commandListPoolCreateInfo;
-		mCommandListPool = std::make_shared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
+		mCommandListPool = MakeShared<CommandListPool>(renderDevice, commandListPoolCreateInfo, allocationCallbacks);
 
 		Renderer::FenceCreateInfo fenceCreateInfo;
 		fenceCreateInfo.Signaled = false;
-		mFrameFence = std::static_pointer_cast<Fence>(renderDevice->CreateFence(fenceCreateInfo));
+		mFrameFence = renderDevice->CreateFence(fenceCreateInfo).StaticCast<Fence>();
 	}
 
-	void FrameContext::Synchronize() const
+    FrameContext::~FrameContext()
+    {
+    }
+
+    void FrameContext::Synchronize() const
 	{
 		if (mSubmitted)
 			mFrameFence->Wait();
@@ -57,12 +61,12 @@ namespace Ck::Vulkan
 			mRenderContext->WaitSemaphore(Renderer::CommandQueueType::Graphic, acquiredImage.ImageAvailable, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 		}
 
-		return renderSurface->GetFramebuffer(acquiredImage.ImageIndex.Get()).get();
+		return renderSurface->GetFramebuffer(acquiredImage.ImageIndex.Get()).Get();
 	}
 
 	CommandList* FrameContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)
 	{
-		return mCommandLists.FindIf([&](std::shared_ptr<CommandList>& commandList) {
+		return mCommandLists.FindIf([&](SharedPtr<CommandList>& commandList) {
 			if (commandList->GetState() != Renderer::CommandListState::Initial)
 				return false;
 
@@ -73,13 +77,13 @@ namespace Ck::Vulkan
 				return false;
 
 			return true;
-		}).Then([&](std::shared_ptr<CommandList>& commandList) {
+		}).Then([&](SharedPtr<CommandList>& commandList) {
 			commandList->SetObjectName(createInfo.Name);
 		}).GetOrElse([&]() {
 			return mCommandLists.Emplace(
 				mCommandListPool->CreateCommandList(createInfo)
 			);
-		}).get();
+		}).Get();
 	}
 
 	Renderer::BufferAllocator* FrameContext::GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType)
@@ -87,14 +91,14 @@ namespace Ck::Vulkan
 		for (const auto& [bufferAllocatorKey, bufferAllocator] : mBufferAllocators)
 		{
 			if (std::get<0>(bufferAllocatorKey) & usage && std::get<1>(bufferAllocatorKey) == memoryType)
-				return bufferAllocator.get();
+				return bufferAllocator.Get();
 		}
 
 		RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
-		std::shared_ptr<BufferAllocator> allocator = std::make_shared<BufferAllocator>(renderDevice, usage, 1024 * 1024, memoryType);
+		SharedPtr<BufferAllocator> allocator = MakeShared<BufferAllocator>(renderDevice, usage, 1024 * 1024, memoryType);
 		mBufferAllocators[BufferAllocatorKey(usage, memoryType)] = allocator;
 
-		return allocator.get();
+		return allocator.Get();
 	}
 
 	void FrameContext::Present(VkQueue queue)

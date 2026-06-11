@@ -21,7 +21,7 @@ namespace Ck::Renderer
 	     * \brief Get the underling Buffer
 	     * \return The underlying Buffer
 	     */
-		virtual std::shared_ptr<Buffer> GetBuffer() const = 0;
+		virtual SharedPtr<Buffer> GetBuffer() const = 0;
 
 		/**
 		 * \brief Get the format used to interpret Buffer data

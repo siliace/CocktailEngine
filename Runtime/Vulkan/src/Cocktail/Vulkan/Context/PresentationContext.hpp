@@ -36,7 +36,7 @@ namespace Ck::Vulkan
 		 * \param old
 		 * \return
 		 */
-		std::shared_ptr<Swapchain> CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const;
+		SharedPtr<Swapchain> CreateSwapchain(const Extent2D<unsigned int>& size, VkPresentModeKHR presentMode, Swapchain* old) const;
 
 		/**
 		 * \brief

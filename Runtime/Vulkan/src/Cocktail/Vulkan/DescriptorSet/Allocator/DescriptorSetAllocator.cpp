@@ -15,26 +15,26 @@ namespace Ck::Vulkan
 	{
 		mAcquiredSets.Clear();
 		mVacantSets.Clear();
-		for (const std::shared_ptr<DescriptorPool>& descriptorPool : mDescriptorPools)
+		for (const SharedPtr<DescriptorPool>& descriptorPool : mDescriptorPools)
 			descriptorPool->Reset();
 	}
 
-	std::shared_ptr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo, Uint64 stateHash, bool& cached)
+	SharedPtr<DescriptorSet> DescriptorSetAllocator::CreateDescriptorSet(const DescriptorSetCreateInfo& createInfo, Uint64 stateHash, bool& cached)
 	{
 		cached = true;
-        Optional<std::shared_ptr<DescriptorSet>&> set = mAcquiredSets.TryGet(stateHash);
+        Optional<SharedPtr<DescriptorSet>&> set = mAcquiredSets.TryGet(stateHash);
         if (!set.IsEmpty())
             return set.Get();
 
 		cached = false;
-		std::shared_ptr<DescriptorSet> descriptorSet = mVacantSets.FindIndexIf([&](const std::shared_ptr<DescriptorSet> &set) {
+		SharedPtr<DescriptorSet> descriptorSet = mVacantSets.FindIndexIf([&](const SharedPtr<DescriptorSet>& set) {
 			return createInfo.Layout->IsCompatibleWith(*set->GetLayout());
 		}).Map([&](unsigned int index) {
 			return mVacantSets.RemoveAt(index);
 		}).GetOrElse([&]() {
-			std::shared_ptr<DescriptorPool> descriptorPool = CreateDescriptorPool(createInfo.Layout);
+			SharedPtr<DescriptorPool> descriptorPool = CreateDescriptorPool(createInfo.Layout);
 
-			std::shared_ptr<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
+			SharedPtr<DescriptorSet> descriptorSets[MaxSetPerDescriptorPool];
 			for (unsigned int i = 0; i < MaxSetPerDescriptorPool; i++)
 				descriptorSets[i] = mDescriptorSetPool.Allocate(mRenderDevice, descriptorPool, createInfo, nullptr);
 
@@ -49,13 +49,13 @@ namespace Ck::Vulkan
 		return descriptorSet;
 	}
 
-	std::shared_ptr<DescriptorPool> DescriptorSetAllocator::CreateDescriptorPool(std::shared_ptr<DescriptorSetLayout> layout)
+	SharedPtr<DescriptorPool> DescriptorSetAllocator::CreateDescriptorPool(SharedPtr<DescriptorSetLayout> layout)
 	{
 		DescriptorPoolCreateInfo createInfo;
 		createInfo.MaxSet = MaxSetPerDescriptorPool;
 		createInfo.LayoutSignature = layout->ToSignature();
 
-		std::shared_ptr<DescriptorPool> descriptorPool = mRenderDevice->CreateDescriptorPool(createInfo);
+		SharedPtr<DescriptorPool> descriptorPool = mRenderDevice->CreateDescriptorPool(createInfo);
 		mDescriptorPools.Add(descriptorPool);
 
 		return descriptorPool;

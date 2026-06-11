@@ -9,37 +9,37 @@ namespace Ck
 
 	void Connection::Disconnect()
 	{
-		if (const std::shared_ptr<Detail::SlotState> slot = mState.lock())
+		if (const SharedPtr<Detail::SlotState> slot = mState.ToStrong())
 			slot->Disconnect();
 
-		mState.reset();
+		mState.Reset(nullptr);
 	}
 
 	void Connection::Enable() const
 	{
-		if (const std::shared_ptr<Detail::SlotState> slot = mState.lock())
+		if (const SharedPtr<Detail::SlotState> slot = mState.ToStrong())
 			slot->Enable();
 	}
 
 	void Connection::Disable() const
 	{
-		if (const std::shared_ptr<Detail::SlotState> slot = mState.lock())
+		if (const SharedPtr<Detail::SlotState> slot = mState.ToStrong())
 			slot->Disable();
 	}
 
 	bool Connection::IsConnected() const
 	{
-		const std::shared_ptr<Detail::SlotState> slot = mState.lock();
+		const SharedPtr<Detail::SlotState> slot = mState.ToStrong();
 		return slot && slot->IsConnected();
 	}
 
 	bool Connection::IsDisabled() const
 	{
-		const std::shared_ptr<Detail::SlotState> slot = mState.lock();
+		const SharedPtr<Detail::SlotState> slot = mState.ToStrong();
 		return slot && slot->IsDisabled();
 	}
 
-	Connection::Connection(std::weak_ptr<Detail::SlotState> state) :
+	Connection::Connection(WeakPtr<Detail::SlotState> state) :
 		mState(std::move(state))
 	{
 		/// Nothing
