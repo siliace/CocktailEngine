@@ -91,7 +91,7 @@ namespace Ck
         SharedPtr<Mesh> mMesh;
         SharedPtr<VertexBuffer> mVertexBuffer;
         SharedPtr<IndexBuffer> mIndexBuffer;
-        std::unordered_set<SharedPtr<Material>> mMaterials;
+        HashSet<SharedPtr<Material>> mMaterials;
         HashMap<const Material*, Array<Geometry>> mGeometries;
     };
 }

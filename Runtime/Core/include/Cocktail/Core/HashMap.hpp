@@ -1,1023 +1,562 @@
 ﻿#ifndef COCKTAIL_CORE_HASHMAP_HPP
 #define COCKTAIL_CORE_HASHMAP_HPP
 
-#include <Cocktail/Core/Array.hpp>
-#include <Cocktail/Core/LinkedList.hpp>
+#include <Cocktail/Core/HashSet.hpp>
 
 namespace Ck
 {
     /**
-     * \brief Represents a key-value pair stored in a map
+     * \brief Represents a key-value pair stored in a HashMap
      *
-     * This structure stores a key and its associated value. It is used
-     * as the base representation for entries contained within HashMap.
+     * \c MapEntry is the public-facing element type for \c HashMap.
+     * Both the key and value are directly accessible as public members.
      *
-     * \tparam TKey Type of the key
-     * \tparam TValue Type of the value
+     * \tparam TKey   Type of the key
+     * \tparam TValue Type of the associated value
      */
     template <typename TKey, typename TValue>
     struct MapEntry
     {
+        /**
+         * \brief Type of the key
+         */
         using KeyType = TKey;
+
+        /**
+         * \brief Type of the associated value
+         */
         using ValueType = TValue;
 
         /**
-         * \brief Constructs an empty map entry
+         * \brief Default constructor — value-initialises both \c Key and \c Value
          */
         MapEntry() = default;
 
         /**
-         * \brief Constructs a map entry from a key and value
+         * \brief Construct from a key and a value (copy)
          *
-         * \param key Entry key
-         * \param value Entry value
+         * \param key   Key to store
+         * \param value Value to associate with the key
          */
         MapEntry(const KeyType& key, const ValueType& value) :
             Key(key),
             Value(value)
         {
-            /// Nothing
         }
 
         /**
-         * \brief Constructs a map entry using perfect forwarding
+         * \brief Construct from a key and a value (perfect forwarding)
          *
-         * \tparam TOtherKey Key argument type
-         * \tparam TOtherValue Value argument type
+         * \tparam TOtherKey   Type forwarded as key
+         * \tparam TOtherValue Type forwarded as value
          *
-         * \param key Entry key
-         * \param value Entry value
+         * \param key   Key to store
+         * \param value Value to associate with the key
          */
         template <typename TOtherKey = TKey, typename TOtherValue = TValue>
         MapEntry(TOtherKey&& key, TOtherValue&& value) :
             Key(std::forward<TOtherKey>(key)),
             Value(std::forward<TOtherValue>(value))
         {
+        }
+
+        /**
+         * \brief The entry's key — used for lookup and hashing
+         */
+        KeyType Key;
+
+        /**
+         * \brief The entry's associated value
+         */
+        ValueType Value;
+    };
+
+    // -----------------------------------------------------------------------
+    // Entry policy for HashMap
+    // -----------------------------------------------------------------------
+
+    namespace Detail
+    {
+        /**
+         * \brief Entry policy that stores \c MapEntry<TKey, TValue> nodes
+         *
+         * This policy is used by \c HashTableBase to handle the HashMap-specific
+         * semantics: keys are stored together with their values, and a \c Put
+         * on a duplicate key replaces the existing value in place.
+         *
+         * \tparam TKey   Key type
+         * \tparam TValue Value type
+         */
+        template <typename TKey, typename TValue>
+        struct MapEntryPolicy
+        {
+            /**
+             * \brief The type stored in each bucket node
+             */
+            using EntryType = MapEntry<TKey, TValue>;
+
+            /**
+             * \brief The type used to look up entries
+             */
+            using KeyType = TKey;
+
+            /**
+             * \brief Extract the lookup key from a stored entry
+             *
+             * \param entry The entry to extract the key from
+             *
+             * \return Const reference to the entry's key
+             */
+            static const KeyType& GetKey(const EntryType& entry)
+            {
+                return entry.Key;
+            }
+
+            /**
+             * \brief Replace the value of an existing entry
+             *
+             * Called by \c Bucket::Put when a node with a matching key is found.
+             * The key is left unchanged; only the value is updated.
+             *
+             * \tparam TOtherKey   Forwarded key argument (unused — key remains unchanged)
+             * \tparam TOtherValue Forwarded replacement value
+             *
+             * \param entry Entry whose value should be updated
+             * \param value New value to assign
+             */
+            template <typename TOtherKey, typename TOtherValue>
+            static void ReplaceValue(EntryType& entry, TOtherKey&& /*key*/, TOtherValue&& value)
+            {
+                ObjectMemoryUtils::Destroy(&entry.Value);
+                ObjectMemoryUtils::Construct(&entry.Value, std::forward<TOtherValue>(value));
+            }
+        };
+    }
+
+    /**
+     * \brief Associative container storing key-value pairs using an open-addressing hash table
+     *
+     * \c HashMap provides average O(1) complexity for insertion, lookup, and
+     * removal.  Entries are distributed across buckets according to the hash
+     * value of their keys; collisions are resolved by chaining (each bucket is
+     * a linked list).  A rehash is triggered automatically when the load factor
+     * exceeds 0.75.
+     *
+     * \par Iteration order
+     * Iteration is not in insertion order or key order — it follows bucket order.
+     * The order may change after a rehash.
+     *
+     * \par Thread safety
+     * This class is not thread-safe.  External synchronisation is required when
+     * concurrent reads and writes are needed.
+     *
+     * \tparam TKey       Type of the keys
+     * \tparam TValue     Type of the associated values
+     * \tparam THash      Callable that produces a \c std::size_t hash for a \c TKey
+     * \tparam TEqual     Binary predicate that returns \c true when two \c TKey values are equal
+     * \tparam TAllocator Allocator type used for bucket-node memory
+     */
+    template <typename TKey, typename TValue, typename THash = std::hash<TKey>, typename TEqual = std::equal_to<TKey>, typename TAllocator = HeapAllocator>
+    class HashMap : public Detail::HashTableBase<Detail::MapEntryPolicy<TKey, TValue>, THash, TEqual, TAllocator>
+    {
+        using Base = Detail::HashTableBase<Detail::MapEntryPolicy<TKey, TValue>, THash, TEqual, TAllocator>;
+        using Node = typename Base::Node;
+
+    public:
+
+        /**
+         * \brief Key type stored in each entry
+         */
+        using KeyType = TKey;
+
+        /**
+         * \brief Value type stored in each entry
+         */
+        using ValueType = TValue;
+
+        /**
+         * \brief Allocator type used for internal storage
+         */
+        using AllocatorType = TAllocator;
+
+        /**
+         * \brief Type used for sizes and indices
+         */
+        using SizeType = typename TAllocator::SizeType;
+
+        /**
+         * \brief Mutable iterator — dereferences to \c MapEntry<TKey, TValue>&
+         *
+         * \see Detail::HashTableIterator
+         */
+        using Iterator = Detail::HashTableIterator<Base, MapEntry<TKey, TValue>>;
+
+        /**
+         * \brief Read-only iterator — dereferences to \c const MapEntry<TKey, TValue>&
+         *
+         * \see Detail::HashTableConstIterator
+         */
+        using ConstIterator = Detail::HashTableConstIterator<Base, MapEntry<TKey, TValue>>;
+
+        // -----------------------------------------------------------------------
+        // Construction / assignment
+        // -----------------------------------------------------------------------
+
+        /**
+         * \brief Constructs an empty map with the given initial bucket count
+         *
+         * The actual bucket count is rounded up to the next power of two with a
+         * minimum of 8.
+         *
+         * \param bucketCount Desired initial bucket count (0 = use the default minimum)
+         */
+        explicit HashMap(SizeType bucketCount = 0) :
+            Base(bucketCount)
+        {
             /// Nothing
         }
 
-        KeyType Key; ///< Entry key
-        ValueType Value; ///< Entry value
-    };
-
-    /**
-     * \brief Associative container storing key-value pairs using a hash table
-     *
-     * HashMap provides average constant-time complexity for insertion,
-     * lookup, and removal operations. Entries are distributed across
-     * buckets according to the hash value of their keys.
-     *
-     * \tparam TKey Type used for keys
-     * \tparam TValue Type used for stored values
-     * \tparam THash Hash function used to generate hash codes for keys
-     * \tparam TEqual Equality predicate used to compare keys
-     * \tparam TAllocator Allocator used for internal memory management
-     */
-    template <typename TKey, typename TValue, typename THash = std::hash<TKey>, typename TEqual = std::equal_to<TKey>, typename TAllocator = HeapAllocator>
-    class HashMap
-    {
-    public:
-
-        using KeyType = TKey;
-        using ValueType = TValue;
-        using AllocatorType = TAllocator;
-        using SizeType = typename TAllocator::SizeType;
-
-    private:
-
-        struct Entry : MapEntry<KeyType, ValueType>
-        {
-            Entry() :
-                HashCode(0)
-            {
-                /// Nothing
-            }
-
-            Entry(std::size_t hashCode, const KeyType& key, const ValueType& value) :
-                MapEntry<KeyType, ValueType>(key, value),
-                HashCode(hashCode)
-            {
-                /// Nothing
-            }
-
-            template <typename TOtherKey = TKey, typename TOtherValue>
-            Entry(std::size_t hashCode, TOtherKey&& key, TOtherValue&& value) :
-                MapEntry<KeyType, ValueType>(std::forward<TOtherKey>(key), std::forward<TOtherValue>(value)),
-                HashCode(hashCode)
-            {
-                /// Nothing
-            }
-
-            std::size_t HashCode;
-        };
-
-        class Bucket : public Detail::LinkedListBase<Entry, TAllocator>
-        {
-        public:
-
-            template <typename TOtherKey, typename TOtherValue>
-            bool Put(std::size_t hashCode, TOtherKey&& key, TOtherValue&& value)
-            {
-                Detail::LinkedListNode<Entry, TAllocator>* head = Detail::LinkedListBase<Entry, TAllocator>::GetHead();
-                while (head != nullptr)
-                {
-                    Entry& entry = head->GetValue();
-                    if (entry.HashCode == hashCode && mComparator(entry.Key, key))
-                    {
-                        ObjectMemoryUtils::Destroy(entry.Value);
-                        ObjectMemoryUtils::Construct(&entry.Value, std::forward<TOtherValue>(value));
-
-                        return false;
-                    }
-
-                    head = head->GetNext();
-                }
-
-                Detail::LinkedListBase<Entry, TAllocator>::EmplaceBack(hashCode, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value));
-                return true;
-            }
-
-            Optional<Entry&> Find(std::size_t hashCode, const KeyType& key)
-            {
-                Detail::LinkedListNode<Entry, TAllocator>* head = Detail::LinkedListBase<Entry, TAllocator>::GetHead();
-                while (head != nullptr)
-                {
-                    Entry& entry = head->GetValue();
-                    if (entry.HashCode == hashCode && mComparator(entry.Key, key))
-                        return Optional<Entry&>::Of(head->GetValue());
-
-                    head = head->GetNext();
-                }
-
-                return Optional<Entry&>::Empty();
-            }
-
-            Optional<const Entry&> Find(std::size_t hashCode, const KeyType& key) const
-            {
-                Detail::LinkedListNode<Entry, TAllocator>* head = Detail::LinkedListBase<Entry, TAllocator>::GetHead();
-                while (head != nullptr)
-                {
-                    const Entry& entry = head->GetValue();
-                    if (entry.HashCode == hashCode && mComparator(entry.Key, key))
-                        return Optional<const Entry&>::Of(head->GetValue());
-
-                    head = head->GetNext();
-                }
-
-                return Optional<Entry&>::Empty();
-            }
-
-            template <typename TOtherKey, typename TOtherValue>
-            Entry& Emplace(std::size_t hashCode, TOtherKey&& key, TOtherValue&& value)
-            {
-                return Detail::LinkedListBase<Entry, TAllocator>::EmplaceBack(hashCode, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value));
-            }
-
-            bool Remove(std::size_t hashCode, const KeyType& key)
-            {
-                Detail::LinkedListNode<Entry, TAllocator>* head = Detail::LinkedListBase<Entry, TAllocator>::GetHead();
-                while (head != nullptr)
-                {
-                    const Entry& value = head->GetValue();
-                    if (value.HashCode == hashCode && mComparator(value.Key, key))
-                    {
-                        Detail::LinkedListBase<Entry, TAllocator>::Unlink(head);
-                        return true;
-                    }
-
-                    head = head->GetNext();
-                }
-
-                return false;
-            }
-
-            void Clear()
-            {
-                Detail::LinkedListNode<Entry, TAllocator>* head = Detail::LinkedListBase<Entry, TAllocator>::GetHead();
-                while (head != nullptr)
-                    head = Detail::LinkedListBase<Entry, TAllocator>::Unlink(head);
-            }
-
-        private:
-
-            TEqual mComparator;
-        };
-
-    public:
-
-        class Iterator;
-        class ConstIterator;
-
         /**
-         * \brief Forward iterator used to traverse all entries in the hash map
+         * \brief Copy constructor
          *
-         * The iterator automatically skips empty buckets and provides access
-         * to the stored key-value pairs.
-         */
-        class Iterator
-        {
-            using BucketIterator = Detail::LinkedListIterator<Entry, TAllocator>;
-
-        public:
-
-            /**
-             * \brief Creates an iterator starting at the specified bucket
-             *
-             * \param owner Hash map being iterated.
-             * \param firstBucket Index of the first bucket to inspect.
-             */
-            explicit Iterator(HashMap& owner, SizeType firstBucket = 0) :
-                mOwner(&owner),
-                mBucketIndex(firstBucket),
-                mBucketIterator(nullptr)
-            {
-                AdvanceToValid();
-            }
-
-            /**
-             * \brief Moves the iterator backward
-             *
-             * \param count Number of elements to rewind
-             *
-             * \return Reference to this iterator
-             */
-            Iterator& Rewind(SizeType count = 1)
-            {
-                for (SizeType i = 0; i < count; i++)
-                {
-                    mBucketIterator.Rewind();
-                    RewindToValid();
-                }
-
-                return *this;
-            }
-
-            /**
-             * \brief Moves the iterator forward
-             *
-             * \param count Number of elements to advance
-             *
-             * \return Reference to this iterator
-             */
-            Iterator& Advance(SizeType count = 1)
-            {
-                for (SizeType i = 0; i < count; i++)
-                {
-                    mBucketIterator.Advance();
-                    AdvanceToValid();
-                }
-
-                return *this;
-            }
-
-            /**
-             * \brief Checks whether the iterator references a valid entry
-             *
-             * \return True if the iterator is valid, false otherwise
-             */
-            bool IsValid() const
-            {
-                return mBucketIterator.IsValid();
-            }
-
-            /**
-             * \brief Returns the current entry
-             *
-             * \return Reference to the current key-value pair
-             */
-            MapEntry<KeyType, ValueType>& GetValue()
-            {
-                return mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Returns the current entry
-             *
-             * \return Reference to the current key-value pair
-             */
-            const MapEntry<KeyType, ValueType>& GetValue() const
-            {
-                return mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Dereferences the iterator
-             *
-             * \return Reference to the current key-value pair
-             */
-            MapEntry<KeyType, ValueType>& operator*() const
-            {
-                return mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Provides pointer-like access to the current entry
-             *
-             * \return Pointer to the current key-value pair
-             */
-            MapEntry<KeyType, ValueType>* operator->() const
-            {
-                return &mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Advances the iterator to the next entry
-             *
-             * \return Reference to this iterator
-             */
-            Iterator& operator++()
-            {
-                mBucketIterator = mBucketIterator.Next();
-                AdvanceToValid();
-
-                return *this;
-            }
-
-            /**
-             * \brief Rewind the iterator to the previous entry
-             *
-             * \return Reference to this iterator
-             */
-            Iterator& operator--()
-            {
-                mBucketIterator = mBucketIterator.Previous();
-                RewindToValid();
-
-                return *this;
-            }
-
-            /**
-             * \brief Compares two iterators for equality
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if both iterators reference the same position
-             */
-            bool operator==(const Iterator& other) const
-            {
-                return mBucketIterator == other.mBucketIterator;
-            }
-
-            /**
-             * \brief Compares two iterators for inequality
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if the iterators reference different positions
-             */
-            bool operator!=(const Iterator& other) const
-            {
-                return !(*this == other);
-            }
-
-        private:
-
-            friend class ConstIterator;
-
-            /**
-             * \brief Moves backward until a valid entry is found
-             */
-            void RewindToValid()
-            {
-                while (!mBucketIterator.IsValid() && mBucketIndex > 0)
-                {
-                    Bucket& bucket = mOwner->mBuckets[mBucketIndex--];
-                    mBucketIterator = BucketIterator(bucket);
-
-                    if (mBucketIterator.IsValid())
-                        return;
-                }
-            }
-
-            /**
-             * \brief Moves forward until a valid entry is found
-             */
-            void AdvanceToValid()
-            {
-                while (!mBucketIterator.IsValid() && mBucketIndex < mOwner->mBucketCount)
-                {
-                    Bucket& bucket = mOwner->mBuckets[mBucketIndex++];
-                    mBucketIterator = BucketIterator(bucket);
-
-                    if (mBucketIterator.IsValid())
-                        return;
-                }
-            }
-
-            HashMap* mOwner; ///< Hash map being iterated
-            SizeType mBucketIndex; ///< Current bucket index
-            BucketIterator mBucketIterator; ///< Iterator within the current bucket
-        };
-
-        /**
-         * \brief Read-only forward iterator used to traverse all entries in the hash map
+         * Deep-copies all entries from \p other.
          *
-         * The iterator automatically skips empty buckets and provides
-         * read-only access to stored key-value pairs.
-         */
-        class ConstIterator
-        {
-            using BucketIterator = Detail::LinkedListConstIterator<Entry, TAllocator>;
-
-        public:
-
-            /**
-             * \brief Creates a const iterator starting at the specified bucket
-             *
-             * \param owner Hash map being iterated
-             * \param firstBucket Index of the first bucket to inspect
-             */
-            ConstIterator(const HashMap& owner, SizeType firstBucket = 0) :
-                mOwner(&owner),
-                mBucketIndex(firstBucket),
-                mBucketIterator(nullptr)
-            {
-                AdvanceToValid();
-            }
-
-            /**
-             * \brief Constructs a const iterator from a mutable iterator
-             *
-             * \param other Iterator to convert
-             */
-            ConstIterator(Iterator other) :
-                mOwner(other.mOwner),
-                mBucketIndex(other.mBucketIndex),
-                mBucketIterator(other.mBucketIterator)
-            {
-                /// Nothing
-            }
-
-            /**
-             * \brief Moves the iterator backward
-             *
-             * \param count Number of elements to rewind
-             *
-             * \return Reference to this iterator
-             */
-            ConstIterator& Rewind(SizeType count = 1)
-            {
-                for (SizeType i = 0; i < count; i++)
-                {
-                    mBucketIterator.Rewind();
-                    RewindToValid();
-                }
-
-                return *this;
-            }
-
-            /**
-             * \brief Moves the iterator forward
-             *
-             * \param count Number of elements to advance
-             *
-             * \return Reference to this iterator
-             */
-            ConstIterator& Advance(SizeType count = 1)
-            {
-                for (SizeType i = 0; i < count; i++)
-                {
-                    mBucketIterator.Advance();
-                    AdvanceToValid();
-                }
-
-                return *this;
-            }
-
-            /**
-             * \brief Checks whether the iterator references a valid entry
-             *
-             * \return True if the iterator is valid, false otherwise
-             */
-            bool IsValid() const
-            {
-                return mBucketIterator.IsValid();
-            }
-
-            /**
-             * \brief Returns the current entry
-             *
-             * \return Constant reference to the current key-value pair
-             */
-            const MapEntry<KeyType, ValueType>& GetValue() const
-            {
-                return mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Dereferences the iterator
-             *
-             * \return Constant reference to the current key-value pair
-             */
-            const MapEntry<KeyType, ValueType>& operator*() const
-            {
-                return mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Provides pointer-like access to the current entry
-             *
-             * \return Pointer to the current key-value pair
-             */
-            const MapEntry<KeyType, ValueType>* operator->() const
-            {
-                return &mBucketIterator.GetValue();
-            }
-
-            /**
-             * \brief Advances the iterator to the next entry
-             *
-             * \return Reference to this iterator
-             */
-            ConstIterator& operator++()
-            {
-                mBucketIterator = mBucketIterator.Next();
-                AdvanceToValid();
-
-                return *this;
-            }
-
-            /**
-             * \brief Rewind the iterator to the previous entry
-             *
-             * \return Reference to this iterator
-             */
-            Iterator& operator--()
-            {
-                mBucketIterator = mBucketIterator.Previous();
-                RewindToValid();
-
-                return *this;
-            }
-
-            /**
-             * \brief Compares the iterator with a mutable iterator
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if both iterators reference the same position
-             */
-            bool operator==(const Iterator& other) const
-            {
-                return mBucketIterator == other.mBucketIterator;
-            }
-
-            /**
-             * \brief Compares two const iterators for equality
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if both iterators reference the same position
-             */
-            bool operator==(const ConstIterator& other) const
-            {
-                return mBucketIterator == other.mBucketIterator;
-            }
-
-            /**
-             * \brief Compares the iterator with a mutable iterator
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if the iterators reference different positions
-             */
-            bool operator!=(const Iterator& other) const
-            {
-                return !(*this == other);
-            }
-
-            /**
-             * \brief Compares two const iterators for inequality
-             *
-             * \param other Iterator to compare against
-             *
-             * \return True if the iterators reference different positions
-             */
-            bool operator!=(const ConstIterator& other) const
-            {
-                return !(*this == other);
-            }
-
-        private:
-
-            /**
-             * \brief Moves backward until a valid entry is found
-             */
-            void RewindToValid()
-            {
-                while (!mBucketIterator.IsValid() && mBucketIndex > 0)
-                {
-                    Bucket& bucket = mOwner->mBuckets[mBucketIndex--];
-                    mBucketIterator = BucketIterator(bucket);
-
-                    if (mBucketIterator.IsValid())
-                        return;
-                }
-            }
-
-            /**
-             * \brief Moves forward until a valid entry is found
-             */
-            void AdvanceToValid()
-            {
-                while (!mBucketIterator.IsValid() && mBucketIndex < mOwner->mBucketCount)
-                {
-                    const Bucket& bucket = mOwner->mBuckets[mBucketIndex++];
-                    mBucketIterator = BucketIterator(bucket);
-
-                    if (mBucketIterator.IsValid())
-                        return;
-                }
-            }
-
-            const HashMap* mOwner; ///< Hash map being iterated.
-            SizeType mBucketIndex; ///< Current bucket index.
-            BucketIterator mBucketIterator; ///< Iterator within the current bucket.
-        };
-
-        /**
-         * \brief Constructs a hash map with the specified initial bucket count
-         *
-         * The actual bucket count is rounded up to the next power of two,
-         * with a minimum of 8 buckets.
-         *
-         * \param bucketCount Desired initial bucket count
-         */
-        HashMap(SizeType bucketCount = 0) :
-            mSize(0)
-        {
-            mBucketCount = NextPowerOfTwo(std::max<SizeType>(8, bucketCount));
-            mBuckets = MakeUnique<Bucket[]>(mBucketCount);
-        }
-
-        /**
-         * \brief Constructs a hash map by copying another hash map
-         *
-         * All entries from the source hash map are duplicated into this instance
-         *
-         * \param other Hash map to copy
+         * \param other Map to copy from
          */
         HashMap(const HashMap& other) :
-            mSize(0),
-            mBucketCount(other.mBucketCount),
-            mHasher(other.mHasher)
+            Base(other)
         {
-            mBuckets = MakeUnique<Bucket[]>(mBucketCount);
-
-            ConstIterator iterator(other);
-            while (iterator.IsValid())
-            {
-                const MapEntry<KeyType, ValueType>& entry = iterator.GetValue();
-                Put(entry.Key, entry.Value);
-
-                iterator.Advance();
-            }
+            /// Nothing
         }
 
         /**
-         * \brief Constructs a hash map by taking ownership of another hash map's resources
+         * \brief Move constructor
          *
-         * After the move, the source hash map is left in a valid but unspecified state
+         * Transfers ownership of \p other's bucket array.
+         * \p other is left empty after the operation.
          *
-         * \param other Hash map to move from
+         * \param other Map to move from
          */
-        HashMap(HashMap&& other) noexcept
+        HashMap(HashMap&& other) noexcept :
+            Base(std::move(other))
         {
-            mSize = std::exchange(other.mSize, 0);
-            mBucketCount = std::exchange(other.mBucketCount, 0);
-            mHasher = std::move(other.mHasher);
-            mBuckets = std::move(other.mBuckets);
+            /// Nothing
         }
 
         /**
-         * \brief Replaces the contents of this hash map with a copy of another hash map
+         * \brief Copy assignment operator
          *
-         * Existing entries are removed before copying the contents of the source hash map.
+         * Clears this map, then deep-copies all entries from \p other.
          *
-         * \param other Hash map to copy
+         * \param other Map to copy from
          *
-         * \return Reference to this hash map
+         * \return Reference to \c *this
          */
         HashMap& operator=(const HashMap& other)
         {
-            if (this != &other)
-            {
-                Clear();
-
-                mHasher = other.mHasher;
-                mBucketCount = other.mBucketCount;
-                mBuckets = MakeUnique<Bucket[]>(other.mBucketCount);
-
-                ConstIterator iterator(other);
-                while (iterator.IsValid())
-                {
-                    const MapEntry<KeyType, ValueType>& entry = iterator.GetValue();
-                    Put(entry.Key, entry.Value);
-
-                    iterator.Advance();
-                }
-            }
-
+            Base::operator=(other);
             return *this;
         }
 
         /**
-         * \brief Replaces the contents of this hash map by taking ownership of another hash map's resources
+         * \brief Move assignment operator
          *
-         * Existing resources are released and ownership of the source hash map's
-         * resources is transferred to this instance.
+         * Transfers ownership of \p other's bucket array.
+         * \p other is left empty after the operation.
          *
-         * \param other Hash map to move from
+         * \param other Map to move from
          *
-         * \return Reference to this hash map
+         * \return Reference to \c *this
          */
         HashMap& operator=(HashMap&& other) noexcept
         {
-            if (this != &other)
-            {
-                mSize = std::exchange(other.mSize, 0);
-                mBucketCount = std::exchange(other.mBucketCount, 0);
-                mHasher = std::move(other.mHasher);
-                mBuckets = std::move(other.mBuckets);
-            }
-
+            Base::operator=(std::move(other));
             return *this;
         }
 
+        // -----------------------------------------------------------------------
+        // Insertion
+        // -----------------------------------------------------------------------
+
         /**
-         * \brief Inserts or replaces a key-value pair
+         * \brief Insert a new key-value pair, or replace the value of an existing key
          *
-         * If the key already exists, its associated value is replaced.
-         * Otherwise, a new entry is inserted.
+         * If a \c MapEntry with the same key already exists its \c Value member
+         * is replaced in-place without reallocating the node.  Otherwise a new
+         * entry is inserted.
          *
-         * \tparam TOtherKey Key type
-         * \tparam TOtherValue Value type
+         * \tparam TOtherKey   Type of the key argument (forwarded)
+         * \tparam TOtherValue Type of the value argument (forwarded)
          *
-         * \param key Key to insert or update
-         * \param value Value associated with the key
+         * \param key   Key to insert or update
+         * \param value Value to associate with \p key
          */
         template <typename TOtherKey, typename TOtherValue>
         void Put(TOtherKey&& key, TOtherValue&& value)
         {
-            std::size_t hashCode;
-            Bucket& bucket = GetBucket(key, hashCode);
-            if (bucket.Put(hashCode, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value)))
-            {
-                ++mSize;
-                if (mSize > mBucketCount * 3 / 4)
-                    Rehash(mBucketCount << 1);
-            }
+            Base::PutEntry(key, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value));
         }
 
         /**
-         * \brief Inserts a key-value pair only if the key is not already present
+         * \brief Insert a key-value pair only when the key is not already present
          *
-         * \tparam TOtherKey Key type
-         * \tparam TOtherValue Value type
+         * If a \c MapEntry with the same key already exists, this is a no-op.
          *
-         * \param key Key to insert
-         * \param value Value associated with the key
+         * \tparam TOtherKey   Type of the key argument (forwarded)
+         * \tparam TOtherValue Type of the value argument (forwarded)
          *
-         * \return True if a new entry was inserted, false if the key already existed
+         * \param key   Key to check and potentially insert
+         * \param value Value to insert when the key is absent
+         *
+         * \return \c true if a new entry was inserted, \c false if the key was
+         *         already present
          */
         template <typename TOtherKey, typename TOtherValue>
         bool PutIfMissing(TOtherKey&& key, TOtherValue&& value)
         {
-            std::size_t hashCode;
-            Bucket& bucket = GetBucket(key, hashCode);
-            if (!bucket.Find(hashCode, key).IsEmpty())
-                return false;
-
-            bucket.Emplace(hashCode, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value));
-            ++mSize;
-
-            if (mSize > mBucketCount * 3 / 4)
-                Rehash(mBucketCount << 1);
-
-            return true;
+            return Base::PutEntryIfMissing(key, std::forward<TOtherKey>(key), std::forward<TOtherValue>(value));
         }
 
         /**
-         * \brief Returns the value associated with a key, creating it if necessary
+         * \brief Return the value for \p key, inserting a computed value when absent
          *
-         * If the key does not exist, the provided function is called to generate
-         * a value which is then inserted into the map.
+         * When the key is not present, \p function is called with \p key to produce
+         * the value to insert.  The newly inserted value is returned.
+         * When the key already exists its current value is returned and \p function
+         * is never called.
          *
-         * \tparam TOtherKey Key type
-         * \tparam F Value factory type
+         * \tparam TOtherKey Type of the key (forwarded)
+         * \tparam F         Callable with signature \c ValueType(const KeyType&)
          *
-         * \param key Key to search for
-         * \param function Function used to create a value when the key is missing
+         * \param key      Key to look up or create
+         * \param function Factory called with \p key when the entry is absent
          *
-         * \return Reference to the existing or newly created value
+         * \return Mutable reference to the existing or newly created value
+         *
+         * \warning If the insertion triggers a rehash the internal node address
+         *          changes; the returned reference remains valid through a
+         *          post-rehash lookup.
          */
         template <typename TOtherKey, typename F>
         ValueType& ComputeIfMissing(TOtherKey&& key, F&& function)
         {
-            std::size_t hashCode;
-            Bucket& bucket = GetBucket(key, hashCode);
-            if (Optional<Entry&> entry = bucket.Find(hashCode, key); !entry.IsEmpty())
-                return entry.Get().Value;
+            Optional<Node&> existing = Base::FindNode(static_cast<const KeyType&>(key));
+            if (!existing.IsEmpty())
+                return existing.Get().Value;
 
             FunctionReturnType<F> value = function(key);
-            Entry& entry = bucket.Emplace(hashCode, std::forward<TOtherKey>(key), std::move(value));
-            ++mSize;
-
-            if (mSize > mBucketCount * 3 / 4)
+            std::size_t hashCode;
+            auto& bucket = Base::GetBucket(key, hashCode);
+            Node& node = bucket.Emplace(hashCode, std::forward<TOtherKey>(key), std::move(value));
+            ++this->mSize;
+            if (this->mSize > this->mBucketCount * 3 / 4)
             {
-                Rehash(mBucketCount << 1);
-                return TryFindEntry(key).Get().Value;
+                Base::Reserve(this->mSize);
+                return Base::FindNode(static_cast<const KeyType&>(key)).Get().Value;
             }
-
-            return entry.Value;
+            return node.Value;
         }
 
         /**
-         * \brief Replaces the value associated with an existing key
+         * \brief Replace the value of an existing entry without inserting
          *
-         * \tparam TOtherKey Key type
-         * \tparam TOtherValue Value type
+         * Locates the entry for \p key.  If found its value is updated to
+         * \p value.  If the key is absent, the map is left unchanged.
          *
-         * \param key Key to update
-         * \param value New value
+         * \tparam TOtherKey   Type of the key argument
+         * \tparam TOtherValue Type of the replacement value (forwarded)
          *
-         * \return True if the key was found and replaced, false otherwise
+         * \param key   Key of the entry to update
+         * \param value New value to assign
+         *
+         * \return \c true if the key was found and the value was updated,
+         *         \c false if the key does not exist
          */
         template <typename TOtherKey, typename TOtherValue>
         bool Replace(TOtherKey&& key, TOtherValue&& value)
         {
-            return !TryFindEntry(key)
-                        .Then([&value](Entry& entry) {
-                            entry.Value = std::forward<TOtherValue>(value);
+            return !Base::FindNode(static_cast<const KeyType&>(key))
+                        .Then([&value](Node& node) {
+                            node.Value = std::forward<TOtherValue>(value);
                         })
                         .IsEmpty();
         }
 
+        // -----------------------------------------------------------------------
+        // Lookup
+        // -----------------------------------------------------------------------
+
         /**
-         * \brief Retrieves the value associated with a key
+         * \brief Return a pointer to the value for \p key, or \c nullptr if absent
          *
-         * \param key Key to search for
+         * \param key Key to look up
          *
-         * \return Pointer to the value if found, nullptr otherwise
+         * \return Pointer to the associated value, or \c nullptr if not found
          */
         ValueType* Get(const KeyType& key)
         {
             return TryGet(key)
-                .Map([](ValueType& value) -> ValueType* {
-                    return &value;
+                .Map([](ValueType& v) -> ValueType* {
+                    return &v;
                 })
                 .GetOr(nullptr);
         }
 
         /**
-         * \brief Retrieves the value associated with a key
+         * \brief Return a const pointer to the value for \p key, or \c nullptr if absent
          *
-         * \param key Key to search for
+         * \param key Key to look up
          *
-         * \return Pointer to the value if found, nullptr otherwise
+         * \return Const pointer to the associated value, or \c nullptr if not found
          */
         const ValueType* Get(const KeyType& key) const
         {
             return TryGet(key)
-                .Map([](const ValueType& value) -> const ValueType* {
-                    return &value;
+                .Map([](const ValueType& v) -> const ValueType* {
+                    return &v;
                 })
                 .GetOr(nullptr);
         }
 
         /**
-         * \brief Attempts to retrieve the value associated with a key
+         * \brief Return an \c Optional mutable reference to the value for \p key
          *
-         * \tparam TOtherKey Key type
+         * \tparam TOtherKey Type of the key argument
          *
-         * \param key Key to search for
+         * \param key Key to look up
          *
-         * \return An Optional containing the value if found
+         * \return \c Optional<ValueType&> containing the value if found, empty otherwise
          */
         template <typename TOtherKey>
         Optional<ValueType&> TryGet(TOtherKey&& key)
         {
-            return TryFindEntry(key).Map([](Entry& entry) -> ValueType& {
-                return entry.Value;
+            return Base::FindNode(static_cast<const KeyType&>(key)).Map([](Node& node) -> ValueType& {
+                return node.Value;
             });
         }
 
         /**
-         * \brief Attempts to retrieve the value associated with a key
+         * \brief Return an \c Optional const reference to the value for \p key
          *
-         * \tparam TOtherKey Key type
+         * \tparam TOtherKey Type of the key argument
          *
-         * \param key Key to search for
+         * \param key Key to look up
          *
-         * \return An Optional containing the value if found
+         * \return \c Optional<const ValueType&> containing the value if found, empty otherwise
          */
         template <typename TOtherKey>
         Optional<const ValueType&> TryGet(TOtherKey&& key) const
         {
-            return TryFindEntry(key).Map([](const Entry& entry) -> const ValueType& {
-                return entry.Value;
+            return Base::FindNode(static_cast<const KeyType&>(key)).Map([](const Node& node) -> const ValueType& {
+                return node.Value;
             });
         }
 
         /**
-         * \brief Retrieves the value associated with a key or creates a default one
+         * \brief Return the value for \p key, inserting a default-constructed value when absent
          *
-         * If the key does not exist, a default-constructed value is inserted
+         * If the key does not exist a new entry is inserted with a
+         * default-constructed \c ValueType and a reference to it is returned.
+         * This mirrors the behaviour of \c std::unordered_map::operator[].
          *
-         * \tparam TOtherKey Key type
+         * \tparam TOtherKey Type of the key argument (forwarded)
          *
-         * \param key Key to search for
+         * \param key Key to look up or create
          *
-         * \return Reference to the existing or newly inserted value
+         * \return Mutable reference to the existing or newly created value
+         *
+         * \warning If the insertion triggers a rehash the internal node address
+         *          changes; the returned reference remains valid through a
+         *          post-rehash lookup.
          */
         template <typename TOtherKey>
         ValueType& GetOrAdd(TOtherKey&& key)
         {
+            Optional<Node&> existing = Base::FindNode(static_cast<const KeyType&>(key));
+            if (!existing.IsEmpty())
+                return existing.Get().Value;
+
             std::size_t hashCode;
-            Bucket& bucket = GetBucket(key, hashCode);
-            if (Optional<Entry&> entry = bucket.Find(hashCode, key); !entry.IsEmpty())
-                return entry.Get().Value;
-
-            Entry& entry = bucket.Emplace(hashCode, std::forward<TOtherKey>(key), ValueType());
-            ++mSize;
-
-            if (mSize > mBucketCount * 3 / 4)
+            auto& bucket = Base::GetBucket(key, hashCode);
+            Node& node = bucket.Emplace(hashCode, std::forward<TOtherKey>(key), ValueType());
+            ++this->mSize;
+            if (this->mSize > this->mBucketCount * 3 / 4)
             {
-                Rehash(mBucketCount << 1);
-                return TryFindEntry(key).Get().Value;
+                Base::Reserve(this->mSize);
+                return Base::FindNode(static_cast<const KeyType&>(key)).Get().Value;
             }
-
-            return entry.Value;
+            return node.Value;
         }
 
         /**
-         * \brief Checks whether the specified key exists
+         * \brief Check whether \p key exists in the map
          *
-         * \tparam TOtherKey Key type
+         * \tparam TOtherKey Type of the key argument
          *
          * \param key Key to search for
          *
-         * \return True if the key exists, false otherwise
+         * \return \c true if an entry with \p key exists, \c false otherwise
          */
         template <typename TOtherKey>
         bool Contains(TOtherKey&& key) const
         {
-            return !TryFindEntry(key).IsEmpty();
+            return !Base::FindNode(static_cast<const KeyType&>(key)).IsEmpty();
         }
 
+        // -----------------------------------------------------------------------
+        // Removal
+        // -----------------------------------------------------------------------
+
         /**
-         * \brief Removes an entry from the map
+         * \brief Remove the entry for \p key
          *
-         * \tparam TOtherKey Key type
+         * \tparam TOtherKey Type of the key argument
          *
-         * \param key Key to remove
+         * \param key Key of the entry to remove
          *
-         * \return True if an entry was removed, false otherwise
+         * \return \c true if an entry was found and removed, \c false otherwise
          */
         template <typename TOtherKey>
         bool Remove(TOtherKey&& key)
         {
-            std::size_t hashCode;
-            Bucket& bucket = GetBucket(key, hashCode);
-            if (bucket.Remove(hashCode, key))
-            {
-                --mSize;
-                return true;
-            }
-
-            return false;
+            return Base::RemoveEntry(static_cast<const KeyType&>(key));
         }
+
+        // -----------------------------------------------------------------------
+        // Iteration helpers
+        // -----------------------------------------------------------------------
+
         /**
-         * \brief Applies a function to all entries in the map
+         * \brief Apply \p function to every entry in the map
          *
-         * \tparam TFunction Type of the function
-         * \param function Function to apply to each element
+         * The callable receives either:
+         * - no arguments (arity 0),
+         * - the value only \c (const ValueType&) (arity 1), or
+         * - the value and the key \c (const ValueType&, const KeyType&) (arity 2).
          *
-         * \warning The \p function should be read-only.
-         *          Any insertion/deletion of an element will cause an unpredictable iteration behavior.
+         * \tparam TFunction Callable type; arity must be 0, 1, or 2
+         *
+         * \param function The function to apply to each entry
+         *
+         * \warning Do not insert or remove entries during iteration — doing so
+         *          may trigger a rehash and invalidate the internal iterators.
          */
         template <typename TFunction>
         void ForEach(TFunction function) const
         {
-            static_assert(FunctionTraits<TFunction>::Arity <= 2, "Transform function takes only 0, 1 or 2 parameters");
+            static_assert(FunctionTraits<TFunction>::Arity <= 2, "ForEach function accepts 0, 1, or 2 parameters");
 
-            for (SizeType i = 0; i < mBucketCount; i++)
+            for (SizeType i = 0; i < this->mBucketCount; i++)
             {
-                Detail::LinkedListIterator<Entry, AllocatorType> it(mBuckets[i]);
+                Detail::LinkedListConstIterator<Node, AllocatorType> it(this->mBuckets[i]);
                 while (it.IsValid())
                 {
                     if constexpr (FunctionTraits<TFunction>::Arity == 0)
-                    {
                         function();
-                    }
                     else if constexpr (FunctionTraits<TFunction>::Arity == 1)
-                    {
                         function(it->Value);
-                    }
-                    else if constexpr (FunctionTraits<TFunction>::Arity == 2)
-                    {
+                    else
                         function(it->Value, it->Key);
-                    }
 
                     it.Advance();
                 }
@@ -1025,13 +564,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an iterator pointing to the first element of the map
+         * \brief Return a mutable iterator positioned at the first entry
          *
-         * This function provides a convenient way to manually obtain a mutable iterator
-         * to the beginning of the hash map. If the map is empty, the returned iterator
-         * will be invalid (i.e., \c IsValid() will return false).
-         *
-         * \return An iterator positioned at the head of the map
+         * \return Iterator at the beginning of the map
          */
         Iterator GetIterator()
         {
@@ -1039,13 +574,9 @@ namespace Ck
         }
 
         /**
-         * \brief Returns a constant iterator pointing to the first element of the map
+         * \brief Return a read-only iterator positioned at the first entry
          *
-         * This overload is used when the map is accessed through a const reference.
-         * It provides read-only traversal of the container. If the map is empty,
-         * the returned iterator will be invalid.
-         *
-         * \return A const iterator positioned at the head of the map
+         * \return Const iterator at the beginning of the map
          */
         ConstIterator GetIterator() const
         {
@@ -1053,281 +584,120 @@ namespace Ck
         }
 
         /**
-         * \brief Returns an iterator pointing to the last element of the map
+         * \brief Return a mutable iterator positioned at the last entry
          *
-         * This function provides a convenient way to manually obtain a mutable iterator
-         * to the beginning of the hash map. If the map is empty, the returned iterator
-         * will be invalid (i.e., \c IsValid() will return false).
-         *
-         * \return An iterator positioned at the last element of the map
+         * \return Iterator at the last valid entry of the map
          */
         Iterator GetLastIterator()
         {
-            Iterator it(*this, mBucketCount);
+            Iterator it(*this, this->mBucketCount);
             it.Rewind();
-
             return it;
         }
 
         /**
-         * \brief Returns a constant iterator pointing to the last element of the map
+         * \brief Return a read-only iterator positioned at the last entry
          *
-         * This overload is used when the map is accessed through a const reference.
-         * It provides read-only traversal of the container. If the map is empty,
-         * the returned iterator will be invalid.
-         *
-         * \return A const iterator positioned at the last element of the map
+         * \return Const iterator at the last valid entry of the map
          */
         ConstIterator GetLastIterator() const
         {
-            ConstIterator it(*this, mBucketCount);
+            ConstIterator it(*this, this->mBucketCount);
             it.Rewind();
-
             return it;
         }
 
+        // -----------------------------------------------------------------------
+        // Bulk operations
+        // -----------------------------------------------------------------------
+
         /**
-         * \brief Returns all values contained in the map
+         * \brief Collect all keys stored in the map into a \c HashSet
          *
-         * \return An array containing all stored values
+         * \return HashSet containing a copy of every key in the map
+         */
+        HashSet<ValueType, THash, TEqual, AllocatorType> GetKeys() const
+        {
+            HashSet<ValueType, THash, TEqual, AllocatorType> keys;
+            keys.Reserve(this->mSize);
+            ForEach([&keys](const ValueType& v, const KeyType& k) {
+                keys.Add(k);
+            });
+            return keys;
+        }
+
+        /**
+         * \brief Collect all values stored in the map into an \c Array
+         *
+         * The order of values in the returned array matches the iteration order
+         * of the map (bucket order).
+         *
+         * \return Array containing a copy of every value in the map
          */
         Array<ValueType, AllocatorType> GetValues() const
         {
             Array<ValueType, AllocatorType> values;
-            values.Reserve(mSize);
-
-            for (SizeType i = 0; i < mBucketCount; i++)
-            {
-                const Bucket& bucket = mBuckets[i];
-                Detail::LinkedListConstIterator<Entry, TAllocator> iterator(bucket);
-                while (iterator.IsValid())
-                {
-                    const Entry& entry = iterator.GetValue();
-                    values.Add(entry.Value);
-
-                    iterator = iterator.Next();
-                }
-            }
-
+            values.Reserve(this->mSize);
+            ForEach([&values](const ValueType& v) {
+                values.Add(v);
+            });
             return values;
         }
 
-        /**
-         * \brief Ensures that the map can hold at least the specified number of elements
-         *
-         * May trigger a rehash operation if additional buckets are required.
-         *
-         * \param capacity Desired element capacity
-         */
-        void Reserve(SizeType capacity)
-        {
-            SizeType requiredBucketCount = NextPowerOfTwo(std::max<SizeType>(8, capacity * 4 / 3 + 1));
-
-            if (requiredBucketCount > mBucketCount)
-                Rehash(requiredBucketCount);
-        }
+        using Base::Clear;
+        using Base::GetBucketCount;
+        using Base::GetSize;
+        using Base::IsEmpty;
+        using Base::Reserve;
 
         /**
-         * \brief Removes all entries from the map.
-         */
-        void Clear()
-        {
-            for (SizeType i = 0; i < mBucketCount; i++)
-            {
-                Bucket& bucket = mBuckets[i];
-                bucket.Clear();
-            }
-
-            mSize = 0;
-        }
-
-        /**
-         * \brief Returns the number of stored entries
+         * \brief Access or insert the value for \p key
          *
-         * \return Current element count
-         */
-        SizeType GetSize() const
-        {
-            return mSize;
-        }
-
-        /**
-         * \brief Returns the number of buckets currently allocated
-         *
-         * \return Bucket count
-         */
-        SizeType GetBucketCount() const
-        {
-            return mBucketCount;
-        }
-
-        /**
-         * \brief Checks whether the map is empty
-         *
-         * \return True if the map contains no entries, false otherwise
-         */
-        bool IsEmpty() const
-        {
-            return mSize == 0;
-        }
-
-        /**
-         * \brief Retrieves or creates the value associated with a key
-         *
-         * Equivalent to calling GetOrAdd().
+         * Equivalent to \c GetOrAdd(key).  If the key does not exist a
+         * default-constructed value is inserted and returned.
          *
          * \param key Key to access
          *
-         * \return Reference to the associated value
+         * \return Mutable reference to the associated value
          */
         ValueType& operator[](const KeyType& key)
         {
             return GetOrAdd(key);
         }
-
-    private:
-
-        /**
-         * \brief Rebuilds the hash table using a new bucket count
-         *
-         * All existing entries are redistributed into a newly allocated
-         * bucket array according to their stored hash codes. The operation
-         * preserves all key-value pairs while changing the bucket layout.
-         *
-         * \param newBucketCount Number of buckets to allocate
-         */
-        void Rehash(SizeType newBucketCount)
-        {
-            UniquePtr<Bucket[]> newBuckets = MakeUnique<Bucket[]>(newBucketCount);
-
-            for (SizeType i = 0; i < mBucketCount; i++)
-            {
-                Bucket& oldBucket = mBuckets[i];
-                Detail::LinkedListIterator<Entry, TAllocator> iterator(oldBucket);
-                while (iterator.IsValid())
-                {
-                    Entry& entry = iterator.GetValue();
-
-                    SizeType newIndex = entry.HashCode & (newBucketCount - 1);
-                    newBuckets[newIndex].Emplace(entry.HashCode, std::move(entry.Key), std::move(entry.Value));
-
-                    iterator = iterator.Next();
-                }
-            }
-
-            mBuckets = std::move(newBuckets);
-            mBucketCount = newBucketCount;
-        }
-
-        /**
-         * \brief Returns the bucket corresponding to the specified key
-         *
-         * Computes the hash code of the key and determines the target bucket
-         * using the current bucket count.
-         *
-         * \tparam TOtherKey Key type
-         *
-         * \param key Key whose bucket should be retrieved
-         * \param hashCode Receives the computed hash code
-         *
-         * \return Reference to the corresponding bucket
-         */
-        template <typename TOtherKey>
-        Bucket& GetBucket(TOtherKey&& key, std::size_t& hashCode)
-        {
-            hashCode = mHasher(key);
-            SizeType bucketIndex = hashCode & (mBucketCount - 1);
-            return mBuckets[bucketIndex];
-        }
-
-        /**
-         * \brief Returns the bucket corresponding to the specified key
-         *
-         * Computes the hash code of the key and determines the target bucket
-         * using the current bucket count.
-         *
-         * \tparam TOtherKey Key type
-         *
-         * \param key Key whose bucket should be retrieved
-         * \param hashCode Receives the computed hash code
-         *
-         * \return Constant reference to the corresponding bucket
-         */
-        template <typename TOtherKey>
-        const Bucket& GetBucket(TOtherKey&& key, std::size_t& hashCode) const
-        {
-            hashCode = mHasher(key);
-            SizeType bucketIndex = hashCode & (mBucketCount - 1);
-            return mBuckets[bucketIndex];
-        }
-
-        /**
-         * \brief Attempts to locate an entry associated with the specified key
-         *
-         * Searches the bucket corresponding to the key and returns the matching
-         * entry if one exists.
-         *
-         * \tparam TOtherKey Key type
-         * \param key Key to search for
-         *
-         * \return An Optional containing the matching entry if found,
-         *         or an empty Optional otherwise
-         */
-        template <typename TOtherKey>
-        Optional<Entry&> TryFindEntry(TOtherKey&& key)
-        {
-            std::size_t hashCode;
-            return GetBucket(key, hashCode).Find(hashCode, key);
-        }
-
-        /**
-         * \brief Attempts to locate an entry associated with the specified key
-         *
-         * Searches the bucket corresponding to the key and returns the matching
-         * entry if one exists.
-         *
-         * \tparam TOtherKey Key type
-         * \param key Key to search for
-         *
-         * \return An Optional containing the matching entry if found,
-         *         or an empty Optional otherwise
-         */
-        template <typename TOtherKey>
-        Optional<const Entry&> TryFindEntry(TOtherKey&& key) const
-        {
-            std::size_t hashCode;
-            return GetBucket(key, hashCode).Find(hashCode, key);
-        }
-
-        SizeType mSize; ///< Number of entries currently stored in the hash map
-        SizeType mBucketCount; ///< Total number of allocated buckets
-        THash mHasher; ///< Hash function used to compute key hash codes
-        UniquePtr<Bucket[]> mBuckets; ///< Array containing all hash buckets
     };
 
-    template <typename TKey, typename TValue, typename THash, typename TEqual, typename TAllocator>
-    typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::Iterator begin(HashMap<TKey, TValue, THash, TEqual, TAllocator>& hashMap)
+    /// \name ADL begin/end support for range-based for loops
+    /// \{
+
+    /** \brief Returns a mutable iterator to the first entry of \p m */
+    template <typename K, typename V, typename H, typename E, typename A>
+    typename HashMap<K, V, H, E, A>::Iterator begin(HashMap<K, V, H, E, A>& m)
     {
-        return typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::Iterator(hashMap);
+        return m.GetIterator();
     }
 
-    template <typename TKey, typename TValue, typename THash, typename TEqual, typename TAllocator>
-    typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::ConstIterator begin(const HashMap<TKey, TValue, THash, TEqual, TAllocator>& hashMap)
+    /** \brief Returns a read-only iterator to the first entry of \p m */
+    template <typename K, typename V, typename H, typename E, typename A>
+    typename HashMap<K, V, H, E, A>::ConstIterator begin(const HashMap<K, V, H, E, A>& m)
     {
-        return typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::ConstIterator(hashMap);
+        return m.GetIterator();
     }
 
-    template <typename TKey, typename TValue, typename THash, typename TEqual, typename TAllocator>
-    typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::Iterator end(HashMap<TKey, TValue, THash, TEqual, TAllocator>& hashMap)
+    /** \brief Returns a mutable past-the-end iterator for \p m */
+    template <typename K, typename V, typename H, typename E, typename A>
+    typename HashMap<K, V, H, E, A>::Iterator end(HashMap<K, V, H, E, A>& m)
     {
-        return typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::Iterator(hashMap, hashMap.GetBucketCount());
+        return typename HashMap<K, V, H, E, A>::Iterator(m, m.GetBucketCount());
     }
 
-    template <typename TKey, typename TValue, typename THash, typename TEqual, typename TAllocator>
-    typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::ConstIterator end(const HashMap<TKey, TValue, THash, TEqual, TAllocator>& hashMap)
+    /** \brief Returns a read-only past-the-end iterator for \p m */
+    template <typename K, typename V, typename H, typename E, typename A>
+    typename HashMap<K, V, H, E, A>::ConstIterator end(const HashMap<K, V, H, E, A>& m)
     {
-        return typename HashMap<TKey, TValue, THash, TEqual, TAllocator>::ConstIterator(hashMap, hashMap.GetBucketCount());
+        return typename HashMap<K, V, H, E, A>::ConstIterator(m, m.GetBucketCount());
     }
+
+    /// \}
 }
 
 #endif // COCKTAIL_CORE_HASHMAP_HPP

@@ -5,7 +5,7 @@ namespace Ck
     StaticMeshShape::StaticMeshShape(GraphicEngine& graphicEngine, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials) :
         mMesh(std::move(mesh))
     {
-        mMaterials.reserve(materials.GetSize());
+        mMaterials.Reserve(materials.GetSize());
 
         mVertexBuffer = graphicEngine.CreateVertexBuffer(mMesh->GetVertices());
         if (mMesh->IsIndexed())
@@ -17,7 +17,7 @@ namespace Ck
 
             SharedPtr<Material> material = materials[materialIndex];
 
-            mMaterials.insert(material);
+            mMaterials.Add(material);
             mGeometries[material.Get()].Add({ subMesh.Count, subMesh.FirstVertex, subMesh.FirstIndex, subMesh.PrimitiveTopology });
         }
     }

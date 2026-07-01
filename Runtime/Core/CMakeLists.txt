@@ -14,6 +14,8 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Flags.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/LinkedList.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/HashMap.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/HashSet.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/HashTable.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/StaticArray.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/String.hpp
     SRC

@@ -6,7 +6,7 @@
 TEMPLATE_TEST_CASE("Create empty", "[HashMap]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
 {
     Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hashMap;
-    
+
     REQUIRE(hashMap.IsEmpty());
     REQUIRE(hashMap.GetSize() == 0);
 }
@@ -17,11 +17,11 @@ TEMPLATE_TEST_CASE("Create by copy", "[HashMap]", Ck::HeapAllocator, Ck::LargeHe
     hashMap1.Put(1, 2);
     hashMap1.Put(2, 4);
     hashMap1.Put(3, 6);
-    
+
     SECTION("By constructor")
     {
         Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hastMap2(hashMap1);
-    
+
         REQUIRE_FALSE(hastMap2.IsEmpty());
         REQUIRE(hastMap2.GetSize() == 3);
 
@@ -33,16 +33,16 @@ TEMPLATE_TEST_CASE("Create by copy", "[HashMap]", Ck::HeapAllocator, Ck::LargeHe
             REQUIRE(rhs.IsValid());
             REQUIRE(lhs.GetValue().Key == rhs.GetValue().Key);
             REQUIRE(lhs.GetValue().Value == rhs.GetValue().Value);
-            
+
             lhs.Advance();
             rhs.Advance();
         }
     }
-    
+
     SECTION("By assignation")
     {
         Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hastMap2 = hashMap1;
-    
+
         REQUIRE_FALSE(hastMap2.IsEmpty());
         REQUIRE(hastMap2.GetSize() == 3);
 
@@ -54,7 +54,7 @@ TEMPLATE_TEST_CASE("Create by copy", "[HashMap]", Ck::HeapAllocator, Ck::LargeHe
             REQUIRE(rhs.IsValid());
             REQUIRE(lhs.GetValue().Key == rhs.GetValue().Key);
             REQUIRE(lhs.GetValue().Value == rhs.GetValue().Value);
-            
+
             lhs.Advance();
             rhs.Advance();
         }
@@ -67,18 +67,18 @@ TEMPLATE_TEST_CASE("Create by move", "[HashMap]", Ck::HeapAllocator, Ck::LargeHe
     hashMap1.Put(1, 2);
     hashMap1.Put(2, 4);
     hashMap1.Put(3, 6);
-    
+
     SECTION("By constructor")
     {
         Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hastMap2(std::move(hashMap1));
-    
+
         REQUIRE(hashMap1.IsEmpty());
         REQUIRE_FALSE(hastMap2.IsEmpty());
 
         REQUIRE(hashMap1.GetSize() == 0);
         REQUIRE(hastMap2.GetSize() == 3);
     }
-    
+
     SECTION("By assignation")
     {
         Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hastMap2 = std::move(hashMap1);
@@ -220,6 +220,20 @@ TEMPLATE_TEST_CASE("Remove elements", "[HashMap]", Ck::HeapAllocator, Ck::LargeH
         REQUIRE(hashMap.Remove(1));
         REQUIRE(hashMap.GetSize() == 1);
     }
+}
+
+TEMPLATE_TEST_CASE("Get all keys", "[HashMap]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::HashMap<int, int, std::hash<int>, std::equal_to<int>, TestType> hashMap;
+    hashMap.Put(1, 2);
+    hashMap.Put(2, 4);
+    hashMap.Put(3, 6);
+
+    auto keys = hashMap.GetKeys();
+    REQUIRE(keys.GetSize() == 3);
+    REQUIRE(keys.Contains(1));
+    REQUIRE(keys.Contains(2));
+    REQUIRE(keys.Contains(3));
 }
 
 TEMPLATE_TEST_CASE("Get all values", "[HashMap]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)

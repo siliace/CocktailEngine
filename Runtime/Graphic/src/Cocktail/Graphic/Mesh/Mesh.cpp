@@ -13,7 +13,7 @@ namespace Ck
 		assert(!mSubMeshes.IsEmpty());
 
 		for (const SubMesh& subMesh : mSubMeshes)
-			mMaterialIndices.insert(subMesh.MaterialIndex);
+			mMaterialIndices.Add(subMesh.MaterialIndex);
 
 		GenerateBoundingBox();
 	}
@@ -30,7 +30,7 @@ namespace Ck
 		subMesh.MaterialIndex = 0;
 		mSubMeshes.Add(subMesh);
 
-		mMaterialIndices.insert(0);
+		mMaterialIndices.Add(0);
 
 		GenerateBoundingBox();
 	}
@@ -55,7 +55,7 @@ namespace Ck
 		return mSubMeshes;
 	}
 
-	const std::unordered_set<unsigned int>& Mesh::GetMaterialIndices() const
+	const HashSet<unsigned int>& Mesh::GetMaterialIndices() const
 	{
 		return mMaterialIndices;
 	}

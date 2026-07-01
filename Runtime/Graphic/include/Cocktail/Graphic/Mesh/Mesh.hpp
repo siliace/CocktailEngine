@@ -1,9 +1,8 @@
 #ifndef COCKTAIL_GRAPHIC_MESH_MESH_HPP
 #define COCKTAIL_GRAPHIC_MESH_MESH_HPP
 
-#include <unordered_set>
-
 #include <Cocktail/Core/Array.hpp>
+#include <Cocktail/Core/HashSet.hpp>
 #include <Cocktail/Core/Math/Volume/Box.hpp>
 
 #include <Cocktail/Graphic/Export.hpp>
@@ -99,7 +98,7 @@ namespace Ck
 		 * \brief 
 		 * \return 
 		 */
-		const std::unordered_set<unsigned int>& GetMaterialIndices() const;
+		const HashSet<unsigned int>& GetMaterialIndices() const;
 
 		/**
 		 * \brief 
@@ -117,7 +116,7 @@ namespace Ck
 		SharedPtr<VertexArray> mVertices;
 		SharedPtr<IndexArray> mIndices;
 		Array<SubMesh> mSubMeshes;
-		std::unordered_set<unsigned int> mMaterialIndices;
+		HashSet<unsigned int> mMaterialIndices;
 		Box<float> mBoundingBox;
 	};
 }

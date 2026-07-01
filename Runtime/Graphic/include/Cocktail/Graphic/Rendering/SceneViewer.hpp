@@ -1,8 +1,6 @@
 #ifndef COCKTAIL_GRAPHIC_RENDERING_SCENEVIEWER_HPP
 #define COCKTAIL_GRAPHIC_RENDERING_SCENEVIEWER_HPP
 
-#include <set>
-
 #include <Cocktail/Core/Signal/Observable.hpp>
 #include <Cocktail/Core/Signal/Signal.hpp>
 
