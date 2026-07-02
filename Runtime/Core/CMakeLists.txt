@@ -242,6 +242,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/StlAdapter.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/UseSystemAllocator.hpp
     SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/BinnedAllocator.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/MallocAllocator.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/UseSystemAllocator.cpp
 )

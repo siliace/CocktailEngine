@@ -3,6 +3,17 @@
 
 namespace Ck
 {
+    namespace
+    {
+        std::size_t GetPageSizeImpl()
+        {
+            SYSTEM_INFO systemInfo;
+            GetSystemInfo(&systemInfo);
+
+            return systemInfo.dwPageSize;
+        }
+    }
+
     void* SystemMemory::Allocate(std::size_t size)
     {
         return VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -15,9 +26,7 @@ namespace Ck
 
     std::size_t SystemMemory::GetPageSize()
     {
-        SYSTEM_INFO systemInfo;
-        GetSystemInfo(&systemInfo);
-
-        return systemInfo.dwPageSize;
+        static const std::size_t pageSize = GetPageSizeImpl();
+        return pageSize;
     }
 }

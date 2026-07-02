@@ -67,6 +67,6 @@ namespace Ck
 
     void Memory::CreateGlobalAllocator()
     {
-        gAllocator = new BinnedAllocator<4>();
+        gAllocator = new BinnedAllocator();
     }
 }

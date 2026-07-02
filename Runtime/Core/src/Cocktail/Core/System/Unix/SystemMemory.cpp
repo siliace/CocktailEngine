@@ -17,6 +17,7 @@ namespace Ck
 
     std::size_t SystemMemory::GetPageSize()
     {
-        return sysconf(_SC_PAGESIZE);
+        static const std::size_t pageSize = static_cast<std::size_t>(sysconf(_SC_PAGESIZE));
+        return pageSize;
     }
 }
