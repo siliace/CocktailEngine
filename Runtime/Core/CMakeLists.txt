@@ -235,15 +235,19 @@ cocktail_source_directory(CORE_FILES
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MallocAllocationHandler.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MallocAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/MemoryAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/StlAdapter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/ThreadSafeAllocatorProxy.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/UseSystemAllocator.hpp
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/BinnedAllocator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/MallocAllocationHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/MallocAllocator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/ThreadSafeAllocatorProxy.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Cocktail/Core/Memory/Allocator/UseSystemAllocator.cpp
 )
 

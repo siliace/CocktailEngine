@@ -3,6 +3,7 @@
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
 #include <Cocktail/Core/Memory/Memory.hpp>
 #include <Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp>
+#include <Cocktail/Core/Memory/Allocator/ThreadSafeAllocatorProxy.hpp>
 
 namespace Ck
 {
@@ -31,11 +32,14 @@ namespace Ck
 
     void* Memory::Allocate(std::size_t size, std::size_t alignment)
     {
-        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
-            CreateGlobalAllocator();
-            assert(gAllocator != nullptr);
+            std::lock_guard lg(gAllocatorLock);
+            if (!gAllocator)
+            {
+                CreateGlobalAllocator();
+                assert(gAllocator != nullptr);
+            }
         }
 
         return gAllocator->Allocate(size, alignment);
@@ -43,11 +47,14 @@ namespace Ck
 
     void* Memory::Reallocate(void* pointer, std::size_t size, std::size_t alignment)
     {
-        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
-            CreateGlobalAllocator();
-            assert(gAllocator != nullptr);
+            std::lock_guard lg(gAllocatorLock);
+            if (!gAllocator)
+            {
+                CreateGlobalAllocator();
+                assert(gAllocator != nullptr);
+            }
         }
 
         return gAllocator->Reallocate(pointer, size, alignment);
@@ -55,11 +62,14 @@ namespace Ck
 
     void Memory::Free(void* pointer)
     {
-        std::lock_guard lg(gAllocatorLock);
         if (!gAllocator)
         {
-            CreateGlobalAllocator();
-            assert(gAllocator != nullptr);
+            std::lock_guard lg(gAllocatorLock);
+            if (!gAllocator)
+            {
+                CreateGlobalAllocator();
+                assert(gAllocator != nullptr);
+            }
         }
 
         gAllocator->Free(pointer);
@@ -67,6 +77,8 @@ namespace Ck
 
     void Memory::CreateGlobalAllocator()
     {
-        gAllocator = new BinnedAllocator();
+        gAllocator = new ThreadSafeAllocatorProxy(
+            MakeUnique<BinnedAllocator>()
+        );
     }
 }

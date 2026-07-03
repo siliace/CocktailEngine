@@ -25,10 +25,10 @@ namespace Ck
         using const_reference = const value_type&;
         using size_type = typename TSource::SizeType;
         using difference_type = std::ptrdiff_t;
-        using is_always_equal = std::true_type;
-        using propagate_on_container_copy_assignment = std::true_type;
-        using propagate_on_container_move_assignment = std::true_type;
-        using propagate_on_container_swap = std::true_type;
+        using is_always_equal = std::conditional_t<SourceAllocatorType::AlwaysEqual, std::true_type, std::false_type>;
+        using propagate_on_container_copy_assignment = std::conditional_t<SourceAllocatorType::PropagateOnContainerCopy, std::true_type, std::false_type>;
+        using propagate_on_container_move_assignment = std::conditional_t<SourceAllocatorType::PropagateOnContainerMove, std::true_type, std::false_type>;
+        using propagate_on_container_swap = std::conditional_t<SourceAllocatorType::PropagateOnContainerMove, std::true_type, std::false_type>;
 
         StlAdapter() = default;
         StlAdapter(const StlAdapter& other) = default;
@@ -60,6 +60,7 @@ namespace Ck
         {
             return true;
         }
+
         bool operator!=(const StlAdapter&) const noexcept
         {
             return false;

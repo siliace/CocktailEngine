@@ -86,7 +86,7 @@ namespace Ck
         BlockHeader* allocatedBlock;
 
         // We don't want to allocate 0 bytes even if it's a valid call
-        userSize = std::max(1lu, userSize);
+        userSize = std::max(static_cast<std::size_t>(1), userSize);
         std::size_t allocationSize = ComputeAllocationSize(userSize, alignment);
         if (PageIndex* index = FindPageIndex(allocationSize))
         {
