@@ -30,13 +30,13 @@ Main::ExitCode ApplicationMain(Application* application)
 		return windowFactory->CreateWindow(windowCreateInfo);
 	});
 
-	std::shared_ptr<GraphicEngine> graphicEngine = std::make_shared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>(graphicEngine);
+	SharedPtr<GraphicEngine> graphicEngine = MakeShared<GraphicEngine>(Renderer::GraphicApi::Vulkan);
+	SharedPtr<Scene> scene = MakeShared<Scene>(graphicEngine);
 
-	std::shared_ptr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
-	std::shared_ptr<Material> material = std::make_shared<Material>("default-cube", Material::ShadingMode::Unlit, true);
+	SharedPtr<Mesh> cubeMesh = MeshFactory::CreateCube(1.f, LinearColor::White);
+	SharedPtr<Material> material = MakeShared<Material>("default-cube", Material::ShadingMode::Unlit, true);
 	material->SetEmissiveColor(LinearColor::White);
-    std::shared_ptr<Shape> shape = std::make_shared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<std::shared_ptr<Material>>{ std::move(material) });
+    SharedPtr<Shape> shape = MakeShared<StaticMeshShape>(*graphicEngine, std::move(cubeMesh), Array<SharedPtr<Material>>{ std::move(material) });
 
     for (unsigned int i = 0; i < 30; i++)
     {
@@ -105,9 +105,9 @@ Main::ExitCode ApplicationMain(Application* application)
 	SceneViewerParameters viewerParameters;
 	viewerParameters.DepthStencilFormat = PixelFormat::DepthStencil(24, 8);
 	viewerParameters.Samples = Renderer::RasterizationSamples::e4;
-	std::shared_ptr<SceneViewer> viewer = std::make_shared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
+	SharedPtr<SceneViewer> viewer = MakeShared<WindowSceneViewer>(scene, window.Get(), viewerParameters, true);
 
-    UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.get(), camera);
+    UniquePtr<SceneView> sceneView = MakeUnique<SceneView>(scene.Get(), camera);
 	UniquePtr<Viewport> viewport = MakeUnique<Viewport>(std::move(sceneView), viewportArea);
 	viewer->AttachViewport(std::move(viewport));
 
