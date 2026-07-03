@@ -238,9 +238,12 @@ namespace Ck
 
         void Thread::SetName(StringView name)
         {
-            int error = pthread_setname_np(mHandle, AsciiString::Convert(name).GetData());
-            if (error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+            if (!name.IsEmpty())
+            {
+                int error = pthread_setname_np(mHandle, AsciiString::Convert(name).GetData());
+                if (error != 0)
+                    throw std::system_error(error, PthreadErrorCategory::Instance);
+            }
         }
 
         String Thread::GetName() const
