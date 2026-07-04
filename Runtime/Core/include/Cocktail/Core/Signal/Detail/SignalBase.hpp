@@ -30,6 +30,7 @@ namespace Ck::Detail
 
 	    /**
          * \brief Move constructor
+         *
          * \param other 
          */
         SignalBase(SignalBase&& other) noexcept
@@ -37,12 +38,14 @@ namespace Ck::Detail
             std::lock_guard<Lockable> lhs(mSlotLock);
             std::lock_guard<Lockable> rhs(other.mSlotLock);
 
-            mSlots = other.mSlots;
+            mSlots = std::move(other.mSlots);
         }
 
 	    /**
-         * \brief 
-         * \param other 
+         * \brief
+         *
+         * \param other
+         *
          * \return 
          */
         SignalBase& operator=(const SignalBase& other) = delete;
@@ -54,18 +57,23 @@ namespace Ck::Detail
          */
         SignalBase& operator=(SignalBase&& other) noexcept
         {
-            std::lock_guard<Lockable> lhs(mSlotLock);
-            std::lock_guard<Lockable> rhs(other.mSlotLock);
+            if (this != &other)
+            {
+                std::lock_guard<Lockable> lhs(mSlotLock);
+                std::lock_guard<Lockable> rhs(other.mSlotLock);
 
-            mSlots = other.mSlots;
+                mSlots = std::move(other.mSlots);
+            }
 
             return *this;
         }
 
 	    /**
          * \brief Connect a callable with compatible arguments
+         *
          * \param callable The callable
          * \param groupId The groupId identifier used to order Slot invocation
+         *
          * \return A connection used to manage the Slot
          */
         template <typename Callable>
@@ -134,10 +142,12 @@ namespace Ck::Detail
 
 	    /**
          * \brief Tell whether the signal has active connections bound
+         *
          * \return True if the signal has active connections, false otherwise
          */
         bool IsBound() const
         {
+            std::lock_guard<Lockable> lg(mSlotLock);
             return !mSlots.empty();
         }
 
