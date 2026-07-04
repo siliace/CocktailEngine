@@ -48,7 +48,21 @@ namespace Ck
          *
          * \param original Pointer to the memory block to free
          */
-        void Free(void* original);
+        void Free(void* original) override;
+
+        /**
+         * \brief Tell whether the allocator needs to be externalized synchronized
+         *
+         * \return True if the allocators needs external synchronization, false otherwise
+         */
+        bool IsThreadSafe() const override;
+
+        /**
+         * \brief Tell whether the allocator should be instantiated per thread
+         *
+         * \return True if the allocators is per thread, false otherwise
+         */
+        bool IsThreadLocal() const override;
     };
 }
 

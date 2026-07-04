@@ -54,6 +54,20 @@ namespace Ck
          * \param pointer Pointer to the memory block to free
          */
         virtual void Free(void* pointer) = 0;
+
+        /**
+         * \brief Tell whether the allocator needs to be externalized synchronized
+         *
+         * \return True if the allocators needs external synchronization, false otherwise
+         */
+        virtual bool IsThreadSafe() const = 0;
+
+        /**
+         * \brief Tell whether the allocator should be instantiated per thread
+         *
+         * \return True if the allocators is per thread, false otherwise
+         */
+        virtual bool IsThreadLocal() const = 0;
     };
 }
 

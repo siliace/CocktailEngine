@@ -16,4 +16,14 @@ namespace Ck
     {
         std::free(original);
     }
+
+    bool MallocAllocator::IsThreadSafe() const
+    {
+        return true;
+    }
+
+    bool MallocAllocator::IsThreadLocal() const
+    {
+        return false;
+    }
 }

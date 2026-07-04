@@ -12,7 +12,7 @@ namespace Ck::Detail::Pthread
     public:
 
         ThreadManager();
-        ~ThreadManager();
+        ~ThreadManager() override;
         void Register(Thread* thread);
         void Unregister(Thread* thread);
         Thread* GetCurrentThread() override;

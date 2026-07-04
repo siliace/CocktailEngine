@@ -42,7 +42,7 @@ namespace Ck
         BinConfiguration{ 64, 1 }, BinConfiguration{ 128, 1 }, BinConfiguration{ 256, 1 }, BinConfiguration{ 512, 2 }, BinConfiguration{ 1024, 3 });
 
     const std::size_t BinnedAllocator::SlabPageSize = SystemMemory::GetPageSize();
-    
+
     BinnedAllocator::BinnedAllocator()
     {
         for (unsigned int i = 0; i < BinCount; ++i)
@@ -84,6 +84,9 @@ namespace Ck
     void* BinnedAllocator::Allocate(std::size_t userSize, std::size_t alignment)
     {
         BlockHeader* allocatedBlock;
+
+        // Reclaim blocks freed by other threads before allocating
+        DrainRemoteFrees();
 
         // We don't want to allocate 0 bytes even if it's a valid call
         userSize = std::max(static_cast<std::size_t>(1), userSize);
@@ -179,6 +182,9 @@ namespace Ck
             return nullptr;
         }
 
+        // Reclaim blocks freed by other threads before reallocating
+        DrainRemoteFrees();
+
         BlockHeader* block = UserToBlock(static_cast<Byte*>(pointer));
         // Free-sentinel invariant check: UserSize == 0 on the binned path means the block is
         // already free. Reallocating a freed block (use-after-free) is caught here before
@@ -193,7 +199,7 @@ namespace Ck
         // Capacity of the current slot: for binned blocks it is the bin's fixed block
         // size; for large blocks it is the full OS allocation size stored in BlockSize.
         std::size_t blockMaxSize = block->Page ? block->Page->Index->BlockSize : block->BlockSize;
-        if (size <= blockMaxSize)
+        if (ComputeAllocationSize(size, alignment) <= blockMaxSize)
         {
             block->UserSize = size;
             return pointer;
@@ -219,6 +225,16 @@ namespace Ck
         assert(blockHeader->UserSize > 0 && "Double freeing same memory");
 
         FreeBlock(blockHeader);
+    }
+
+    bool BinnedAllocator::IsThreadSafe() const
+    {
+        return true;
+    }
+
+    bool BinnedAllocator::IsThreadLocal() const
+    {
+        return true;
     }
 
     std::size_t BinnedAllocator::ComputeAllocationSize(std::size_t allocationSize, std::size_t alignment)
@@ -296,6 +312,8 @@ namespace Ck
             // slot at a time as blocks are handed out for the first time.
             pageHeader->FirstUninitializedBlock = reinterpret_cast<BlockHeader*>(page + sizeof(PageHeader));
             pageHeader->UninitializedBlockCount = index->BlockCount;
+
+            pageHeader->OwnerAllocator = this;
         }
 
         // Link page into page list for this index
@@ -309,80 +327,115 @@ namespace Ck
         index->FirstAvailablePage = pageHeader;
     }
 
-    void BinnedAllocator::FreeBlock(BlockHeader* block)
+    void BinnedAllocator::FreeBlock(BlockHeader* block) const
     {
         if (PageHeader* page = block->Page)
         {
-            PageIndex* index = page->Index;
-
-            // Push the block onto the page's free list
-            block->NextFree = page->FirstFreeBlock;
-            page->FirstFreeBlock = block;
-            assert(page->FirstFreeBlock != nullptr);
-
-            // Free-sentinel invariant: reset UserSize to 0 to mark this block as free.
-            // This must happen AFTER the block is pushed onto the free list and BEFORE
-            // the page's FreeBlockCount is incremented, so that any concurrent or
-            // re-entrant observer always sees a consistent state.
-            // UserSize == 0 is the signal read by Free (double-free detection) and by
-            // Allocate (double-alloc detection). Do not remove or defer this write.
-            block->UserSize = 0;
-
-            ++page->FreeBlockCount;
-
-            // If the page became completely free, either keep it as a reserve or release it
-            if (page->FreeBlockCount == index->BlockCount)
+            if (page->OwnerAllocator == this)
             {
-                PageHeader* previous = page->Previous;
-                PageHeader* next = page->Next;
+                PageIndex* index = page->Index;
 
-                if (previous)
+                // Push the block onto the page's free list
+                block->NextFree = page->FirstFreeBlock;
+                page->FirstFreeBlock = block;
+                assert(page->FirstFreeBlock != nullptr);
+
+                // Free-sentinel invariant: reset UserSize to 0 to mark this block as free.
+                // This must happen AFTER the block is pushed onto the free list and BEFORE
+                // the page's FreeBlockCount is incremented, so that any concurrent or
+                // re-entrant observer always sees a consistent state.
+                // UserSize == 0 is the signal read by Free (double-free detection) and by
+                // Allocate (double-alloc detection). Do not remove or defer this write.
+                block->UserSize = 0;
+
+                ++page->FreeBlockCount;
+
+                // If the page became completely free, either keep it as a reserve or release it
+                if (page->FreeBlockCount == index->BlockCount)
                 {
-                    previous->Next = next;
-                    if (next)
-                        next->Previous = previous;
+                    PageHeader* previous = page->Previous;
+                    PageHeader* next = page->Next;
+
+                    if (previous)
+                    {
+                        previous->Next = next;
+                        if (next)
+                            next->Previous = previous;
+                    }
+                    else
+                    {
+                        index->FirstPage = next;
+                        if (index->FirstPage)
+                            index->FirstPage->Previous = nullptr;
+                    }
+
+                    if (page == page->Index->FirstAvailablePage)
+                    {
+                        PageHeader* availablePage = page->Index->FirstPage;
+                        while (availablePage && availablePage->FreeBlockCount == 0)
+                            availablePage = availablePage->Next;
+
+                        index->FirstAvailablePage = availablePage;
+                    }
+
+                    if (!index->ReservedPage)
+                    {
+                        // No reserve held yet — unlink this page from the active list and
+                        // park it as the reserve instead of returning it to the OS immediately.
+                        // This prevents constant OS alloc/free thrashing under alternating
+                        // alloc/free workloads. AllocatePage will reclaim it when needed.
+                        index->ReservedPage = page;
+                    }
+                    else
+                    {
+                        std::size_t slabSize = index->SlabPageCount * SlabPageSize;
+                        SystemMemory::Free(page, slabSize);
+                    }
                 }
                 else
                 {
-                    index->FirstPage = next;
-                    if (index->FirstPage)
-                        index->FirstPage->Previous = nullptr;
-                }
+                    if (!index->FirstAvailablePage || page->FreeBlockCount > index->FirstAvailablePage->FreeBlockCount)
+                        index->FirstAvailablePage = page;
 
-                if (page == page->Index->FirstAvailablePage)
-                {
-                    PageHeader* availablePage = page->Index->FirstPage;
-                    while (availablePage && availablePage->FreeBlockCount == 0)
-                        availablePage = availablePage->Next;
-
-                    index->FirstAvailablePage = availablePage;
-                }
-
-                if (!index->ReservedPage)
-                {
-                    // No reserve held yet — unlink this page from the active list and
-                    // park it as the reserve instead of returning it to the OS immediately.
-                    // This prevents constant OS alloc/free thrashing under alternating
-                    // alloc/free workloads. AllocatePage will reclaim it when needed.
-                    index->ReservedPage = page;
-                }
-                else
-                {
-                    std::size_t slabSize = index->SlabPageCount * SlabPageSize;
-                    SystemMemory::Free(page, slabSize);
+                    assert(page->FreeBlockCount > 0 && page->FirstFreeBlock != nullptr);
                 }
             }
             else
             {
-                if (!index->FirstAvailablePage || page->FreeBlockCount > index->FirstAvailablePage->FreeBlockCount)
-                    index->FirstAvailablePage = page;
-
-                assert(page->FreeBlockCount > 0 && page->FirstFreeBlock != nullptr);
+                // Cross-thread free: this block belongs to a different thread's allocator.
+                // Push it onto the owner's lock-free remote free queue for deferred processing.
+                page->OwnerAllocator->PushRemoteFree(block);
             }
         }
         else
         {
             SystemMemory::Free(block, block->BlockSize);
+        }
+    }
+
+    void BinnedAllocator::PushRemoteFree(BlockHeader* block)
+    {
+        // Treiber stack push: CAS loop to prepend block to the remote free list.
+        // Multiple foreign threads may push concurrently; the owning thread drains.
+        BlockHeader* head = mRemoteFreeHead.load(std::memory_order_relaxed);
+        do
+        {
+            block->NextFree = head;
+        } while (!mRemoteFreeHead.compare_exchange_weak(head, block, std::memory_order_release, std::memory_order_relaxed));
+    }
+
+    void BinnedAllocator::DrainRemoteFrees()
+    {
+        // Atomic exchange claims the entire remote free list in one operation.
+        // After the exchange, no other thread can see these blocks on our queue.
+        BlockHeader* head = mRemoteFreeHead.exchange(nullptr, std::memory_order_acquire);
+
+        // Walk the claimed list and free each block locally (we are the owner).
+        while (head)
+        {
+            BlockHeader* next = head->NextFree;
+            FreeBlock(head);
+            head = next;
         }
     }
 }

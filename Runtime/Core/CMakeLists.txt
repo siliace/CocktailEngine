@@ -241,6 +241,7 @@ cocktail_source_directory(CORE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/SizedLinearAllocator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/StlAdapter.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/ThreadLocalAllocatorProxy.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/ThreadSafeAllocatorProxy.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/Cocktail/Core/Memory/Allocator/UseSystemAllocator.hpp
     SRC

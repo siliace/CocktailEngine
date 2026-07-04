@@ -1,14 +1,41 @@
 #include <cstring>
 
 #include <Cocktail/Core/Application/ServiceFacade.hpp>
-#include <Cocktail/Core/Memory/Memory.hpp>
 #include <Cocktail/Core/Memory/Allocator/BinnedAllocator.hpp>
+#include <Cocktail/Core/Memory/Allocator/ThreadLocalAllocatorProxy.hpp>
 #include <Cocktail/Core/Memory/Allocator/ThreadSafeAllocatorProxy.hpp>
+#include <Cocktail/Core/Memory/Memory.hpp>
+#include <Cocktail/Core/System/Concurrency/Thread.hpp>
+#include <Cocktail/Core/System/SystemMemory.hpp>
 
 namespace Ck
 {
-    std::mutex gAllocatorLock;
-    static MemoryAllocator* gAllocator = nullptr;
+    namespace
+    {
+        MemoryAllocator* gAllocator;
+
+        template <typename TAllocator, typename = std::enable_if_t<std::is_base_of_v<MemoryAllocator, TAllocator>>>
+        void CreateGlobalAllocator()
+        {
+            assert(!gAllocator);
+
+            UniquePtr<MemoryAllocator> allocator = MakeUnique<TAllocator>();
+            if (!allocator->IsThreadSafe())
+            {
+                gAllocator = new ThreadSafeAllocatorProxy(std::move(allocator));
+            }
+            else if (allocator->IsThreadLocal())
+            {
+                gAllocator = new ThreadLocalAllocatorProxy<TAllocator>();
+            }
+            else
+            {
+                gAllocator = allocator.Release();
+            }
+
+            assert(gAllocator && gAllocator->IsThreadSafe() && !gAllocator->IsThreadLocal());
+        }
+    }
 
     void Memory::Zero(void* destination, std::size_t size)
     {
@@ -34,12 +61,8 @@ namespace Ck
     {
         if (!gAllocator)
         {
-            std::lock_guard lg(gAllocatorLock);
-            if (!gAllocator)
-            {
-                CreateGlobalAllocator();
-                assert(gAllocator != nullptr);
-            }
+            CreateGlobalAllocator<BinnedAllocator>();
+            assert(gAllocator);
         }
 
         return gAllocator->Allocate(size, alignment);
@@ -49,12 +72,8 @@ namespace Ck
     {
         if (!gAllocator)
         {
-            std::lock_guard lg(gAllocatorLock);
-            if (!gAllocator)
-            {
-                CreateGlobalAllocator();
-                assert(gAllocator != nullptr);
-            }
+            CreateGlobalAllocator<BinnedAllocator>();
+            assert(gAllocator);
         }
 
         return gAllocator->Reallocate(pointer, size, alignment);
@@ -64,21 +83,10 @@ namespace Ck
     {
         if (!gAllocator)
         {
-            std::lock_guard lg(gAllocatorLock);
-            if (!gAllocator)
-            {
-                CreateGlobalAllocator();
-                assert(gAllocator != nullptr);
-            }
+            CreateGlobalAllocator<BinnedAllocator>();
+            assert(gAllocator);
         }
 
         gAllocator->Free(pointer);
-    }
-
-    void Memory::CreateGlobalAllocator()
-    {
-        gAllocator = new ThreadSafeAllocatorProxy(
-            MakeUnique<BinnedAllocator>()
-        );
     }
 }

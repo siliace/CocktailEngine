@@ -79,6 +79,20 @@ namespace Ck
          */
         void Free(void* pointer) override;
 
+        /**
+         * \brief Tell whether the allocator needs to be externalized synchronized
+         *
+         * \return True if the allocators needs external synchronization, false otherwise
+         */
+        bool IsThreadSafe() const override;
+
+        /**
+         * \brief Tell whether the allocator should be instantiated per thread
+         *
+         * \return True if the allocators is per thread, false otherwise
+         */
+        bool IsThreadLocal() const override;
+
     private:
 
         std::mutex mLock; /*!< Mutex serializing all accesses to the wrapped allocator */

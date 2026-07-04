@@ -109,10 +109,6 @@ namespace Ck
          * \param pointer Pointer to the memory block to free
          */
         static void Free(void* pointer);
-
-    private:
-
-        static void CreateGlobalAllocator();
     };
 }
 

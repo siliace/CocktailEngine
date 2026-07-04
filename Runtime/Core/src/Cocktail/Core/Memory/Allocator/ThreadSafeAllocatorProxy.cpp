@@ -25,4 +25,14 @@ namespace Ck
         std::lock_guard lg(mLock);
         return mInnerAllocator->Free(pointer);
     }
+
+    bool ThreadSafeAllocatorProxy::IsThreadSafe() const
+    {
+        return true;
+    }
+
+    bool ThreadSafeAllocatorProxy::IsThreadLocal() const
+    {
+        return false;
+    }
 }

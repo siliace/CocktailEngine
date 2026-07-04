@@ -1,6 +1,8 @@
 #ifndef COCKTAIL_CORE_MEMORY_ALLOCATOR_BINNEDALLOCATOR_HPP
 #define COCKTAIL_CORE_MEMORY_ALLOCATOR_BINNEDALLOCATOR_HPP
 
+#include <atomic>
+
 #include <Cocktail/Core/Memory/Allocator/MemoryAllocator.hpp>
 #include <Cocktail/Core/StaticArray.hpp>
 
@@ -91,10 +93,24 @@ namespace Ck
          */
         void Free(void* pointer) override;
 
+        /**
+         * \brief Tell whether the allocator needs to be externalized synchronized
+         *
+         * \return True if the allocators needs external synchronization, false otherwise
+         */
+        bool IsThreadSafe() const override;
+
+        /**
+         * \brief Tell whether the allocator should be instantiated per thread
+         *
+         * \return True if the allocators is per thread, false otherwise
+         */
+        bool IsThreadLocal() const override;
+
     private:
 
         struct PageHeader;
-        struct PageIndex;
+        struct BlockHeader;
 
         /**
          * \struct BlockHeader
@@ -157,6 +173,8 @@ namespace Ck
             std::size_t BlockSize;
         };
 
+        struct PageIndex;
+
         /**
          * \struct PageHeader
          *
@@ -194,6 +212,7 @@ namespace Ck
              */
             BlockHeader* FirstUninitializedBlock;
             std::size_t UninitializedBlockCount;
+            BinnedAllocator* OwnerAllocator; /*!< Allocator owning this page */
         };
 
         /**
@@ -311,7 +330,7 @@ namespace Ck
          *
          * \param index Bin descriptor to allocate a new slab for
          */
-        static void AllocatePage(PageIndex* index);
+        void AllocatePage(PageIndex* index);
 
         /**
          * \brief Returns a single block to its page's free list
@@ -332,9 +351,42 @@ namespace Ck
          *
          * \param block Block to return to the free list; must belong to a binned page
          */
-        static void FreeBlock(BlockHeader* block);
+        void FreeBlock(BlockHeader* block) const;
 
-        PageIndex mPageIndexes[BinCount]; /*!< Per-bin descriptors, one entry per size class, initialized at construction from \c BinConfigurations */
+        /**
+         * \brief Pushes a block onto this allocator's lock-free remote free queue
+         *
+         * Called by threads that do not own this allocator (cross-thread free).
+         * Uses a Treiber stack (CAS loop on an atomic head pointer) so that any
+         * number of foreign threads can push concurrently without locks.
+         *
+         * \param block Block to enqueue for deferred freeing by the owning thread
+         */
+        void PushRemoteFree(BlockHeader* block);
+
+        /**
+         * \brief Drains all blocks from the remote free queue and frees them locally
+         *
+         * Performs a single atomic exchange to claim the entire queue, then walks
+         * the claimed list and calls \c FreeBlock on each entry. This is O(n) in
+         * the number of remotely-freed blocks since the last drain, but runs only
+         * on the owning thread so it does not contend with pushers.
+         *
+         * Called at the start of \c Allocate and \c Reallocate to reclaim memory
+         * returned by other threads.
+         */
+        void DrainRemoteFrees();
+
+        StaticArray<PageIndex, BinCount> mPageIndexes; /*!< Per-bin descriptors, one entry per size class, initialized at construction from \c BinConfigurations */
+
+        /**
+         * \brief Lock-free MPSC (multiple-producer, single-consumer) remote free queue
+         *
+         * Head of a Treiber stack used by foreign threads to defer block frees back
+         * to this allocator's owning thread. Foreign threads push via \c PushRemoteFree
+         * (CAS loop); the owning thread drains via \c DrainRemoteFrees (atomic exchange).
+         */
+        std::atomic<BlockHeader*> mRemoteFreeHead{nullptr};
     };
 }
 

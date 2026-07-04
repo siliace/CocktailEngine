@@ -6,7 +6,8 @@
 
 namespace Ck::Detail::Pthread
 {
-    ThreadManager::ThreadManager()
+    ThreadManager::ThreadManager() :
+        mCurrentThreadKey()
     {
         if (int error = pthread_key_create(&mCurrentThreadKey, nullptr); error != 0)
             throw std::system_error(error, PthreadErrorCategory::Instance);
