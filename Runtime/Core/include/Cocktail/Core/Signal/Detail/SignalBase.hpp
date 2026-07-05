@@ -10,30 +10,35 @@
 
 namespace Ck::Detail
 {
-	/**
-     * \brief 
+    /**
+     * \brief
      */
     template <typename Lockable, typename... Args>
     class SignalBase : public SlotContainer
     {
     public:
 
-	    /**
+        /**
          * \brief Default constructor
          */
-        SignalBase() = default;
+        SignalBase() :
+            mEmitting(false)
+        {
+            /// Nothing
+        }
 
-	    /**
+        /**
          * \brief Copy constructor
          */
         SignalBase(const SignalBase&) = delete;
 
-	    /**
+        /**
          * \brief Move constructor
          *
-         * \param other 
+         * \param other
          */
-        SignalBase(SignalBase&& other) noexcept
+        SignalBase(SignalBase&& other) noexcept :
+            mEmitting(false)
         {
             std::lock_guard<Lockable> lhs(mSlotLock);
             std::lock_guard<Lockable> rhs(other.mSlotLock);
@@ -41,19 +46,19 @@ namespace Ck::Detail
             mSlots = std::move(other.mSlots);
         }
 
-	    /**
+        /**
          * \brief
          *
          * \param other
          *
-         * \return 
+         * \return
          */
         SignalBase& operator=(const SignalBase& other) = delete;
 
-	    /**
-         * \brief 
-         * \param other 
-         * \return 
+        /**
+         * \brief
+         * \param other
+         * \return
          */
         SignalBase& operator=(SignalBase&& other) noexcept
         {
@@ -68,7 +73,7 @@ namespace Ck::Detail
             return *this;
         }
 
-	    /**
+        /**
          * \brief Connect a callable with compatible arguments
          *
          * \param callable The callable
@@ -86,19 +91,19 @@ namespace Ck::Detail
             SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, Callable>(std::forward<Callable>(callable), groupId);
 
             // Create a connection to the slot we created
-        	return Connection(slot);
+            return Connection(slot);
         }
 
-	    /**
-         * \brief 
-         * \tparam T 
-         * \param object 
+        /**
+         * \brief
+         * \tparam T
+         * \param object
          * \param function
-         * \param groupId 
-         * \return 
+         * \param groupId
+         * \return
          */
         template <typename T>
-        Connection Connect(T& object, void (T::* function)(Args...), unsigned int groupId = 0)
+        Connection Connect(T& object, void (T::*function)(Args...), unsigned int groupId = 0)
         {
             using SlotType = ObjectSlot<T, Args...>;
 
@@ -109,16 +114,16 @@ namespace Ck::Detail
             return Connection(slot);
         }
 
-	    /**
-         * \brief 
-         * \tparam T 
-         * \param object 
+        /**
+         * \brief
+         * \tparam T
+         * \param object
          * \param function
-         * \param groupId 
-         * \return 
+         * \param groupId
+         * \return
          */
         template <typename T>
-        Connection Connect(const T& object, void (T::* function)(Args...) const, unsigned int groupId = 0)
+        Connection Connect(const T& object, void (T::*function)(Args...) const, unsigned int groupId = 0)
         {
             using SlotType = ConstantObjectSlot<T, Args...>;
 
@@ -129,18 +134,36 @@ namespace Ck::Detail
             return Connection(slot);
         }
 
-	    /**
-         * \brief 
-         * \param args 
+        /**
+         * \brief
+         * \param args
          */
         void Emit(Args... args)
         {
             std::lock_guard<Lockable> lg(mSlotLock);
+
+            // Flag the signal an emitting
+            // This way, the Connect/Disconnect methods will be aware the slot map should not change to not invalidate its iterators
+            mEmitting = true;
+
             for (const auto& [groupIndex, slot] : mSlots)
-				slot->Invoke(std::tie<Args...>(args...));
+                slot->Invoke(std::tie<Args...>(args...));
+
+            // We are done emitting
+            mEmitting = false;
+
+            // Any slot connected to the signal during the emission car now safely be connected to the main slot map
+            for (auto& [groupIndex, slot] : mConnectingSlots)
+                mSlots.insert({ groupIndex, std::move(slot) });
+
+            for (auto& [groupIndex, slot] : mDisconnectingSlots)
+                Disconnect(slot.Get());
+
+            mConnectingSlots.clear();
+            mDisconnectingSlots.clear();
         }
 
-	    /**
+        /**
          * \brief Tell whether the signal has active connections bound
          *
          * \return True if the signal has active connections, false otherwise
@@ -151,27 +174,35 @@ namespace Ck::Detail
             return !mSlots.empty();
         }
 
-		/**
-		 * \brief Disconnect every Slot from the Signal
-		 */
+        /**
+         * \brief Disconnect every Slot from the Signal
+         */
         void Disconnect() override
         {
-			std::lock_guard<Lockable> lg(mSlotLock);
+            std::lock_guard<Lockable> lg(mSlotLock);
             mSlots.clear();
         }
 
-		/**
-		 * \brief Disconnect a whole group from the Signal
-		 * \param groupId The group to disconnect
-		 */
+        /**
+         * \brief Disconnect a whole group from the Signal
+         * \param groupId The group to disconnect
+         */
         void Disconnect(unsigned int groupId) override
         {
-			std::lock_guard<Lockable> lg(mSlotLock);
+            std::lock_guard<Lockable> lg(mSlotLock);
             for (auto it = mSlots.begin(); it != mSlots.end();)
             {
                 if (it->first == groupId)
                 {
-                    it = mSlots.erase(it);
+                    if (mEmitting)
+                    {
+                        mDisconnectingSlots.insert({ it->first, it->second });
+                        ++it;
+                    }
+                    else
+                    {
+                        it = mSlots.erase(it);
+                    }
                 }
                 else
                 {
@@ -181,26 +212,34 @@ namespace Ck::Detail
         }
 
     protected:
-        
-		/**
-		 * \brief Disconnect a Slot from the Signal
-		 * \param state The Slot to disconnect
-		 */
+
+        /**
+         * \brief Disconnect a Slot from the Signal
+         * \param state The Slot to disconnect
+         */
         void Disconnect(SlotState* state) override
         {
             unsigned int groupId = state->GetGroupId();
 
             std::lock_guard<Lockable> lg(mSlotLock);
             auto beginEndPair = mSlots.equal_range(groupId);
-			auto begin = beginEndPair.first;
-			auto end = beginEndPair.second;
+            auto begin = beginEndPair.first;
+            auto end = beginEndPair.second;
             for (auto it = begin; it != end; ++it)
             {
-	            if (it->second.Get() == state)
-	            {
-                    mSlots.erase(it);
+                if (it->second.Get() == state)
+                {
+                    if (mEmitting)
+                    {
+                        mDisconnectingSlots.insert({ it->first, it->second });
+                        ++it;
+                    }
+                    else
+                    {
+                        mSlots.erase(it);
+                    }
                     return;
-	            }
+                }
             }
         }
 
@@ -218,15 +257,25 @@ namespace Ck::Detail
             SharedPtr<Slot<Args...>> slot = MakeShared<T>(std::forward<SlotArgs>(args)..., this, groupId);
 
             {
-				std::lock_guard<Lockable> lg(mSlotLock);
-                mSlots.insert({ groupId, slot });
+                std::lock_guard<Lockable> lg(mSlotLock);
+                if (mEmitting)
+                {
+                    mConnectingSlots.insert({ groupId, slot });
+                }
+                else
+                {
+                    mSlots.insert({ groupId, slot });
+                }
             }
 
             return slot;
         }
 
+        bool mEmitting;
         Lockable mSlotLock;
         std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mSlots;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mConnectingSlots;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mDisconnectingSlots;
     };
 }
 
