@@ -19,7 +19,7 @@ namespace Ck::Detail
 		 * \brief 
 		 * \param args 
 		 */
-		void Invoke(std::tuple<Args...> args)
+		void Invoke(std::tuple<Args...>&& args)
 		{
 			if (SlotState::IsConnected() && !SlotState::IsDisabled())
 				DoInvoke(std::move(args));

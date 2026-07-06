@@ -147,7 +147,7 @@ namespace Ck::Detail
             mEmitting = true;
 
             for (const auto& [groupIndex, slot] : mSlots)
-                slot->Invoke(std::tie<Args...>(args...));
+                slot->Invoke(std::forward_as_tuple(args...));
 
             // We are done emitting
             mEmitting = false;
