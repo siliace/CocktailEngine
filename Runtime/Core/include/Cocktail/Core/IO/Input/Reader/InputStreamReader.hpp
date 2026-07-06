@@ -113,7 +113,7 @@ namespace Ck
          */
         Uint64 Seek(Uint64 position) override
         {
-            return mInner->Seek(position / sizeof(CharType));
+            return mInner->Seek(position * sizeof(CharType));
         }
 
         /**

@@ -1,5 +1,5 @@
-#ifndef COCKTAIL_CORE_IO_OUTPUT_WRITER_TRANSLATORWRITER_HPP
-#define COCKTAIL_CORE_IO_OUTPUT_WRITER_TRANSLATORWRITER_HPP
+#ifndef COCKTAIL_CORE_IO_OUTPUT_WRITER_LINEWRITER_HPP
+#define COCKTAIL_CORE_IO_OUTPUT_WRITER_LINEWRITER_HPP
 
 #include <Cocktail/Core/IO/Output/Writer/Writer.hpp>
 #include <Cocktail/Core/Utility/TranslatorCast.hpp>
@@ -19,7 +19,7 @@ namespace Ck
     template <typename TEncoding = Encoders::Text>
     class LineWriter : public Writer<TEncoding>
     {
-        using StringUtils = StringUtils<Encoders::CharType<TEncoding>, Encoders::SizeType<TEncoding>>;
+        using StringUtilsImpl = StringUtils<Encoders::CharType<TEncoding>, Encoders::SizeType<TEncoding>>;
 
     public:
 
@@ -68,7 +68,7 @@ namespace Ck
          */
         void Write(const CharType* text)
         {
-            Write(text, StringUtils::GetLength(text));
+            Write(text, StringUtilsImpl::GetLength(text));
         }
 
         /**
@@ -78,7 +78,7 @@ namespace Ck
          */
         void WriteLine(const CharType* text)
         {
-            WriteLine(text, StringUtils::GetLength(text));
+            WriteLine(text, StringUtilsImpl::GetLength(text));
         }
 
         /**
@@ -198,4 +198,4 @@ namespace Ck
     };
 }
 
-#endif // COCKTAIL_CORE_IO_OUTPUT_WRITER_TRANSLATORWRITER_HPP
+#endif // COCKTAIL_CORE_IO_OUTPUT_WRITER_LINEWRITER_HPP

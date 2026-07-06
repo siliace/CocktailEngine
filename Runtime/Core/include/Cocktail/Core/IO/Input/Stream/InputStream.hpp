@@ -58,7 +58,7 @@ namespace Ck
          */
         virtual SizeType TransferTo(OutputStream<TAllocator>& outputStream)
         {
-            const SizeType TransferBufferSize = 8196;
+            const SizeType TransferBufferSize = 8192;
 
             SizeType transferred = 0;
             Byte transferBuffer[TransferBufferSize];

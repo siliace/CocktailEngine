@@ -78,7 +78,7 @@ namespace Ck
          */
         Uint64 Seek(Uint64 position) override
         {
-            return mFile->SetCursor(FileCursorMode::Current, position);
+            return mFile->SetCursor(FileCursorMode::Begin, position);
         }
 
         /**

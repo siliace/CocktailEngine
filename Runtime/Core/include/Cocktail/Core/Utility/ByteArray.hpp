@@ -311,7 +311,9 @@ namespace Ck
         {
             assert(where <= mSize);
             assert(data != nullptr);
-            assert(length > 0);
+
+            if (length == 0)
+                return *this;
 
             SizeType fullSize = mSize + length;
             UniquePtr<Byte[], AllocatorAwareDeleter<Byte[], AllocatorType>> fullData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, fullSize);

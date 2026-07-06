@@ -17,6 +17,27 @@ cocktail_source_directory(CORE_TEST_FILES
 )
 
 cocktail_source_directory(CORE_TEST_FILES
+    FOLDER "IO"
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedInputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedOutputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputAccumulator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputStreamReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/LineReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/LineWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputAccumulator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputStreamWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/Reader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/TranscodingReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/TranscodingWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/Writer.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES
     FOLDER "Math"    
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Math/Angle.cpp
@@ -90,6 +111,27 @@ cocktail_source_directory(CORE_TEST_FILES
     SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/Time/Duration.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Utility/Time/TimeUnit.cpp
+)
+
+cocktail_source_directory(CORE_TEST_FILES
+    FOLDER "IO"
+    SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputAccumulator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputAccumulator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedInputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedOutputStream.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/Reader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/Writer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/BufferedWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/InputStreamReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/OutputStreamWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/LineReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/LineWriter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/TranscodingReader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IO/TranscodingWriter.cpp
 )
 
 cocktail_add_catch_test(

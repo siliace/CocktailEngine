@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_IO_INPUT_INPUTACCUMULATOR_HPP
 #define COCKTAIL_CORE_IO_INPUT_INPUTACCUMULATOR_HPP
 
+#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 
 namespace Ck
@@ -59,6 +60,24 @@ namespace Ck
         }
 
         /**
+         * \brief Deleted copy constructor
+         */
+        InputAccumulator(const InputAccumulator&) = delete;
+
+        /**
+         * \brief Move constructor
+         *
+         * Creates a new instance of InputAccumulator by moving an existing instance.
+         *
+         * \param other InputAccumulator to move from
+         */
+        InputAccumulator(InputAccumulator&& other) noexcept :
+            mBuffer(std::exchange(other.mBuffer, nullptr))
+        {
+            mAllocator = AllocatorUtils::MovePropagateAllocator(other.mAllocator);
+        }
+
+        /**
          * \brief Destructor
          *
          * Frees the internal buffer.
@@ -66,6 +85,29 @@ namespace Ck
         virtual ~InputAccumulator()
         {
             mAllocator.Deallocate(mBuffer);
+        }
+
+        /**
+         * \brief Deleted copy assignment operator
+         */
+        InputAccumulator& operator=(const InputAccumulator&) = delete;
+
+        /**
+         * \brief Move assignment operator
+         *
+         * \param other InputAccumulator to move from
+         *
+         * \return Reference to *this
+         */
+        InputAccumulator& operator=(InputAccumulator&& other) noexcept
+        {
+            if (this != &other)
+            {
+                mBuffer = std::exchange(other.mBuffer, nullptr);
+                mAllocator = AllocatorUtils::MovePropagateAllocator(other.mAllocator);
+            }
+
+            return *this;
         }
 
         /**
@@ -164,6 +206,16 @@ namespace Ck
         SizeType GetBufferPosition() const
         {
             return mPos;
+        }
+
+        /**
+         * \brief Get the amount of data available without triggering another Read call in the inner InputStream
+         *
+         * \return The amount of data available
+         */
+        SizeType GetAvailableLength() const
+        {
+            return mLimit - mPos;
         }
 
         /**

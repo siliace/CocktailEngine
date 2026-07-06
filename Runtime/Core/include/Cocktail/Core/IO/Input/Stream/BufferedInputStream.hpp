@@ -109,7 +109,7 @@ namespace Ck
          */
         Uint64 Tell() const override
         {
-            return mSource->Tell() + InputAccumulator<Byte, TAllocator>::GetBufferPosition();
+            return mSource->Tell() - InputAccumulator<Byte, TAllocator>::GetAvailableLength();
         }
 
         /**

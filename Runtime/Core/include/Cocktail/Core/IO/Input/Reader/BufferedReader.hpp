@@ -56,6 +56,21 @@ namespace Ck
         }
 
         /**
+         * \brief Read one character
+         *
+         * Extract the character from the internal buffer. If necessary,
+         * additional data is fetched from the underlying reader.
+         *
+         * \param c The character read from the source
+         *
+         * \return True if a character was successfully read, false otherwise
+         */
+        bool Read(CharType& c) override
+        {
+            return InputAccumulator<CharType, TAllocator>::Extract(&c, 1) == 1;
+        }
+
+        /**
          * \brief Read multiple characters into a buffer
          *
          * Extracts characters from the internal buffer. If necessary,

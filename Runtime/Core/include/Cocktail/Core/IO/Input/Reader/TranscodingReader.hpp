@@ -77,19 +77,19 @@ namespace Ck
          */
         bool Read(CharType& character) override
         {
-            if (mInternalDecodeBuffer.Position == mInternalDecodeBuffer.Limit)
+            if (mInternalTranscodeBuffer.IsValid())
             {
-                SourceSizeType read = mSource->Read(mInternalDecodeBuffer.Buffer, SourceEncodingType::MaxCodepoinTDstLength);
-                if (read == 0)
-                    return false;
-
-                mInternalDecodeBuffer.Position = 0;
-                mInternalDecodeBuffer.Limit = read;
+                character = mInternalTranscodeBuffer.Pop();
+                return true;
             }
 
+            if (!mInternalDecodeBuffer.IsValid() && !mInternalDecodeBuffer.Push(*mSource))
+                return false;
+
             Utf32Char codepoint;
+            auto current = mInternalDecodeBuffer.Buffer + mInternalDecodeBuffer.Position;
             auto available = mInternalDecodeBuffer.Limit - mInternalDecodeBuffer.Position;
-            SourceSizeType decoded = SourceEncodingType::Decode(mInternalDecodeBuffer.Buffer + mInternalDecodeBuffer.Position, available, codepoint);
+            SourceSizeType decoded = SourceEncodingType::Decode(current, available, codepoint);
             if (decoded == 0)
             {
                 SizeType index = (mSource->HasCursor() ? mSource->Tell() : 0) + mInternalDecodeBuffer.Position;
@@ -98,12 +98,14 @@ namespace Ck
 
             mInternalDecodeBuffer.Position += decoded;
 
-            CharType encodeBuffer[EncodingType::MaxCodepoinTDstLength];
-            SizeType encoded = EncodingType::Encode(codepoint, encodeBuffer);
+            SizeType encoded = EncodingType::Encode(codepoint, mInternalTranscodeBuffer.Buffer);
             if (encoded == 0)
                 ExceptionUtils::ThrowCodepointEncodingException(codepoint);
 
-            character = encodeBuffer[0];
+            character = mInternalTranscodeBuffer.Buffer[0];
+
+            mInternalTranscodeBuffer.Position = 1;
+            mInternalTranscodeBuffer.Limit = encoded;
 
             return true;
         }
@@ -139,7 +141,14 @@ namespace Ck
          */
         bool HasCursor() const override
         {
-            return mSource->HasCursor();
+            if constexpr (EncodingType::SupportSurrogate)
+            {
+                ExceptionUtils::ThrowNotImplemented();
+            }
+            else
+            {
+                return mSource->HasCursor();
+            }
         }
 
         /**
@@ -153,7 +162,14 @@ namespace Ck
          */
         Uint64 Seek(Uint64 position) override
         {
-            return mSource->Seek(position * sizeof(CharType));
+            if constexpr (EncodingType::SupportSurrogate)
+            {
+                ExceptionUtils::ThrowNotImplemented();
+            }
+            else
+            {
+                return mSource->Seek(position * sizeof(CharType));
+            }
         }
 
         /**
@@ -161,7 +177,14 @@ namespace Ck
          */
         void Rewind() override
         {
-            mSource->Rewind();
+            if constexpr (EncodingType::SupportSurrogate)
+            {
+                ExceptionUtils::ThrowNotImplemented();
+            }
+            else
+            {
+                mSource->Rewind();
+            }
         }
 
         /**
@@ -173,7 +196,14 @@ namespace Ck
          */
         Uint64 Tell() const override
         {
-            return mSource->Tell() * sizeof(SourceCharType) / sizeof(CharType);
+            if constexpr (EncodingType::SupportSurrogate)
+            {
+                ExceptionUtils::ThrowNotImplemented();
+            }
+            else
+            {
+                return mSource->Tell() * sizeof(SourceCharType) / sizeof(CharType);
+            }
         }
 
         /**
@@ -183,7 +213,14 @@ namespace Ck
          */
         SizeType GetSize() const override
         {
-            return mSource->GetSize() * sizeof(SourceCharType) / sizeof(CharType);
+            if constexpr (EncodingType::SupportSurrogate)
+            {
+                ExceptionUtils::ThrowNotImplemented();
+            }
+            else
+            {
+                return mSource->GetSize() * sizeof(SourceCharType) / sizeof(CharType);
+            }
         }
 
         /**
@@ -201,18 +238,45 @@ namespace Ck
         /**
          * \brief Internal buffer used for decoding source characters
          */
-        struct InternalDecodeBuffer
+        template <typename TEncoding>
+        struct InternalBuffer
         {
-            SourceSizeType Limit = 0;
-            SourceSizeType Position = 0;
-            SourceCharType Buffer[SourceEncodingType::MaxCodepoinTDstLength];
+            bool Push(Reader<TEncoding>& source)
+            {
+                SourceSizeType read = source.Read(Buffer, TEncoding::MaxCodepointEncodingLength);
+                if (read == 0)
+                    return false;
+
+                Position = 0;
+                Limit = read;
+
+                return true;
+            }
+
+            typename TEncoding::CharType Pop()
+            {
+                typename TEncoding::CharType result = Buffer[Position];
+                ++Position;
+
+                if (Position == Limit)
+                    Position = Limit = 0;
+
+                return result;
+            }
+
+            bool IsValid() const
+            {
+                return Position < Limit;
+            }
+
+            typename TEncoding::SizeType Limit = 0;
+            typename TEncoding::SizeType Position = 0;
+            typename TEncoding::CharType Buffer[TEncoding::MaxCodepointEncodingLength];
         };
 
-        /** \brief Source reader */
-        Reader<TSrc>* mSource;
-
-        /** \brief Internal decode buffer */
-        InternalDecodeBuffer mInternalDecodeBuffer;
+        Reader<TSrc>* mSource; /*!< Source stream to transcode from */
+        InternalBuffer<TSrc> mInternalDecodeBuffer; /*!< Internal buffer storing previously decoded codepoints */
+        InternalBuffer<TDst> mInternalTranscodeBuffer; /*!< Internal buffer storing previously transcode codepoints */
     };
 
     /**

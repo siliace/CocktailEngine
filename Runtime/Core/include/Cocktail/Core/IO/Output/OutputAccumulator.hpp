@@ -1,6 +1,7 @@
 #ifndef COCKTAIL_CORE_IO_OUTPUT_OUTPUTACCUMULATOR_HPP
 #define COCKTAIL_CORE_IO_OUTPUT_OUTPUTACCUMULATOR_HPP
 
+#include <Cocktail/Core/Memory/Allocator/AllocatorUtils.hpp>
 #include <Cocktail/Core/Memory/Allocator/SizedHeapAllocator.hpp>
 
 namespace Ck
@@ -28,7 +29,7 @@ namespace Ck
         /**
          * \brief Size type used for buffer operations
          */
-        using SizeType = typename AllocatorType::SizeType;
+        using SizeType = typename TAllocator::SizeType;
 
         /**
          * \brief Constructor
@@ -43,7 +44,25 @@ namespace Ck
         {
             assert(mSize > 0);
 
-            mBuffer = mAllocator.Allocate(0, mSize, sizeof(E));
+            mBuffer = mAllocator.Allocate(mSize * sizeof(E));
+        }
+
+        /**
+         * \brief Deleted copy constructor
+         */
+        OutputAccumulator(const OutputAccumulator&) = delete;
+
+        /**
+         * \brief Move constructor
+         *
+         * Creates a new instance of OutputAccumulator by moving an existing instance of OutputAccumulator.
+         *
+         * \param other OutputAccumulator to move from
+         */
+        OutputAccumulator(OutputAccumulator&& other) noexcept :
+            mBuffer(std::exchange(other.mBuffer, nullptr))
+        {
+            mAllocator = AllocatorUtils::MovePropagateAllocator(other.mAllocator);
         }
 
         /**
@@ -54,6 +73,29 @@ namespace Ck
         virtual ~OutputAccumulator()
         {
             mAllocator.Deallocate(mBuffer);
+        }
+
+        /**
+         * \brief Deleted copy assignment operator
+         */
+        OutputAccumulator& operator=(const OutputAccumulator&) = delete;
+
+        /**
+         * \brief Move assignment operator
+         *
+         * \param other OutputAccumulator to move from
+         *
+         * \return Reference to *this
+         */
+        OutputAccumulator& operator=(OutputAccumulator&& other) noexcept
+        {
+            if (this != &other)
+            {
+                mBuffer = std::exchange(other.mBuffer, nullptr);
+                mAllocator = AllocatorUtils::MovePropagateAllocator(other.mAllocator);
+            }
+
+            return *this;
         }
 
         /**
@@ -123,7 +165,7 @@ namespace Ck
         SizeType mPos; ///< Current position in the buffer (number of elements filled)
         SizeType mSize; ///< Total size of the buffer
         E* mBuffer; ///< Internal buffer
-        TAllocator mAllocator; ///< Allocator for the buffer
+        AllocatorType mAllocator; ///< Allocator for the buffer
     };
 }
 

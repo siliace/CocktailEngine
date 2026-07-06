@@ -6,6 +6,23 @@
 
 namespace Ck
 {
+    namespace Detail
+    {
+        template <typename TAllocator>
+        struct FileReaderStorage
+        {
+        protected:
+
+            explicit FileReaderStorage(const Path& path, FileSystemDriver* driver) :
+                mFileInputStream(path, driver)
+            {
+                /// Nothing
+            }
+
+            FileInputStream<TAllocator> mFileInputStream;
+        };
+    }
+
     /**
      * \brief Reader for files on disk
      *
@@ -20,7 +37,7 @@ namespace Ck
      * \tparam TAllocator The allocator used internally for buffering
      */
     template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
-    class FileReader : public InputStreamReader<TEncoding, TAllocator>
+    class FileReader : Detail::FileReaderStorage<TAllocator>, public InputStreamReader<TEncoding, TAllocator>
     {
     public:
 
@@ -49,10 +66,10 @@ namespace Ck
          * \param driver Optional file system driver
          */
         explicit FileReader(const Path& path, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
-            mFileInputStream(path, driver),
-            InputStreamReader<TEncoding, TAllocator>(mFileInputStream)
+            Detail::FileReaderStorage<TAllocator>(path, driver),
+            InputStreamReader<TEncoding, TAllocator>(Detail::FileReaderStorage<TAllocator>::mFileInputStream)
         {
-            /// Nothing to do
+            /// Nothing
         }
 
         /**
@@ -64,13 +81,8 @@ namespace Ck
          */
         File* GetFile() const
         {
-            return mFileInputStream->GetFile();
+            return Detail::FileReaderStorage<TAllocator>::mFileInputStream.GetFile();
         }
-
-    private:
-
-        /** \brief File input stream used internally to read raw bytes */
-        FileInputStream<TAllocator> mFileInputStream;
     };
 
     /** \brief FileReader using ASCII encoding */

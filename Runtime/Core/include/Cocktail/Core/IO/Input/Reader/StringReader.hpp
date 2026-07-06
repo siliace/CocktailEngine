@@ -46,7 +46,26 @@ namespace Ck
             mCursor(0),
             mString(std::move(string))
         {
-            /// Nothing to initialize
+            /// Nothing
+        }
+        /**
+        * \brief Read a single character
+         *
+         * Copies one characters from the current cursor position into \p c.
+         *
+         * \param c The character read from the source
+         *
+         * \return True if a character was successfully read, false otherwise (e.g. end of stream)
+         */
+        bool Read(CharType& c) override
+        {
+            if (mCursor == mString.GetLength())
+                return false;
+
+            c = mString[mCursor];
+            ++mCursor;
+
+            return true;
         }
 
         /**

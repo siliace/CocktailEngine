@@ -115,25 +115,25 @@ namespace Ck
      * \brief Transcoding writer to ASCII encoding
      */
     template <typename TDst>
-    using AsciiTranscodingReader = TranscodingWriter<TDst, Encoders::Ascii>;
+    using AsciiTranscodingWriter = TranscodingWriter<TDst, Encoders::Ascii>;
 
     /**
      * \brief Transcoding writer to UTF-8 encoding
      */
     template <typename TDst>
-    using Utf8TranscodingReader = TranscodingWriter<TDst, Encoders::Utf8>;
+    using Utf8TranscodingWriter = TranscodingWriter<TDst, Encoders::Utf8>;
 
     /**
      * \brief Transcoding writer to UTF-16 encoding
      */
     template <typename TDst>
-    using Utf16TranscodingReader = TranscodingWriter<TDst, Encoders::Utf16>;
+    using Utf16TranscodingWriter = TranscodingWriter<TDst, Encoders::Utf16>;
 
     /**
      * \brief Transcoding writer to UTF-32 encoding
      */
     template <typename TDst>
-    using Utf32TranscodingReader = TranscodingWriter<TDst, Encoders::Utf32>;
+    using Utf32TranscodingWriter = TranscodingWriter<TDst, Encoders::Utf32>;
 }
 
 #endif // COCKTAIL_CORE_IO_OUTPUT_WRITER_TRANSCODINGWRITER_HPP

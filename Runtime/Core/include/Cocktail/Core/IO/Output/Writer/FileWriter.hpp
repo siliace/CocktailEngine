@@ -6,6 +6,23 @@
 
 namespace Ck
 {
+    namespace Detail
+    {
+        template <typename TAllocator>
+        struct FileWriterStorage
+        {
+        protected:
+
+            explicit FileWriterStorage(const Path& path, bool truncate, FileSystemDriver* driver) :
+                mFileOutputStream(path, truncate, driver)
+            {
+                /// Nothing
+            }
+
+            FileOutputStream<TAllocator> mFileOutputStream;
+        };
+    }
+
     /**
      * \brief Writer that writes text to a file
      *
@@ -16,7 +33,7 @@ namespace Ck
      * \tparam TAllocator Allocator type for internal streams (default: SizedHeapAllocator<32>)
      */
     template <typename TEncoding = Encoders::Text, typename TAllocator = SizedHeapAllocator<32>>
-    class FileWriter : public OutputStreamWriter<TEncoding>
+    class FileWriter : Detail::FileWriterStorage<TAllocator>, public OutputStreamWriter<TEncoding>
     {
     public:
 
@@ -31,15 +48,11 @@ namespace Ck
          * \param driver File system driver to use (default: local file system)
          */
         explicit FileWriter(const Path& path, bool truncate = false, FileSystemDriver* driver = LocalFileSystem::GetRootDriver()) :
-            mFileOutputStream(path, truncate, driver),
-            OutputStreamWriter<TEncoding>(mFileOutputStream)
+            Detail::FileWriterStorage<TAllocator>(path, truncate, driver),
+            OutputStreamWriter<TEncoding>(Detail::FileWriterStorage<TAllocator>::mFileOutputStream)
         {
             /// Nothing
         }
-
-    private:
-
-        FileOutputStream<TAllocator> mFileOutputStream; ///< Internal file output stream
     };
 }
 

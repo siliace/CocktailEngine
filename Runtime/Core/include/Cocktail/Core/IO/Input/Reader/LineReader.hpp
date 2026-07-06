@@ -107,7 +107,7 @@ namespace Ck
                 }
             }
 
-            return false;
+            return !line.IsEmpty();
         }
 
     private:

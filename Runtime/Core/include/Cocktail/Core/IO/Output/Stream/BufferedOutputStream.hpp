@@ -59,7 +59,8 @@ namespace Ck
          */
         SizeType Write(const Byte* buffer, SizeType length) override
         {
-            return OutputAccumulator<Byte, TAllocator>::Append(buffer, length);
+            OutputAccumulator<Byte, TAllocator>::Append(buffer, length);
+            return length;
         }
 
         /**
@@ -73,7 +74,7 @@ namespace Ck
             OutputAccumulator<Byte, TAllocator>::Commit();
         }
 
-    private:
+    protected:
 
         /**
          * \brief Commit a buffer to the underlying stream
