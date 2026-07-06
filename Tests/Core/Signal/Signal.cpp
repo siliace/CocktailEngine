@@ -29,6 +29,43 @@ public:
 
 bool TestClass::StaitcMethodCalled = false;
 
+TEST_CASE("Move-constructed signal keeps working slots", "[Signal]")
+{
+    Ck::Signal<int> original;
+
+    int value = 0;
+    auto connection = original.Connect([&](int v) {
+        value = v;
+    });
+
+    Ck::Signal<int> moved(std::move(original));
+
+    moved.Emit(42);
+    REQUIRE(value == 42);
+
+    connection.Disconnect();
+    REQUIRE_FALSE(moved.IsBound());
+}
+
+TEST_CASE("Move-assigned signal keeps working slots", "[Signal]")
+{
+    Ck::Signal<int> original;
+
+    int value = 0;
+    auto connection = original.Connect([&](int v) {
+        value = v;
+    });
+
+    Ck::Signal<int> moved;
+    moved = std::move(original);
+
+    moved.Emit(10);
+    REQUIRE(value == 10);
+
+    connection.Disconnect();
+    REQUIRE_FALSE(moved.IsBound());
+}
+
 TEST_CASE("Emit a signal to a free function", "[Signal]")
 {
 	Ck::Signal<int> signal;

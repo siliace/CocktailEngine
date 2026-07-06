@@ -44,6 +44,8 @@ namespace Ck::Detail
             std::lock_guard<Lockable> rhs(other.mSlotLock);
 
             mSlots = std::move(other.mSlots);
+            for (const auto& [groupIndex, slot] : mSlots)
+                slot->Rebind(this);
         }
 
         /**
@@ -68,6 +70,8 @@ namespace Ck::Detail
                 std::lock_guard<Lockable> rhs(other.mSlotLock);
 
                 mSlots = std::move(other.mSlots);
+                for (const auto& [groupIndex, slot] : mSlots)
+                    slot->Rebind(this);
             }
 
             return *this;

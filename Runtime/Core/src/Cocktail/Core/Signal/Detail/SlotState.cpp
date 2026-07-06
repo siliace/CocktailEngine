@@ -45,4 +45,9 @@ namespace Ck::Detail
 	{
 		/// Nothing
 	}
+
+    void SlotState::Rebind(SlotContainer* container)
+    {
+	    mContainer = container;
+    }
 }

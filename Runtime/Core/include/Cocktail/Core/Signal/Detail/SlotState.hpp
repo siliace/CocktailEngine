@@ -9,6 +9,9 @@ namespace Ck::Detail
 {
 	class SlotContainer;
 
+    template <typename, typename...>
+    class SignalBase;
+
 	/**
 	 * \brief 
 	 */
@@ -65,6 +68,16 @@ namespace Ck::Detail
 		SlotState(SlotContainer* container, unsigned int groupId);
 
 	private:
+
+	    template <typename, typename...>
+	    friend class SignalBase;
+
+        /**
+         * \brief
+         *
+         * \param container
+         */
+	    void Rebind(SlotContainer* container);
 
 		SlotContainer* mContainer;
 		unsigned int mGroupId;
