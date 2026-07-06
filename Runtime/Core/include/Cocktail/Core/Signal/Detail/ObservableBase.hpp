@@ -12,7 +12,7 @@ namespace Ck::Detail
 	 * \brief 
 	 */
 	template <typename Lockable>
-	class COCKTAIL_CORE_API ObservableBase
+	class ObservableBase
 	{
 	public:
 
@@ -25,13 +25,13 @@ namespace Ck::Detail
 		 * \brief 
 		 * \param other 
 		 */
-		ObservableBase(const ObservableBase<Lockable>& other) = delete;
+		ObservableBase(const ObservableBase& other) = delete;
 
 		/**
 		 * \brief 
 		 * \param other 
 		 */
-		ObservableBase(ObservableBase<Lockable>&& other) noexcept
+		ObservableBase(ObservableBase&& other) noexcept
 		{
 			std::lock_guard<Lockable> lhs(mMutex);
 			std::lock_guard<Lockable> rhs(other.mMutex);
@@ -49,19 +49,22 @@ namespace Ck::Detail
 		 * \param other 
 		 * \return 
 		 */
-		ObservableBase<Lockable>& operator=(const ObservableBase<Lockable>& other) = delete;
+		ObservableBase& operator=(const ObservableBase& other) = delete;
 
 		/**
 		 * \brief 
 		 * \param other 
 		 * \return 
 		 */
-		ObservableBase<Lockable>& operator=(ObservableBase<Lockable>&& other) noexcept
+		ObservableBase& operator=(ObservableBase&& other) noexcept
 		{
-			std::lock_guard<Lockable> lhs(mMutex);
-			std::lock_guard<Lockable> rhs(other.mMutex);
+		    if (this != &other)
+		    {
+		        std::lock_guard<Lockable> lhs(mMutex);
+		        std::lock_guard<Lockable> rhs(other.mMutex);
 
-			mConnections = std::move(other.mConnections);
+		        mConnections = std::move(other.mConnections);
+		    }
 
 			return *this;
 		}
@@ -72,11 +75,14 @@ namespace Ck::Detail
 		 * \param callback
 		 */
 		template <typename SignalLockable, typename... Args, typename Callback>
-		void Connect(SignalBase<SignalLockable, Args...>& signal, Callback&& callback)
+		Connection& Connect(SignalBase<SignalLockable, Args...>& signal, Callback&& callback)
 		{
 			std::lock_guard<Lockable> lg(mMutex);
+
 			Connection connection = signal.Connect(std::forward<Callback>(callback));
 			mConnections.Add(std::move(connection));
+
+		    return mConnections.Last();
 		}
 
 	protected:
