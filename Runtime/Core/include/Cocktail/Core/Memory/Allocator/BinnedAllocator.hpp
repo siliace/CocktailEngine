@@ -253,11 +253,6 @@ namespace Ck
              */
             PageHeader* ReservedPage = nullptr; /*!< One fully-empty slab kept off the active list as a reuse buffer; \c nullptr if no reserve is held */
         };
-
-        /**
-         * \brief Size of one OS slab page 
-         */
-        static const std::size_t SlabPageSize;
         
         /**
          * \brief Computes the total allocation size required for a user allocation

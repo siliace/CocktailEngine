@@ -3,6 +3,7 @@
 
 #include <functional>
 
+#include <Cocktail/Core/Memory/SharedPtr.hpp>
 #include <Cocktail/Core/Signal/Detail/SlotState.hpp>
 
 namespace Ck::Detail
@@ -166,6 +167,44 @@ namespace Ck::Detail
 
 		ReferenceType mObject;
 		FunctionType mFunction;
+	};
+
+	/**
+	 * \brief A slot decorator that automatically disconnects the underlying slot after being invoked once
+	 */
+	template <typename... Args>
+	class OneShotSlot final : public Slot<Args...>
+	{
+	public:
+
+		/**
+		 * \brief
+		 * \param inner The slot to wrap
+		 * \param container
+		 * \param groupId
+		 */
+		OneShotSlot(UniquePtr<Slot<Args...>> inner, SlotContainer* container, unsigned int groupId) :
+			Slot<Args...>(container, groupId),
+			mInner(std::move(inner))
+		{
+			/// Nothing
+		}
+
+	protected:
+
+		/**
+		 * \brief
+		 * \param args
+		 */
+		void DoInvoke(std::tuple<Args...>&& args) override
+		{
+			mInner->Invoke(std::move(args));
+			SlotState::Disconnect();
+		}
+
+	private:
+
+		UniquePtr<Slot<Args...>> mInner;
 	};
 }
 

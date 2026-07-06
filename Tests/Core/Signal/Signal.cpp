@@ -96,3 +96,54 @@ TEST_CASE("Emit a signal to free functions with group ids", "[Signal]")
 	REQUIRE(values[1] == 5 + 1);
 	REQUIRE(values[2] == 7 + 1);
 }
+
+TEST_CASE("ConnectOnce fires only once", "[Signal]")
+{
+	Ck::Signal<int> signal;
+
+	int callCount = 0;
+	auto connection = signal.ConnectOnce([&](int value) {
+		callCount += value;
+	});
+
+	signal.Emit(1);
+	REQUIRE(callCount == 1);
+
+	signal.Emit(1);
+	REQUIRE(callCount == 1);
+    REQUIRE_FALSE(signal.IsBound());
+	REQUIRE_FALSE(connection.IsConnected());
+}
+
+TEST_CASE("ConnectOnce with multiple slots", "[Signal]")
+{
+	Ck::Signal<> signal;
+
+	int persistent = 0;
+	int oneShot = 0;
+
+	auto conn1 = signal.Connect([&]() { persistent++; });
+	auto conn2 = signal.ConnectOnce([&]() { oneShot++; });
+
+	signal.Emit();
+	REQUIRE(persistent == 1);
+	REQUIRE(oneShot == 1);
+    REQUIRE_FALSE(conn2.IsConnected());
+
+	signal.Emit();
+	REQUIRE(persistent == 2);
+	REQUIRE(oneShot == 1);
+}
+
+TEST_CASE("ConnectOnce with a member method", "[Signal]")
+{
+	Ck::Signal<bool> signal;
+
+	TestClass testObject;
+	auto connection = signal.ConnectOnce(testObject, &TestClass::MethodCall);
+
+	signal.Emit(true);
+	REQUIRE(testObject.MemberMethodCalled);
+    REQUIRE_FALSE(signal.IsBound());
+	REQUIRE_FALSE(connection.IsConnected());
+}

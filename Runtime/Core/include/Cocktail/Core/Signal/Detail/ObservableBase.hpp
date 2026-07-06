@@ -12,7 +12,7 @@ namespace Ck::Detail
 	 * \brief 
 	 */
 	template <typename Lockable>
-	class ObservableBase
+	class COCKTAIL_CORE_API ObservableBase
 	{
 	public:
 

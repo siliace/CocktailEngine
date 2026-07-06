@@ -41,13 +41,11 @@ namespace Ck
     static constexpr StaticArray<BinConfiguration, BinnedAllocator::BinCount> BinConfigurations = MakeStaticArray<BinConfiguration>(
         BinConfiguration{ 64, 1 }, BinConfiguration{ 128, 1 }, BinConfiguration{ 256, 1 }, BinConfiguration{ 512, 2 }, BinConfiguration{ 1024, 3 });
 
-    const std::size_t BinnedAllocator::SlabPageSize = SystemMemory::GetPageSize();
-
     BinnedAllocator::BinnedAllocator()
     {
         for (unsigned int i = 0; i < BinCount; ++i)
         {
-            std::size_t slabSize = BinConfigurations[i].SlabPageCount * SlabPageSize;
+            std::size_t slabSize = BinConfigurations[i].SlabPageCount * SystemMemory::GetPageSize();
             std::size_t blockCount = (slabSize - sizeof(PageHeader)) / BinConfigurations[i].BlockSize;
 
             mPageIndexes[i].SlabPageCount = BinConfigurations[i].SlabPageCount;
@@ -62,7 +60,7 @@ namespace Ck
     {
         for (PageIndex& pageIndex : mPageIndexes)
         {
-            std::size_t slabSize = pageIndex.SlabPageCount * SlabPageSize;
+            std::size_t slabSize = pageIndex.SlabPageCount * SystemMemory::GetPageSize();
 
             PageHeader* current = pageIndex.FirstPage;
             while (current)
@@ -297,7 +295,7 @@ namespace Ck
         }
         else
         {
-            const std::size_t slabSize = index->SlabPageCount * SlabPageSize;
+            const std::size_t slabSize = index->SlabPageCount * SystemMemory::GetPageSize();
             Byte* page = static_cast<Byte*>(SystemMemory::Allocate(slabSize));
             assert(page && "malloc failed in AllocatePage");
 
@@ -388,7 +386,7 @@ namespace Ck
                     }
                     else
                     {
-                        std::size_t slabSize = index->SlabPageCount * SlabPageSize;
+                        std::size_t slabSize = index->SlabPageCount * SystemMemory::GetPageSize();
                         SystemMemory::Free(page, slabSize);
                     }
                 }

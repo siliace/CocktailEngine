@@ -95,12 +95,15 @@ namespace Ck::Detail
         }
 
         /**
-         * \brief
-         * \tparam T
-         * \param object
-         * \param function
-         * \param groupId
-         * \return
+         * \brief Connect a member function
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
          */
         template <typename T>
         Connection Connect(T& object, void (T::*function)(Args...), unsigned int groupId = 0)
@@ -115,12 +118,15 @@ namespace Ck::Detail
         }
 
         /**
-         * \brief
-         * \tparam T
-         * \param object
-         * \param function
-         * \param groupId
-         * \return
+         * \brief Connect a const member function
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The const member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
          */
         template <typename T>
         Connection Connect(const T& object, void (T::*function)(Args...) const, unsigned int groupId = 0)
@@ -131,6 +137,75 @@ namespace Ck::Detail
             SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, std::move(function), groupId);
 
             // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a callable that will be automatically disconnected after being invoked once
+         *
+         * \param callable The callable
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename Callable>
+        Connection ConnectOnce(Callable&& callable, unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = CallableSlot<Callable, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(std::forward<Callable>(callable), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(std::move(inner), groupId);
+
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a member function that will be automatically disconnected after being invoked once
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection ConnectOnce(T& object, void (T::*function)(Args...), unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = ObjectSlot<T, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(object, std::move(function), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(std::move(inner), groupId);
+
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a const member function that will be automatically disconnected after being invoked once
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The const member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection ConnectOnce(const T& object, void (T::*function)(Args...) const, unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = ConstantObjectSlot<T, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(object, std::move(function), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(std::move(inner), groupId);
+
             return Connection(slot);
         }
 
@@ -272,7 +347,7 @@ namespace Ck::Detail
         }
 
         bool mEmitting;
-        Lockable mSlotLock;
+        mutable Lockable mSlotLock;
         std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mSlots;
         std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mConnectingSlots;
         std::multimap<unsigned int, SharedPtr<Slot<Args...>>> mDisconnectingSlots;
