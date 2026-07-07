@@ -15,15 +15,15 @@ namespace Ck
         assert(x < mSize.Width && y < mSize.Height);
 
         Uint64 offset = 0;
-        offset += y * mSize.Width;
-        offset += x;
+        offset += static_cast<Uint64>(y) * static_cast<Uint64>(mSize.Width);
+        offset += static_cast<Uint64>(x);
 
         return offset * ImageRawFormat::GetPixelStride(mFormat);
     }
 
     Uint64 ImageInfo::GetPixelCount() const
     {
-        return mSize.Width * mSize.Height;
+        return static_cast<Uint64>(mSize.Width) * static_cast<Uint64>(mSize.Height);
     }
 
     const Extent2D<unsigned int>& ImageInfo::GetSize() const

@@ -36,7 +36,7 @@ namespace Ck
         {
             for (unsigned int i = 0; i < size.Width; i++)
             {
-                const Byte* pixel = GetPixelPointer(j, i);
+                const Byte* pixel = GetPixelPointer(i, j);
                 LinearColor color = ImageRawFormat::GetPixelColor(pixel, GetRawFormat(), GetGammaSpace());
 
                 colors.Add(color);

@@ -7,30 +7,51 @@ namespace Ck
         template <typename T>
         LinearColor GreyPixelMemoryToColor(const T* pixel, GammaSpace gammaSpace, bool hasAlpha)
         {
-            static constexpr auto Max = std::numeric_limits<T>::max();
-
             LinearColor color;
-            const float normalized = static_cast<float>(pixel[0]) / Max;
-            const float grey = gammaSpace == GammaSpace::sRGB ? ColorConversion::SrgbColorToLinear(normalized) : normalized;
+            float grey;
+            float alpha;
+
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                grey = static_cast<float>(pixel[0]);
+                alpha = hasAlpha ? static_cast<float>(pixel[1]) : 1.f;
+            }
+            else
+            {
+                static constexpr auto Max = std::numeric_limits<T>::max();
+                grey = static_cast<float>(pixel[0]) / Max;
+                alpha = hasAlpha ? static_cast<float>(pixel[1]) / Max : 1.f;
+            }
+
+            if (gammaSpace == GammaSpace::sRGB)
+                grey = ColorConversion::SrgbColorToLinear(grey);
 
             color.R = grey;
-            color.B = grey;
             color.G = grey;
-            color.A = hasAlpha ? static_cast<float>(pixel[1]) / Max : 1.f;
-
+            color.B = grey;
+            color.A = alpha;
             return color;
         }
 
         template <typename T>
         LinearColor RgbPixelMemoryToColor(const T* pixel, GammaSpace gammaSpace, bool hasAlpha)
         {
-            static constexpr auto Max = std::numeric_limits<T>::max();
-
             LinearColor color;
-            color.R = static_cast<float>(pixel[0]) / Max;
-            color.G = static_cast<float>(pixel[1]) / Max;
-            color.B = static_cast<float>(pixel[2]) / Max;
-            color.A = hasAlpha ? static_cast<float>(pixel[3]) / Max : 1.f;
+            if constexpr (std::is_floating_point_v<T>)
+            {
+                color.R = static_cast<float>(pixel[0]);
+                color.G = static_cast<float>(pixel[1]);
+                color.B = static_cast<float>(pixel[2]);
+                color.A = hasAlpha ? static_cast<float>(pixel[3]) : 1.f;
+            }
+            else
+            {
+                static constexpr auto Max = std::numeric_limits<T>::max();
+                color.R = static_cast<float>(pixel[0]) / Max;
+                color.G = static_cast<float>(pixel[1]) / Max;
+                color.B = static_cast<float>(pixel[2]) / Max;
+                color.A = hasAlpha ? static_cast<float>(pixel[3]) / Max : 1.f;
+            }
 
             if (gammaSpace == GammaSpace::sRGB)
             {
@@ -115,7 +136,7 @@ namespace Ck
 
             case Type::GreyAlpha8:
             case Type::GreyAlpha16:
-            case Type::GreyAlpha32F: return 1;
+            case Type::GreyAlpha32F: return 2;
 
             case Type::RedGreenBlue8:
             case Type::RedGreenBlue16:
