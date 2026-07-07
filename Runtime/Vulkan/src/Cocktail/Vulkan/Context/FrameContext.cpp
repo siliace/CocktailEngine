@@ -44,7 +44,7 @@ namespace Ck::Vulkan
 		mFrameFence->Reset();
 	}
 
-	Framebuffer* FrameContext::AcquireNextFramebuffer(const RenderSurface* renderSurface)
+	Framebuffer* FrameContext::AcquireNextFramebuffer(RenderSurface* renderSurface)
 	{
 	    AcquiredImage& acquiredImage = mAcquiredImages.ComputeIfMissing(renderSurface, [this](const RenderSurface*) {
 	        RenderDevice* renderDevice = static_cast<RenderDevice*>(mRenderContext->GetRenderDevice());
@@ -124,7 +124,8 @@ namespace Ck::Vulkan
 			VkSemaphore* waitSemaphoreHandles = COCKTAIL_STACK_ALLOC(VkSemaphore, mAcquiredImages.GetSize());
 			VkSwapchainKHR* swapchainHandles = COCKTAIL_STACK_ALLOC(VkSwapchainKHR, mAcquiredImages.GetSize());
 			unsigned int* imageIndexes = COCKTAIL_STACK_ALLOC(unsigned int, mAcquiredImages.GetSize());
-			VkResult* result = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.GetSize());
+			VkResult* results = COCKTAIL_STACK_ALLOC(VkResult, mAcquiredImages.GetSize());
+		    const RenderSurface** presentedSurfaces = COCKTAIL_STACK_ALLOC(const RenderSurface*, mAcquiredImages.GetSize());
 
 			unsigned int acquiredImageCount = 0;
 			for (const auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
@@ -132,6 +133,7 @@ namespace Ck::Vulkan
 				if (acquiredImage.ImageIndex.IsEmpty())
 					continue;
 
+			    presentedSurfaces[acquiredImageCount] = acquiredSurface;
 				waitSemaphoreHandles[acquiredImageCount] = acquiredImage.ImagePresentable->GetHandle();
 				swapchainHandles[acquiredImageCount] = acquiredSurface->GetSwapchain()->GetHandle();
 				imageIndexes[acquiredImageCount] = acquiredImage.ImageIndex.Get();
@@ -148,10 +150,18 @@ namespace Ck::Vulkan
 					presentInfo.swapchainCount = acquiredImageCount;
 					presentInfo.pSwapchains = swapchainHandles;
 					presentInfo.pImageIndices = imageIndexes;
-					presentInfo.pResults = result;
+					presentInfo.pResults = results;
 				}
 
-				vkQueuePresentKHR(queue, &presentInfo);
+			    VkResult presentResult = vkQueuePresentKHR(queue, &presentInfo);
+                if (presentResult != VK_SUCCESS)
+                {
+                    for (unsigned int i = 0; i < acquiredImageCount; i++)
+                    {
+                        assert(results[i] == VK_ERROR_OUT_OF_DATE_KHR || results[i] == VK_SUBOPTIMAL_KHR);
+                        presentedSurfaces[i]->MarkSwapchainOutdated();
+                    }
+                }
 
 				for (auto& [acquiredSurface, acquiredImage] : mAcquiredImages)
 					acquiredImage.ImageIndex = Optional<unsigned int>::Empty();

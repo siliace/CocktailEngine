@@ -41,7 +41,7 @@ namespace Ck::Vulkan
 		 * \param fence
 		 * \return
 		 */
-		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence) const;
+		Optional<unsigned int> AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence);
 
 		/**
 		 * \brief 
@@ -55,10 +55,12 @@ namespace Ck::Vulkan
 		 */
 		Renderer::RenderDevice* GetRenderDevice() const override;
 
-		/**
-		 * \brief
-		 * \return
-		 */
+	    void MarkSwapchainOutdated() const;
+
+        /**
+         * \brief
+         * \return
+         */
 		Extent2D<unsigned int> GetSize() const override;
 
 		/**
@@ -136,6 +138,7 @@ namespace Ck::Vulkan
 		RenderDevice* mRenderDevice;
 		const VkAllocationCallbacks* mAllocationCallbacks;
 		VkSurfaceKHR mHandle;
+	    mutable bool mSwapchainOutdated;
 		PixelFormat mDepthStencilFormat;
 		UniquePtr<PresentationContext> mPresentationContext;
 		SharedPtr<RenderPass> mRenderPass;

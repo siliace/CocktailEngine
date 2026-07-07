@@ -130,7 +130,6 @@ namespace Ck::Vulkan
 
 		RenderDevice* mRenderDevice;
 		SharedPtr<CommandListPool> mAllocator;
-		DescriptorSetAllocator* mDescriptorSetAllocator;
 		VkCommandBuffer mHandle;
 		bool mOneShot;
 		bool mSecondary;

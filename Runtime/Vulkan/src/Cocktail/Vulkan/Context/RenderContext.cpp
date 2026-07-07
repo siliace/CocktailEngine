@@ -48,7 +48,7 @@ namespace Ck::Vulkan
 
 	Renderer::Framebuffer* RenderContext::AcquireFramebuffer(Renderer::RenderSurface* renderSurface)
 	{
-		return GetCurrentFrameContext()->AcquireNextFramebuffer(static_cast<const RenderSurface*>(renderSurface));
+		return GetCurrentFrameContext()->AcquireNextFramebuffer(static_cast<RenderSurface*>(renderSurface));
 	}
 
 	Renderer::CommandList* RenderContext::CreateCommandList(const Renderer::CommandListCreateInfo& createInfo)

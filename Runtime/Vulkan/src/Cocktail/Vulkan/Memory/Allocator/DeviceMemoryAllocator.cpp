@@ -152,6 +152,8 @@ namespace Ck::Vulkan
 
 		VkPhysicalDeviceMemoryProperties memoryProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+
+        // Pass 1: exact match
 		for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; i++)
 		{
 			if (!(typeIndexMask & Bit(i)))
@@ -163,7 +165,38 @@ namespace Ck::Vulkan
 			return i;
 		}
 
-		return 0;
+	    // Pass 2: superset match (has all required flags, possibly more)
+	    for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; i++)
+	    {
+	        if (!(typeIndexMask & Bit(i)))
+	            continue;
+
+	        if ((memoryProperties.memoryTypes[i].propertyFlags & memoryTypeProperties) == memoryTypeProperties)
+	            return i;
+	    }
+
+	    // Pass 3: fallback for Unified — try Dynamic (host-visible without device-local)
+	    if (memoryType == Renderer::MemoryType::Unified)
+	    {
+	        VkMemoryPropertyFlags fallback = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	        for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; i++)
+	        {
+	            if (!(typeIndexMask & Bit(i)))
+	                continue;
+
+	            if ((memoryProperties.memoryTypes[i].propertyFlags & fallback) == fallback)
+	                return i;
+	        }
+	    }
+
+	    // Nothing suitable — return any compatible type as last resort
+	    for (unsigned int i = 0; i < memoryProperties.memoryTypeCount; i++)
+	    {
+	        if (typeIndexMask & Bit(i))
+	            return i;
+	    }
+
+	    return 0;
 	}
 
     DeviceMemoryBlock* DeviceMemoryAllocator::AllocateBlock(Renderer::MemoryPriority priority, const VkMemoryRequirements& memoryRequirements, unsigned int memoryTypeIndex)

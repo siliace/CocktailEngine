@@ -16,7 +16,8 @@ namespace Ck::Vulkan
 		mRenderDevice(renderDevice),
 		mAllocationCallbacks(allocationCallbacks),
 		mHandle(VK_NULL_HANDLE),
-	    mVSyncEnable(false)
+	    mSwapchainOutdated(true),
+        mVSyncEnable(false)
 	{
 		mDepthStencilFormat = createInfo.DepthStencilFormat;
 
@@ -62,15 +63,28 @@ namespace Ck::Vulkan
 		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mHandle, mAllocationCallbacks);
 	}
 
-	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence) const
+	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence)
 	{
 		if (!mSwapchain)
 			return Optional<unsigned int>::Empty();
 
+	    if (mSwapchainOutdated)
+	        RecreateSwapchain(mSwapchain->GetSize(), mVSyncEnable);
+
 		unsigned int imageIndex;
 		VkSemaphore semaphoreHandle = semaphore ? semaphore->GetHandle() : VK_NULL_HANDLE;
 		VkFence fenceHandle = fence ? fence->GetHandle() : VK_NULL_HANDLE;
-		COCKTAIL_VK_CHECK(vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), timeout.GetCount(TimeUnit::Nanoseconds()), semaphoreHandle, fenceHandle, &imageIndex));
+	    VkResult result = vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), timeout.GetCount(TimeUnit::Nanoseconds()), semaphoreHandle, fenceHandle, &imageIndex);
+	    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+	    {
+	        RecreateSwapchain(mSwapchain->GetSize(), mVSyncEnable);
+
+	        // Retry acquire with new swapchain
+	        result = vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), timeout.GetCount(TimeUnit::Nanoseconds()), semaphoreHandle, fenceHandle, &imageIndex);
+	    }
+
+	    if (result == VK_SUBOPTIMAL_KHR)
+	        mSwapchainOutdated = true; // Image acquired but swapchain isn't ideal — mark for next frame
 
 		return Optional<unsigned int>::Of(imageIndex);
 	}
@@ -92,7 +106,12 @@ namespace Ck::Vulkan
 		return mRenderDevice;
 	}
 
-	Extent2D<unsigned int> RenderSurface::GetSize() const
+    void RenderSurface::MarkSwapchainOutdated() const
+    {
+        mSwapchainOutdated = true;
+    }
+
+    Extent2D<unsigned int> RenderSurface::GetSize() const
 	{
 		return mSwapchain->GetSize();
 	}

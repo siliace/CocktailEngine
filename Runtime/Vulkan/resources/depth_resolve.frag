@@ -27,9 +27,11 @@ void main()
         }
         else if (fragmentInfo.depthResolveMode == RESOLVE_MODE_AVERAGE)
         {
-            depth = texelFetch(inTexture, position, 0).r;
-            for (int i = 1; i < fragmentInfo.sampleCount; i++)
-                depth = (depth + texelFetch(inTexture, position, i).r) / 2.f;
+            depth = 0.f;
+            for (int i = 0; i < fragmentInfo.sampleCount; i++)
+                depth += texelFetch(inTexture, position, i).r;
+
+            depth /= float(fragmentInfo.sampleCount);
         }
         else if (fragmentInfo.depthResolveMode == RESOLVE_MODE_MIN)
         {

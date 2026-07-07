@@ -39,7 +39,7 @@ namespace Ck::Vulkan
 		 * \param renderSurface
 		 * \return
 		 */
-		Framebuffer* AcquireNextFramebuffer(const RenderSurface* renderSurface);
+		Framebuffer* AcquireNextFramebuffer(RenderSurface* renderSurface);
 
 		/**
 		 * \brief 

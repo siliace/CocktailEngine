@@ -72,10 +72,10 @@ namespace Ck::Vulkan
 				return VK_ACCESS_SHADER_WRITE_BIT;
 
 			case Renderer::ResourceState::CopySource:
-				return VK_ACCESS_TRANSFER_WRITE_BIT;
+				return VK_ACCESS_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::CopyDestination:
-				return VK_ACCESS_TRANSFER_READ_BIT;
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
 			}
 
 			COCKTAIL_UNREACHABLE();
@@ -131,10 +131,10 @@ namespace Ck::Vulkan
 				return VK_ACCESS_SHADER_READ_BIT;
 
 			case Renderer::ResourceState::CopySource:
-				return VK_ACCESS_TRANSFER_WRITE_BIT;
+				return VK_ACCESS_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::CopyDestination:
-				return VK_ACCESS_TRANSFER_READ_BIT;
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
 
 			case Renderer::ResourceState::VertexBuffer:
 				return VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
@@ -369,8 +369,7 @@ namespace Ck::Vulkan
 		mSecondary(createInfo.Secondary),
 		mState(Renderer::CommandListState::Initial),
 		mUsage(createInfo.Usage),
-		mCurrentFramebuffer(nullptr),
-		mDescriptorSetAllocator(nullptr)
+		mCurrentFramebuffer(nullptr)
 	{
 		Renderer::CommandQueueType queueType = SelectQueueForUsage(mUsage);
 
@@ -549,7 +548,7 @@ namespace Ck::Vulkan
 				const Renderer::GpuBarrier& barrier = barriers[i];
 				if (barrier.Type == Renderer::GpuBarrierType::Memory)
 				{
-					VkMemoryBarrier memoryBarrier;
+					VkMemoryBarrier memoryBarrier{ VK_STRUCTURE_TYPE_MEMORY_BARRIER, nullptr };
 					memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
 					memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 
@@ -566,8 +565,8 @@ namespace Ck::Vulkan
 					VkBufferMemoryBarrier bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER, nullptr };
 					PopulateBufferMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
 
-					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, PixelFormat::Undefined());
-					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, PixelFormat::Undefined());
+					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Buffer.OldState, PixelFormat::Undefined());
+					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Buffer.NewState, PixelFormat::Undefined());
 
 					vkCmdPipelineBarrier(mHandle,
 						sourceStages, destinationStages,
@@ -624,7 +623,7 @@ namespace Ck::Vulkan
 			int mipHeight = vkTexture->GetSize().Height;
 			int mipDepth = vkTexture->GetSize().Depth;
 
-			for (unsigned int level = subResource.BaseMipMapLevel; level <= subResource.MipMapLevelCount; level++)
+			for (unsigned int level = subResource.BaseMipMapLevel; level < subResource.BaseMipMapLevel + subResource.MipMapLevelCount; level++)
 			{
 				VkImageBlit* blits = COCKTAIL_STACK_ALLOC(VkImageBlit, subResource.ArrayLayerCount);
 
@@ -636,6 +635,7 @@ namespace Ck::Vulkan
 				{
 					VkImageBlit blit = {};
 					blit.srcOffsets[0] = { 0, 0, 0 };
+					blit.srcOffsets[1] = { mipWidth, mipHeight, mipDepth };
 					blit.srcOffsets[1] = { mipWidth, mipHeight, mipDepth };
 					blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 					blit.srcSubresource.mipLevel = level - 1;
@@ -1388,7 +1388,7 @@ namespace Ck::Vulkan
 
 	bool CommandList::IsSecondary() const
 	{
-		return false;
+		return mSecondary;
 	}
 
 	void CommandList::MarkInitial()
