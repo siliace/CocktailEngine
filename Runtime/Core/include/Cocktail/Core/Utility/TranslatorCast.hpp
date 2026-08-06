@@ -247,7 +247,6 @@ namespace Ck
 	template <typename TIn, typename TOut, typename Enabler = void>
 	struct TranslatorBetween
 	{
-		static_assert(false, "No translator available between TIn and TOut");
 	};
 
 	template <typename T> struct TranslatorBetween<T, T> { using Type = IdentityTranslator<T>; };
