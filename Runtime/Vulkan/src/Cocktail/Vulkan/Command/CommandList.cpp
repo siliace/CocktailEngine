@@ -457,6 +457,14 @@ namespace Ck::Vulkan
 		COCKTAIL_VK_CHECK(vkBeginCommandBuffer(mHandle, &beginInfo));
 
 		mState = Renderer::CommandListState::Recording;
+	    
+        const bool isGraphic  = mUsage == Renderer::CommandListUsageBits::Graphic;
+	    const bool isVsrSupported = mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::VariableShadingRate);
+	    if (isGraphic && isVsrSupported)
+	    {
+            Extent2D<unsigned int> fragmentSize = MakeExtent(1u, 1u);
+	        SetShadingRate(fragmentSize, Renderer::ShadingRateCombiner::Keep, Renderer::ShadingRateCombiner::Keep);
+	    }
 	}
 
 	void CommandList::End()
