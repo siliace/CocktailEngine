@@ -113,7 +113,7 @@ namespace Ck::Vulkan
 			return {};
 		}
 
-		VkAccessFlags GetDestinationResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
+		VkAccessFlags GetDestinationResourceStateAccess(Renderer::CommandListUsageBits usage, Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
 			{
@@ -128,7 +128,7 @@ namespace Ck::Vulkan
 
 			case Renderer::ResourceState::GraphicShaderResource:
 			case Renderer::ResourceState::ComputeShaderResource:
-				return VK_ACCESS_SHADER_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_SHADER_READ_BIT : 0;
 
 			case Renderer::ResourceState::CopySource:
 				return VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -137,20 +137,20 @@ namespace Ck::Vulkan
 				return VK_ACCESS_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::VertexBuffer:
-				return VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT : 0;
 
 			case Renderer::ResourceState::IndexBuffer:
-				return VK_ACCESS_INDEX_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_INDEX_READ_BIT : 0;
 
 			case Renderer::ResourceState::UniformBuffer:
-				return VK_ACCESS_UNIFORM_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_UNIFORM_READ_BIT : 0;
 			}
 
 			COCKTAIL_UNREACHABLE();
 			return {};
 		}
 
-		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
+		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::CommandListUsageBits usage, Renderer::ResourceState resourceState, const PixelFormat& format)
 		{
 			switch (resourceState)
 			{
@@ -165,7 +165,7 @@ namespace Ck::Vulkan
 
 			case Renderer::ResourceState::GraphicShaderResource:
 			case Renderer::ResourceState::ComputeShaderResource:
-				return VK_ACCESS_2_SHADER_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_SHADER_READ_BIT : VK_ACCESS_2_NONE_KHR;
 
 			case Renderer::ResourceState::CopySource:
 				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
@@ -174,13 +174,13 @@ namespace Ck::Vulkan
 				return VK_ACCESS_2_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::VertexBuffer:
-				return VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT : VK_ACCESS_2_NONE_KHR;
 
 			case Renderer::ResourceState::IndexBuffer:
-				return VK_ACCESS_2_INDEX_READ_BIT;
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_INDEX_READ_BIT : VK_ACCESS_2_NONE_KHR;
 
 			case Renderer::ResourceState::UniformBuffer:
-				return VK_ACCESS_2_UNIFORM_READ_BIT;
+				return usage != Renderer::CommandListUsageBits::Transfer ? VK_ACCESS_2_UNIFORM_READ_BIT : VK_ACCESS_2_NONE_KHR;
 			}
 
 			COCKTAIL_UNREACHABLE();
@@ -273,7 +273,7 @@ namespace Ck::Vulkan
 		}
 
 		template <typename T>
-		void PopulateBufferMemoryBarrier(const QueueFamilyContext& queueFamilyContext, T& bufferMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		void PopulateBufferMemoryBarrier(Renderer::CommandListUsageBits usage, const QueueFamilyContext& queueFamilyContext, T& bufferMemoryBarrier, const Renderer::GpuBarrier& barrier)
 		{
 			Renderer::ResourceState oldState = barrier.Buffer.OldState;
 			Renderer::ResourceState newState = barrier.Buffer.NewState;
@@ -282,12 +282,12 @@ namespace Ck::Vulkan
 			if constexpr (std::is_same_v<T, VkBufferMemoryBarrier2KHR>)
 			{
 				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, PixelFormat::Undefined());
-				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(usage, newState, PixelFormat::Undefined());
 			}
 			else
 			{
 				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, PixelFormat::Undefined());
-				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(usage, newState, PixelFormat::Undefined());
 			}
 
 			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
@@ -317,7 +317,7 @@ namespace Ck::Vulkan
 		}
 
 		template <typename T>
-		void PopulateImageMemoryBarrier(const QueueFamilyContext& queueFamilyContext, T& imageMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		void PopulateImageMemoryBarrier(Renderer::CommandListUsageBits usage, const QueueFamilyContext& queueFamilyContext, T& imageMemoryBarrier, const Renderer::GpuBarrier& barrier)
 		{
 			Renderer::ResourceState oldState = barrier.Texture.OldState;
 			Renderer::ResourceState newState = barrier.Texture.NewState;
@@ -326,12 +326,12 @@ namespace Ck::Vulkan
 			if constexpr (std::is_same_v<T, VkImageMemoryBarrier2KHR>)
 			{
 				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, resource->GetFormat());
-				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(newState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(usage, newState, resource->GetFormat());
 			}
 			else
 			{
 				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, resource->GetFormat());
-				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(newState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(usage, newState, resource->GetFormat());
 			}
 
 			imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState, resource->GetFormat());
@@ -508,7 +508,7 @@ namespace Ck::Vulkan
 						Renderer::ResourceState newState = barrier.Buffer.NewState;
 
 						VkBufferMemoryBarrier2KHR bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR, nullptr };
-						PopulateBufferMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
+						PopulateBufferMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
 						bufferMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, PixelFormat::Undefined());
 						bufferMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, PixelFormat::Undefined());
 
@@ -522,7 +522,7 @@ namespace Ck::Vulkan
 						Renderer::ResourceState newState = barrier.Texture.NewState;
 
 						VkImageMemoryBarrier2KHR imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR, nullptr };
-						PopulateImageMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
+						PopulateImageMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
 						imageMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, resource->GetFormat());
 						imageMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, resource->GetFormat());
 
@@ -564,7 +564,7 @@ namespace Ck::Vulkan
 				else if (barrier.Type == Renderer::GpuBarrierType::Buffer)
 				{
 					VkBufferMemoryBarrier bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER, nullptr };
-					PopulateBufferMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
+					PopulateBufferMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
 
 					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, PixelFormat::Undefined());
 					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, PixelFormat::Undefined());
@@ -582,7 +582,7 @@ namespace Ck::Vulkan
 					const Renderer::Texture* resource = barrier.Texture.Resource;
 
 					VkImageMemoryBarrier imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, nullptr };
-					PopulateImageMemoryBarrier(mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
+					PopulateImageMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
 
 					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, resource->GetFormat());
 					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, resource->GetFormat());
