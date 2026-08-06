@@ -27,9 +27,17 @@ TEST_CASE("LineWriter write operations", "[IO][LineWriter]")
         writer.WriteLine(text, 5);
 
         auto result = inner.ToString();
+        
+#ifdef COCKTAIL_OS_WINDOWS
+        // On Windows: "Hello\r\n"
+        REQUIRE(result.GetLength() == 7);
+        REQUIRE(result.At(5) == '\r');
+        REQUIRE(result.At(6) == '\n');
+#else
         // On Linux: "Hello\n"
         REQUIRE(result.GetLength() == 6);
         REQUIRE(result.At(5) == '\n');
+#endif
     }
 
     SECTION("NextLine writes line break only")
@@ -37,8 +45,15 @@ TEST_CASE("LineWriter write operations", "[IO][LineWriter]")
         writer.NextLine();
 
         auto result = inner.ToString();
+        
+#ifdef COCKTAIL_OS_WINDOWS
+        REQUIRE(result.GetLength() == 2);
+        REQUIRE(result.At(0) == '\r');
+        REQUIRE(result.At(1) == '\n');
+#else
         REQUIRE(result.GetLength() == 1);
         REQUIRE(result.At(0) == '\n');
+#endif
     }
 
     SECTION("Write boolean")
@@ -65,7 +80,12 @@ TEST_CASE("LineWriter write operations", "[IO][LineWriter]")
         writer.WriteLine(sv);
 
         auto result = inner.ToString();
+        
+#ifdef COCKTAIL_OS_WINDOWS
+        REQUIRE(result == BasicString<Encoding>("Line\r\n"));
+#else
         REQUIRE(result == BasicString<Encoding>("Line\n"));
+#endif
     }
 }
 
