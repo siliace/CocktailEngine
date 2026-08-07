@@ -283,11 +283,24 @@ function(cocktail_add_catch_test)
         endif ()
     endforeach()
 
-    if (${THIS_CUSTOM_MAIN})
+    # A custom main provides its own entry point, so link against the Catch2 target
+    # without one to avoid two competing definitions of main()
+    if (THIS_CUSTOM_MAIN)
         target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK} Catch2::Catch2)
     else ()
         target_link_libraries(${THIS_TARGET} PRIVATE ${THIS_LINK} Catch2::Catch2WithMain)
     endif ()
+
+    # Register the whole Catch2 binary as a single CTest test
+    #
+    # Catch2's catch_discover_tests() is not usable here: the test executables boot a
+    # Cocktail Application, which logs to stdout before Catch2 lists its test cases,
+    # and those log lines would be parsed as test names
+    add_test(
+        NAME ${THIS_NAME}
+        COMMAND ${THIS_TARGET}
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:${THIS_TARGET}>
+    )
 
     if (WIN32)
         add_custom_command(TARGET ${THIS_TARGET} POST_BUILD

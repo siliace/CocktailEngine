@@ -1,3 +1,8 @@
+# Keep third-party test suites out of the build and out of CTest, so that
+# `ctest` only reports on Cocktail's own tests
+set(BUILD_TESTING OFF)
+set(tinyxml2_BUILD_TESTING OFF)
+
 add_subdirectory(Catch2)
 add_subdirectory(cmrc)
 add_subdirectory(SPIRV-Headers)

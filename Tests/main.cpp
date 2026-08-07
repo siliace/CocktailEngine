@@ -42,16 +42,18 @@ ExitCode ApplicationMain(Application* application)
     if (result == 0)
     {
         CK_LOG(Catch2, LogLevel::Info, CK_TEXT("All tests passed"));
+        return ExitCode::Success;
     }
-    else if (result > 0)
+
+    if (result > 0)
     {
-        CK_LOG(Catch2, LogLevel::Warning, CK_TEXT("Tests finished with %d failed test(s)"), result);
+        CK_LOG(Catch2, LogLevel::Error, CK_TEXT("Tests finished with %d failed test(s)"), result);
     }
     else
     {
         CK_LOG(Catch2, LogLevel::Error, CK_TEXT("Catch2 aborted due to internal error"));
-        return ExitCode::GeneralError;
     }
 
-    return ExitCode::Success;
+    // Failures must reach the process exit code, otherwise CTest reports the run as passed
+    return ExitCode::GeneralError;
 }
