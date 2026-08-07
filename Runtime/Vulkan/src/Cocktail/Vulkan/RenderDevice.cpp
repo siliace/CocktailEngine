@@ -482,7 +482,7 @@ namespace Ck::Vulkan
 		    vkGetPhysicalDeviceFeatures2KHR(mPhysicalDevice, &physicalDeviceFeatures);
 
 		    if (!fragmentShadingRateFeatures.primitiveFragmentShadingRate || !fragmentShadingRateFeatures.attachmentFragmentShadingRate || !fragmentShadingRateFeatures.pipelineFragmentShadingRate)
-		        mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate];
+		        mSupportedExtensions[Renderer::RenderDeviceExtension::VariableShadingRate] = false;
 
 		    if (synchronization2Features.synchronization2 == VK_FALSE)
 		        mSupportedFeatures[RenderDeviceFeature::Synchronization2] = false;
