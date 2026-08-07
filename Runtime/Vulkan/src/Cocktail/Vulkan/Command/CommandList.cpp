@@ -556,7 +556,7 @@ namespace Ck::Vulkan
 				const Renderer::GpuBarrier& barrier = barriers[i];
 				if (barrier.Type == Renderer::GpuBarrierType::Memory)
 				{
-					VkMemoryBarrier memoryBarrier;
+					VkMemoryBarrier memoryBarrier{ VK_STRUCTURE_TYPE_MEMORY_BARRIER, nullptr };
 					memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
 					memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 
@@ -573,8 +573,8 @@ namespace Ck::Vulkan
 					VkBufferMemoryBarrier bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER, nullptr };
 					PopulateBufferMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
 
-					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Texture.OldState, PixelFormat::Undefined());
-					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Texture.NewState, PixelFormat::Undefined());
+				    VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.Buffer.OldState, PixelFormat::Undefined());
+				    VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.Buffer.NewState, PixelFormat::Undefined());
 
 					vkCmdPipelineBarrier(mHandle,
 						sourceStages, destinationStages,
