@@ -72,10 +72,10 @@ namespace Ck::Vulkan
 				return VK_ACCESS_SHADER_WRITE_BIT;
 
 			case Renderer::ResourceState::CopySource:
-				return VK_ACCESS_TRANSFER_WRITE_BIT;
+				return VK_ACCESS_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::CopyDestination:
-				return VK_ACCESS_TRANSFER_READ_BIT;
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
 			}
 
 			COCKTAIL_UNREACHABLE();
@@ -103,10 +103,10 @@ namespace Ck::Vulkan
 				return VK_ACCESS_2_SHADER_WRITE_BIT;
 
 			case Renderer::ResourceState::CopySource:
-				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+			    return VK_ACCESS_2_TRANSFER_READ_BIT;
 
 			case Renderer::ResourceState::CopyDestination:
-				return VK_ACCESS_2_TRANSFER_READ_BIT;
+			    return VK_ACCESS_2_TRANSFER_WRITE_BIT;
 			}
 
 			COCKTAIL_UNREACHABLE();
