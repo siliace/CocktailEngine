@@ -631,7 +631,7 @@ namespace Ck::Vulkan
 			int mipHeight = vkTexture->GetSize().Height;
 			int mipDepth = vkTexture->GetSize().Depth;
 
-			for (unsigned int level = subResource.BaseMipMapLevel; level <= subResource.MipMapLevelCount; level++)
+		    for (unsigned int level = subResource.BaseMipMapLevel; level < subResource.BaseMipMapLevel + subResource.MipMapLevelCount; level++)
 			{
 				VkImageBlit* blits = COCKTAIL_STACK_ALLOC(VkImageBlit, subResource.ArrayLayerCount);
 
@@ -1395,7 +1395,7 @@ namespace Ck::Vulkan
 
 	bool CommandList::IsSecondary() const
 	{
-		return false;
+		return mSecondary;
 	}
 
 	void CommandList::MarkInitial()
