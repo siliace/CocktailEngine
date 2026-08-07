@@ -322,7 +322,7 @@ namespace Ck::Vulkan
 			applicationInfo.pApplicationName = applicationName.GetData();
 			applicationInfo.applicationVersion = VK_MAKE_API_VERSION(0, applicationVersion.Major, applicationVersion.Minor, applicationVersion.Patch);
 			applicationInfo.pEngineName = "CocktailEngine";
-			applicationInfo.engineVersion = VK_MAKE_API_VERSION(0, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION, COCKTAIL_MAJOR_VERSION);
+			applicationInfo.engineVersion = VK_MAKE_API_VERSION(0, COCKTAIL_MAJOR_VERSION, COCKTAIL_MINOR_VERSION, COCKTAIL_PATCH_VERSION);
 
 			switch (apiVersion)
 			{
