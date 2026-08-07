@@ -369,8 +369,7 @@ namespace Ck::Vulkan
 		mSecondary(createInfo.Secondary),
 		mState(Renderer::CommandListState::Initial),
 		mUsage(createInfo.Usage),
-		mCurrentFramebuffer(nullptr),
-		mDescriptorSetAllocator(nullptr)
+		mCurrentFramebuffer(nullptr)
 	{
 		Renderer::CommandQueueType queueType = SelectQueueForUsage(mUsage);
 
