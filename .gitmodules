@@ -1,0 +1,39 @@
+[submodule "sources/runtime/Core/thirdparty/magic_enum/magic_enum"]
+	path = sources/runtime/Core/thirdparty/magic_enum/magic_enum
+	url = https://github.com/Neargye/magic_enum
+[submodule "thirdparty/Catch2/Catch2"]
+	path = thirdparty/Catch2/Catch2
+	url = https://github.com/catchorg/Catch2
+[submodule "sources/runtime/Main/thirdparty/cmrc/cmrc"]
+	path = sources/runtime/Main/thirdparty/cmrc/cmrc
+	url = https://github.com/vector-of-bool/cmrc
+[submodule "sources/runtime/Core/thirdparty/tinyxml2/tinyxml2"]
+	path = sources/runtime/Core/thirdparty/tinyxml2/tinyxml2
+	url = https://github.com/leethomason/tinyxml2
+[submodule "sources/runtime/Vulkan/thirdparty/Vulkan-Headers"]
+	path = sources/runtime/Vulkan/thirdparty/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "sources/runtime/Vulkan/thirdparty/SPIRV-Headers"]
+	path = sources/runtime/Vulkan/thirdparty/SPIRV-Headers
+	url = https://github.com/KhronosGroup/SPIRV-Headers
+[submodule "sources/runtime/Vulkan/thirdparty/volk"]
+	path = sources/runtime/Vulkan/thirdparty/volk/volk
+	url = https://github.com/zeux/volk
+[submodule "sources/runtime/Vulkan/thirdparty/SPRIV-Reflect/SPIRV-Reflect"]
+	path = sources/runtime/Vulkan/thirdparty/SPRIV-Reflect/SPIRV-Reflect
+	url = https://github.com/KhronosGroup/SPIRV-Reflect
+[submodule "sources/runtime/Graphic/thirdparty/tinygltf/tinygltf"]
+	path = sources/runtime/Graphic/thirdparty/tinygltf/tinygltf
+	url = https://github.com/syoyo/tinygltf
+[submodule "sources/runtime/Graphic/thirdparty/tinyobjloader/tinyobjloader"]
+	path = sources/runtime/Graphic/thirdparty/tinyobjloader/tinyobjloader
+	url = https://github.com/tinyobjloader/tinyobjloader
+[submodule "thirdparty/glslang/glslang"]
+	path = thirdparty/glslang/glslang
+	url = https://github.com/KhronosGroup/glslang
+[submodule "plugins/ImGui/sources/ImGuiIntegration/thirdparty/imgui/imgui"]
+	path = plugins/ImGui/sources/ImGuiIntegration/thirdparty/imgui/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "sources/runtime/Core/thirdparty/cyaml/cyaml"]
+	path = sources/runtime/Core/thirdparty/cyaml/cyaml
+	url = https://github.com/andrewmd5/cyaml

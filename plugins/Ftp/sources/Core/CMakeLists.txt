@@ -1,0 +1,1 @@
+ck_add_test()
