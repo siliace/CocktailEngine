@@ -1,0 +1,47 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "asan",
+            "binaryDir": "${sourceDir}/build/asan",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ENABLE_ASAN": "On"
+            }
+        },
+        {
+            "name": "debug",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Asan",
+            "configurePreset": "asan",
+            "verbose": true,
+            "jobs": 16
+        },
+        {
+            "name": "Debug",
+            "configurePreset": "debug",
+            "verbose": true,
+            "jobs": 16
+        },
+        {
+            "name": "Release",
+            "configurePreset": "release",
+            "verbose": true,
+            "jobs": 16
+        }
+    ]
+}

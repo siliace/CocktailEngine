@@ -1,0 +1,35 @@
+#ifndef COCKAIL_GRAPHIC_MESH_MESHFACTORY_HPP
+#define COCKAIL_GRAPHIC_MESH_MESHFACTORY_HPP
+
+#include <CocktailEngine/Core/Color.hpp>
+
+#include <CocktailEngine/Graphic/Mesh/Mesh.hpp>
+
+namespace Ck
+{
+	/**
+	 * \brief 
+	 */
+	class COCKTAILENGINE_GRAPHIC_API MeshFactory
+	{
+	public:
+
+		/**
+		 * \brief Create a colored cube mesh
+		 * \param size The size of the cube's edge to create
+		 * \param color The color of the cube to create
+		 * \return The mesh of the cube
+		 */
+		static SharedPtr<Mesh> CreateCube(float size, const LinearColor& color = LinearColor::Black);
+
+		/**
+		 * \brief 
+		 * \param box 
+		 * \param color 
+		 * \return 
+		 */
+		static SharedPtr<Mesh> CreateBox(const Box<float>& box, const LinearColor& color = LinearColor::Black);
+	};
+}
+
+#endif // COCKAIL_GRAPHIC_MESH_MESHFACTORY_HPP

@@ -1,0 +1,680 @@
+#include <catch2/catch_all.hpp>
+
+#include <CocktailEngine/Core/Array.hpp>
+#include <CocktailEngine/Core/Exception.hpp>
+#include <CocktailEngine/Core/Memory/Allocator/SizedLinearAllocator.hpp>
+
+TEMPLATE_TEST_CASE("Construct an Array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    SECTION("empty")
+    {
+        Ck::Array<int, TestType> array;
+
+        REQUIRE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 0);
+    }
+
+    SECTION("from initialize list")
+    {
+        Ck::Array<int, TestType> array = { 1, 2, 3 };
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 3);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == i + 1);
+    }
+
+    SECTION("with a default size")
+    {
+        Ck::Array<int, TestType> array(5);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 5);
+    }
+
+    SECTION("with a default size and an initial content")
+    {
+        Ck::Array<int, TestType> array(5, 3);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 5);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == 3);
+    }
+
+    SECTION("from a raw pointer and an element count")
+    {
+        int ints[] = { 3, 5, 7 };
+
+        Ck::Array<int, TestType> array(ints, 3);
+
+        REQUIRE_FALSE(array.IsEmpty());
+        REQUIRE(array.GetSize() == 3);
+
+        for (unsigned int i = 0; i < array.GetSize(); i++)
+            REQUIRE(array[i] == ints[i]);
+    }
+}
+
+TEMPLATE_TEST_CASE("Copy an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array1 = { 1, 2, 3 };
+    
+    SECTION("By construction")
+    {
+        Ck::Array<int, TestType> array2(array1);
+        
+        REQUIRE(array1.GetSize() == array2.GetSize());
+        
+        typename Ck::Array<int, TestType>::ConstIterator lhs = array1.GetIterator();
+        typename Ck::Array<int, TestType>::ConstIterator rhs = array2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::Array<int, TestType> array2 = { 4, 5, 6 };
+        array2 = array1;
+
+        REQUIRE(array1.GetSize() == array2.GetSize());
+        
+        typename Ck::Array<int, TestType>::ConstIterator lhs = array1.GetIterator();
+        typename Ck::Array<int, TestType>::ConstIterator rhs = array2.GetIterator();
+        while (lhs.IsValid() || rhs.IsValid())
+        {
+            REQUIRE(lhs.IsValid());
+            REQUIRE(rhs.IsValid());
+            REQUIRE(lhs.GetValue() == rhs.GetValue());
+            
+            lhs.Advance();
+            rhs.Advance();
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE("Move an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array1 = { 1, 2, 3 };
+    
+    SECTION("By construction")
+    {
+        Ck::Array<int, TestType> array2(Move(array1));
+        
+        REQUIRE(array1.GetSize() == 0);
+        
+        REQUIRE(array2.GetSize() == 3);
+        REQUIRE(array2 == Ck::Array<int, TestType>{ 1, 2, 3 });
+    }
+    
+    SECTION("By assignation")
+    {
+        Ck::Array<int, TestType> array2 = { 4, 5, 6 };
+        array2 = Move(array1);
+        
+        REQUIRE(array1.GetSize() == 0);
+        
+        REQUIRE(array2.GetSize() == 3);
+        REQUIRE(array2 == Ck::Array<int, TestType>{ 1, 2, 3 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Add elements to the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array;
+
+    array.Add(2);
+    REQUIRE(array.GetSize() == 1);
+    REQUIRE(array.GetCapacity() >= 1);
+
+    array.Add(4);
+    REQUIRE(array.GetSize() == 2);
+    REQUIRE(array.GetCapacity() >= 2);
+
+    array.Add(6);
+    REQUIRE(array.GetSize() == 3);
+    REQUIRE(array.GetCapacity() >= 3);
+
+    REQUIRE(array == Ck::Array<int, TestType>{ 2, 4, 6 });
+}
+
+TEMPLATE_TEST_CASE("Add elements in the middle of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 1, 3, 5, 7 };
+
+    array.AddAt(1, 2);
+    REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 5, 7 });
+
+    array.AddAt(3, 4);
+    REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 4, 5, 7 });
+
+    array.AddAt(5, 6);
+    REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 4, 5, 6, 7 });
+}
+
+TEMPLATE_TEST_CASE("Prepend elements at the begining of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("Insert another array")
+    {
+        array.Prepend(Ck::Array<float, TestType>{ 0.f, 1.f, 2, 3, 4 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+
+    SECTION("Insert a initialize list")
+    {
+        array.Prepend({ 0, 1, 2, 3, 4 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Insert elements in the middle of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("Insert another array")
+    {
+        array.Insert(4, Ck::Array<float, TestType>{ 4.f, 5.f, 6.f, 7.f, 8.f, 9.f });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+
+    SECTION("Insert a initialize list")
+    {
+        array.Insert(4, { 4, 5, 6, 7, 8, 9 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Append elements at the end of an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+    SECTION("Insert another array")
+    {
+        array.Append(Ck::Array<float, TestType>{ 11.f, 12.f, 13.f, 14.f, 15.f });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+
+    SECTION("Insert a initialize list")
+    {
+        array.Append({ 11, 12, 13, 14, 15 });
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Get an element from the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("from a valid index")
+    {
+        REQUIRE(array.At(3) == 3);
+    }
+
+    SECTION("from an invalid index")
+    {
+        REQUIRE_THROWS(array.At(22));
+    }
+}
+
+TEMPLATE_TEST_CASE("Try to get an element from the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("from a valid index")
+    {
+        Ck::Optional<int&> value = array.TryAt(3);
+        REQUIRE_FALSE(value.IsEmpty());
+        REQUIRE(value.Get() == 3);
+    }
+
+    SECTION("from an invalid index")
+    {
+        REQUIRE(array.TryAt(22).IsEmpty());
+    }
+}
+
+TEMPLATE_TEST_CASE("Test whether an array contains a value", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    REQUIRE(array.Contains(5));
+    REQUIRE_FALSE(array.Contains(88));
+}
+
+TEMPLATE_TEST_CASE("Test whether an array contains a value matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    REQUIRE(array.ContainsIf([](int value) {
+        return value == 5;
+        }));
+
+    REQUIRE_FALSE(array.ContainsIf([](int value) {
+        return value == 88;
+        }));
+}
+
+TEMPLATE_TEST_CASE("Find the index of a value", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 3, 2, 1, 0 };
+
+    SECTION("from the beginning")
+    {
+        Ck::Optional<typename TestType::SizeType> index = array.FindIndex(1);
+        REQUIRE_FALSE(index.IsEmpty());
+        REQUIRE(index.Get() == 1);
+    }
+
+    SECTION("from the end")
+    {
+        Ck::Optional<typename TestType::SizeType> index = array.FindLastIndex(1);
+        REQUIRE_FALSE(index.IsEmpty());
+        REQUIRE(index.Get() == 6);
+    }
+
+    SECTION("missing from the array")
+    {
+        Ck::Optional<typename TestType::SizeType> index = array.FindLastIndex(51);
+        REQUIRE(index.IsEmpty());
+    }
+}
+
+TEMPLATE_TEST_CASE("Test whether an array contains at last one value matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    REQUIRE(array.AnyOf([](int value) {
+        return value == 5;
+        }));
+
+    REQUIRE_FALSE(array.AnyOf([](int value) {
+        return value == 88;
+        }));
+}
+
+TEMPLATE_TEST_CASE("Test whether an array contains values matching a predicate", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>,
+                   Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    REQUIRE(array.AllOf([](int value) {
+        return value < 16;
+        }));
+
+    REQUIRE_FALSE(array.AllOf([](int value) {
+        return value > 10;
+        }));
+}
+
+TEMPLATE_TEST_CASE("Pop the first element of the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array;
+
+    SECTION("from an empty array")
+    {
+        REQUIRE_THROWS_AS(array.PopFirst(), Ck::ContainerEmpty);
+    }
+
+    SECTION("from a filled array")
+    {
+        array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+        int value = array.PopFirst();
+        REQUIRE(value == 0);
+        REQUIRE(array == Ck::Array<int, TestType>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Pop the last element of the array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array;
+
+    SECTION("from an empty array")
+    {
+        REQUIRE_THROWS_AS(array.PopLast(), Ck::ContainerEmpty);
+    }
+
+    SECTION("from a filled array")
+    {
+        array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+        int value = array.PopLast();
+        REQUIRE(value == 15);
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Filter an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("To another array")
+    {
+        Ck::Array<int, TestType> results = array.Filter([](int i) {
+            return i % 2 == 0;
+        });
+
+        REQUIRE(results.GetSize() == 8);
+        REQUIRE(results == Ck::Array<int, TestType>{0, 2, 4, 6, 8, 10, 12, 14});
+    }
+
+    SECTION("In place")
+    {
+        array.FilterInPlace([](int i) {
+            return i % 2 == 0;
+        });
+
+        REQUIRE(array.GetSize() == 8);
+        REQUIRE(array == Ck::Array<int, TestType>{0, 2, 4, 6, 8, 10, 12, 14});
+    }
+}
+
+TEMPLATE_TEST_CASE("Reduce an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 1, 2, 3, 4 };
+    int sum = array.Reduce(0, [](int current, int value) {
+        return current + value;
+    });
+
+    REQUIRE(sum == 10);
+}
+
+TEMPLATE_TEST_CASE("Reverse an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("To another array")
+    {
+        Ck::Array<int, TestType> reversed = array.Reverse();
+        REQUIRE(reversed == Ck::Array<int, TestType>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
+    }
+
+    SECTION("In place")
+    {
+        array.ReverseInPlace();
+        REQUIRE(array == Ck::Array<int, TestType>{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Splice an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("To another array")
+    {
+        Ck::Array<int, TestType> sliced = array.Splice(3);
+
+        REQUIRE(sliced.GetSize() == 3);
+        REQUIRE(sliced == Ck::Array<int, TestType>{ 0, 1, 2 });
+    }
+
+    SECTION("In place")
+    {
+        array.SpliceInPlace(3);
+
+        REQUIRE(array.GetSize() == 3);
+        REQUIRE(array == Ck::Array<int, TestType>{ 0, 1, 2 });
+    }
+}
+
+TEMPLATE_TEST_CASE("Splice an array with range", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("To another array")
+    {
+        Ck::Array<int, TestType> sliced = array.Splice(3, 5);
+
+        REQUIRE(sliced.GetSize() == 11);
+        REQUIRE(sliced == Ck::Array<int, TestType>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
+    }
+
+    SECTION("In place")
+    {
+        array.SpliceInPlace(3, 5);
+
+        REQUIRE(array.GetSize() == 11);
+        REQUIRE(array == Ck::Array<int, TestType>{0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 15});
+    }
+}
+
+TEMPLATE_TEST_CASE("Resize an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array;
+
+    array.Resize(10);
+
+    REQUIRE(array.GetSize() == 10);
+    REQUIRE(array.GetCapacity() >= 10);
+
+    SECTION("to a smaller capacity")
+    {
+        array.Resize(5);
+
+        REQUIRE(array.GetSize() == 5);
+    }
+
+    SECTION("to a bigger capacity")
+    {
+        array.Resize(15);
+
+        REQUIRE(array.GetSize() == 15);
+        REQUIRE(array.GetCapacity() >= 15);
+    }
+}
+
+TEMPLATE_TEST_CASE("Reserve an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> arr;
+    arr.Reserve(10);
+
+    REQUIRE(arr.GetSize() == 0);
+    REQUIRE(arr.GetCapacity() >= 10);
+}
+
+TEMPLATE_TEST_CASE("Clear and Shrink an array", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    Ck::Array<int, TestType> array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+    SECTION("Clear")
+    {
+        array.Clear();
+
+        REQUIRE(array.GetSize() == 0);
+        REQUIRE(array.GetCapacity() > 0);
+    }
+
+    SECTION("Clear and Shrink")
+    {
+        array.Clear();
+        array.Shrink();
+
+        REQUIRE(array.GetSize() == 0);
+        REQUIRE(array.GetCapacity() == 0);
+    }
+}
+
+TEST_CASE("Iterate over elements of an Array", "[Array]")
+{
+    Ck::Array<int> list;
+
+    list.Add(1);
+    list.Add(2);
+    list.Add(3);
+    list.Add(4);
+    list.Add(5);
+
+    SECTION("In normal order")
+    {
+        int previous = 0;
+        for (Ck::Array<int>::Iterator it = list.GetIterator(); it.IsValid(); it = it.Next())
+        {
+            REQUIRE(previous + 1 == *it);
+
+            previous = *it;
+        }
+    }
+
+    SECTION("In revered order")
+    {
+        int previous = 6;
+        for (Ck::Array<int>::Iterator it = list.GetLastIterator(); it.IsValid(); it = it.Previous())
+        {
+            REQUIRE(previous - 1 == *it);
+
+            previous = *it;
+        }
+    }
+}
+
+namespace
+{
+    /**
+     * \brief Element counting how many times it is constructed and destroyed
+     *
+     * Resize reports the right size whatever it does to the elements themselves, so
+     * asserting on the size says nothing about them. Counting the calls to the
+     * constructors is what says each new element was built once, and comparing the two
+     * counters is what says none was built over a live one: an element whose storage is
+     * taken by a placement-new never sees its destructor, so whatever it owned is lost.
+     */
+    struct LifetimeCounter
+    {
+        static inline int Constructed = 0;
+        static inline int Destroyed = 0;
+
+        static void ResetCounters()
+        {
+            Constructed = 0;
+            Destroyed = 0;
+        }
+
+        LifetimeCounter() :
+            Value(0)
+        {
+            ++Constructed;
+        }
+
+        explicit LifetimeCounter(int value) :
+            Value(value)
+        {
+            ++Constructed;
+        }
+
+        LifetimeCounter(const LifetimeCounter& other) :
+            Value(other.Value)
+        {
+            ++Constructed;
+        }
+
+        // Array requires its elements to be nothrow move constructible, since that is
+        // what lets it move a range when it reallocates.
+        LifetimeCounter(LifetimeCounter&& other) noexcept :
+            Value(other.Value)
+        {
+            ++Constructed;
+        }
+
+        ~LifetimeCounter()
+        {
+            ++Destroyed;
+        }
+
+        LifetimeCounter& operator=(const LifetimeCounter&) = default;
+        LifetimeCounter& operator=(LifetimeCounter&&) noexcept = default;
+
+        int Value;
+    };
+}
+
+TEMPLATE_TEST_CASE("Resize an array builds each new element once", "[Array]", Ck::HeapAllocator, Ck::LargeHeapAllocator, Ck::LinearAllocator<1024>, Ck::LargeLinearAllocator<1024>)
+{
+    SECTION("Default constructed elements")
+    {
+        LifetimeCounter::ResetCounters();
+
+        {
+            Ck::Array<LifetimeCounter, TestType> array;
+            array.Resize(8);
+
+            REQUIRE(array.GetSize() == 8);
+            CHECK(LifetimeCounter::Constructed == 8);
+        }
+
+        CHECK(LifetimeCounter::Destroyed == LifetimeCounter::Constructed);
+    }
+
+    SECTION("Elements copied from a value")
+    {
+        // Built before the counters are reset, so only what the array does is counted,
+        // and destroyed after the checks below since it outlives the inner scope.
+        const LifetimeCounter source(42);
+
+        LifetimeCounter::ResetCounters();
+
+        {
+            Ck::Array<LifetimeCounter, TestType> array;
+            array.Resize(8, source);
+
+            REQUIRE(array.GetSize() == 8);
+            CHECK(LifetimeCounter::Constructed == 8);
+
+            bool copied = true;
+            for (unsigned int i = 0; i < array.GetSize(); i++)
+                copied = copied && array[i].Value == 42;
+
+            CHECK(copied);
+        }
+
+        CHECK(LifetimeCounter::Destroyed == LifetimeCounter::Constructed);
+    }
+
+    SECTION("Through the sized constructor")
+    {
+        LifetimeCounter::ResetCounters();
+
+        {
+            Ck::Array<LifetimeCounter, TestType> array(8);
+
+            REQUIRE(array.GetSize() == 8);
+            CHECK(LifetimeCounter::Constructed == 8);
+        }
+
+        CHECK(LifetimeCounter::Destroyed == LifetimeCounter::Constructed);
+    }
+
+    SECTION("Growing an array that already holds elements")
+    {
+        Ck::Array<LifetimeCounter, TestType> array;
+
+        // Reserved up front so the growth below cannot reallocate: a reallocation moves
+        // the elements already there, and those moves are constructions too, which would
+        // make the expected count depend on the growth policy rather than on Resize.
+        array.Reserve(16);
+        array.Resize(4);
+
+        LifetimeCounter::ResetCounters();
+
+        array.Resize(10);
+
+        // Only the six new elements are built, and none of the four already there is
+        // touched. Keeping the target size and the number of new elements different is
+        // deliberate: it pins which of the two the loop is supposed to be counting.
+        REQUIRE(array.GetSize() == 10);
+        CHECK(LifetimeCounter::Constructed == 6);
+        CHECK(LifetimeCounter::Destroyed == 0);
+    }
+}

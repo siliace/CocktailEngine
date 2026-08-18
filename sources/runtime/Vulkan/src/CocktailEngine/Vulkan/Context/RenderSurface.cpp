@@ -1,0 +1,226 @@
+#include <CocktailEngine/Core/Log/Log.hpp>
+
+#include <CocktailEngine/Vulkan/RenderDevice.hpp>
+#include <CocktailEngine/Vulkan/Vulkan.hpp>
+#include <CocktailEngine/Vulkan/VulkanUtils.hpp>
+#include <CocktailEngine/Vulkan/Context/RenderSurface.hpp>
+#include <CocktailEngine/Vulkan/Context/Swapchain.hpp>
+#include <CocktailEngine/Vulkan/Framebuffer/RenderBuffer.hpp>
+#include <CocktailEngine/Vulkan/Framebuffer/RenderPass.hpp>
+#include <CocktailEngine/Vulkan/Texture/TextureView.hpp>
+#include <CocktailEngine/Vulkan/WSI/WSI.hpp>
+
+namespace Ck::Vulkan
+{
+	RenderSurface::RenderSurface(RenderDevice* renderDevice, const Renderer::RenderSurfaceCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks) :
+		mRenderDevice(renderDevice),
+		mAllocationCallbacks(allocationCallbacks),
+		mHandle(VK_NULL_HANDLE),
+	    mVSyncEnable(false)
+	{
+		mDepthStencilFormat = createInfo.DepthStencilFormat;
+
+		// Create the Surface we will render to
+		Window& window = *createInfo.TargetWindow;
+		mHandle = WSI::CreateWindowSurface(mRenderDevice->GetInstanceHandle(), window, mAllocationCallbacks);
+
+		// Create the PresentationContext used to manage swapchains creation
+		mPresentationContext = MakeUnique<PresentationContext>(mRenderDevice, this, createInfo.BufferCount, createInfo.ColorDepth, createInfo.AlphaDepth, createInfo.SurfaceColorSpace);
+
+		CreateRenderPass(createInfo.Samples, createInfo.DepthStencilFormat);
+
+		// Create the initial swapchain
+		RecreateSwapchain(window.GetSize(), createInfo.EnableVSync);
+
+		// Destroy the surface when the window is closed
+		Connect(window.OnCloseEvent(), [&](const WindowCloseEvent& event) {
+			vkDeviceWaitIdle(mRenderDevice->GetHandle());
+			mSwapchain = nullptr;
+		});
+
+		// Recreate or destroy the swapchain where the window is resized
+		Connect(window.OnResizedEvent(), [&](const WindowResizedEvent& event) {
+			bool minimized = false;
+			minimized |= event.DisplayMode == WindowDisplayMode::Minimized;
+			minimized |= event.Size.Width == 0;
+			minimized |= event.Size.Height == 0;
+
+			if (!minimized)
+			{
+				RecreateSwapchain(event.Size, mVSyncEnable);
+			}
+			else
+			{
+				mSwapchain = nullptr;
+			}
+		});
+	}
+
+	RenderSurface::~RenderSurface()
+	{
+		mSwapchain = nullptr;
+		vkDestroySurfaceKHR(mRenderDevice->GetInstanceHandle(), mHandle, mAllocationCallbacks);
+	}
+
+	Optional<unsigned int> RenderSurface::AcquireNextFramebuffer(Duration timeout, SharedPtr<Semaphore> semaphore, SharedPtr<Fence> fence) const
+	{
+		if (!mSwapchain)
+			return Optional<unsigned int>::Empty();
+
+		unsigned int imageIndex;
+		VkSemaphore semaphoreHandle = semaphore ? semaphore->GetHandle() : VK_NULL_HANDLE;
+		VkFence fenceHandle = fence ? fence->GetHandle() : VK_NULL_HANDLE;
+		COCKTAIL_VK_CHECK(vkAcquireNextImageKHR(mRenderDevice->GetHandle(), mSwapchain->GetHandle(), timeout.GetCount(TimeUnit::Nanoseconds()), semaphoreHandle, fenceHandle, &imageIndex));
+
+		return Optional<unsigned int>::Of(imageIndex);
+	}
+
+	void RenderSurface::SetObjectName(const char* name) const
+	{
+		VkDebugUtilsObjectNameInfoEXT objectNameInfo{ VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT, nullptr };
+		{
+			objectNameInfo.objectType = VK_OBJECT_TYPE_SURFACE_KHR;
+			objectNameInfo.objectHandle = reinterpret_cast<Uint64>(mHandle);
+			objectNameInfo.pObjectName = name;
+		}
+
+		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
+	}
+
+	Renderer::RenderDevice* RenderSurface::GetRenderDevice() const
+	{
+		return mRenderDevice;
+	}
+
+	Extent2D<unsigned int> RenderSurface::GetSize() const
+	{
+		return mSwapchain->GetSize();
+	}
+
+	PixelFormat RenderSurface::GetColorFormat() const
+	{
+		return mPresentationContext->GetSurfaceFormat();
+	}
+
+	PixelFormat RenderSurface::DepthStencilFormat() const
+	{
+		return mDepthStencilFormat;
+	}
+
+	Renderer::RasterizationSamples RenderSurface::GetSamples() const
+	{
+		return mRenderPass->GetSamples();
+	}
+
+	bool RenderSurface::IsVsyncEnabled() const
+	{
+		return mVSyncEnable;
+	}
+
+	void RenderSurface::EnableVSync(bool enable)
+	{
+		RecreateSwapchain(GetSize(), enable);
+	}
+
+	unsigned int RenderSurface::GetBufferCount() const
+	{
+		return mPresentationContext->GetBufferCount();
+	}
+
+	SharedPtr<Framebuffer> RenderSurface::GetFramebuffer(unsigned int framebufferIndex) const
+	{
+		if (framebufferIndex >= GetBufferCount())
+			return nullptr;
+
+		return mFramebuffers[framebufferIndex];
+	}
+
+	SharedPtr<Swapchain> RenderSurface::GetSwapchain() const
+	{
+		return mSwapchain;
+	}
+
+	VkSurfaceKHR RenderSurface::GetHandle() const
+	{
+		return mHandle;
+	}
+
+	void RenderSurface::CreateRenderPass(Renderer::RasterizationSamples samples, PixelFormat depthStencilFormat)
+	{
+		Renderer::FramebufferLayout framebufferLayout;
+		framebufferLayout.Samples = samples;
+		framebufferLayout.ColorAttachmentCount = 1;
+		framebufferLayout.ColorAttachmentFormats[0] = mPresentationContext->GetSurfaceFormat();
+		framebufferLayout.DepthStencilAttachmentFormat = depthStencilFormat;
+
+		RenderPassCreateInfo createInfo;
+		createInfo.FramebufferLayout = framebufferLayout;
+		createInfo.DepthResolveMode = Renderer::ResolveMode::Average;
+		createInfo.StencilResolveMode = Renderer::ResolveMode::SampleZero;
+		createInfo.Presentable = true;
+
+		mRenderPass = mRenderDevice->CreateRenderPass(createInfo);
+	}
+
+	void RenderSurface::RecreateSwapchain(const Extent2D<unsigned int>& size, bool enableVSync)
+ 	{
+		VkPresentModeKHR presentMode;
+		if (enableVSync)
+		{
+			mVSyncEnable = true;
+			presentMode = VK_PRESENT_MODE_FIFO_KHR;
+		}
+		else 
+		{
+			if (mPresentationContext->IsPresentationModeSupported(VK_PRESENT_MODE_IMMEDIATE_KHR))
+			{
+				mVSyncEnable = false;
+				presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+			}
+			else
+			{
+				CK_LOG(VulkanLogCategory, LogLevel::Warning, CK_TEXT("RenderSurface does not support present mode immediate, vsync cannot be disabled"));
+
+				mVSyncEnable = true;
+				presentMode = VK_PRESENT_MODE_FIFO_KHR;
+			}
+		}
+
+		mSwapchain = mPresentationContext->CreateSwapchain(size, presentMode, mSwapchain.Get());
+
+		SharedPtr<TextureView> depthStencilTextureView;
+		if (mDepthStencilFormat != PixelFormat::Undefined())
+		{
+			RenderBufferCreateInfo renderBufferCreateInfo;
+			renderBufferCreateInfo.Format = mDepthStencilFormat;
+			renderBufferCreateInfo.Size = mSwapchain->GetSize();
+			renderBufferCreateInfo.Samples = Renderer::RasterizationSamples::e1;
+
+			SharedPtr<RenderBuffer> depthStencilTexture = mRenderDevice->CreateRenderBuffer(renderBufferCreateInfo);
+
+			Renderer::TextureViewCreateInfo viewCreateInfo;
+			viewCreateInfo.Source = depthStencilTexture;
+			viewCreateInfo.Type = Renderer::TextureViewType::e2D;
+
+			depthStencilTextureView = mRenderDevice->CreateTextureView(viewCreateInfo).StaticCast<TextureView>();
+		}
+
+		for (unsigned int i = 0; i < mSwapchain->GetTextureCount(); i++)
+		{
+			Renderer::TextureViewCreateInfo viewCreateInfo;
+			viewCreateInfo.Source = mSwapchain->GetTexture(i);
+			viewCreateInfo.Type = Renderer::TextureViewType::e2D;
+			viewCreateInfo.Format = mPresentationContext->GetSurfaceFormat();
+
+			SharedPtr<TextureView> swapchainTextureView = mRenderDevice->CreateTextureView(viewCreateInfo).StaticCast<TextureView>();
+
+			Renderer::FramebufferCreateInfo framebufferCreateInfo;
+			framebufferCreateInfo.Samples = mRenderPass->GetSamples();
+			framebufferCreateInfo.ColorAttachments[0] = swapchainTextureView;
+			framebufferCreateInfo.ColorAttachmentCount = 1;
+			framebufferCreateInfo.DepthStencilAttachment = depthStencilTextureView;
+
+			mFramebuffers[i] = mRenderDevice->CreateFramebuffer(mRenderPass, framebufferCreateInfo).StaticCast<Framebuffer>();
+		}
+	}
+}

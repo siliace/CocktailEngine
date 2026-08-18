@@ -1,0 +1,49 @@
+#ifndef COCKTAILENGINE_VULKAN_PIPELINE_STATE_COMPUTESTATEMANAGER_HPP
+#define COCKTAILENGINE_VULKAN_PIPELINE_STATE_COMPUTESTATEMANAGER_HPP
+
+#include <CocktailEngine/Vulkan/Pipeline/State/ComputeState.hpp>
+#include <CocktailEngine/Vulkan/Pipeline/State/StateManager.hpp>
+
+namespace Ck::Vulkan
+{
+	/**
+	 * \brief
+	 */
+	class ComputeStateManager : public StateManager
+	{
+	public:
+
+		/**
+		 * \brief
+		 * \param renderDevice
+		 * \param descriptorSetAllocator
+		 */
+		ComputeStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
+
+		/**
+		 * \brief 
+		 * \param shaderProgram 
+		 */
+		void SetShaderProgram(const ShaderProgram* shaderProgram) override;
+
+		/**
+		 * \brief 
+		 * \param shaderType 
+		 * \param name 
+		 */
+		void SetEntryPoint(Renderer::ShaderType shaderType, const char* name) override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		SharedPtr<Pipeline> CompilePipeline() override;
+
+	private:
+
+		ComputeState mState;
+		const ShaderProgram* mShaderProgram;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_PIPELINE_STATE_COMPUTESTATEMANAGER_HPP

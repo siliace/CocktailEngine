@@ -1,0 +1,168 @@
+#include <tiny_gltf.h>
+
+#include <CocktailEngine/Core/Utility/StringUtils.hpp>
+
+#include <CocktailEngine/Graphic/Scene/Container/Gltf/GltfUtils.hpp>
+
+namespace Ck
+{
+	DataType GltfUtils::ConvertComponentType(int componentType)
+	{
+        switch (componentType)
+        {
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            return DataType::Int8;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            return DataType::UnsignedInt8;
+
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            return DataType::Int16;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return DataType::UnsignedInt16;
+
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            return DataType::Int32;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return DataType::UnsignedInt32;
+
+        case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            return DataType::Float32;
+
+        case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+            return DataType::Float64;
+        }
+
+        COCKTAIL_UNREACHABLE();
+	}
+
+	Optional<VertexAttributeSemantic> GltfUtils::ConvertAttributeName(const AnsiChar* name)
+	{
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "POSITION"))
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Position);
+
+		if (StringUtils<AnsiChar, Uint32>::Equal(name, "NORMAL"))
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Normal);
+        
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "TEXCOORD_0"))
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::TexCoord);
+        
+        if (StringUtils<AnsiChar, Uint32>::Equal(name, "TANGENT"))
+            return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Tangent);
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(name, "JOINTS_0"))
+	        return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Joints);
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(name, "WEIGHTS_0"))
+	        return Optional<VertexAttributeSemantic>::Of(VertexAttributeSemantic::Weights);
+
+	    return Optional<VertexAttributeSemantic>::Empty();
+	}
+
+	Renderer::PrimitiveTopology GltfUtils::ConvertPrimitiveTopology(int primitiveMode)
+	{
+        switch (primitiveMode)
+        {
+        case TINYGLTF_MODE_POINTS:
+            return Renderer::PrimitiveTopology::Point;
+
+        case TINYGLTF_MODE_LINE:
+            return Renderer::PrimitiveTopology::Line;
+
+        case TINYGLTF_MODE_LINE_STRIP:
+            return Renderer::PrimitiveTopology::LineStrip;
+
+        case TINYGLTF_MODE_TRIANGLES:
+            return Renderer::PrimitiveTopology::Triangle;
+
+        case TINYGLTF_MODE_TRIANGLE_STRIP:
+            return Renderer::PrimitiveTopology::TriangleStrip;
+
+        case TINYGLTF_MODE_TRIANGLE_FAN:
+            return Renderer::PrimitiveTopology::TriangleFan;
+        }
+
+        COCKTAIL_UNREACHABLE();
+	}
+
+	Renderer::IndexType GltfUtils::ConvertIndexType(int componentType)
+	{
+        switch (componentType)
+        {
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            return Renderer::IndexType::Byte;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return Renderer::IndexType::Short;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return Renderer::IndexType::Integer;
+        }
+
+        COCKTAIL_UNREACHABLE();
+	}
+
+	Vector3<float> GltfUtils::ConvertVector3(const std::vector<double>& values)
+	{
+		Vector3<float> vector;
+		assert(values.size() == 3);
+		for (std::size_t i = 0; i < values.size(); i++)
+			vector.At(i) = static_cast<float>(values[i]);
+
+		return vector;
+	}
+
+	Quaternion<float> GltfUtils::ConvertQuaternion(const std::vector<double>& values)
+	{
+		Quaternion<float> quaternion;
+		assert(values.size() == 4);
+		quaternion.X = static_cast<float>(values[0]);
+		quaternion.Y = static_cast<float>(values[1]);
+		quaternion.Z = static_cast<float>(values[2]);
+		quaternion.W = static_cast<float>(values[3]);
+
+		return quaternion;
+	}
+
+	LinearColor GltfUtils::ConvertLinearColor(const std::vector<double>& values)
+	{
+		LinearColor color;
+		assert(values.size() == 3 || values.size() == 4);
+		color.R = static_cast<float>(values[0]);
+		color.G = static_cast<float>(values[1]);
+		color.B = static_cast<float>(values[2]);
+		color.A = values.size() == 4 ? static_cast<float>(values[3]) : 1.f;
+
+		return color;
+	}
+
+	Material::AlphaMode GltfUtils::ConvertAlphaMode(const AnsiChar* value)
+	{
+        if (StringUtils<AnsiChar, Uint32>::Equal(value, "OPAQUE"))
+			return Material::AlphaMode::Opaque;
+
+		if (StringUtils<AnsiChar, Uint32>::Equal(value, "BLEND"))
+			return Material::AlphaMode::Blend;
+
+		if (StringUtils<AnsiChar, Uint32>::Equal(value, "MASK"))
+			return Material::AlphaMode::Mask;
+
+		COCKTAIL_UNREACHABLE();
+	}
+
+    Light::Type GltfUtils::ConvertLightType(const AnsiChar* value)
+	{
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "directional"))
+	        return Light::Type::Directional;
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "point"))
+	        return Light::Type::Point;
+
+	    if (StringUtils<AnsiChar, Uint32>::Equal(value, "spot"))
+	        return Light::Type::Spot;
+
+	    COCKTAIL_UNREACHABLE();
+    }
+}

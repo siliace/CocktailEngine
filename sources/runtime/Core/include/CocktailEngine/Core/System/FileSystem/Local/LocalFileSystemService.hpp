@@ -1,0 +1,58 @@
+#ifndef COCKTAILENGINE_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMSERVICE_HPP
+#define COCKTAILENGINE_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMSERVICE_HPP
+
+#include <CocktailEngine/Core/System/FileSystem/Path.hpp>
+#include <CocktailEngine/Core/System/FileSystem/Local/LocalFileSystemDriver.hpp>
+
+namespace Ck
+{
+	/**
+	 * \brief 
+	 */
+	class LocalFileSystemService
+	{
+	public:
+
+		/**
+		 * \brief Destructor
+		 */
+		virtual ~LocalFileSystemService() = default;
+
+		/**
+		 * \brief Get the path of the process current working directory
+		 * \return The path of the working directory
+		 */
+		virtual Path GetWorkingDirectory() const = 0;
+
+		/**
+		 * \brief Set the path of the process current working directory
+		 * \param workingDirectory 
+		 */
+		virtual void SetWorkingDirectory(const Path& workingDirectory) = 0;
+
+		/**
+		 * \brief
+		 *
+		 * \return
+		 */
+		virtual Path GetTempDirectoryPath() const = 0;
+
+        /**
+         * \brief Get the default "root" driver to the local file system
+         *
+         * \return The root driver
+         */
+	    virtual LocalFileSystemDriver* GetRootDriver() const = 0;
+
+		/**
+		 * \brief Create a new LocalFileSystemDriver
+		 *
+         * \param base The base path where the driver to create should point
+		 *
+		 * \return The created driver
+		 */
+		virtual UniquePtr<LocalFileSystemDriver> CreateDriver(const Path& base = Path::Empty) = 0;
+	};
+}
+
+#endif // COCKTAILENGINE_CORE_SYSTEM_FILESYSTEM_LOCAL_LOCALFILESYSTEMSERVICE_HPP

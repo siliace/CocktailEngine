@@ -1,0 +1,147 @@
+#ifndef COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP
+#define COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP
+
+#include <CocktailEngine/Core/Color.hpp>
+#include <CocktailEngine/Core/String.hpp>
+#include <CocktailEngine/Core/Memory/SharedPtr.hpp>
+#include <CocktailEngine/Core/Utility/EnumMap.hpp>
+
+#include <CocktailEngine/Graphic/Export.hpp>
+
+namespace Ck
+{
+	class TextureResource;
+
+	class COCKTAILENGINE_GRAPHIC_API Material
+	{
+	public:
+
+		enum class ShadingMode
+		{
+			Unlit,
+		    Flat,
+		    Lit,
+		};
+
+		enum class TextureType
+		{
+			Ambient = Bit(0),
+			BaseColor = Bit(1),
+			MetallicRoughness = Bit(2),
+			Normal = Bit(3),
+			Displacement = Bit(4),
+			Alpha = Bit(5),
+			Reflection = Bit(6),
+			Emission = Bit(7),
+		};
+
+		struct Parameters
+		{
+			LinearColor Base;
+			LinearColor Emission;
+			float Roughness = 0.f;
+		    float Metallic = 0.f;
+		};
+
+		enum class AlphaMode
+		{
+			Opaque,
+			Blend,
+			Mask
+		};
+
+		/**
+		 * \brief 
+		 * \param name 
+		 * \param shadingMode
+		 * \param doubleSided 
+		 */
+		Material(AsciiString name, ShadingMode shadingMode, bool doubleSided = false);
+
+		/**
+		 * \brief
+		 * \param color
+		 */
+		void SetBaseColor(const LinearColor& color);
+
+		/**
+		 * \brief
+		 * \param color
+		 */
+		void SetEmissiveColor(const LinearColor& color);
+
+        /**
+         * \brief
+         * \param metallic
+         */
+	    void SetMetallic(float metallic);
+
+        /**
+         * \brief
+         * \param roughness
+         */
+	    void SetRoughness(float roughness);
+
+		/**
+		 * \brief 
+		 * \param textureType 
+		 * \param textureResource 
+		 */
+		void SetTexture(TextureType textureType, SharedPtr<TextureResource> textureResource);
+
+		/**
+		 * \brief 
+		 * \param textureType 
+		 * \return 
+		 */
+		SharedPtr<TextureResource> GetTexture(TextureType textureType) const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		bool IsEmissive() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const AsciiString& GetName() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		ShadingMode GetShadingMode() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const Parameters& GetParameters() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		bool IsDoubleSided() const;
+
+		AlphaMode GetAlphaMode() const;
+		void SetAlphaMode(AlphaMode alphaMode);
+
+		float GetAlphaCutoff() const;
+		void SetAlphaCutoff(float alphaCutoff);
+
+	private:
+
+		AsciiString mName;
+		ShadingMode mShadingMode;
+		Parameters mParameters;
+		EnumMap<TextureType, SharedPtr<TextureResource>> mTextures;
+		bool mDoubleSided;
+		AlphaMode mAlphaMode;
+		float mAlphaCutoff;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_MATERIAL_MATERIAL_HPP

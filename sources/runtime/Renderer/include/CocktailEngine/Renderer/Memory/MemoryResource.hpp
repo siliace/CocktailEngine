@@ -1,0 +1,44 @@
+#ifndef COCKTAILENGINE_RENDERER_MEMORY_MEMORYRESOURCE_HPP
+#define COCKTAILENGINE_RENDERER_MEMORY_MEMORYRESOURCE_HPP
+
+#include <CocktailEngine/Renderer/RenderDeviceObject.hpp>
+#include <CocktailEngine/Renderer/Memory/MemoryPriority.hpp>
+#include <CocktailEngine/Renderer/Memory/MemoryType.hpp>
+#include <CocktailEngine/Renderer/Memory/ResourceType.hpp>
+
+namespace Ck::Renderer
+{
+    /**
+     * \brief Interface shared by classes backed by GPU memory
+     */
+    class MemoryResource : public RenderDeviceObject
+    {
+    public:
+
+	    /**
+         * \brief 
+         * \return 
+         */
+        virtual bool IsExclusive() const = 0;
+
+        /**
+         * \brief
+         * \return
+         */
+        virtual MemoryPriority GetPriority() const = 0;
+
+	    /**
+         * \brief 
+         * \return 
+         */
+        virtual MemoryType GetMemoryType() const = 0;
+
+	    /**
+         * \brief 
+         * \return 
+         */
+        virtual ResourceType GetResourceType() const = 0;
+    }; 
+}
+
+#endif // COCKTAILENGINE_RENDERER_MEMORY_MEMORYRESOURCE_HPP

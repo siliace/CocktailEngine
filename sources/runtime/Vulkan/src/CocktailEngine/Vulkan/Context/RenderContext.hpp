@@ -1,0 +1,143 @@
+#ifndef COCKTAILENGINE_VULKAN_CONTEXT_RENDERCONTEXT_HPP
+#define COCKTAILENGINE_VULKAN_CONTEXT_RENDERCONTEXT_HPP
+
+#include <CocktailEngine/Renderer/Context/RenderContext.hpp>
+
+#include <CocktailEngine/Vulkan/Context/FrameContext.hpp>
+#include <CocktailEngine/Vulkan/Queue/QueueSubmitter.hpp>
+
+namespace Ck::Vulkan
+{
+	class RenderDevice;
+
+	/**
+	 * \brief 
+	 */
+	class RenderContext : public Renderer::RenderContext, public Observable
+	{
+	public:
+
+		/**
+		 * \brief
+		 * \param renderDevice 
+		 * \param createInfo
+		 * \param allocationCallbacks 
+		 */
+		RenderContext(RenderDevice* renderDevice, const Renderer::RenderContextCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+
+		/**
+		 * \brief 
+		 */
+		~RenderContext() override;
+
+		/**
+		 * \brief 
+		 * \param name 
+		 */
+		void SetObjectName(const char* name) const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Renderer::RenderDevice* GetRenderDevice() const override;
+
+		/**
+		 * \brief 
+		 * \param usage 
+		 * \param memoryType 
+		 * \return 
+		 */
+		Renderer::BufferAllocator* GetBufferAllocator(Renderer::BufferUsageFlags usage, Renderer::MemoryType memoryType) override;
+
+		/**
+		 * \brief 
+		 * \param renderSurface 
+		 * \return 
+		 */
+		Renderer::Framebuffer* AcquireFramebuffer(Renderer::RenderSurface* renderSurface) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		Renderer::CommandList* CreateCommandList(const Renderer::CommandListCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param commandQueue 
+		 */
+		void SignalQueue(Renderer::CommandQueueType commandQueue) override;
+
+		/**
+		 * \brief Add a Fence to be signaled by the current submit batch
+		 * \param commandQueue The command queue where signal the Fence
+		 * \param fence The fence to signal
+		 */
+		void SignalFence(Renderer::CommandQueueType commandQueue, SharedPtr<Fence> fence);
+
+		/**
+		 * \brief Add a Semaphore to be signaled by the current submit
+		 * \param commandQueue The command queue where signal the Semaphore
+		 * \param semaphore The Semaphore to signal
+		 */
+		void SignalSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore);
+
+		/**
+		 * \brief 
+		 * \param waitingQueue 
+		 * \param waitedQueue 
+		 */
+		void WaitQueue(Renderer::CommandQueueType waitingQueue, Renderer::CommandQueueType waitedQueue) override;
+
+		/**
+		 * \brief Add a Semaphore to be waited by the current submit
+		 * \param commandQueue The command queue where wait the Semaphore
+		 * \param semaphore The Semaphore to wait
+		 * \param waitStages The pipeline stages blocked by the wait operation
+		 */
+		void WaitSemaphore(Renderer::CommandQueueType commandQueue, SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages);
+
+		/**
+		 * \brief 
+		 * \param commandQueue
+		 * \param commandListCount 
+		 * \param commandLists 
+		 * \param fence 
+		 */
+		void SubmitCommandLists(Renderer::CommandQueueType commandQueue, unsigned int commandListCount, Renderer::CommandList** commandLists, Renderer::Fence* fence) override;
+
+		/**
+		 * \brief 
+		 */
+		void Submit();
+
+		/**
+		 * \brief 
+		 */
+		void Flush() override;
+
+		/**
+		 * \brief 
+		 */
+		void Synchronize() override;
+
+	private:
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		FrameContext* GetCurrentFrameContext() const;
+
+		RenderDevice* mRenderDevice;
+		VkQueue mPresentationQueue;
+		UniquePtr<SubmitScheduler> mScheduler;
+		EnumMap<Renderer::CommandQueueType, UniquePtr<QueueSubmitter>> mSubmitters;
+		unsigned int mCurrentFrameContext;
+		Array<UniquePtr<FrameContext>> mFrameContexts;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_CONTEXT_RENDERCONTEXT_HPP
