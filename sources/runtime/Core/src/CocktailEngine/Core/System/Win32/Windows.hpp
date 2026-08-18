@@ -1,0 +1,63 @@
+#ifndef COCKTAILENGINE_CORE_SYSTEM_WIN32_WINDOWS_HPP
+#define COCKTAILENGINE_CORE_SYSTEM_WIN32_WINDOWS_HPP
+
+#ifndef WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN 1
+#endif
+
+// The engine talks to Windows in UTF-16, which is what UNICODE and _UNICODE select:
+// without them the generic names below resolve to the ANSI half of the API, and a
+// TextChar buffer would be read as bytes. The build defines both for every Cocktail
+// target, so this only ever fires for a translation unit reaching the platform from
+// outside of one, and it fires before <Windows.h> has decided anything.
+#if !defined(UNICODE) || !defined(_UNICODE)
+	#error "Cocktail requires UNICODE and _UNICODE on Windows: the engine uses the W half of the Win32 API."
+#endif
+
+#include <Windows.h>
+#include <Windowsx.h>
+#include <mmsystem.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+
+#ifdef CreateWindow
+	#undef CreateWindow
+#endif
+
+#ifdef CreateDirectory
+	#undef CreateDirectory
+#endif
+
+#ifdef RemoveDirectory
+    #undef RemoveDirectory
+#endif
+
+#ifdef CreateFile
+	#undef CreateFile
+#endif
+
+#ifdef CopyFile
+    #undef CopyFile
+#endif
+
+#ifdef MoveFile
+    #undef MoveFile
+#endif
+
+#ifdef LoadLibrary
+	#undef LoadLibrary
+#endif
+
+#ifdef IsMinimized
+	#undef IsMinimized
+#endif
+
+#ifdef IsMaximized
+	#undef IsMaximized
+#endif
+
+#ifdef Yield
+	#undef Yield
+#endif
+
+#endif // COCKTAILENGINE_CORE_SYSTEM_WIN32_WINDOWS_HPP

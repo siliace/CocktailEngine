@@ -1,0 +1,88 @@
+#ifndef COCKTAIL_GRAPHIC_SCENE_LIGHT_POSITIONALLIGHT_HPP
+#define COCKTAIL_GRAPHIC_SCENE_LIGHT_POSITIONALLIGHT_HPP
+
+#include <CocktailEngine/Core/Math/InterpolationCurve.hpp>
+
+#include <CocktailEngine/Graphic/Scene/Light/Light.hpp>
+#include <CocktailEngine/Graphic/Spatial/Transformable.hpp>
+
+namespace Ck
+{
+    /**
+     * \brief
+     */
+    class COCKTAILENGINE_GRAPHIC_API PositionalLight : public Transformable, public Light
+    {
+    public:
+
+        /**
+         * \brief
+         */
+        static const ScalarInterpolationCurve<float> DefaultLinearAttenuationCurve;
+
+        /**
+         * \brief
+         */
+        static const ScalarInterpolationCurve<float> DefaultQuadraticAttenuationCurve;
+
+        /**
+         * \brief
+         *
+         * \return
+         */
+        float GetRange() const;
+
+        /**
+         * \brief
+         *
+         * \param range
+         */
+        void SetRange(float range);
+
+        /**
+         * \brief Compute the attenuation for at a given distance from the light
+         */
+        float ComputeAttenuation(float distance) const;
+
+        /**
+         * \brief
+         * \return
+         */
+        float GetConstantAttenuationFactor() const;
+
+        /**
+         * \brief
+         * \return
+         */
+        float GetLinearAttenuationFactor() const;
+
+        /**
+         * \brief
+         * \return
+         */
+        float GetQuadraticAttenuationFactor() const;
+
+    protected:
+
+        /**
+         * \brief
+         *
+         * \param transformationNode
+         * \param name
+         * \param range
+         * \param color
+         * \param intensity
+         */
+        PositionalLight(TransformationNode* transformationNode, String name, float range, LinearColor color, float intensity);
+
+    private:
+
+        float mRange;
+        LazyValue<float> mLinearAttenuationFactor;
+        LazyValue<float> mQuadraticAttenuationFactor;
+        ScalarInterpolationCurve<float> mLinearAttenuationCurve;
+        ScalarInterpolationCurve<float> mQuadraticAttenuationCurve;
+    };
+}
+
+#endif // COCKTAIL_GRAPHIC_SCENE_LIGHT_POSITIONALLIGHT_HPP

@@ -1,0 +1,50 @@
+#ifndef COCKTAILENGINE_CORE_MATH_INTERPOLATION_HPP
+#define COCKTAILENGINE_CORE_MATH_INTERPOLATION_HPP
+
+#include <cassert>
+
+namespace Ck
+{
+    /**
+     * \brief Perform a linear interpolation between two values
+     *
+     * \tparam T The type of value to interpole
+     * \tparam U The type of the interpolation factor
+     *
+     * \param a The left value of the interpolation
+     * \param b The right value of the interpolation
+     * \param x The interpolation factor
+     *
+     * \return The interpolated value
+     */
+    template <typename T, typename U>
+    T Lerp(const T& a, const T& b, U x)
+    {
+        assert(a != b);
+
+        return a * (T(1) - x) + b * x;
+    }
+
+    /**
+     * \brief Perform a smooth interpolation between two values
+    *
+     * \tparam T The type of value to interpole
+     * \tparam U The type of the interpolation factor
+     *
+     * \param a The left value of the interpolation
+     * \param b The right value of the interpolation
+     * \param x The interpolation factor
+     *
+     * \return The interpolated value
+     */
+    template <typename T, typename U>
+    T Smoothstep(const T& a, const T& b, U x)
+    {
+        assert(a != b);
+
+        auto t = std::clamp((x - a) / (b - a), T(0), T(1));
+        return t * t * (T(3) - T(2) * t);
+    }
+}
+
+#endif // COCKTAILENGINE_CORE_MATH_INTERPOLATION_HPP

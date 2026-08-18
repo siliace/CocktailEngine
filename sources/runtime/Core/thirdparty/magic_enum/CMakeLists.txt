@@ -1,0 +1,2 @@
+set(MAGIC_ENUM_OPT_BUILD_EXAMPLES OFF)
+add_subdirectory(magic_enum)

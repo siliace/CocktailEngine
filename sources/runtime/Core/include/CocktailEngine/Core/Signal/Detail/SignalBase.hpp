@@ -1,0 +1,368 @@
+#ifndef COCKTAILENGINE_CORE_SIGNAL_DETAIL_SIGNALBASE_HPP
+#define COCKTAILENGINE_CORE_SIGNAL_DETAIL_SIGNALBASE_HPP
+
+#include <map>
+
+#include <CocktailEngine/Core/Memory/Allocator/SizedHeapAllocator.hpp>
+#include <CocktailEngine/Core/Memory/Allocator/StlAdapter.hpp>
+#include <CocktailEngine/Core/Memory/SharedPtr.hpp>
+#include <CocktailEngine/Core/Signal/Connection.hpp>
+#include <CocktailEngine/Core/Signal/Detail/Slot.hpp>
+#include <CocktailEngine/Core/Signal/Detail/SlotContainer.hpp>
+
+namespace Ck::Detail
+{
+    /**
+     * \brief
+     */
+    template <typename Lockable, typename... Args>
+    class SignalBase : public SlotContainer
+    {
+    public:
+
+        /**
+         * \brief Default constructor
+         */
+        SignalBase() :
+            mEmitting(false)
+        {
+            /// Nothing
+        }
+
+        /**
+         * \brief Copy constructor
+         */
+        SignalBase(const SignalBase&) = delete;
+
+        /**
+         * \brief Move constructor
+         *
+         * \param other
+         */
+        SignalBase(SignalBase&& other) noexcept :
+            mEmitting(false)
+        {
+            std::lock_guard<Lockable> lhs(mSlotLock);
+            std::lock_guard<Lockable> rhs(other.mSlotLock);
+
+            mSlots = Move(other.mSlots);
+            for (const auto& [groupIndex, slot] : mSlots)
+                slot->Rebind(this);
+        }
+
+        /**
+         * \brief
+         *
+         * \param other
+         *
+         * \return
+         */
+        SignalBase& operator=(const SignalBase& other) = delete;
+
+        /**
+         * \brief
+         * \param other
+         * \return
+         */
+        SignalBase& operator=(SignalBase&& other) noexcept
+        {
+            if (this != &other)
+            {
+                std::lock_guard<Lockable> lhs(mSlotLock);
+                std::lock_guard<Lockable> rhs(other.mSlotLock);
+
+                mSlots = Move(other.mSlots);
+                for (const auto& [groupIndex, slot] : mSlots)
+                    slot->Rebind(this);
+            }
+
+            return *this;
+        }
+
+        /**
+         * \brief Connect a callable with compatible arguments
+         *
+         * \param callable The callable
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename Callable>
+        Connection Connect(Callable&& callable, unsigned int groupId = 0)
+        {
+            // The real slot type
+            using SlotType = CallableSlot<Callable, Args...>;
+
+            // Create the slot into the signal
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, Callable>(Forward<Callable>(callable), groupId);
+
+            // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a member function
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection Connect(T& object, void (T::*function)(Args...), unsigned int groupId = 0)
+        {
+            using SlotType = ObjectSlot<T, Args...>;
+
+            // Create the slot into the signal
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, Move(function), groupId);
+
+            // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a const member function
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The const member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection Connect(const T& object, void (T::*function)(Args...) const, unsigned int groupId = 0)
+        {
+            using SlotType = ConstantObjectSlot<T, Args...>;
+
+            // Create the slot into the signal
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, typename SlotType::ReferenceType, typename SlotType::FunctionType>(object, Move(function), groupId);
+
+            // Create a connection to the slot we created
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a callable that will be automatically disconnected after being invoked once
+         *
+         * \param callable The callable
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename Callable>
+        Connection ConnectOnce(Callable&& callable, unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = CallableSlot<Callable, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(Forward<Callable>(callable), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(Move(inner), groupId);
+
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a member function that will be automatically disconnected after being invoked once
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection ConnectOnce(T& object, void (T::*function)(Args...), unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = ObjectSlot<T, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(object, Move(function), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(Move(inner), groupId);
+
+            return Connection(slot);
+        }
+
+        /**
+         * \brief Connect a const member function that will be automatically disconnected after being invoked once
+         *
+         * \tparam T The object type
+         *
+         * \param object The object instance
+         * \param function The const member function pointer
+         * \param groupId The groupId identifier used to order Slot invocation
+         *
+         * \return A connection used to manage the Slot
+         */
+        template <typename T>
+        Connection ConnectOnce(const T& object, void (T::*function)(Args...) const, unsigned int groupId = 0)
+        {
+            using SlotType = OneShotSlot<Args...>;
+            using InnerSlotType = ConstantObjectSlot<T, Args...>;
+
+            UniquePtr<InnerSlotType> inner = MakeUnique<InnerSlotType>(object, Move(function), this, groupId);
+
+            SharedPtr<Slot<Args...>> slot = CreateSlot<SlotType, UniquePtr<InnerSlotType>>(Move(inner), groupId);
+
+            return Connection(slot);
+        }
+
+        /**
+         * \brief
+         * \param args
+         */
+        void Emit(Args... args)
+        {
+            std::lock_guard<Lockable> lg(mSlotLock);
+
+            // Flag the signal an emitting
+            // This way, the Connect/Disconnect methods will be aware the slot map should not change to not invalidate its iterators
+            mEmitting = true;
+
+            for (const auto& [groupIndex, slot] : mSlots)
+                slot->Invoke(std::forward_as_tuple(args...));
+
+            // We are done emitting
+            mEmitting = false;
+
+            // Any slot connected to the signal during the emission car now safely be connected to the main slot map
+            for (auto& [groupIndex, slot] : mConnectingSlots)
+                mSlots.insert({ groupIndex, Move(slot) });
+
+            for (auto& [groupIndex, slot] : mDisconnectingSlots)
+                Disconnect(slot.Get());
+
+            mConnectingSlots.clear();
+            mDisconnectingSlots.clear();
+        }
+
+        /**
+         * \brief Tell whether the signal has active connections bound
+         *
+         * \return True if the signal has active connections, false otherwise
+         */
+        bool IsBound() const
+        {
+            std::lock_guard<Lockable> lg(mSlotLock);
+            return !mSlots.empty();
+        }
+
+        /**
+         * \brief Disconnect every Slot from the Signal
+         */
+        void Disconnect() override
+        {
+            std::lock_guard<Lockable> lg(mSlotLock);
+            mSlots.clear();
+        }
+
+        /**
+         * \brief Disconnect a whole group from the Signal
+         * \param groupId The group to disconnect
+         */
+        void Disconnect(unsigned int groupId) override
+        {
+            std::lock_guard<Lockable> lg(mSlotLock);
+            for (auto it = mSlots.begin(); it != mSlots.end();)
+            {
+                if (it->first == groupId)
+                {
+                    if (mEmitting)
+                    {
+                        mDisconnectingSlots.insert({ it->first, it->second });
+                        ++it;
+                    }
+                    else
+                    {
+                        it = mSlots.erase(it);
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+
+    protected:
+
+        /**
+         * \brief Disconnect a Slot from the Signal
+         * \param state The Slot to disconnect
+         */
+        void Disconnect(SlotState* state) override
+        {
+            unsigned int groupId = state->GetGroupId();
+
+            std::lock_guard<Lockable> lg(mSlotLock);
+            auto beginEndPair = mSlots.equal_range(groupId);
+            auto begin = beginEndPair.first;
+            auto end = beginEndPair.second;
+            for (auto it = begin; it != end; ++it)
+            {
+                if (it->second.Get() == state)
+                {
+                    if (mEmitting)
+                    {
+                        mDisconnectingSlots.insert({ it->first, it->second });
+                        ++it;
+                    }
+                    else
+                    {
+                        mSlots.erase(it);
+                    }
+                    return;
+                }
+            }
+        }
+
+    private:
+
+        /**
+         * \brief Create a new Slot into the Signal
+         * \param args Arguments to use to construct the new Slot
+         * \param groupId The group of the Slot to create
+         * \return The created slot
+         */
+        template <typename T, typename... SlotArgs>
+        SharedPtr<Slot<Args...>> CreateSlot(SlotArgs&&... args, unsigned int groupId)
+        {
+            SharedPtr<Slot<Args...>> slot = MakeShared<T>(Forward<SlotArgs>(args)..., this, groupId);
+
+            {
+                std::lock_guard<Lockable> lg(mSlotLock);
+                if (mEmitting)
+                {
+                    mConnectingSlots.insert({ groupId, slot });
+                }
+                else
+                {
+                    mSlots.insert({ groupId, slot });
+                }
+            }
+
+            return slot;
+        }
+
+        using AllocatorAdapter = StlAdapter<
+            std::pair<const unsigned int, SharedPtr<Slot<Args...>>>,
+            LargeHeapAllocator
+        >;
+
+        bool mEmitting;
+        mutable Lockable mSlotLock;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>, std::less<unsigned int>, AllocatorAdapter> mSlots;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>, std::less<unsigned int>, AllocatorAdapter> mConnectingSlots;
+        std::multimap<unsigned int, SharedPtr<Slot<Args...>>, std::less<unsigned int>, AllocatorAdapter> mDisconnectingSlots;
+    };
+}
+
+#endif // COCKTAILENGINE_CORE_SIGNAL_DETAIL_SIGNALBASE_HPP

@@ -1,0 +1,41 @@
+#ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_MIPMAPSTEXTURERESOURCE_HPP
+#define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_MIPMAPSTEXTURERESOURCE_HPP
+
+#include <CocktailEngine/Graphic/Material/MipMaps/MipMaps.hpp>
+#include <CocktailEngine/Graphic/Rendering/Resource/TextureResource.hpp>
+
+namespace Ck
+{
+    class COCKTAILENGINE_GRAPHIC_API MipMapsTextureResource : public TextureResource
+    {
+    public:
+		
+	    /**
+         * \brief Constructor
+         * \param graphicEngine 
+         * \param mipMaps 
+         * \param name 
+         */
+        MipMapsTextureResource(SharedPtr<GraphicEngine> graphicEngine, SharedPtr<MipMaps> mipMaps, const AnsiChar* name = "");
+
+	    /**
+         * \brief
+         * \param baseLayer 
+         * \param baseLevel 
+         * \param levelCount 
+         */
+        void LoadLevels(unsigned int baseLayer, unsigned int baseLevel, unsigned int levelCount);
+
+	    /**
+         * 
+         * @return 
+         */
+        SharedPtr<MipMaps> GetMipMaps() const;
+
+    private:    
+
+        SharedPtr<MipMaps> mMipMaps;
+    };
+}
+
+#endif // COCKTAIL_GRAPHIC_RENDERING_RESOURCE_MIPMAPSTEXTURERESOURCE_HPP

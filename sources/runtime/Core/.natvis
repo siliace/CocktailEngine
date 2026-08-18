@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Ck::Array&lt;*&gt;">
+		<DisplayString Condition="mSize == 0 &amp;&amp; mCapacity == 0">Empty</DisplayString>
+		<DisplayString Condition="mSize == 0 &amp;&amp; mCapacity &gt; 0">Empty, Capacity={mCapacity}</DisplayString>
+		<DisplayString Condition="mSize &gt; 0">{{ Size={mSize} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mSize</Item>
+			<Item Name="[capacity]" ExcludeView="simple">mCapacity</Item>
+			<ArrayItems>
+				<Size>mSize</Size>
+				<ValuePointer>($T1*)mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Array&lt;*&gt;::Iterator">
+		<DisplayString Condition="mValue &lt; mOwner->mData &amp;&amp; mValue &gt;= mOwner->mData + mOwner->mSize">Invalid</DisplayString>
+		<DisplayString Condition="mValue &gt;= mOwner->mData &amp;&amp; mValue &lt; mOwner->mData + mOwner->mSize">{{ Index={mValue - mOwner->mData}, Value={*mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[index]" ExcludeView="simple">mValue - mOwner->mData</Item>
+			<Item Name="[value]" ExcludeView="simple">*mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Array&lt;*&gt;::ConstIterator">
+		<DisplayString Condition="mValue &lt; mOwner->mData &amp;&amp; mValue &gt;= mOwner->mData + mOwner->mSize">Invalid</DisplayString>
+		<DisplayString Condition="mValue &gt;= mOwner->mData &amp;&amp; mValue &lt; mOwner->mData + mOwner->mSize">{{ Index={mValue - mOwner->mData}, Value={*mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[index]" ExcludeView="simple">mValue - mOwner->mData</Item>
+			<Item Name="[value]" ExcludeView="simple">*mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;">
+		<DisplayString Condition="mSize == 0 &amp;&amp; mBucketCount == 0">Empty</DisplayString>
+		<DisplayString Condition="mSize == 0 &amp;&amp; mBucketCount &gt; 0">Empty, BucketCount={mBucketCount}</DisplayString>
+		<DisplayString Condition="mSize &gt; 0">{{ Size={mSize}, BucketCount={mBucketCount} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mSize</Item>
+			<Item Name="[bucketCount]" ExcludeView="simple">mBucketCount</Item>
+			<CustomListItems Condition="mBucketCount &gt; 0" MaxItemsPerView="32">
+				<Variable Name="bucketIndex" InitialValue="0" />
+				<Variable Name="node" InitialValue="mBuckets.mPtr[0].mHead.mPtr" />
+				<Loop>
+					<If Condition="bucketIndex &lt; mBucketCount">
+						<Exec>node = mBuckets.mPtr[bucketIndex].mHead.mPtr</Exec>
+						<Loop>
+							<If Condition="node != nullptr">
+								<Item Name="{node->mValue.Key}">node->mValue.Value</Item>
+								<Exec>node = node->mNext.mPtr</Exec>
+							</If>
+							<Break Condition="node == nullptr"/>
+						</Loop>
+						<Exec>bucketIndex = bucketIndex + 1</Exec>
+					</If>
+					<Break Condition="bucketIndex &gt;= mBucketCount"/>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;::Iterator">
+		<DisplayString Condition="mBucketIterator.mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mBucketIterator.mNode != nullptr">{{ Key={mBucketIterator.mNode->mValue.Key}, Value={mBucketIterator.mNode->mValue.Value} }}</DisplayString>
+		<Expand>
+			<Item Name="[key]" ExcludeView="simple">mBucketIterator.mNode->mValue.Key</Item>
+			<Item Name="[value]" ExcludeView="simple">mBucketIterator.mNode->mValue.Value</Item>
+			<Item Name="[hash]" ExcludeView="simple">mBucketIterator.mNode->mValue.HashCode</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::HashMap&lt;*,*,*,*,*&gt;::ConstIterator">
+		<DisplayString Condition="mBucketIterator.mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mBucketIterator.mNode != nullptr">{{ Key={mBucketIterator.mNode->mValue.Key}, Value={mBucketIterator.mNode->mValue.Value} }}</DisplayString>
+		<Expand>
+			<Item Name="[key]" ExcludeView="simple">mBucketIterator.mNode->mValue.Key</Item>
+			<Item Name="[value]" ExcludeView="simple">mBucketIterator.mNode->mValue.Value</Item>
+			<Item Name="[hash]" ExcludeView="simple">mBucketIterator.mNode->mValue.HashCode</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::LinkedList&lt;*,*&gt;">
+		<DisplayString Condition="mSize == 0">Empty</DisplayString>
+		<DisplayString Condition="mSize &gt; 0">{{ Size={mSize} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mSize</Item>
+			<CustomListItems Condition="mSize &gt; 0" MaxItemsPerView="32">
+				<Variable Name="node" InitialValue="mHead.mPtr" />
+				<Variable Name="index" InitialValue="0" />
+				<Loop>
+					<If Condition="node != nullptr">
+						<Item Name="{index}">node->mValue</Item>
+						<Exec>node = node->mNext.mPtr</Exec>
+						<Exec>index = index + 1</Exec>
+					</If>
+					<Break Condition="node == nullptr"/>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Detail::LinkedListIterator&lt;*,*&gt;">
+		<DisplayString Condition="mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mNode != nullptr">{{ Value={mNode->mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[value]" ExcludeView="simple">mNode->mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Detail::LinkedListConstIterator&lt;*,*&gt;">
+		<DisplayString Condition="mNode == nullptr">Invalid</DisplayString>
+		<DisplayString Condition="mNode != nullptr">{{ Value={mNode->mValue} }}</DisplayString>
+		<Expand>
+			<Item Name="[value]" ExcludeView="simple">mNode->mValue</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::StaticArray&lt;*,*&gt;">
+		<DisplayString>{{ Size={$T2} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">$T2</Item>
+			<ArrayItems>
+				<Size>$T2</Size>
+				<ValuePointer>($T1*)mElements</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::StaticArray&lt;*,0&gt;">
+		<DisplayString>Empty</DisplayString>
+	</Type>
+	<Type Name="Ck::String">
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity == 0">Empty</DisplayString>
+		<DisplayString Condition="mCharacters.mSize == 0 &amp;&amp; mCharacters.mCapacity &gt; 0">
+			Empty,
+			Capacity={mCharacters.mCapacity - 1}
+		</DisplayString>
+		<DisplayString Condition="mCharacters.mSize &gt; 0">
+			Content={(wchar_t*)mCharacters.mData},
+			Length={mCharacters.mSize - 1}, Capacity={mCharacters.mCapacity - 1}
+		</DisplayString>
+		<StringView>(wchar_t*)mCharacters.mData</StringView>
+		<Expand>
+			<Item Name="Length" ExcludeView="simple">mCharacters.mSize - 1</Item>
+			<Item Name="Capacity" ExcludeView="simple">mCharacters.mCapacity - 1</Item>
+			<ArrayItems>
+				<Size>mCharacters.mSize - 1</Size>
+				<ValuePointer>(wchar_t*)mCharacters.mData</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::StringView">
+		<DisplayString Condition="mLength == 0">Empty</DisplayString>
+		<DisplayString Condition="mLength &gt; 0">Content={(wchar_t*)mString}, Length={mLength}</DisplayString>
+		<StringView Condition="mLength &gt; 0 &amp;&amp; mString != 0">mString</StringView>
+		<Expand>
+			<Item Name="Length" ExcludeView="simple">mLength</Item>
+			<ArrayItems>
+				<Size>mLength</Size>
+				<ValuePointer>(wchar_t*)mString</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Vector2&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Vector3&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}, {mComponents[2]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+			<Item Name="z" ExcludeView="simple">mComponents[2]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Vector4&lt;*&gt;">
+		<DisplayString>{mComponents[0]}, {mComponents[1]}, {mComponents[2]}, {mComponents[3]}</DisplayString>
+		<Expand>
+			<Item Name="x" ExcludeView="simple">mComponents[0]</Item>
+			<Item Name="y" ExcludeView="simple">mComponents[1]</Item>
+			<Item Name="z" ExcludeView="simple">mComponents[2]</Item>
+			<Item Name="w" ExcludeView="simple">mComponents[3]</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::LazyValue&lt;*&gt;">
+		<DisplayString Condition="mDirty == true">Dirty</DisplayString>
+		<DisplayString Condition="mDirty == false">Value={mValue}</DisplayString>
+		<Expand>
+			<Item Name="Value" Condition="!mDirty">
+				mValue
+			</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::Optional&lt;*&gt;">
+		<DisplayString>{mEmpty ? "Empty" : "{value}"}</DisplayString>
+		<Expand>
+			<Item Name="Value">
+				*(($T1*)$address(mStorage))
+			</Item>
+			<Item Name="IsEmpty">mEmpty</Item>
+		</Expand>
+	</Type>
+	<Type Name="Ck::UniquePtr&lt;*,*&gt;">
+		<DisplayString Condition="mPtr == nullptr">Empty</DisplayString>
+		<DisplayString Condition="mPtr != nullptr">{*mPtr}</DisplayString>
+		<Expand>
+			<Item Name="[pointer]">mPtr</Item>
+			<Item Name="[deleter]">mDeleter</Item>
+			<ExpandedItem Condition="mPtr != nullptr">*mPtr</ExpandedItem>
+		</Expand>
+	</Type>
+</AutoVisualizer>

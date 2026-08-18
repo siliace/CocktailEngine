@@ -1,0 +1,45 @@
+#ifndef COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAM_HPP
+#define COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAM_HPP
+
+#include <CocktailEngine/Core/Utility/CompositeKey.hpp>
+
+#include <CocktailEngine/Graphic/Material/Shading/MaterialProgramCreateInfo.hpp>
+#include <CocktailEngine/Graphic/Material/Shading/MaterialProgramVariant.hpp>
+
+namespace Ck
+{
+	/**
+	 * \brief 
+	 */
+	class COCKTAILENGINE_GRAPHIC_API MaterialProgram
+	{
+	public:
+
+	    static BindingSlot GetMaterialTextureBindingSlot(Material::TextureType textureType);
+
+	    MaterialProgram() = delete;
+		MaterialProgram(Renderer::RenderDevice* renderDevice, const MaterialProgramCreateInfo& createInfo);
+
+        MaterialProgram(const MaterialProgram& other) = delete;
+        MaterialProgram(MaterialProgram&& other) = default;
+        MaterialProgram& operator=(const MaterialProgram& other) = delete;
+        MaterialProgram& operator=(MaterialProgram&& other) = default;
+
+        MaterialProgramVariant* GetVariant(Flags<VertexAttributeSemantic> vertexAttributes, Flags<Material::TextureType> materialTextures) const;
+
+		const String& GetName() const;
+
+	    Material::ShadingMode GetShadingMode() const;
+
+	private:
+
+		using VariantKey = CompositeKey<Flags<VertexAttributeSemantic>, Flags<Material::TextureType>>;
+
+		String mName;
+	    Material::ShadingMode mShadingMode;
+	    SharedPtr<MaterialProgramInterface> mInterface;
+		HashMap<VariantKey, UniquePtr<MaterialProgramVariant>> mVariants;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_MATERIAL_SHADING_MATERIALPROGRAM_HPP

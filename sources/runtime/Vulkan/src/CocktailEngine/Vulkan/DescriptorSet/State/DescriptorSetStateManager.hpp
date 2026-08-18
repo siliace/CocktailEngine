@@ -1,0 +1,233 @@
+#ifndef COCKTAILENGINE_VULKAN_DESCRIPTORSET_STATE_DESCRIPTORSETSTATEMANAGER_HPP
+#define COCKTAILENGINE_VULKAN_DESCRIPTORSET_STATE_DESCRIPTORSETSTATEMANAGER_HPP
+
+#include <CocktailEngine/Renderer/Shader/DescriptorType.hpp>
+
+namespace Ck::Vulkan
+{
+	class Buffer;
+	class DescriptorSet;
+	class DescriptorSetAllocator;
+	class DescriptorSetLayout;
+	class DescriptorUpdateTemplate;
+	class RenderDevice;
+	class Sampler;
+	class TextureView;
+
+	struct ImageStateInfo
+	{
+		const TextureView* ResourceView = nullptr;
+		const Sampler* ResourceSampler = nullptr;
+	};
+
+	struct BufferStateInfo
+	{
+		const Buffer* Resource = nullptr;
+		std::size_t Offset = 0;
+		std::size_t Range = 0;
+	};
+
+	struct DescriptorState
+	{
+		unsigned int Binding = 0;
+		unsigned int ArrayElement = 0;
+		Renderer::DescriptorType Type = Renderer::DescriptorType::Texture;
+	    Flags<Renderer::ShaderType> ShaderStages;
+		ImageStateInfo ImageInfo;
+		BufferStateInfo BufferInfo;
+		bool Dirty = false;
+	};
+
+	class DescriptorSetStateManager
+	{
+	public:
+
+		/**
+		 * \brief 
+		 */
+		DescriptorSetStateManager() = delete;
+		
+		/**
+		 * \brief Constructor
+		 * \param renderDevice 
+		 * \param descriptorSetAllocator 
+		 */
+		explicit DescriptorSetStateManager(RenderDevice* renderDevice, DescriptorSetAllocator* descriptorSetAllocator);
+
+		/**
+		 * \brief 
+		 * \param other 
+		 */
+		DescriptorSetStateManager(const DescriptorSetStateManager& other) = delete;
+
+		/**
+		 * \brief 
+		 * \param other 
+		 */
+		DescriptorSetStateManager(DescriptorSetStateManager&& other) noexcept = default;
+
+		/**
+		 * \brief 
+		 * \param other 
+		 * \return 
+		 */
+		DescriptorSetStateManager& operator=(const DescriptorSetStateManager& other) = delete;
+
+		/**
+		 * \brief 
+		 * \param other 
+		 * \return 
+		 */
+		DescriptorSetStateManager& operator=(DescriptorSetStateManager&& other) noexcept = default;
+
+		/**
+		 * \brief 
+		 * \param binding
+		 * \param arrayIndex 
+		 * \param sampler
+		 * \return
+		 */
+		bool BindSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Sampler* sampler);
+
+		/**
+		 * \brief 
+		 * \param binding
+		 * \param arrayIndex 
+		 * \param textureView 
+		 * \param sampler
+		 * \return
+		 */
+		bool BindTextureSampler(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView, const Sampler* sampler);
+
+		/**
+		 * \brief
+		 * \param binding
+		 * \param arrayIndex
+		 * \param textureView
+		 * \return
+		 */
+		bool BindTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
+
+		/**
+		 * \brief
+		 * \param binding
+		 * \param arrayIndex
+		 * \param textureView
+		 * \return
+		 */
+		bool BindStorageTexture(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const TextureView* textureView);
+
+		/**
+		 * \brief 
+		 * \param binding
+		 * \param arrayIndex 
+		 * \param buffer 
+		 * \param offset 
+		 * \param range 
+		 * \return
+		 */
+		bool BindUniformBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
+
+		/**
+		 * \brief
+		 * \param binding
+		 * \param arrayIndex
+		 * \param buffer
+		 * \param offset
+		 * \param range
+		 * \return
+		 */
+		bool BindStorageBuffer(unsigned int binding, Flags<Renderer::ShaderType> shaderStages, unsigned int arrayIndex, const Buffer* buffer, std::size_t offset, std::size_t range);
+
+		/**
+		 * \brief 
+		 */
+		void ResetBindings();
+
+		/**
+		 * \brief 
+		 * \param layout
+		 * \param imagesInfo
+		 * \param buffersInfo 
+		 * \param writes 
+		 * \return 
+		 */
+		unsigned int CompileDescriptors(SharedPtr<DescriptorSetLayout> layout, VkDescriptorImageInfo* imagesInfo, VkDescriptorBufferInfo* buffersInfo, VkWriteDescriptorSet* writes);
+
+		/**
+		 * \brief 
+		 * \param descriptorSetLayout 
+		 * \param descriptorUpdateTemplate 
+		 * \param descriptors 
+		 */
+		void CompileDescriptorsWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate, unsigned char* descriptors);
+
+		/**
+		 * \brief 
+		 * \param descriptorSetLayout 
+		 * \return 
+		 */
+		SharedPtr<DescriptorSet> CompileSet(SharedPtr<DescriptorSetLayout> descriptorSetLayout);
+
+		/**
+		 * \brief 
+		 * \param descriptorSetLayout 
+		 * \param descriptorUpdateTemplate 
+		 * \return 
+		 */
+		SharedPtr<DescriptorSet> CompileSetWithTemplate(SharedPtr<DescriptorSetLayout> descriptorSetLayout, SharedPtr<DescriptorUpdateTemplate> descriptorUpdateTemplate);
+
+		/**
+		 * \brief 
+		 * \param binding 
+		 * \return 
+		 */
+		bool IsBindingDirty(unsigned int binding) const;
+
+	private:
+
+		/**
+		 * \brief
+		 * \param state
+		 * \param type
+		 * \param textureView
+		 * \param sampler
+		 * \return
+		 */
+		static bool FillImageState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const TextureView* textureView, const Sampler* sampler);
+
+		/**
+		 * \brief 
+		 * \param state 
+		 * \param type 
+		 * \param buffer 
+		 * \param offset 
+		 * \param range 
+		 * \return 
+		 */
+		static bool FillBufferState(DescriptorState& state, Flags<Renderer::ShaderType> shaderStages, Renderer::DescriptorType type, const Buffer* buffer, std::size_t offset, std::size_t range);
+
+		/**
+		 * \brief
+		 * \param binding
+		 * \param arrayElement
+		 * \return
+		 */
+		Optional<DescriptorState&> FindDescriptorState(unsigned int binding, unsigned int arrayElement);
+
+		/**
+		 * \brief 
+		 * \param binding
+		 * \param arrayElement 
+		 * \return 
+		 */
+		DescriptorState& FindOrCreateDescriptorState(unsigned int binding, unsigned int arrayElement);
+
+		RenderDevice* mRenderDevice;
+		DescriptorSetAllocator* mDescriptorSetAllocator;
+		Array<DescriptorState> mBindingStates;
+		unsigned int mBindingDirtyFlags;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_DESCRIPTORSET_STATE_DESCRIPTORSETSTATEMANAGER_HPP

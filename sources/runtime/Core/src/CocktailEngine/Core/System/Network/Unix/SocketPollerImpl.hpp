@@ -1,0 +1,75 @@
+#ifndef COCKTAILENGINE_CORE_SYSTEM_NETWORK_UNIX_SOCKETPOLLERIMPL_HPP
+#define COCKTAILENGINE_CORE_SYSTEM_NETWORK_UNIX_SOCKETPOLLERIMPL_HPP
+
+#include <poll.h>
+
+#include <CocktailEngine/Core/System/Network/SocketPoller.hpp>
+
+namespace Ck
+{
+	class SocketPoller::Impl
+	{
+	public:
+
+		/**
+		 * \brief
+		 * \param socketHandle
+		 * \param flags
+		 */
+		void Add(Socket::Handle socketHandle, EventFlags flags);
+
+		/**
+		 * \brief
+		 * \param socketHandle
+		 */
+		void Remove(Socket::Handle socketHandle);
+
+		/**
+		 * \brief
+		 */
+		void Clear();
+
+		/**
+		 * \brief
+		 * \param socketHandle
+		 * \return
+		 */
+		bool Has(Socket::Handle socketHandle) const;
+
+		/**
+		 * \brief
+		 * \param duration
+		 * \return
+		 */
+		bool Wait(const Duration& duration);
+
+		/**
+		 * \brief 
+		 * \param socket 
+		 * \return 
+		 */
+		bool IsDisconnected(Socket::Handle socket) const;
+
+		/**
+		 * \brief 
+		 * \param socket 
+		 * \return 
+		 */
+		bool IsReadyToRead(Socket::Handle socket) const;
+
+		/**
+		 * \brief 
+		 * \param socket 
+		 * \return 
+		 */
+		bool IsReadyToWrite(Socket::Handle socket) const;
+
+	private:
+
+		const pollfd* GetSocketDescriptor(Socket::Handle socket) const;
+
+		Array<pollfd> mDescriptors;
+	};
+}
+
+#endif // COCKTAILENGINE_CORE_SYSTEM_NETWORK_UNIX_SOCKETPOLLERIMPL_HPP

@@ -1,0 +1,124 @@
+#ifndef COCKTAIL_GRAPHIC_MESH_MESH_HPP
+#define COCKTAIL_GRAPHIC_MESH_MESH_HPP
+
+#include <CocktailEngine/Core/Array.hpp>
+#include <CocktailEngine/Core/HashSet.hpp>
+#include <CocktailEngine/Core/Math/Volume/Box.hpp>
+
+#include <CocktailEngine/Graphic/Export.hpp>
+
+#include <CocktailEngine/Renderer/Renderer.hpp>
+
+namespace Ck
+{
+	class GraphicEngine;
+	class IndexArray;
+	class VertexArray;
+
+	/**
+	 * \brief 
+	 */
+	class COCKTAILENGINE_GRAPHIC_API Mesh
+	{
+	public:
+
+		/**
+		 * \brief 
+		 */
+		struct SubMesh
+		{
+			/**
+			 * \brief Specifies the number of index or vertex of the sub-mesh
+			 */
+			unsigned int Count = 0;
+
+			/**
+			 * \brief Specifies the index of the first vertex of the sub-mesh in the global mesh's vertex array
+			 */
+			unsigned int FirstVertex = 0;
+
+			/**
+			 * \brief Specifies the index of the first index of the sub-mesh in the global mesh's index array
+			 * If the mesh is not indexed, this value should be ignored
+			 */
+			unsigned int FirstIndex = 0;
+
+			/**
+			 * \brief The primitive used to compose the sub-mesh's geometry
+			 */
+			Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
+
+			/**
+			 * \brief Specifies the index of material to use to draw the sub-mesh
+			 */
+			unsigned int MaterialIndex = 0;
+		};
+
+		/**
+		 * \brief 
+		 * \param vertices 
+		 * \param indices 
+		 * \param subMeshes 
+		 */
+		Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Array<SubMesh> subMeshes);
+
+		/**
+		 * \brief
+		 * \param vertices
+		 * \param indices
+		 * \param primitiveTopology
+		 */
+		Mesh(SharedPtr<VertexArray> vertices, SharedPtr<IndexArray> indices, Renderer::PrimitiveTopology primitiveTopology = Renderer::PrimitiveTopology::Triangle);
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		bool IsIndexed() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const SharedPtr<VertexArray>& GetVertices() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const SharedPtr<IndexArray>& GetIndices() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const Array<SubMesh>& GetSubMeshes() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const HashSet<unsigned int>& GetMaterialIndices() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Box<float> GetBoundingBox() const;
+
+	private:
+
+		/**
+		 * \brief 
+		 */
+		void GenerateBoundingBox();
+
+		SharedPtr<VertexArray> mVertices;
+		SharedPtr<IndexArray> mIndices;
+		Array<SubMesh> mSubMeshes;
+		HashSet<unsigned int> mMaterialIndices;
+		Box<float> mBoundingBox;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_MESH_MESH_HPP

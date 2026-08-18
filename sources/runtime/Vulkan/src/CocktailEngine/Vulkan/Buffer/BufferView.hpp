@@ -1,0 +1,87 @@
+#ifndef COCKTAILENGINE_VULKAN_BUFFER_BUFFERVIEW_HPP
+#define COCKTAILENGINE_VULKAN_BUFFER_BUFFERVIEW_HPP
+
+#include <CocktailEngine/Renderer/Buffer/BufferView.hpp>
+#include <CocktailEngine/Renderer/Buffer/BufferViewCreateInfo.hpp>
+
+#include <CocktailEngine/Vulkan/Buffer/Buffer.hpp>
+
+namespace Ck::Vulkan
+{
+	class RenderDevice;
+
+	/**
+	 * \brief 
+	 */
+	class BufferView : public Renderer::BufferView
+	{
+	public:
+
+		/**
+		 * \brief 
+		 * \param renderDevice 
+		 * \param createInfo 
+		 * \param allocationCallbacks 
+		 */
+		BufferView(RenderDevice* renderDevice, const Renderer::BufferViewCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+
+		/**
+		 * \brief 
+		 */
+		~BufferView() override;
+
+		/**
+		 * \brief 
+		 * \param name 
+		 */
+		void SetObjectName(const char* name) const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Renderer::RenderDevice* GetRenderDevice() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Buffer> GetBuffer() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		PixelFormat GetFormat() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		std::size_t GetOffset() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		std::size_t GetRange() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		VkBufferView GetHandle() const;
+
+	private:
+
+		RenderDevice* mRenderDevice;
+		SharedPtr<Buffer> mBuffer;
+		PixelFormat mFormat;
+		std::size_t mOffset;
+		std::size_t mRange;
+		const VkAllocationCallbacks* mAllocationCallbacks;
+		VkBufferView mHandle;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_BUFFER_BUFFERVIEW_HPP

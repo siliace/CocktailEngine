@@ -1,0 +1,46 @@
+#ifndef COCKTAIL_GRAPHIC_RENDERING_RESOURCE_VERTEXBUFFER_HPP
+#define COCKTAIL_GRAPHIC_RENDERING_RESOURCE_VERTEXBUFFER_HPP
+
+#include <CocktailEngine/Graphic/Rendering/Resource/BufferResource.hpp>
+#include <CocktailEngine/Graphic/Geometry/Vertex/VertexArray.hpp>
+
+namespace Ck
+{
+    /**
+     * \brief
+     */
+    class COCKTAILENGINE_GRAPHIC_API VertexBuffer : public BufferResource
+    {
+    public:
+
+        /**
+         * \brief
+         * \param graphicEngine
+         * \param vertices
+         * \param name
+         */
+        VertexBuffer(SharedPtr<GraphicEngine> graphicEngine, SharedPtr<VertexArray> vertices, const AnsiChar* name = "");
+
+        /**
+         * \brief
+         */
+        void Upload();
+
+        /**
+         * \brief 
+         */
+        void Upload(std::size_t firstVertex, std::size_t vertexCount);
+
+        /**
+         * \brief 
+         * \return 
+         */
+        SharedPtr<VertexArray> GetVertexArray() const;
+
+    private:
+
+        SharedPtr<VertexArray> mVertices;
+    };
+}
+
+#endif // COCKTAIL_GRAPHIC_RENDERING_RESOURCE_VERTEXBUFFER_HPP

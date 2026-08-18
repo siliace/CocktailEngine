@@ -1,0 +1,98 @@
+#ifndef COCKTAIL_GRAPHIC_SCENE_SHAPE_STATICMESHSHAPE_HPP
+#define COCKTAIL_GRAPHIC_SCENE_SHAPE_STATICMESHSHAPE_HPP
+
+#include <CocktailEngine/Graphic/Mesh/Mesh.hpp>
+#include <CocktailEngine/Graphic/Rendering/Engine/GraphicEngine.hpp>
+#include <CocktailEngine/Graphic/Scene/Shape/Shape.hpp>
+
+namespace Ck
+{
+    /**
+     * \brief Shape implementation for rendering static meshes
+     *
+     * StaticMeshShape represents a non-animated mesh that can be attached
+     * to a scene graph node. It submits one or more geometries to the render
+     * queue, grouped by material, and relies on prebuilt vertex and index
+     * buffers for efficient rendering.
+     */
+    class COCKTAILENGINE_GRAPHIC_API StaticMeshShape : public Shape
+    {
+    public:
+
+        /**
+         * \brief Constructs a StaticMeshShape
+         *
+         * Initializes GPU resources required to render the given mesh and
+         * associates the provided materials with the corresponding geometries.
+         *
+         * \param graphicEngine The graphic engine used to create rendering resources
+         * \param mesh The static mesh to render
+         * \param materials The set of materials applied to the mesh
+         */
+        StaticMeshShape(GraphicEngine& graphicEngine, SharedPtr<Mesh> mesh, const Array<SharedPtr<Material>>& materials);
+
+        /**
+         * \brief Submits the mesh geometries to the render queue
+         *
+         * For each material, the corresponding geometries are added to the render
+         * queue using the appropriate vertex/index buffers and primitive topology.
+         * Transformations are combined with the scene graph and camera state.
+         *
+         * \param queue The render queue to which draw commands are added
+         * \param cameraTransformation The transformation associated with the camera
+         * \param worldTransformation The world transformation of the scene graph node
+         */
+        void AddToQueue(RenderQueue& queue, const Transformation& cameraTransformation, const Transformation& worldTransformation) override;
+
+        /**
+         * \brief Extends a bounding volume to include the mesh
+         *
+         * Updates the given bounding volume so that it encloses the spatial
+         * extent of the static mesh in world space.
+         *
+         * \param volume The bounding volume to extend
+         */
+        void ExtendBoundingVolume(Volume<float>& volume) override;
+
+    protected:
+
+        /**
+         * \brief Emits a static mesh render record to the render queue
+         *
+         * This method is responsible for submitting a fully prepared
+         * StaticMeshRecordInfo to the given RenderQueue.
+         *
+         * It is designed as an extension point for derived classes that may
+         * want to alter how records are emitted (e.g. modify material parameters,
+         * adjust sorting keys, inject additional data, or redirect to another
+         * render record type).
+         *
+         * The default implementation forwards the record to the queue using
+         * the provided sorting key.
+         *
+         * \param queue The render queue that will receive the record.
+         * \param staticMeshRecordInfo The fully populated mesh record to emit.
+         * \param shadingMode The shading mode associated with this emission.
+         * \param sortingKey The sorting key used to order the record within the queue.
+         */
+        virtual void EmitRecord(RenderQueue& queue, const StaticMeshRecordInfo& staticMeshRecordInfo, Material::ShadingMode shadingMode, Uint64 sortingKey);
+
+    private:
+
+        struct Geometry
+        {
+            unsigned int Count = 0;
+            unsigned int FirstVertex = 0;
+            unsigned int FirstIndex = 0;
+            Renderer::PrimitiveTopology PrimitiveTopology = Renderer::PrimitiveTopology::Triangle;
+        };
+
+        SharedPtr<Mesh> mMesh;
+        SharedPtr<VertexBuffer> mVertexBuffer;
+        SharedPtr<IndexBuffer> mIndexBuffer;
+        HashSet<SharedPtr<Material>> mMaterials;
+        HashMap<const Material*, Array<Geometry>> mGeometries;
+    };
+}
+
+#endif // COCKTAIL_GRAPHIC_SCENE_SHAPE_STATICMESHSHAPE_HPP

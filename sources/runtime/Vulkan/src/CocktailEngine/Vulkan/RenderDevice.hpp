@@ -1,0 +1,364 @@
+#ifndef COCKTAILENGINE_VULKAN_RENDERDEVICE_HPP
+#define COCKTAILENGINE_VULKAN_RENDERDEVICE_HPP
+
+#include <CocktailEngine/Core/Application/ServiceContainer.hpp>
+#include <CocktailEngine/Core/Memory/SharedFromThis.hpp>
+#include <CocktailEngine/Core/Utility/EnumMap.hpp>
+#include <CocktailEngine/Core/Utility/ObjectPool.hpp>
+
+#include <CocktailEngine/Renderer/RenderDevice.hpp>
+#include <CocktailEngine/Renderer/Command/CommandListCreateInfo.hpp>
+
+#include <CocktailEngine/Vulkan/ExtensionManager.hpp>
+#include <CocktailEngine/Vulkan/RenderDeviceCreateInfo.hpp>
+#include <CocktailEngine/Vulkan/Queue/QueueFamilyContext.hpp>
+
+namespace Ck::Vulkan
+{
+	class CommandListPool;
+	class Buffer;
+	class BufferView;
+	class CommandList;
+	class ComputePipeline;
+	struct ComputePipelineCreateInfo;
+	class DescriptorPool;
+	struct DescriptorPoolCreateInfo;
+	class DescriptorSetAllocator;
+	class DescriptorSetLayout;
+	struct DescriptorSetLayoutCreateInfo;
+	class DescriptorUpdateTemplate;
+	struct DescriptorUpdateTemplateCreateInfo;
+	class DeviceMemory;
+	struct DeviceMemoryCreateInfo;
+	class Fence;
+	class Framebuffer;
+	class GraphicPipeline;
+	struct GraphicPipelineCreateInfo;
+	class PipelineCache;
+	class PipelineLayout;
+	struct PipelineLayoutCreateInfo;
+	class RenderBuffer;
+	struct RenderBufferCreateInfo;
+	class RenderContext;
+	class RenderPass;
+	struct RenderPassCreateInfo;
+	class RenderSurface;
+	class Sampler;
+	class Semaphore;
+	struct SemaphoreCreateInfo;
+	class Shader;
+	class ShaderProgram;
+	class Swapchain;
+	struct SwapchainCreateInfo;
+	class Texture;
+	class TextureView;
+
+	/**
+	 * \brief 
+	 */
+	class RenderDevice : public Renderer::RenderDevice, public ServiceContainer, public SharedFromThis<RenderDevice>
+	{
+	public:
+
+		/**
+		 * \brief 
+		 */
+		static constexpr unsigned int MaxParallelRenderContext = 1;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 */
+		explicit RenderDevice(const RenderDeviceCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 */
+		~RenderDevice() override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Buffer> CreateBuffer(const Renderer::BufferCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::BufferView> CreateBufferView(const Renderer::BufferViewCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param pool 
+		 * \param descriptorSetAllocator 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<CommandList> CreateCommandList(SharedPtr<CommandListPool> pool, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo);
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		SharedPtr<ComputePipeline> CreateComputePipeline(const PipelineCache* pipelineCache, const ComputePipelineCreateInfo& createInfo);
+
+		/**
+		 * \brief
+		 * \param createInfo
+		 * \return
+		 */
+		SharedPtr<DescriptorPool> CreateDescriptorPool(const DescriptorPoolCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<DescriptorSetLayout> CreateDescriptorSetLayout(const DescriptorSetLayoutCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<DescriptorUpdateTemplate> CreateDescriptorUpdateTemplate(const DescriptorUpdateTemplateCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<DeviceMemory> CreateDeviceMemory(const DeviceMemoryCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Fence> CreateFence(const Renderer::FenceCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Framebuffer> CreateFramebuffer(const Renderer::FramebufferCreateInfo& createInfo) override;
+
+		/**
+		 * \brief
+		 * \param renderPass
+		 * \param createInfo
+		 * \return
+		 */
+		SharedPtr<Renderer::Framebuffer> CreateFramebuffer(SharedPtr<RenderPass> renderPass, const Renderer::FramebufferCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		SharedPtr<GraphicPipeline> CreateGraphicPipeline(const PipelineCache* pipelineCache, const GraphicPipelineCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<PipelineLayout> CreatePipelineLayout(const PipelineLayoutCreateInfo& createInfo);
+
+		/**
+		 * \brief
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<RenderBuffer> CreateRenderBuffer(const RenderBufferCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::RenderContext> CreateRenderContext(const Renderer::RenderContextCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::RenderSurface> CreateRenderSurface(const Renderer::RenderSurfaceCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<RenderPass> CreateRenderPass(const RenderPassCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Sampler> CreateSampler(const Renderer::SamplerCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Semaphore> CreateSemaphore(const SemaphoreCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Shader> CreateShader(const Renderer::ShaderCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::ShaderProgram> CreateShaderProgram(const Renderer::ShaderProgramCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Swapchain> CreateSwapchain(const SwapchainCreateInfo& createInfo);
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Texture> CreateTexture(const Renderer::TextureCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \param createInfo 
+		 * \return 
+		 */
+		SharedPtr<Renderer::TextureView> CreateTextureView(const Renderer::TextureViewCreateInfo& createInfo) override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		const QueueFamilyContext& GetQueueFamilyContext() const;
+
+		/**
+		 * \brief 
+		 * \param feature 
+		 * \return 
+		 */
+		bool IsFeatureSupported(RenderDeviceFeature feature) const;
+
+		/**
+		 * \brief 
+		 * \param extension 
+		 * \return 
+		 */
+		bool IsExtensionSupported(Renderer::RenderDeviceExtension extension) const override;
+
+		/**
+		 * \brief 
+		 * \param format 
+		 * \param memoryType 
+		 * \return 
+		 */
+		Renderer::TextureUsageFlags GetTextureFormatSupport(const PixelFormat& format, Renderer::MemoryType memoryType) const override;
+
+        /**
+         * \brief
+         * \param fragmentSize
+         * \param samples
+         * \return
+         */
+	    bool IsShadingRateSupported(Extent2D<unsigned int> fragmentSize, Renderer::RasterizationSamples samples) override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Signal<LogLevel, Renderer::MessageType, AsciiStringView>& OnDebugMessage() override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		VkInstance GetInstanceHandle() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		VkPhysicalDevice GetPhysicalDeviceHandle() const;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		VkDevice GetHandle() const;
+
+	private:
+
+		/**
+		 * \brief 
+		 * \param applicationName 
+		 * \param applicationVersion 
+		 * \param apiVersion 
+		 * \param enableValidationLayer 
+		 */
+		void CreateInstance(AsciiStringView applicationName, const VersionDescriptor& applicationVersion, VulkanApiVersion apiVersion, bool enableValidationLayer);
+
+		/**
+		 * \brief 
+		 */
+		void ChoosePhysicalDevice();
+
+		/**
+		 * \brief 
+		 */
+		void CreateDevice();
+
+		ExtensionManager mExtensionManager;
+		VkAllocationCallbacks mAllocationCallbacks;
+		VkInstance mInstance;
+		VkPhysicalDevice mPhysicalDevice;
+		UniquePtr<QueueFamilyContext> mQueueFamilyContext;
+		VkDevice mHandle;
+		ObjectPool<Buffer> mBufferPool;
+		ObjectPool<BufferView> mBufferViewPool;
+		ObjectPool<CommandList> mCommandListPool;
+		ObjectPool<ComputePipeline> mComputePipelinePool;
+		ObjectPool<DescriptorPool> mDescriptorPoolPool;
+		ObjectPool<DescriptorSetLayout> mDescriptorSetLayoutPool;
+		ObjectPool<DescriptorUpdateTemplate> mDescriptorUpdateTemplatePool;
+		ObjectPool<DeviceMemory> mDeviceMemoryPool;
+		ObjectPool<Fence> mFencePool;
+		ObjectPool<Framebuffer> mFramebufferPool;
+		ObjectPool<GraphicPipeline> mGraphicPipelinePool;
+		ObjectPool<PipelineLayout> mPipelineLayoutPool;
+		ObjectPool<RenderBuffer> mRenderBufferPool;
+		ObjectPool<RenderContext> mRenderContextPool;
+		ObjectPool<RenderPass> mRenderPassPool;
+		ObjectPool<RenderSurface> mRenderSurfacePool;
+		ObjectPool<Sampler> mSamplerPool;
+		ObjectPool<Semaphore> mSemaphorePool;
+		ObjectPool<Shader> mShaderPool;
+		ObjectPool<ShaderProgram> mShaderProgramPool;
+		ObjectPool<Swapchain> mSwapchainPool;
+		ObjectPool<Texture> mTexturePool;
+		ObjectPool<TextureView> mTextureViewPool;
+		EnumMap<RenderDeviceFeature, bool> mSupportedFeatures;
+		EnumMap<Renderer::RenderDeviceExtension, bool> mSupportedExtensions;
+		Signal<LogLevel, Renderer::MessageType, AsciiStringView> mOnDebugMessage;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_RENDERDEVICE_HPP

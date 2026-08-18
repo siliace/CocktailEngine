@@ -1,0 +1,68 @@
+#ifndef COCKTAILENGINE_CORE_SYSTEM_WINDOW_WIN32_WINDOWFACTORY_HPP
+#define COCKTAILENGINE_CORE_SYSTEM_WINDOW_WIN32_WINDOWFACTORY_HPP
+
+#include <CocktailEngine/Core/System/Win32/Windows.hpp>
+#include <CocktailEngine/Core/System/Window/WindowFactory.hpp>
+#include <CocktailEngine/Core/System/Window/Win32/WindowClass.hpp>
+#include <CocktailEngine/Core/Utility/EnumMap.hpp>
+
+namespace Ck::Detail::Win32
+{
+	/**
+	 * \brief 
+	 */
+	class WindowFactory final : public Ck::WindowFactory
+	{
+	public:
+
+		/**
+		 * \brief 
+		 */
+		explicit WindowFactory(HINSTANCE instanceHandle);
+		
+		/**
+		 * \brief
+		 *
+		 * \param image
+		 * \param hotspot
+		 *
+		 * \return 
+		 */
+		UniquePtr<Ck::ImageCursor> CreateCursor(const Image& image, const Extent2D<unsigned int>& hotspot) override;
+
+		/**
+		 * \brief
+		 *
+		 * \param createInfo
+		 *
+		 * \return 
+		 */
+		UniquePtr<Ck::Window> CreateWindow(const WindowCreateInfo& createInfo) override;
+
+		/**
+		 * \brief
+		 *
+		 * \param type
+		 *
+		 * \return 
+		 */
+		Ck::SystemCursor* LoadSystemCursor(SystemCursorType type) override;
+
+		/**
+		 * \brief Tell whether a SystemCursorType is supported
+		 *
+		 * \param systemCursorType The cursor type to test
+		 *
+		 * \return True if supported, false otherwise
+		 */
+		bool IsSystemCursorSupported(SystemCursorType systemCursorType) const override;
+
+	private:
+
+		HINSTANCE mInstanceHandle;
+		WindowClass mWindowClass;
+		EnumMap<SystemCursorType, UniquePtr<Ck::SystemCursor>> mSystemCursors;
+	};
+}
+
+#endif // COCKTAILENGINE_CORE_SYSTEM_WINDOW_WIN32_WINDOWFACTORY_HPP

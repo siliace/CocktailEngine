@@ -1,0 +1,67 @@
+#include <CocktailEngine/Vulkan/Buffer/Buffer.hpp>
+#include <CocktailEngine/Vulkan/Memory/DeviceMemory.hpp>
+#include <CocktailEngine/Vulkan/RenderDevice.hpp>
+#include <CocktailEngine/Vulkan/Texture/AbstractTexture.hpp>
+#include <CocktailEngine/Vulkan/VulkanUtils.hpp>
+
+namespace Ck::Vulkan
+{
+	DeviceMemory::DeviceMemory(RenderDevice* renderDevice, const DeviceMemoryCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks):
+		mRenderDevice(renderDevice),
+		mAllocationCallbacks(allocationCallbacks),
+		mHandle(VK_NULL_HANDLE),
+		mSize(createInfo.Size)
+	{
+		VkMemoryDedicatedAllocateInfoKHR dedicatedAllocateInfo{ VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR, nullptr };
+		{
+			dedicatedAllocateInfo.image = createInfo.TextureResource ? createInfo.TextureResource->GetHandle() : VK_NULL_HANDLE;
+			dedicatedAllocateInfo.buffer = createInfo.BufferResource ? createInfo.BufferResource->GetHandle() : VK_NULL_HANDLE;
+		}
+
+	    VkMemoryPriorityAllocateInfoEXT memoryPriority{ VK_STRUCTURE_TYPE_MEMORY_PRIORITY_ALLOCATE_INFO_EXT, nullptr };
+		{
+		    memoryPriority.priority = createInfo.Priority;
+		}
+
+		VkMemoryAllocateInfo allocateInfo{ VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, nullptr };
+		{
+			if (createInfo.Dedicated && mRenderDevice->IsFeatureSupported(RenderDeviceFeature::DedicatedAllocation))
+				Chain(allocateInfo, dedicatedAllocateInfo);
+
+		    if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::MemoryPriority))
+		        Chain(allocateInfo, memoryPriority);
+
+			allocateInfo.allocationSize = createInfo.Size;
+			allocateInfo.memoryTypeIndex = createInfo.MemoryTypeIndex;
+		}
+
+		COCKTAIL_VK_CHECK(vkAllocateMemory(mRenderDevice->GetHandle(), &allocateInfo, mAllocationCallbacks, &mHandle));
+	}
+
+	DeviceMemory::~DeviceMemory()
+	{
+		vkFreeMemory(mRenderDevice->GetHandle(), mHandle, mAllocationCallbacks);
+	}
+
+	void DeviceMemory::SetObjectName(const char* name) const
+	{
+		VkDebugUtilsObjectNameInfoEXT objectNameInfo{ VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT, nullptr };
+		{
+			objectNameInfo.objectType = VK_OBJECT_TYPE_DEVICE_MEMORY;
+			objectNameInfo.objectHandle = reinterpret_cast<Uint64>(mHandle);
+			objectNameInfo.pObjectName = name;
+		}
+
+		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
+	}
+
+	Renderer::RenderDevice* DeviceMemory::GetRenderDevice() const
+	{
+		return mRenderDevice;
+	}
+
+	VkDeviceMemory DeviceMemory::GetHandle() const
+	{
+		return mHandle;
+	}
+}
