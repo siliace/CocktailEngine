@@ -1,0 +1,1572 @@
+#include <CocktailEngine/Core/Memory/Allocator/SizedLinearAllocator.hpp>
+
+#include <CocktailEngine/Vulkan/RenderDevice.hpp>
+#include <CocktailEngine/Vulkan/VulkanUtils.hpp>
+#include <CocktailEngine/Vulkan/Buffer/Buffer.hpp>
+#include <CocktailEngine/Vulkan/Command/CommandList.hpp>
+#include <CocktailEngine/Vulkan/Command/Allocator/CommandListPool.hpp>
+#include <CocktailEngine/Vulkan/DescriptorSet/DescriptorUpdateTemplate.hpp>
+#include <CocktailEngine/Vulkan/Framebuffer/DepthResolver.hpp>
+#include <CocktailEngine/Vulkan/Framebuffer/Framebuffer.hpp>
+#include <CocktailEngine/Vulkan/Framebuffer/RenderPass.hpp>
+#include <CocktailEngine/Vulkan/Pipeline/Pipeline.hpp>
+#include <CocktailEngine/Vulkan/Pipeline/State/ComputeStateManager.hpp>
+#include <CocktailEngine/Vulkan/Pipeline/State/GraphicStateManager.hpp>
+#include <CocktailEngine/Vulkan/Shader/ShaderProgram.hpp>
+#include <CocktailEngine/Vulkan/Shader/UniformSlot.hpp>
+#include <CocktailEngine/Vulkan/Texture/Sampler.hpp>
+#include <CocktailEngine/Vulkan/Texture/Texture.hpp>
+#include <CocktailEngine/Vulkan/Texture/TextureView.hpp>
+
+namespace Ck::Vulkan
+{
+	namespace
+	{
+		VkImageLayout GetResourceStateImageLayout(Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			default:
+			case Renderer::ResourceState::Undefined:
+				return VK_IMAGE_LAYOUT_UNDEFINED;
+
+			case Renderer::ResourceState::General:
+				return VK_IMAGE_LAYOUT_GENERAL;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkAccessFlags GetSourceResourceStateAccess(Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkAccessFlags2 GetSourceResourceStateAccess2(Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_WRITE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_ACCESS_2_SHADER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopySource:
+			    return VK_ACCESS_2_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+			    return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkAccessFlags GetDestinationResourceStateAccess(Renderer::CommandListUsageBits usage, Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT : VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_SHADER_READ_BIT : 0;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT : 0;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_INDEX_READ_BIT : 0;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_UNIFORM_READ_BIT : 0;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkAccessFlags2 GetDestinationResourceStateAccess2(Renderer::CommandListUsageBits usage, Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return 0;
+
+			case Renderer::ResourceState::General:
+				return VK_ACCESS_2_MEMORY_READ_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT_KHR : VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT_KHR;
+
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_SHADER_READ_BIT : VK_ACCESS_2_NONE_KHR;
+
+			case Renderer::ResourceState::CopySource:
+				return VK_ACCESS_2_TRANSFER_WRITE_BIT;
+
+			case Renderer::ResourceState::CopyDestination:
+				return VK_ACCESS_2_TRANSFER_READ_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT : VK_ACCESS_2_NONE_KHR;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return usage == Renderer::CommandListUsageBits::Graphic ? VK_ACCESS_2_INDEX_READ_BIT : VK_ACCESS_2_NONE_KHR;
+
+			case Renderer::ResourceState::UniformBuffer:
+				return usage != Renderer::CommandListUsageBits::Transfer ? VK_ACCESS_2_UNIFORM_READ_BIT : VK_ACCESS_2_NONE_KHR;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkPipelineStageFlags GetResourceStatePipelineStage(Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT : VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+
+			case Renderer::ResourceState::General:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+
+			case Renderer::ResourceState::CopySource:
+			case Renderer::ResourceState::CopyDestination:
+				return VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+			case Renderer::ResourceState::VertexBuffer:
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_PIPELINE_STAGE_VERTEX_INPUT_BIT;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkPipelineStageFlags2 GetResourceStatePipelineStage2(Renderer::ResourceState resourceState, const PixelFormat& format)
+		{
+			switch (resourceState)
+			{
+			case Renderer::ResourceState::Undefined:
+				return VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT;
+
+			case Renderer::ResourceState::FramebufferAttachment:
+				return format.IsColor() ? VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR : VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT_KHR;
+
+			case Renderer::ResourceState::General:
+			case Renderer::ResourceState::UniformBuffer:
+			case Renderer::ResourceState::GraphicShaderResource:
+			case Renderer::ResourceState::ComputeShaderResource:
+				return VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT_KHR;
+
+			case Renderer::ResourceState::CopySource:
+			case Renderer::ResourceState::CopyDestination:
+				return VK_PIPELINE_STAGE_2_TRANSFER_BIT_KHR;
+
+			case Renderer::ResourceState::VertexBuffer:
+				return VK_PIPELINE_STAGE_2_VERTEX_INPUT_BIT_KHR;
+
+			case Renderer::ResourceState::IndexBuffer:
+				return VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT_KHR;
+			}
+
+			COCKTAIL_UNREACHABLE();
+			return {};
+		}
+
+		VkImageSubresourceRange GetImageSubResourceRange(const PixelFormat& pixelFormat, const Renderer::TextureSubResource& subResource)
+		{
+			VkImageSubresourceRange subresourceRange;
+			if (pixelFormat.IsColor())
+			{
+				subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			}
+			else
+			{
+				subresourceRange.aspectMask = 0;
+				if (pixelFormat.IsDepth() || pixelFormat.IsDepthStencil())
+					subresourceRange.aspectMask |= VK_IMAGE_ASPECT_DEPTH_BIT;
+
+				if (pixelFormat.IsStencil() || pixelFormat.IsDepthStencil())
+					subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+
+			subresourceRange.baseMipLevel = subResource.BaseMipMapLevel;
+			subresourceRange.levelCount = subResource.MipMapLevelCount;
+			subresourceRange.baseArrayLayer = subResource.BaseArrayLayer;
+			subresourceRange.layerCount = subResource.ArrayLayerCount;
+
+			return subresourceRange;
+		}
+
+		template <typename T>
+		void PopulateBufferMemoryBarrier(Renderer::CommandListUsageBits usage, const QueueFamilyContext& queueFamilyContext, T& bufferMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		{
+			Renderer::ResourceState oldState = barrier.BufferBarrier.OldState;
+			Renderer::ResourceState newState = barrier.BufferBarrier.NewState;
+			const Renderer::Buffer* resource = barrier.BufferBarrier.Resource;
+
+			if constexpr (std::is_same_v<T, VkBufferMemoryBarrier2KHR>)
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(usage, newState, PixelFormat::Undefined());
+			}
+			else
+			{
+				bufferMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, PixelFormat::Undefined());
+				bufferMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(usage, newState, PixelFormat::Undefined());
+			}
+
+			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
+			{
+				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
+				Renderer::CommandQueueType destinationQueue = queueTransfer->DestinationQueueType;
+
+				if (!queueFamilyContext.IsUnified() && sourceQueue != destinationQueue)
+				{
+					bufferMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(sourceQueue).GetIndex();
+					bufferMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(destinationQueue).GetIndex();
+				}
+				else
+				{
+					bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+					bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				}
+			}
+			else
+			{
+				bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			}
+			bufferMemoryBarrier.buffer = static_cast<const Buffer*>(resource)->GetHandle();
+			bufferMemoryBarrier.offset = barrier.BufferBarrier.Offset;
+			bufferMemoryBarrier.size = barrier.BufferBarrier.Size;
+		}
+
+		template <typename T>
+		void PopulateImageMemoryBarrier(Renderer::CommandListUsageBits usage, const QueueFamilyContext& queueFamilyContext, T& imageMemoryBarrier, const Renderer::GpuBarrier& barrier)
+		{
+			Renderer::ResourceState oldState = barrier.TextureBarrier.OldState;
+			Renderer::ResourceState newState = barrier.TextureBarrier.NewState;
+			const Renderer::Texture* resource = barrier.TextureBarrier.Resource;
+
+			if constexpr (std::is_same_v<T, VkImageMemoryBarrier2KHR>)
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess2(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess2(usage, newState, resource->GetFormat());
+			}
+			else
+			{
+				imageMemoryBarrier.srcAccessMask = GetSourceResourceStateAccess(oldState, resource->GetFormat());
+				imageMemoryBarrier.dstAccessMask = GetDestinationResourceStateAccess(usage, newState, resource->GetFormat());
+			}
+
+			imageMemoryBarrier.oldLayout = GetResourceStateImageLayout(oldState, resource->GetFormat());
+			imageMemoryBarrier.newLayout = GetResourceStateImageLayout(newState, resource->GetFormat());
+			if (Renderer::ResourceQueueTransfer* queueTransfer = barrier.QueueTransfer)
+			{
+				Renderer::CommandQueueType sourceQueue = queueTransfer->SourceQueueType;
+				Renderer::CommandQueueType destinationQueue = queueTransfer->DestinationQueueType;
+
+				if (!queueFamilyContext.IsUnified() && sourceQueue != destinationQueue)
+				{
+					imageMemoryBarrier.srcQueueFamilyIndex = queueFamilyContext.GetFamily(sourceQueue).GetIndex();
+					imageMemoryBarrier.dstQueueFamilyIndex = queueFamilyContext.GetFamily(destinationQueue).GetIndex();
+				}
+				else
+				{
+					imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+					imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				}
+			}
+			else
+			{
+				imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			}
+			imageMemoryBarrier.image = static_cast<const AbstractTexture*>(resource)->GetHandle();
+			imageMemoryBarrier.subresourceRange = GetImageSubResourceRange(resource->GetFormat(), barrier.TextureBarrier.SubResource);
+		}
+	}
+
+	CommandList::CommandList(RenderDevice* renderDevice, SharedPtr<CommandListPool> allocator, DescriptorSetAllocator* descriptorSetAllocator, const Renderer::CommandListCreateInfo& createInfo) :
+		mRenderDevice(renderDevice),
+		mAllocator(Move(allocator)),
+		mHandle(VK_NULL_HANDLE),
+		mSecondary(createInfo.Secondary),
+		mState(Renderer::CommandListState::Initial),
+		mUsage(createInfo.Usage),
+		mCurrentFramebuffer(nullptr)
+	{
+		Renderer::CommandQueueType queueType = SelectQueueForUsage(mUsage);
+
+		VkCommandBufferAllocateInfo allocateInfo{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, nullptr };
+		{
+			allocateInfo.commandPool = mAllocator->GetCommandPool(queueType)->GetHandle();
+			allocateInfo.level = !createInfo.Secondary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+			allocateInfo.commandBufferCount = 1;
+		}
+
+		COCKTAIL_VK_CHECK(vkAllocateCommandBuffers(mRenderDevice->GetHandle(), &allocateInfo, &mHandle));
+
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
+		{
+			mStateManagers[Renderer::ShaderProgramType::Compute] = MakeUnique<ComputeStateManager>(mRenderDevice, descriptorSetAllocator);
+
+			if (mUsage == Renderer::CommandListUsageBits::Graphic)
+				mStateManagers[Renderer::ShaderProgramType::Graphic] = MakeUnique<GraphicStateManager>(mRenderDevice, descriptorSetAllocator);
+		}
+
+		mOneShot = mAllocator->IsTransient();
+
+		CommandList::SetObjectName(createInfo.Name);
+	}
+
+	CommandList::~CommandList()
+	{
+		DisconnectAll();
+
+		Renderer::CommandQueueType queueType = SelectQueueForUsage(mUsage);
+		vkFreeCommandBuffers(mRenderDevice->GetHandle(), mAllocator->GetCommandPool(queueType)->GetHandle(), 1, &mHandle);
+	}
+
+	void CommandList::SetObjectName(const char* name) const
+	{
+		VkDebugUtilsObjectNameInfoEXT objectNameInfo{ VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT, nullptr };
+		{
+			objectNameInfo.objectType = VK_OBJECT_TYPE_COMMAND_BUFFER;
+			objectNameInfo.objectHandle = reinterpret_cast<Uint64>(mHandle);
+			objectNameInfo.pObjectName = name;
+		}
+
+		COCKTAIL_VK_CHECK(vkSetDebugUtilsObjectNameEXT(mRenderDevice->GetHandle(), &objectNameInfo));
+	}
+
+	Renderer::RenderDevice* CommandList::GetRenderDevice() const
+	{
+		return mRenderDevice;
+	}
+
+	void CommandList::Begin(Renderer::CommandList* primary)
+	{
+		assert(mState == Renderer::CommandListState::Initial);
+
+		VkCommandBufferInheritanceInfo inheritanceInfo{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO, nullptr };
+		{
+			if (mSecondary && primary)
+			{
+				const Framebuffer* framebuffer = static_cast<CommandList*>(primary)->mCurrentFramebuffer;
+				inheritanceInfo.renderPass = framebuffer ? framebuffer->GetRenderPass()->GetHandle(Renderer::RenderPassMode::Initial) : VK_NULL_HANDLE;
+				inheritanceInfo.framebuffer = framebuffer ? framebuffer->GetHandle() : VK_NULL_HANDLE;
+			}
+			else
+			{
+				inheritanceInfo.renderPass = VK_NULL_HANDLE;
+				inheritanceInfo.framebuffer = VK_NULL_HANDLE;
+			}
+
+			inheritanceInfo.subpass = 0;
+			inheritanceInfo.occlusionQueryEnable = false;
+			inheritanceInfo.queryFlags = {};
+			inheritanceInfo.pipelineStatistics = {};
+		}
+
+		VkCommandBufferBeginInfo beginInfo{ VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, nullptr };
+		{
+			beginInfo.flags = 0;
+			if (mOneShot)
+				beginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+			beginInfo.pInheritanceInfo = mSecondary ? &inheritanceInfo : nullptr;
+		}
+
+		COCKTAIL_VK_CHECK(vkBeginCommandBuffer(mHandle, &beginInfo));
+
+		mState = Renderer::CommandListState::Recording;
+	    
+        const bool isGraphic  = mUsage == Renderer::CommandListUsageBits::Graphic;
+	    const bool isVsrSupported = mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::VariableShadingRate);
+	    if (isGraphic && isVsrSupported)
+	    {
+            Extent2D<unsigned int> fragmentSize = MakeExtent(1u, 1u);
+	        SetShadingRate(fragmentSize, Renderer::ShadingRateCombiner::Keep, Renderer::ShadingRateCombiner::Keep);
+	    }
+	}
+
+	void CommandList::End()
+	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
+		if (mState == Renderer::CommandListState::RecordingRenderPass)
+			EndRenderPass();
+
+		mState = Renderer::CommandListState::Executable;
+
+		COCKTAIL_VK_CHECK(vkEndCommandBuffer(mHandle));
+	}
+
+	void CommandList::Barrier(unsigned int barrierCount, const Renderer::GpuBarrier* barriers)
+	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
+		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::Synchronization2))
+		{
+			unsigned int memoryBarrierCount = 0;
+			VkMemoryBarrier2KHR* memoryBarriers = COCKTAIL_STACK_ALLOC(VkMemoryBarrier2KHR, barrierCount);
+
+			unsigned int bufferMemoryBarrierCount = 0;
+			VkBufferMemoryBarrier2KHR* bufferMemoryBarriers = COCKTAIL_STACK_ALLOC(VkBufferMemoryBarrier2KHR, barrierCount);
+
+			unsigned int imageMemoryBarrierCount = 0;
+			VkImageMemoryBarrier2KHR* imageMemoryBarriers = COCKTAIL_STACK_ALLOC(VkImageMemoryBarrier2KHR, barrierCount);
+
+			VkDependencyInfoKHR dependencyInfo{ VK_STRUCTURE_TYPE_DEPENDENCY_INFO_KHR, nullptr };
+			{
+				for (unsigned int i = 0; i < barrierCount; i++)
+				{
+					const Renderer::GpuBarrier& barrier = barriers[i];
+					if (barrier.Type == Renderer::GpuBarrierType::Memory)
+					{
+						VkMemoryBarrier2KHR memoryBarrier{ VK_STRUCTURE_TYPE_MEMORY_BARRIER_2_KHR, nullptr };
+						memoryBarrier.srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+						memoryBarrier.srcAccessMask = VK_ACCESS_2_MEMORY_WRITE_BIT;
+						memoryBarrier.dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+						memoryBarrier.dstAccessMask = VK_ACCESS_2_MEMORY_READ_BIT;
+
+						memoryBarriers[memoryBarrierCount] = memoryBarrier;
+						memoryBarrierCount++;
+					}
+					else if (barrier.Type == Renderer::GpuBarrierType::Buffer)
+					{
+						Renderer::ResourceState oldState = barrier.BufferBarrier.OldState;
+						Renderer::ResourceState newState = barrier.BufferBarrier.NewState;
+
+						VkBufferMemoryBarrier2KHR bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2_KHR, nullptr };
+						PopulateBufferMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
+						bufferMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, PixelFormat::Undefined());
+						bufferMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, PixelFormat::Undefined());
+
+						bufferMemoryBarriers[bufferMemoryBarrierCount] = bufferMemoryBarrier;
+						bufferMemoryBarrierCount++;
+					}
+					else if (barrier.Type == Renderer::GpuBarrierType::Texture)
+					{
+						const Renderer::Texture* resource = barrier.TextureBarrier.Resource;
+						Renderer::ResourceState oldState = barrier.TextureBarrier.OldState;
+						Renderer::ResourceState newState = barrier.TextureBarrier.NewState;
+
+						VkImageMemoryBarrier2KHR imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2_KHR, nullptr };
+						PopulateImageMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
+						imageMemoryBarrier.srcStageMask = GetResourceStatePipelineStage2(oldState, resource->GetFormat());
+						imageMemoryBarrier.dstStageMask = GetResourceStatePipelineStage2(newState, resource->GetFormat());
+
+						imageMemoryBarriers[imageMemoryBarrierCount] = imageMemoryBarrier;
+						imageMemoryBarrierCount++;
+					}
+				}
+
+				dependencyInfo.dependencyFlags = 0;
+				dependencyInfo.memoryBarrierCount = memoryBarrierCount;
+				dependencyInfo.pMemoryBarriers = memoryBarriers;
+				dependencyInfo.bufferMemoryBarrierCount = bufferMemoryBarrierCount;
+				dependencyInfo.pBufferMemoryBarriers = bufferMemoryBarriers;
+				dependencyInfo.imageMemoryBarrierCount = imageMemoryBarrierCount;
+				dependencyInfo.pImageMemoryBarriers = imageMemoryBarriers;
+			}
+
+			vkCmdPipelineBarrier2KHR(mHandle, &dependencyInfo);
+		}
+		else
+		{
+			for (unsigned int i = 0; i < barrierCount; i++)
+			{
+				const Renderer::GpuBarrier& barrier = barriers[i];
+				if (barrier.Type == Renderer::GpuBarrierType::Memory)
+				{
+					VkMemoryBarrier memoryBarrier{ VK_STRUCTURE_TYPE_MEMORY_BARRIER, nullptr };
+					memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
+					memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+
+					vkCmdPipelineBarrier(mHandle,
+						VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+						0,
+						1, &memoryBarrier,
+						0, nullptr,
+						0, nullptr
+					);
+				}
+				else if (barrier.Type == Renderer::GpuBarrierType::Buffer)
+				{
+					VkBufferMemoryBarrier bufferMemoryBarrier{ VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER, nullptr };
+					PopulateBufferMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), bufferMemoryBarrier, barrier);
+
+				    VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.BufferBarrier.OldState, PixelFormat::Undefined());
+				    VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.BufferBarrier.NewState, PixelFormat::Undefined());
+
+					vkCmdPipelineBarrier(mHandle,
+						sourceStages, destinationStages,
+						0,
+						0, nullptr,
+						1, &bufferMemoryBarrier,
+						0, nullptr
+					);
+				}
+				else if (barrier.Type == Renderer::GpuBarrierType::Texture)
+				{
+					const Renderer::Texture* resource = barrier.TextureBarrier.Resource;
+
+					VkImageMemoryBarrier imageMemoryBarrier{ VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER, nullptr };
+					PopulateImageMemoryBarrier(mUsage, mRenderDevice->GetQueueFamilyContext(), imageMemoryBarrier, barrier);
+
+					VkPipelineStageFlags sourceStages = GetResourceStatePipelineStage(barrier.TextureBarrier.OldState, resource->GetFormat());
+					VkPipelineStageFlags destinationStages = GetResourceStatePipelineStage(barrier.TextureBarrier.NewState, resource->GetFormat());
+
+					vkCmdPipelineBarrier(mHandle,
+						sourceStages, destinationStages,
+						0,
+						0, nullptr,
+						0, nullptr,
+						1, &imageMemoryBarrier
+					);
+				}
+			}
+		}
+	}
+
+	void CommandList::GenerateMipMaps(const Renderer::Texture* texture, Renderer::ResourceState resourceState, const Renderer::TextureSubResource& subResource)
+	{
+		assert(subResource.BaseMipMapLevel > 0);
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(subResource.BaseMipMapLevel + subResource.MipMapLevelCount <= texture->GetMipMapCount());
+		assert(subResource.BaseArrayLayer + subResource.ArrayLayerCount <= texture->GetArrayLayerCount());
+
+		const Texture* vkTexture = static_cast<const Texture*>(texture);
+
+		auto rootSubResource = Renderer::TextureSubResource::AllLayersOneLevel(*texture, subResource.BaseMipMapLevel - 1);
+
+		Renderer::GpuBarrier preBarriers[] = {
+			Renderer::GpuBarrier::Of(texture, resourceState, Renderer::ResourceState::General, rootSubResource),
+			Renderer::GpuBarrier::Of(texture, Renderer::ResourceState::Undefined, Renderer::ResourceState::General, subResource)
+		};
+		Barrier(2, preBarriers);
+
+		VkFormatProperties formatProperties;
+		vkGetPhysicalDeviceFormatProperties(mRenderDevice->GetPhysicalDeviceHandle(), ToVkType(vkTexture->GetFormat()), &formatProperties);
+		if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)
+		{
+			int mipWidth = vkTexture->GetSize().Width;
+			int mipHeight = vkTexture->GetSize().Height;
+			int mipDepth = vkTexture->GetSize().Depth;
+
+		    for (unsigned int level = subResource.BaseMipMapLevel; level < subResource.BaseMipMapLevel + subResource.MipMapLevelCount; level++)
+			{
+				VkImageBlit* blits = COCKTAIL_STACK_ALLOC(VkImageBlit, subResource.ArrayLayerCount);
+
+				int nextMipWidth = std::max(1, mipWidth / 2);
+				int nextMipHeight = std::max(1, mipHeight / 2);
+				int nextMipDepth = std::max(1, mipDepth / 2);
+
+				for (unsigned int arrayLayer = subResource.BaseArrayLayer; arrayLayer < subResource.ArrayLayerCount; arrayLayer++)
+				{
+					VkImageBlit blit = {};
+					blit.srcOffsets[0] = { 0, 0, 0 };
+					blit.srcOffsets[1] = { mipWidth, mipHeight, mipDepth };
+					blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+					blit.srcSubresource.mipLevel = level - 1;
+					blit.srcSubresource.baseArrayLayer = arrayLayer;
+					blit.srcSubresource.layerCount = 1;
+					blit.dstOffsets[0] = { 0, 0, 0 };
+					blit.dstOffsets[1] = { nextMipWidth, nextMipHeight, nextMipDepth };
+					blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+					blit.dstSubresource.mipLevel = level;
+					blit.dstSubresource.baseArrayLayer = arrayLayer;
+					blit.dstSubresource.layerCount = 1;
+
+					blits[arrayLayer - subResource.BaseArrayLayer] = blit;
+				}
+
+				mipWidth = nextMipWidth;
+				mipHeight = nextMipHeight;
+				mipDepth = nextMipDepth;
+
+				vkCmdBlitImage(
+					mHandle,
+					vkTexture->GetHandle(), VK_IMAGE_LAYOUT_GENERAL,
+					vkTexture->GetHandle(), VK_IMAGE_LAYOUT_GENERAL,
+					subResource.ArrayLayerCount, blits,
+					VK_FILTER_LINEAR
+				);
+			}
+		}
+
+		Renderer::GpuBarrier postBarriers[] = {
+			Renderer::GpuBarrier::Of(texture, Renderer::ResourceState::General, resourceState, rootSubResource),
+			Renderer::GpuBarrier::Of(texture, Renderer::ResourceState::General, resourceState, subResource)
+		};
+		Barrier(2, postBarriers);
+	}
+
+	void CommandList::ExecuteCommandLists(unsigned int commandListCount, Renderer::CommandList** commandLists)
+	{
+		assert(mState == Renderer::CommandListState::Recording || mState == Renderer::CommandListState::RecordingRenderPass);
+
+		VkCommandBuffer* commandBufferHandles = COCKTAIL_STACK_ALLOC(VkCommandBuffer, commandListCount);
+		for (unsigned int i = 0; i < commandListCount; i++)
+		{
+			CommandList* vkCommandList = static_cast<CommandList*>(commandLists[i]);
+			assert(vkCommandList->IsSecondary());
+			assert(vkCommandList->GetUsage() == mUsage);
+			assert(vkCommandList->GetState() == Renderer::CommandListState::Executable);
+
+			commandBufferHandles[i] = vkCommandList->GetHandle();
+		}
+
+		vkCmdExecuteCommands(mHandle, commandListCount, commandBufferHandles);
+	}
+
+	void CommandList::ClearColorTexture(const Renderer::Texture* texture, Renderer::ResourceState state, LinearColor colorClearValue, const Renderer::TextureSubResource& subResource)
+	{
+		assert(texture->GetFormat().IsColor());
+		assert(mState == Renderer::CommandListState::Recording);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(state, texture->GetFormat());
+
+		VkClearColorValue clearColorValue;
+		clearColorValue.float32[0] = colorClearValue.R;
+		clearColorValue.float32[1] = colorClearValue.G;
+		clearColorValue.float32[2] = colorClearValue.B;
+		clearColorValue.float32[3] = colorClearValue.A;
+
+		VkImageSubresourceRange subResourceRange = GetImageSubResourceRange(texture->GetFormat(), subResource);
+		vkCmdClearColorImage(mHandle, static_cast<const Texture*>(texture)->GetHandle(), imageLayout, &clearColorValue, 1, &subResourceRange);
+	}
+
+	void CommandList::ClearDepthStencilTexture(const Renderer::Texture* texture, Renderer::ResourceState state, float depthClearValue, unsigned int stencilCleanValue, const Renderer::TextureSubResource& subResource)
+	{
+		assert(!texture->GetFormat().IsColor());
+		assert(mState == Renderer::CommandListState::Recording);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(state, texture->GetFormat());
+
+		VkClearDepthStencilValue depthStencilValue;
+		depthStencilValue.depth = depthClearValue;
+		depthStencilValue.stencil = stencilCleanValue;
+
+		VkImageSubresourceRange subResourceRange = GetImageSubResourceRange(texture->GetFormat(), subResource);
+		vkCmdClearDepthStencilImage(mHandle, static_cast<const Texture*>(texture)->GetHandle(), imageLayout, &depthStencilValue, 1, &subResourceRange);
+	}
+
+	void CommandList::ClearAttachments(unsigned int firstColorAttachment, unsigned int colorAttachmentCount, LinearColor colorClearValue, float depthClearValue, unsigned int stencilCleanValue)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(firstColorAttachment + colorAttachmentCount < mCurrentFramebuffer->GetColorAttachmentCount());
+
+		const bool hasDepthStencil = mCurrentFramebuffer->GetDepthStencilAttachment() != nullptr;
+		const bool isMultisample = mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1;
+
+	    Array<VkClearAttachment, LinearAllocator<MaxAttachmentClearCount>> clearAttachments;
+		if (colorAttachmentCount)
+		{
+			for (unsigned int i = firstColorAttachment; i < mCurrentFramebuffer->GetColorAttachmentCount(); i++)
+			{
+			    VkClearAttachment& clearAttachment = clearAttachments.Emplace();
+				clearAttachment.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				clearAttachment.colorAttachment = i;
+				clearAttachment.clearValue.color.float32[0] = colorClearValue.R;
+				clearAttachment.clearValue.color.float32[1] = colorClearValue.G;
+				clearAttachment.clearValue.color.float32[2] = colorClearValue.B;
+				clearAttachment.clearValue.color.float32[3] = colorClearValue.A;
+
+				if (isMultisample)
+				    clearAttachments.Add(clearAttachment);
+			}
+		}
+
+		if (hasDepthStencil)
+		{
+		    VkClearAttachment& clearAttachment = clearAttachments.Emplace();
+			clearAttachment.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			clearAttachment.colorAttachment = -1;
+			clearAttachment.clearValue.depthStencil.depth = depthClearValue;
+		    clearAttachment.clearValue.depthStencil.stencil = stencilCleanValue;
+
+		    if (isMultisample)
+		        clearAttachments.Add(clearAttachment);
+		}
+
+	    Array<VkClearRect, LinearAllocator<(Framebuffer::MaxColorAttachmentCount + 1) * 2>> clearRects;
+		for (unsigned int i = 0; i < clearAttachments.GetSize(); i++)
+		{
+		    VkClearRect& clearRect = clearRects.Emplace();
+			clearRect.rect.offset = { 0, 0 };
+			clearRect.rect.extent.width = mCurrentFramebuffer->GetSize().Width;
+			clearRect.rect.extent.height = mCurrentFramebuffer->GetSize().Height;
+			clearRect.baseArrayLayer = 0;
+			clearRect.layerCount = 1;
+		}
+
+		vkCmdClearAttachments(mHandle, clearAttachments.GetSize(), clearAttachments.GetData(), clearRects.GetSize(), clearRects.GetData());
+	}
+
+	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, unsigned int uploadCount, const Renderer::BufferUploadInfo* uploads)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+
+		unsigned int regionCount = 0;
+		VkBufferCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferCopy, uploadCount);
+
+		StagingBuffer* currentStagingBuffer = nullptr;
+		for (unsigned int i = 0; i < uploadCount; i++)
+		{
+			StagingBuffer* stagingBuffer = mAllocator->AcquireStagingBuffer(0, uploads[i].Length);
+			if (currentStagingBuffer != stagingBuffer)
+			{
+				if (currentStagingBuffer)
+				{
+					assert(regionCount > 0);
+					vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
+					regionCount = 0;
+				}
+
+				currentStagingBuffer = stagingBuffer;
+			}
+
+			VkBufferCopy region;
+			region.srcOffset = currentStagingBuffer->PushData(0, uploads[i].Length, uploads[i].Data);
+			region.dstOffset = uploads[i].Offset;
+			region.size = uploads[i].Length;
+
+			regions[regionCount++] = region;
+		}
+
+		assert(regionCount > 0);
+		vkCmdCopyBuffer(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), regionCount, regions);
+	}
+
+	void CommandList::UploadBuffer(const Renderer::Buffer* buffer, std::size_t offset, std::size_t length, const void* data)
+	{
+		StagingBuffer* stagingBuffer = mAllocator->AcquireStagingBuffer(0, length);
+
+		VkBufferCopy region;
+		region.srcOffset = stagingBuffer->PushData(0, length, data);
+		region.dstOffset = offset;
+		region.size = length;
+
+		vkCmdCopyBuffer(mHandle, stagingBuffer->GetBuffer()->GetHandle(), static_cast<const Buffer*>(buffer)->GetHandle(), 1, &region);
+	}
+
+	void CommandList::UploadTexture(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int uploadCount, const Renderer::TextureUploadInfo* uploads)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
+
+		PixelFormat format = texture->GetFormat();
+		const std::size_t alignment = format.GetBlockSize();
+
+		// Use undefined on purpose, why should be upload framebuffers attachments?
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined());
+
+		unsigned int regionCount = 0;
+		VkBufferImageCopy* regions = COCKTAIL_STACK_ALLOC(VkBufferImageCopy, uploadCount);
+
+		StagingBuffer* currentStagingBuffer = nullptr;
+		for (unsigned int i = 0; i < uploadCount; i++)
+		{
+			assert(uploads[i].Level < texture->GetMipMapCount());
+			assert(uploads[i].ArrayLayer < texture->GetArrayLayerCount());
+
+			Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), uploads[i].Level);
+			const size_t length = format.ComputeAllocationSize(levelSize);
+
+			StagingBuffer* stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+			if (currentStagingBuffer != stagingBuffer)
+			{
+				if (currentStagingBuffer)
+				{
+					assert(regionCount > 0);
+					vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
+					regionCount = 0;
+				}
+
+				currentStagingBuffer = stagingBuffer;
+			}
+
+			VkImageSubresourceLayers subresourceLayers;
+			subresourceLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			subresourceLayers.mipLevel = uploads[i].Level;
+			subresourceLayers.baseArrayLayer = uploads[i].ArrayLayer;
+			subresourceLayers.layerCount = 1;
+
+			VkBufferImageCopy region;
+			region.bufferOffset = stagingBuffer->PushData(alignment, length, uploads[i].Pixels);
+			region.bufferRowLength = 0;
+			region.bufferImageHeight = 0;
+			region.imageSubresource = subresourceLayers;
+			region.imageOffset = { 0, 0, 0 };
+			region.imageExtent = ToVkType(levelSize);
+
+			regions[regionCount++] = region;
+		}
+
+		assert(regionCount > 0);
+		vkCmdCopyBufferToImage(mHandle, currentStagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, regionCount, regions);
+	}
+
+	void CommandList::UploadTextureLevel(const Renderer::Texture* texture, Renderer::ResourceState resourceState, unsigned int arrayLayer, unsigned int level, const void* pixels)
+	{
+		assert(level < texture->GetMipMapCount());
+		assert(arrayLayer < texture->GetArrayLayerCount());
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(resourceState == Renderer::ResourceState::CopyDestination || resourceState == Renderer::ResourceState::General);
+
+		PixelFormat format = texture->GetFormat();
+		const std::size_t alignment = format.GetBlockSize();
+		Extent3D<unsigned int> levelSize = Renderer::ComputeTextureLevelSize(texture->GetSize(), level);
+		std::size_t length = format.ComputeAllocationSize(levelSize);
+
+		VkImageLayout imageLayout = GetResourceStateImageLayout(resourceState, PixelFormat::Undefined());
+
+		StagingBuffer* stagingBuffer = mAllocator->AcquireStagingBuffer(alignment, length);
+
+		VkImageSubresourceLayers subresourceLayers;
+		subresourceLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceLayers.mipLevel = level;
+		subresourceLayers.baseArrayLayer = arrayLayer;
+		subresourceLayers.layerCount = 1;
+
+		VkBufferImageCopy region;
+		region.bufferOffset = stagingBuffer->PushData(alignment, length, pixels);
+		region.bufferRowLength = 0;
+		region.bufferImageHeight = 0;
+		region.imageSubresource = subresourceLayers;
+		region.imageOffset = { 0, 0, 0 };
+		region.imageExtent = ToVkType(levelSize);
+
+		vkCmdCopyBufferToImage(mHandle, stagingBuffer->GetBuffer()->GetHandle(), static_cast<const Texture*>(texture)->GetHandle(), imageLayout, 1, &region);
+	}
+
+	void CommandList::BeginRenderPass(const Renderer::RenderPassBeginInfo& begin)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+
+		mCurrentFramebuffer = static_cast<const Framebuffer*>(begin.TargetFramebuffer);
+		assert(mCurrentFramebuffer);
+
+		Extent3D<unsigned int> size = mCurrentFramebuffer->GetSize();
+
+		// Color attachments + DepthStencil attachment with resolve attachments
+		Array<VkClearValue, LinearAllocator<MaxAttachmentClearCount>> clearValues;
+		VkRenderPassBeginInfo beginInfo{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, nullptr };
+		{
+			beginInfo.renderPass = mCurrentFramebuffer->GetRenderPass()->GetHandle(begin.Mode);
+			beginInfo.framebuffer = mCurrentFramebuffer->GetHandle();
+			beginInfo.renderArea.offset = { 0, 0 };
+			beginInfo.renderArea.extent = { size.Width, size.Height };
+
+			if (begin.Mode == Renderer::RenderPassMode::Clear)
+			{
+				for (unsigned int i = 0; i < mCurrentFramebuffer->GetColorAttachmentCount(); i++)
+				{
+					VkClearValue& clearValue = clearValues.Emplace();
+					clearValue.color.float32[0] = begin.ColorClearValue[i].R;
+					clearValue.color.float32[1] = begin.ColorClearValue[i].G;
+					clearValue.color.float32[2] = begin.ColorClearValue[i].B;
+					clearValue.color.float32[3] = begin.ColorClearValue[i].A;
+
+					if (mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1)
+					    clearValues.Add(clearValue);
+				}
+
+				if (mCurrentFramebuffer->GetDepthStencilAttachment())
+				{
+					VkClearValue& clearValue = clearValues.Emplace();;
+					clearValue.depthStencil.depth = begin.DepthClearValue;
+					clearValue.depthStencil.stencil = begin.StencilClearValue;
+
+					if (mCurrentFramebuffer->GetRenderPass()->GetSamples() != Renderer::RasterizationSamples::e1)
+					    clearValues.Add(clearValue);
+				}
+
+				beginInfo.clearValueCount = clearValues.GetSize();
+				beginInfo.pClearValues = clearValues.GetData();
+			}
+			else
+			{
+				beginInfo.clearValueCount = 0;
+				beginInfo.pClearValues = nullptr;
+			}
+		}
+
+		vkCmdBeginRenderPass(mHandle, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		Renderer::Viewport viewport;
+		viewport.Width = size.Width;
+		viewport.Height = size.Height;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.f;
+
+		Renderer::Scissor scissor;
+		scissor.Position = { 0, 0 };
+		scissor.Size = { size.Width, size.Height };
+
+		mState = Renderer::CommandListState::RecordingRenderPass;
+
+		mCurrentRenderPassMode = Optional<Renderer::RenderPassMode>::Of(begin.Mode);
+		GetGraphicStateManager()->SetRenderPass(mCurrentFramebuffer->GetRenderPass());
+
+		SetViewport(viewport);
+		SetScissor(scissor);
+	}
+
+	void CommandList::EndRenderPass()
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
+		vkCmdEndRenderPass(mHandle);
+		mState = Renderer::CommandListState::Recording;
+
+		if (mCurrentFramebuffer->GetSamples() != Renderer::RasterizationSamples::e1 && !mCurrentFramebuffer->GetRenderPass()->ResolveDepthStencil())
+		{
+			SharedPtr<TextureView> depthStencilAttachment = mCurrentFramebuffer->GetDepthStencilAttachment().StaticCast<TextureView>();
+			if (depthStencilAttachment)
+			{
+				PixelFormat attachmentFormat = depthStencilAttachment->GetFormat();
+
+				Renderer::ResolveMode depthResolveMode = mCurrentFramebuffer->GetRenderPass()->GetDepthResolveMode();
+				Renderer::ResolveMode stencilResolveMode = mCurrentFramebuffer->GetRenderPass()->GetStencilResolveMode();
+
+				const bool shouldResolveDepth = (attachmentFormat.IsDepth() || attachmentFormat.IsDepthStencil()) && depthResolveMode != Renderer::ResolveMode::None;
+				if (shouldResolveDepth)
+				{
+					mRenderDevice->Invoke([&](DepthResolver* depthStencilResolver) {
+						auto depthStencilMultisampleAttachment = mCurrentFramebuffer->GetDepthStencilMultisampleAttachment().StaticCast<TextureView>();
+						depthStencilResolver->Resolve(*this, mCurrentRenderPassMode.Get(), depthStencilMultisampleAttachment, depthStencilAttachment, depthResolveMode);
+					});
+				}
+			}
+		}
+
+		mCurrentFramebuffer = nullptr;
+		mCurrentRenderPassMode = Optional<Renderer::RenderPassMode>::Empty();
+	}
+
+	void CommandList::BindShaderProgram(const Renderer::ShaderProgram* inShaderProgram)
+	{
+		const ShaderProgram* shaderProgram = static_cast<const ShaderProgram*>(inShaderProgram);
+		Renderer::ShaderProgramType programType = shaderProgram->GetType();
+
+		StateManager* stateManager = GetStateManager(programType);
+
+		SharedPtr<Pipeline> pipeline = mCurrentPipelines[programType];
+		if (pipeline)
+		{
+		    SharedPtr<PipelineLayout> pipelineLayout = pipeline->GetLayout();
+		    SharedPtr<PipelineLayout> nextPipelineLayout = shaderProgram->GetPipelineLayout();
+		    for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
+		    {
+		        SharedPtr<DescriptorSetLayout> descriptorSetLayout = pipelineLayout->GetDescriptorSetLayout(set);
+		        SharedPtr<DescriptorSetLayout> nextDescriptorSetLayout = nextPipelineLayout->GetDescriptorSetLayout(set);
+		        if (!nextDescriptorSetLayout || !descriptorSetLayout->IsCompatibleWith(*nextDescriptorSetLayout))
+		        {
+		            stateManager->ResetBindings(set);
+		            break;
+		        }
+		    }
+		}
+
+		stateManager->SetShaderProgram(shaderProgram);
+	}
+
+	void CommandList::BindVertexBuffer(unsigned int binding, const Renderer::Buffer* inVertexBuffer, std::size_t offset, unsigned int stride, bool instanced, unsigned int divisor)
+	{
+		const Buffer* vertexBuffer = static_cast<const Buffer*>(inVertexBuffer);
+		assert(vertexBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Vertex);
+
+		GraphicStateManager* graphicStateManager = GetGraphicStateManager();
+		graphicStateManager->BindVertexBuffer(binding, vertexBuffer, offset);
+		graphicStateManager->SetVertexInputBinding(binding, stride, instanced, divisor);
+	}
+
+	void CommandList::BindIndexBuffer(const Renderer::Buffer* inIndexBuffer, std::size_t offset, Renderer::IndexType indexType)
+	{
+		const Buffer* indexBuffer = static_cast<const Buffer*>(inIndexBuffer);
+		assert(indexBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Index);
+
+		GetGraphicStateManager()->BindIndexBuffer(indexBuffer, offset, indexType);
+	}
+
+	void CommandList::BindSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::Sampler* sampler)
+	{
+		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
+		assert(slot->GetDescriptorType() == Renderer::DescriptorType::Sampler);
+
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(slot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Sampler*>(sampler));
+	}
+
+	void CommandList::BindTextureSampler(const Renderer::UniformSlot* slot, unsigned int arrayIndex, const Renderer::TextureView* textureView, const Renderer::Sampler* sampler)
+	{
+		assert(!slot->IsArray() || arrayIndex < slot->GetArrayLength());
+		assert(slot->GetDescriptorType() == Renderer::DescriptorType::TextureSampler);
+
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(slot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		mStateManagers[descriptorSetSlot->GetProgramType()]->BindTextureSampler(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const TextureView*>(textureView), static_cast<const Sampler*>(sampler));
+	}
+
+	void CommandList::BindTexture(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::TextureView* inTextureView)
+	{
+		const TextureView* textureView = static_cast<const TextureView*>(inTextureView);
+		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
+
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(uniformSlot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
+
+		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::Texture)
+		{
+			stateManager->BindTexture(set, binding, descriptorSetSlot->GetShaderStages(),arrayIndex, textureView);
+		}
+		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageTexture)
+		{
+			stateManager->BindStorageTexture(set, binding, descriptorSetSlot->GetShaderStages(),arrayIndex, textureView);
+		}
+	}
+
+	void CommandList::BindBuffer(const Renderer::UniformSlot* uniformSlot, unsigned int arrayIndex, const Renderer::Buffer* uniformBuffer, std::size_t offset, std::size_t range)
+	{
+		assert(!uniformSlot->IsArray() || arrayIndex < uniformSlot->GetArrayLength());
+
+		const UniformSlot* descriptorSetSlot = static_cast<const UniformSlot*>(uniformSlot);
+		unsigned int set = descriptorSetSlot->GetSet();
+		unsigned int binding = descriptorSetSlot->GetBinding();
+		StateManager* stateManager = GetStateManager(descriptorSetSlot->GetProgramType());
+
+		if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::UniformBuffer)
+		{
+			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Uniform);
+			stateManager->BindUniformBuffer(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
+		}
+		else if (uniformSlot->GetDescriptorType() == Renderer::DescriptorType::StorageBuffer)
+		{
+			assert(uniformBuffer->GetUsage() & Renderer::BufferUsageFlagBits::Storage);
+			stateManager->BindStorageBuffer(set, binding, descriptorSetSlot->GetShaderStages(), arrayIndex, static_cast<const Buffer*>(uniformBuffer), offset, range);
+		}
+	}
+
+	void CommandList::UpdatePipelineConstant(Renderer::ShaderType shaderType, unsigned int offset, unsigned int length, const void* data)
+	{
+		Renderer::ShaderProgramType programType = shaderType == Renderer::ShaderType::Compute ? Renderer::ShaderProgramType::Compute : Renderer::ShaderProgramType::Graphic;
+
+		StateManager* stateManager = GetStateManager(programType);
+		if (stateManager)
+			stateManager->UpdatePipelineConstant(shaderType, offset, length, data);
+	}
+
+	void CommandList::EnableVertexBinding(unsigned int binding, bool enable)
+	{
+		GetGraphicStateManager()->EnableVertexBinding(binding, enable);
+	}
+
+	void CommandList::SetVertexInputAttributes(unsigned int binding, unsigned int attributeCount, const Renderer::VertexInputAttribute* attributes)
+	{
+		GetGraphicStateManager()->SetVertexInputAttributes(binding, attributeCount, attributes);
+	}
+
+	void CommandList::SetPrimitiveTopology(Renderer::PrimitiveTopology primitiveTopology)
+	{
+		GetGraphicStateManager()->SetPrimitiveTopology(primitiveTopology);
+	}
+
+	void CommandList::SetViewport(const Renderer::Viewport& viewport)
+	{
+		VkViewport vkViewport = ToVkType(viewport);
+		vkCmdSetViewport(mHandle, 0, 1, &vkViewport);
+	}
+
+	void CommandList::SetScissor(const Renderer::Scissor& scissor)
+	{
+		VkRect2D vkScissor = ToVkType(scissor);
+		vkCmdSetScissor(mHandle, 0, 1, &vkScissor);
+	}
+
+	void CommandList::EnableRasterizerDiscard(bool enable)
+	{
+		GetGraphicStateManager()->EnableRasterizerDiscard(enable);
+	}
+
+	void CommandList::SetPolygonMode(Renderer::PolygonMode polygonMode)
+	{
+		GetGraphicStateManager()->SetPolygonMode(polygonMode);
+	}
+
+	void CommandList::SetCullMode(Renderer::CullMode cullMode)
+	{
+		GetGraphicStateManager()->SetCullMode(cullMode);
+	}
+
+	void CommandList::SetFrontFace(Renderer::FrontFace frontFace)
+	{
+		GetGraphicStateManager()->SetFrontFace(frontFace);
+	}
+
+	void CommandList::EnableDepthBias(bool enable)
+	{
+		GetGraphicStateManager()->EnableDepthBias(enable);
+	}
+
+	void CommandList::SetDepthBias(float constantFactor, float clamp, float slopeFactor)
+	{
+		GetGraphicStateManager()->SetDepthBias(constantFactor, clamp, slopeFactor);
+	}
+
+	void CommandList::SetLineWidth(float lineWidth)
+	{
+		if (mRenderDevice->IsFeatureSupported(RenderDeviceFeature::WideLine))
+			GetGraphicStateManager()->SetLineWidth(lineWidth);
+	}
+
+    void CommandList::SetShadingRate(Extent2D<unsigned int> fragmentSize, Renderer::ShadingRateCombiner pipelineCombineOp, Renderer::ShadingRateCombiner primitiveCombineOp)
+	{
+	    if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::VariableShadingRate))
+	    {
+	        VkExtent2D vkSampleSize = ToVkType(fragmentSize);
+
+	        VkFragmentShadingRateCombinerOpKHR combiner[] = {
+	            ToVkType(pipelineCombineOp),
+                ToVkType(primitiveCombineOp),
+            };
+
+	        vkCmdSetFragmentShadingRateKHR(mHandle, &vkSampleSize, combiner);
+	    }
+    }
+
+    void CommandList::EnableSampleShading(bool enable)
+	{
+		GetGraphicStateManager()->EnableSampleShading(enable);
+	}
+
+	void CommandList::SetMinSampleShading(float minSampleShading)
+	{
+		GetGraphicStateManager()->SetMinSampleShading(minSampleShading);
+	}
+
+	void CommandList::EnableAlphaToCoverage(bool enable)
+	{
+		GetGraphicStateManager()->EnableAlphaToCoverage(enable);
+	}
+
+	void CommandList::EnableAlphaToOne(bool enable)
+	{
+		GetGraphicStateManager()->EnableAlphaToOne(enable);
+	}
+
+	void CommandList::EnableDepthTest(bool enable)
+	{
+		GetGraphicStateManager()->EnableDepthTest(enable);
+	}
+
+	void CommandList::EnableDepthWrite(bool enable)
+	{
+		GetGraphicStateManager()->EnableDepthWrite(enable);
+	}
+
+	void CommandList::SetDepthCompareOp(Renderer::CompareOp compareOp)
+	{
+		GetGraphicStateManager()->SetDepthCompareOp(compareOp);
+	}
+
+	void CommandList::EnableLogicOp(bool enable)
+	{
+		GetGraphicStateManager()->EnableLogicOp(enable);
+	}
+
+	void CommandList::SetLogicOp(Renderer::LogicOp logicOp)
+	{
+		GetGraphicStateManager()->SetLogicOp(logicOp);
+	}
+
+	void CommandList::SetBlendingConstants(const LinearColor& blendingConstants)
+	{
+		GetGraphicStateManager()->SetBlendingConstants(blendingConstants);
+	}
+
+	void CommandList::EnableBlending(unsigned int attachmentIndex, bool enable)
+	{
+		GetGraphicStateManager()->EnableBlending(attachmentIndex, enable);
+	}
+
+	void CommandList::SetBlendingEquation(unsigned int attachmentIndex, Renderer::BlendOp colorBlendingOp, Renderer::BlendOp alphaBlendingOp)
+	{
+		GetGraphicStateManager()->SetBlendingEquation(attachmentIndex, colorBlendingOp, alphaBlendingOp);
+	}
+
+	void CommandList::SetBlendingFunction(unsigned int attachmentIndex, Renderer::BlendFactor sourceColor, Renderer::BlendFactor destinationColor, Renderer::BlendFactor sourceAlpha, Renderer::BlendFactor destinationAlpha)
+	{
+		GetGraphicStateManager()->SetBlendingFunction(attachmentIndex, sourceColor, destinationColor, sourceAlpha, destinationAlpha);
+	}
+
+	void CommandList::BeginDebugLabel(const AnsiChar* labelName, LinearColor color)
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+		{
+			VkDebugUtilsLabelEXT debugUtilLabel{ VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT, nullptr };
+			{
+				debugUtilLabel.pLabelName = labelName;
+				debugUtilLabel.color[0] = color.R;
+				debugUtilLabel.color[1] = color.G;
+				debugUtilLabel.color[2] = color.B;
+				debugUtilLabel.color[3] = color.A;
+			}
+
+			vkCmdBeginDebugUtilsLabelEXT(mHandle, &debugUtilLabel);
+		}
+	}
+
+	void CommandList::InsertDebugLabel(const AnsiChar* labelName, LinearColor color)
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+		{
+			VkDebugUtilsLabelEXT debugUtilLabel{ VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT, nullptr };
+			{
+				debugUtilLabel.pLabelName = labelName;
+				debugUtilLabel.color[0] = color.R;
+				debugUtilLabel.color[1] = color.G;
+				debugUtilLabel.color[2] = color.B;
+				debugUtilLabel.color[3] = color.A;
+			}
+
+			vkCmdInsertDebugUtilsLabelEXT(mHandle, &debugUtilLabel);
+		}
+	}
+
+	void CommandList::EndDebugLabel()
+	{
+		if (mRenderDevice->IsExtensionSupported(Renderer::RenderDeviceExtension::Debug))
+			vkCmdEndDebugUtilsLabelEXT(mHandle);
+	}
+
+	void CommandList::Draw(unsigned int vertexCount, unsigned int instanceCount, unsigned int firstVertex, unsigned int firstInstance)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
+		FlushGraphicState();
+		vkCmdDraw(mHandle, vertexCount, instanceCount, firstVertex, firstInstance);
+	}
+
+	void CommandList::DrawIndexed(unsigned int indexCount, unsigned int instanceCount, unsigned int firstIndex, int indexOffset, unsigned int firstInstance)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+
+		FlushGraphicState();
+		vkCmdDrawIndexed(mHandle, indexCount, instanceCount, firstIndex, indexOffset, firstInstance);
+	}
+
+	void CommandList::DrawIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushGraphicState();
+		vkCmdDrawIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset, drawCount, stride);
+	}
+
+	void CommandList::DrawIndexedIndirect(const Renderer::Buffer* buffer, std::size_t offset, unsigned int drawCount, unsigned int stride)
+	{
+		assert(mState == Renderer::CommandListState::RecordingRenderPass);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushGraphicState();
+		vkCmdDrawIndexedIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset, drawCount, stride);
+	}
+
+	void CommandList::Dispatch(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+
+		FlushComputeState();
+		vkCmdDispatch(mHandle, groupCountX, groupCountY, groupCountZ);
+	}
+
+	void CommandList::DispatchIndirect(const Renderer::Buffer* buffer, std::size_t offset)
+	{
+		assert(mState == Renderer::CommandListState::Recording);
+		assert(buffer->GetUsage() & Renderer::BufferUsageFlagBits::Indirect);
+
+		FlushComputeState();
+		vkCmdDispatchIndirect(mHandle, static_cast<const Buffer*>(buffer)->GetHandle(), offset);
+	}
+
+	void CommandList::Reset(bool releaseResources)
+	{
+		assert(mAllocator->IsCommandListResetable());
+
+		vkResetCommandBuffer(mHandle, releaseResources ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0);
+
+		MarkInitial();
+	}
+
+	Renderer::CommandListState CommandList::GetState() const
+	{
+		return mState;
+	}
+
+	Renderer::CommandListUsageBits CommandList::GetUsage() const
+	{
+		return mUsage;
+	}
+
+	bool CommandList::IsSecondary() const
+	{
+		return mSecondary;
+	}
+
+	void CommandList::MarkInitial()
+	{
+		if (mUsage != Renderer::CommandListUsageBits::Transfer)
+		{
+			for (Renderer::ShaderProgramType programType : Enum<Renderer::ShaderProgramType>::Values)
+			{
+				mCurrentPipelines[programType] = nullptr;
+
+				// We reset everything at the beginning to avoid to be polluted by the previous state
+				if (mStateManagers[programType])
+					mStateManagers[programType]->ResetBindings();
+			}
+		}
+
+		mState = Renderer::CommandListState::Initial;
+
+		mOneShot = false;
+	}
+
+	void CommandList::MarkPending()
+	{
+		mState = Renderer::CommandListState::Pending;
+	}
+
+	void CommandList::MarkCompleted()
+	{
+		mState = mOneShot ? Renderer::CommandListState::Invalid : Renderer::CommandListState::Initial;
+	}
+
+	VkCommandBuffer CommandList::GetHandle() const
+	{
+		return mHandle;
+	}
+
+	ComputeStateManager* CommandList::GetComputeStateManager() const
+	{
+		return static_cast<ComputeStateManager*>(GetStateManager(Renderer::ShaderProgramType::Compute));
+	}
+
+	GraphicStateManager* CommandList::GetGraphicStateManager() const
+	{
+		return static_cast<GraphicStateManager*>(GetStateManager(Renderer::ShaderProgramType::Graphic));
+	}
+
+	StateManager* CommandList::GetStateManager(Renderer::ShaderProgramType programType) const
+	{
+		return mStateManagers[programType].Get();
+	}
+
+	void CommandList::FlushComputeState()
+	{
+		FlushState(Renderer::ShaderProgramType::Compute);
+	}
+
+	void CommandList::FlushGraphicState()
+	{
+		FlushState(Renderer::ShaderProgramType::Graphic);
+
+		GraphicStateManager* graphicStateManager = GetGraphicStateManager();
+
+		if (graphicStateManager->IsDirty(GraphicStateManager::GraphicDirtyFlagBits::IndexBuffer))
+		{
+			IndexBufferBinding indexBufferBinding = graphicStateManager->CompileIndexBuffer();
+			vkCmdBindIndexBuffer(mHandle, indexBufferBinding.BufferHandle, indexBufferBinding.Offset, indexBufferBinding.IndexType);
+		}
+
+		if (graphicStateManager->IsDirty(GraphicStateManager::GraphicDirtyFlagBits::VertexBuffers))
+		{
+			for (unsigned int binding = 0; binding < MaxInputBindings; binding++)
+			{
+				if (!graphicStateManager->IsVertexBufferDirty(binding))
+					continue;
+
+				VertexBufferBindingRange bufferRange = graphicStateManager->CompileVertexBuffers(binding);
+				vkCmdBindVertexBuffers(mHandle, binding, bufferRange.BindingCount, bufferRange.BufferHandles, bufferRange.BufferOffsets);
+			}
+		}
+	}
+
+	void CommandList::FlushState(Renderer::ShaderProgramType programType)
+	{
+		StateManager* stateManager = GetStateManager(programType);
+		SharedPtr<Pipeline> currentPipeline = mCurrentPipelines[programType];
+
+		if (!currentPipeline || stateManager->IsDirty(StateManager::DirtyFlagBits::Pipeline))
+		{
+			SharedPtr<Pipeline> pipeline = stateManager->CompilePipeline();
+			if (currentPipeline != pipeline)
+			{
+				vkCmdBindPipeline(mHandle, pipeline->GetLayout()->GetBindPoint(), pipeline->GetHandle());
+				mCurrentPipelines[programType] = pipeline;
+				currentPipeline = pipeline;
+			}
+		}
+
+		SharedPtr<PipelineLayout> pipelineLayout = currentPipeline->GetLayout();
+
+		if (stateManager->IsDirty(StateManager::DirtyFlagBits::DescriptorSet))
+		{
+			for (unsigned int set = 0; set < pipelineLayout->GetDescriptorSetLayoutCount(); set++)
+			{
+				if (!stateManager->IsDescriptorSetDirty(set))
+					continue;
+
+				SharedPtr<DescriptorSetLayout> setLayout = pipelineLayout->GetDescriptorSetLayout(set);
+				if (setLayout->SupportPushDescriptor())
+				{
+					if (auto descriptorUpdateTemplate = pipelineLayout->GetDescriptorUpdateTemplate(set))
+					{
+						unsigned char* descriptors = COCKTAIL_STACK_ALLOC(unsigned char, setLayout->GetDescriptorCount() * descriptorUpdateTemplate->GetElementStride());
+
+						stateManager->CompilePushDescriptorsWithTemplate(setLayout, descriptorUpdateTemplate, set, descriptors);
+						vkCmdPushDescriptorSetWithTemplateKHR(
+							mHandle,
+							descriptorUpdateTemplate->GetHandle(),
+							pipelineLayout->GetHandle(),
+							set,
+							descriptors
+						);
+					}
+					else
+					{
+						VkDescriptorImageInfo* imagesInfo = COCKTAIL_STACK_ALLOC(VkDescriptorImageInfo, setLayout->GetDescriptorCount());
+						VkDescriptorBufferInfo* buffersInfo = COCKTAIL_STACK_ALLOC(VkDescriptorBufferInfo, setLayout->GetDescriptorCount());
+						VkWriteDescriptorSet* writes = COCKTAIL_STACK_ALLOC(VkWriteDescriptorSet, setLayout->GetDescriptorCount());
+
+						unsigned int writeCount = stateManager->CompilePushDescriptors(setLayout, set, imagesInfo, buffersInfo, writes);
+						vkCmdPushDescriptorSetKHR(
+							mHandle,
+							pipelineLayout->GetBindPoint(),
+							pipelineLayout->GetHandle(),
+							set,
+							writeCount,
+							writes
+						);
+					}
+				}
+				else
+				{
+					DescriptorSetRange descriptorSetRange = stateManager->CompileDescriptorSets(pipelineLayout, set);
+					vkCmdBindDescriptorSets(
+						mHandle,
+						pipelineLayout->GetBindPoint(),
+						pipelineLayout->GetHandle(),
+						set,
+						descriptorSetRange.DescriptorSetCount, descriptorSetRange.DescriptorSetHandles,
+						descriptorSetRange.DynamicOffsetCount, descriptorSetRange.DynamicOffsets
+					);
+				}
+			}
+		}
+
+		if (stateManager->IsDirty(StateManager::DirtyFlagBits::PipelineConstant))
+		{
+			for (Renderer::ShaderType shaderType : Enum<Renderer::ShaderType>::Values)
+			{
+				Optional<const PushConstantBlockInfo&> pushConstantBlockInfo = pipelineLayout->GetPipelineConstantBlock(shaderType);
+				if (pushConstantBlockInfo.IsEmpty() || !stateManager->IsDirtyPipelineConstants(shaderType))
+					continue;
+
+				PipelineConstantRange pipelineConstantRange = stateManager->CompilePipelineConstants(shaderType);
+				vkCmdPushConstants(
+					mHandle,
+					pipelineLayout->GetHandle(),
+					ToVkType(shaderType),
+					pipelineConstantRange.Offset, pipelineConstantRange.Size,
+					pipelineConstantRange.Data
+				);
+			}
+		}
+	}
+}

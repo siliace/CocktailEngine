@@ -1,0 +1,49 @@
+name: CMake
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Keep building the other platform when one fails, so a platform-specific
+      # break does not hide the state of the other
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+          - name: Linux
+            os: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/Build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_SHARED_LIBS=ON
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/Build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/Build
+      # --output-on-failure prints the Catch2 report of the failing run,
+      # --no-tests=error fails the job if no test got registered at all
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --no-tests=error

@@ -1,0 +1,41 @@
+#ifndef COCKTAIL_GRAPHIC_RENDERING_WINDOWSCENEVIEWER_HPP
+#define COCKTAIL_GRAPHIC_RENDERING_WINDOWSCENEVIEWER_HPP
+
+#include <CocktailEngine/Graphic/Rendering/SceneViewer.hpp>
+
+namespace Ck
+{
+	class Window;
+
+	/**
+	 * \brief 
+	 */
+	class COCKTAILENGINE_GRAPHIC_API WindowSceneViewer : public SceneViewer
+	{
+	public:
+
+		/**
+		 * \brief 
+		 * \param scene 
+		 * \param window 
+		 * \param parameters 
+		 * \param vSync 
+		 */
+		WindowSceneViewer(SharedPtr<Scene> scene, Window* window, SceneViewerParameters parameters, bool vSync);
+
+	protected:
+
+		/**
+		 * \brief 
+		 * \param renderContext 
+		 * \return 
+		 */
+		Renderer::Framebuffer* AcquireNextFramebuffer(Renderer::RenderContext& renderContext) const override;
+
+	private:
+
+		SharedPtr<Renderer::RenderSurface> mRenderSurface;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_RENDERING_WINDOWSCENEVIEWER_HPP
