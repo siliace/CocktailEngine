@@ -1,0 +1,135 @@
+#ifndef COCKTAIL_GRAPHIC_SCENE_CONTAINER_VERTEXCACHE_HPP
+#define COCKTAIL_GRAPHIC_SCENE_CONTAINER_VERTEXCACHE_HPP
+
+#include <CocktailEngine/Graphic/Geometry/Index/IndexArray.hpp>
+#include <CocktailEngine/Graphic/Geometry/Vertex/VertexArray.hpp>
+
+namespace Ck
+{
+    /**
+     * \brief Utility class to de-duplicate vertices and generate indexes
+     */
+    template <typename T, typename Hasher = std::hash<T>, typename Equal = std::equal_to<T>>
+    class VertexCache
+    {
+    public:
+
+        /**
+         * \brief Constructor
+         * \param vertexLayout
+         */
+        explicit VertexCache(SharedPtr<VertexLayout> vertexLayout) :
+            mVertexLayout(Move(vertexLayout)),
+            mCurrentIndex(0)
+        {
+            /// Nothing
+        }
+
+        virtual ~VertexCache() = default;
+
+        /**
+         * \brief Register a new ObjVertex in the cache
+         * \param vertex
+         */
+        void AddVertex(const T& vertex)
+        {
+            bool inserted = mVertices.PutIfMissing(vertex, mCurrentIndex);
+            mIndices.Add(mCurrentIndex);
+
+            if (inserted)
+                ++mCurrentIndex;
+        }
+
+        /**
+         * \brief
+         * \param other
+         */
+        void Merge(const VertexCache& other)
+        {
+            assert(mVertexLayout->IsCompatibleWith(*other.GetVertexLayout()));
+            for (const auto& [vertex, index] : other.mVertices)
+                AddVertex(vertex);
+        }
+
+        /**
+         * \brief
+         * \return
+         */
+        SharedPtr<IndexArray> CreateIndexArray() const
+        {
+            const bool useShortIndices = mVertices.GetSize() < std::numeric_limits<Uint16>::max();
+            const Renderer::IndexType indexType = useShortIndices ? Renderer::IndexType::Short : Renderer::IndexType::Integer;
+
+            SharedPtr<IndexArray> indices = MakeShared<IndexArray>(indexType, mIndices.GetSize());
+            for (std::size_t i = 0; i < mIndices.GetSize(); i++)
+            {
+                IndexRef indexRef = indices->At(i);
+                unsigned int value = mIndices[i];
+                if (useShortIndices)
+                {
+                    indexRef.Set<Uint16>(static_cast<Uint16>(value));
+                }
+                else
+                {
+                    indexRef.Set<Uint32>(value);
+                }
+            }
+
+            return indices;
+        }
+
+        /**
+         * \brief
+         * \return
+         */
+        SharedPtr<VertexArray> CreateVertexArray() const
+        {
+            SharedPtr<VertexArray> vertices = MakeShared<VertexArray>(mVertexLayout, mVertices.GetSize());
+            for (const auto& [vertex, index] : mVertices)
+                HydrateVertexRef(vertices->At(index), vertex);
+
+            return vertices;
+        }
+
+        SharedPtr<VertexLayout> GetVertexLayout() const
+        {
+            return mVertexLayout;
+        }
+
+        /**
+         * \brief
+         * \return
+         */
+        std::size_t GetVertexCount() const
+        {
+            return mVertices.size();
+        }
+
+        /**
+         * \brief
+         * \return
+         */
+        std::size_t GetIndexCount() const
+        {
+            return mIndices.GetSize();
+        }
+
+    protected:
+
+        /**
+         * \brief
+         * \param vertexRef
+         * \param vertex
+         */
+        virtual void HydrateVertexRef(VertexRef vertexRef, const T& vertex) const = 0;
+
+    private:
+
+        SharedPtr<VertexLayout> mVertexLayout;
+        unsigned int mCurrentIndex;
+        HashMap<T, unsigned int, Hasher, Equal> mVertices;
+        Array<unsigned int> mIndices;
+    };
+}
+
+#endif // COCKTAIL_GRAPHIC_SCENE_CONTAINER_VERTEXCACHE_HPP

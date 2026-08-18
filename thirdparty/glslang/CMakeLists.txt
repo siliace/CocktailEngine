@@ -1,0 +1,6 @@
+set(ENABLE_OPT OFF)
+set(BUILD_EXTERNAL OFF)
+set(BUILD_SHARED_LIBS OFF)
+set(ENABLE_SPVREMAPPER OFF)
+set(ENABLE_HLSL OFF)
+add_subdirectory(glslang)

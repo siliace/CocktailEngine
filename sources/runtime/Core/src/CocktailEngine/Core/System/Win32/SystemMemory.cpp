@@ -1,0 +1,32 @@
+#include <CocktailEngine/Core/System/SystemMemory.hpp>
+#include <CocktailEngine/Core/System/Win32/Windows.hpp>
+
+namespace Ck
+{
+    namespace
+    {
+        std::size_t GetPageSizeImpl()
+        {
+            SYSTEM_INFO systemInfo;
+            GetSystemInfo(&systemInfo);
+
+            return systemInfo.dwPageSize;
+        }
+    }
+
+    void* SystemMemory::Allocate(std::size_t size)
+    {
+        return VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    }
+
+    void SystemMemory::Free(void* pointer, std::size_t)
+    {
+        VirtualFree(pointer, 0, MEM_RELEASE);
+    }
+
+    std::size_t SystemMemory::GetPageSize()
+    {
+        static const std::size_t pageSize = GetPageSizeImpl();
+        return pageSize;
+    }
+}
