@@ -1,0 +1,74 @@
+#ifndef COCKTAILENGINE_CORE_MEMORY_ALLOCATOR_MEMORYALLOCATOR_HPP
+#define COCKTAILENGINE_CORE_MEMORY_ALLOCATOR_MEMORYALLOCATOR_HPP
+
+#include <CocktailEngine/Core/Memory/Allocator/UseSystemAllocator.hpp>
+
+namespace Ck
+{
+    /**
+     * \class MemoryAllocator
+     *
+     * \brief Base interface for classes implementing memory allocation
+     *
+     * This interface defines the fundamental operations required for custom
+     * memory allocators: allocating, reallocating, and freeing memory blocks.
+     */
+    class MemoryAllocator : public UseSystemAllocator
+    {
+    public:
+
+        /**
+         * \brief Default virtual destructor
+         *
+         * Ensures proper cleanup of derived allocator implementations.
+         */
+        virtual ~MemoryAllocator() = default;
+
+        /**
+         * \brief Allocates a block of memory
+         *
+         * \param size Size of the memory block to allocate, in bytes
+         * \param alignment Alignment constraint of the memory to allocate
+         *
+         * \return Pointer to the allocated memory block, or nullptr on failure
+         */
+        virtual void* Allocate(std::size_t size, std::size_t alignment) = 0;
+
+        /**
+         * \brief Resizes an existing memory block
+         *
+         * The contents of the memory block should be preserved up to the smaller
+         * of the old and new sizes.
+         *
+         * \param pointer Pointer to the previously allocated block
+         * \param size New size of the memory block, in bytes
+         * \param alignment Alignment constraint of the memory to allocate
+         *
+         * \return Pointer to the reallocated memory block, or nullptr on failure
+         */
+        virtual void* Reallocate(void* pointer, std::size_t size, std::size_t alignment) = 0;
+
+        /**
+         * \brief Frees a previously allocated memory block
+         *
+         * \param pointer Pointer to the memory block to free
+         */
+        virtual void Free(void* pointer) = 0;
+
+        /**
+         * \brief Tell whether the allocator needs to be externalized synchronized
+         *
+         * \return True if the allocators needs external synchronization, false otherwise
+         */
+        virtual bool IsThreadSafe() const = 0;
+
+        /**
+         * \brief Tell whether the allocator should be instantiated per thread
+         *
+         * \return True if the allocators is per thread, false otherwise
+         */
+        virtual bool IsThreadLocal() const = 0;
+    };
+}
+
+#endif //COCKTAILENGINE_CORE_MEMORY_ALLOCATOR_MEMORYALLOCATOR_HPP

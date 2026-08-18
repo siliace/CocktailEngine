@@ -1,0 +1,70 @@
+#include <CocktailEngine/Renderer/Command/CommandQueueType.hpp>
+
+#include <CocktailEngine/Vulkan/RenderDevice.hpp>
+#include <CocktailEngine/Vulkan/Queue/SubmitScheduler.hpp>
+
+namespace Ck::Vulkan
+{
+	SubmitScheduler::SubmitScheduler(RenderDevice* renderDevice) :
+		mRenderDevice(renderDevice),
+		mProcessingBatch(false)
+	{
+		/// Nothing
+	}
+
+    SubmitScheduler::~SubmitScheduler()
+    {
+		assert(mBatches.IsEmpty());
+		assert(mPending.IsEmpty());
+
+		for (QueueSubmitBatch* terminated : mTerminated)
+			mBatchPool.Recycle(terminated);
+    }
+
+    QueueSubmitBatch* SubmitScheduler::ScheduleBatch(Renderer::CommandQueueType queueType, unsigned int queueIndex)
+    {
+		QueueSubmitBatch* batch = mBatchPool.AllocateUnsafe(mRenderDevice, queueType, queueIndex);
+		mBatches.Add(batch);
+
+		return batch;
+	}
+
+	void SubmitScheduler::ConnectFence(QueueSubmitBatch* batch, SharedPtr<Fence> fence)
+	{
+		batch->AssignFence(Move(fence));
+		batch->Connect(batch->OnCompleted(), [this, batch = batch]() {
+			if (mProcessingBatch)
+				return;
+
+			mPending.FindIndex(batch).Then([&](unsigned int index) {
+				mProcessingBatch = true;
+
+				for (unsigned int i = 0; i < index + 1; i++)
+				{
+					mPending[i]->MarkCompleted();
+					mTerminated.Add(mPending[i]);
+				}
+
+				mPending.SpliceInPlace(0, index + 1);
+			});
+
+			mProcessingBatch = false;
+		});
+	}
+
+	void SubmitScheduler::Submit()
+	{
+		for (QueueSubmitBatch* terminated : mTerminated)
+			mBatchPool.Recycle(terminated);
+
+		mTerminated.Clear();
+
+		while (!mBatches.IsEmpty())
+		{
+			QueueSubmitBatch* batch = mBatches.PopFirst();
+
+			batch->Submit();
+			mPending.Add(batch);
+		}
+	}
+}

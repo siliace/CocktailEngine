@@ -1,0 +1,69 @@
+#ifndef COCKTAILENGINE_RENDERER_COMMAND_RENDERPASSBEGININFO_HPP
+#define COCKTAILENGINE_RENDERER_COMMAND_RENDERPASSBEGININFO_HPP
+
+#include <CocktailEngine/Core/Color.hpp>
+
+#include <CocktailEngine/Renderer/Framebuffer/Framebuffer.hpp>
+
+namespace Ck::Renderer
+{
+	/**
+	 * \brief Enumeration of possible modes to start a render pass
+	 */
+	enum class RenderPassMode
+	{
+		/**
+		 * \brief Ignore previous state of framebuffer attachments
+		 */
+		Initial,
+
+		/**
+		 * \brief Clear framebuffer attachments
+		 */
+		Clear,
+
+		/**
+		* \brief Load framebuffer attachments
+		*/
+		Load,
+	};
+
+	/**
+	 * \brief Structure describing how to start a render pass
+	 * \see CommandList::BeginRenderPass
+	 */
+	struct RenderPassBeginInfo
+	{
+		/**
+		 * \brief Specifies the mode to use to begin the render pass
+		 */
+		RenderPassMode Mode = RenderPassMode::Clear;
+
+		/**
+		 * \brief Specifies the render target to write when issuing draw calls
+		 */
+		const Framebuffer* TargetFramebuffer = nullptr;
+
+		/**
+		 * \brief Specifies the colors to use to clear colors attachments of \p Framebuffer
+		 * If \p Mode is not Clear, this parameter is ignored
+		 */
+		LinearColor ColorClearValue[Framebuffer::MaxColorAttachmentCount];
+
+		/**
+		 * \brief Specifies the color to use to clear depth aspect of the depth stencil attachments of \p Framebuffer
+		 * If \p Mode is not Clear, this parameter is ignored
+		 * If \p Framebuffer does not have a depth capable attachment, this parameter is ignored
+		 */
+		float DepthClearValue = 1.f;
+
+		/**
+		 * \brief Specifies the color to use to clear stencil aspect of the depth stencil attachments of \p Framebuffer
+		 * If \p Mode is not Clear, this parameter is ignored
+		 * If \p Framebuffer does not have a stencil capable attachment, this parameter is ignored
+		 */
+		unsigned int StencilClearValue = 0;
+	};
+}
+
+#endif // COCKTAILENGINE_RENDERER_COMMAND_RENDERPASSBEGININFO_HPP

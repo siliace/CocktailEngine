@@ -1,0 +1,41 @@
+#include <CocktailEngine/Core/System/FileSystem/Local/Unix/LocalDirectory.hpp>
+
+namespace Ck::Detail::Unix
+{
+	LocalDirectory::LocalDirectory(const Path& path) :
+		mPath(path)
+	{
+		mHandle = opendir(reinterpret_cast<const AnsiChar*>(path.ToString().GetData()));
+	}
+
+	LocalDirectory::~LocalDirectory()
+	{
+		closedir(mHandle);
+	}
+
+	Array<Path> LocalDirectory::GetContent() const
+	{
+		dirent64* result;
+		Array<Path> content;
+
+		while ((result = readdir64(mHandle)))
+		{
+			String filename = reinterpret_cast<const Utf8Char*>(result->d_name);
+
+			Path childPath = mPath;
+			content.Add(childPath.Join(filename));
+		}
+
+		return content;
+	}
+
+	const Path &LocalDirectory::GetPath() const
+	{
+		return mPath;
+	}
+
+	void *LocalDirectory::GetSystemHandle() const
+	{
+		return (void*)mHandle;
+	}
+}

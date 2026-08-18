@@ -1,0 +1,138 @@
+#include <CocktailEngine/Core/Math/Matrix/Matrix3.hpp>
+
+#include <CocktailEngine/Graphic/Rendering/Queue/RecordDrawContext.hpp>
+#include <CocktailEngine/Graphic/Rendering/Queue/InstancedStaticMeshRecord.hpp>
+
+#include <CocktailEngine/Renderer/RenderDevice.hpp>
+
+namespace Ck
+{
+    namespace
+    {
+        bool IsStripTopology(Renderer::PrimitiveTopology primitiveTopology)
+        {
+            switch (primitiveTopology)
+            {
+                case Renderer::PrimitiveTopology::LineStrip:
+                case Renderer::PrimitiveTopology::TriangleStrip:
+                    return true;
+            }
+
+            return false;
+        }
+
+        Renderer::PolygonMode GetPrimitivePolygonMode(Renderer::PrimitiveTopology primitiveTopology)
+        {
+            switch (primitiveTopology)
+            {
+                case Renderer::PrimitiveTopology::Point:
+                    return Renderer::PolygonMode::Point;
+
+                case Renderer::PrimitiveTopology::Line:
+                case Renderer::PrimitiveTopology::LineStrip:
+                    return Renderer::PolygonMode::Line;
+
+                case Renderer::PrimitiveTopology::Triangle:
+                case Renderer::PrimitiveTopology::TriangleStrip:
+                case Renderer::PrimitiveTopology::TriangleFan:
+                    return Renderer::PolygonMode::Fill;
+            }
+
+            COCKTAIL_UNREACHABLE();
+        }
+    }
+
+	ObjectPool<InstancedStaticMeshRecord> InstancedStaticMeshRecord::sRecordPool;
+
+	SharedPtr<InstancedStaticMeshRecord> InstancedStaticMeshRecord::New(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant)
+	{
+		return sRecordPool.Allocate(recordInfo, materialProgramVariant);
+	}
+
+	InstancedStaticMeshRecord::InstancedStaticMeshRecord(const InstancedStaticMeshRecordInfo& recordInfo, MaterialProgramVariant* materialProgramVariant) :
+		mRecordInfo(recordInfo),
+		mMaterialProgramVariant(materialProgramVariant)
+	{
+		/// Nothing
+	}
+
+	void InstancedStaticMeshRecord::Draw(Renderer::CommandList& commandList, RecordDrawContext& drawContext) const
+	{
+	    const StaticMeshRecordInfo& staticMeshRecordInfo = mRecordInfo.StaticMeshRecord;
+
+		drawContext.BindMaterialProgram(commandList, mMaterialProgramVariant);
+
+		VertexInfo vertexInfo;
+		vertexInfo.Model = staticMeshRecordInfo.Model.Transpose();
+		Matrix3<float> normalMatrix = Matrix3<float>::From(staticMeshRecordInfo.Model).Inverse().Transpose();
+		for (unsigned int i = 0; i < 3; i++)
+			vertexInfo.Normal[i] = Vector4<float>(normalMatrix.GetColumn(i).Normalized(), 0.f);
+
+		MaterialInfo materialInfo;
+	    materialInfo.BaseColor = staticMeshRecordInfo.MaterialBaseColor;
+	    materialInfo.EmissiveColor[0] = staticMeshRecordInfo.MaterialEmissiveColor.R;
+	    materialInfo.EmissiveColor[1] = staticMeshRecordInfo.MaterialEmissiveColor.G;
+	    materialInfo.EmissiveColor[2] = staticMeshRecordInfo.MaterialEmissiveColor.B;
+	    materialInfo.Roughness = staticMeshRecordInfo.MaterialRoughness;
+	    materialInfo.Metallic = staticMeshRecordInfo.MaterialMetallic;
+		materialInfo.AlphaMode = static_cast<int>(staticMeshRecordInfo.AlphaMode);
+		materialInfo.AlphaCutoff = staticMeshRecordInfo.AlphaCutoff;
+
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Vertex, 0, sizeof(VertexInfo), &vertexInfo);
+		commandList.UpdatePipelineConstant(Renderer::ShaderType::Fragment, 0, sizeof(MaterialInfo), &materialInfo);
+		for (Material::TextureType textureType : Enum<Material::TextureType>::Values)
+		{
+		    SharedPtr<Renderer::TextureView> textureView = staticMeshRecordInfo.MaterialTextures[textureType];
+		    if (!textureView)
+		        continue;
+
+            BindingSlot slot = MaterialProgram::GetMaterialTextureBindingSlot(textureType);
+		    if (slot == InvalidBindingSlot)
+		        continue;
+
+		    drawContext.BindTextureSampler(ShaderBindingDomain::Material, slot, textureView.Get(), nullptr);
+		}
+
+	    drawContext.BindBuffer(ShaderBindingDomain::Drawcall, DrawcallBindingSlots::Instances, mRecordInfo.InstancesBuffer);
+
+	    for (unsigned int i = 0; i < staticMeshRecordInfo.VertexBufferCount; i++)
+	    {
+	        const StaticMeshRecordInfo::VertexBuffer& vertexBuffer = staticMeshRecordInfo.VertexBuffers[i];
+	        drawContext.BindVertexBuffer(commandList, i, vertexBuffer.Layout, vertexBuffer.Buffer, vertexBuffer.Offset);
+	    }
+
+		if (drawContext.GetModifiers() & RecordDrawContext::RenderingModifierBits::Wireframe)
+		{
+			commandList.SetPrimitiveTopology(IsStripTopology(staticMeshRecordInfo.PrimitiveTopology) ? Renderer::PrimitiveTopology::LineStrip : Renderer::PrimitiveTopology::Line);
+			commandList.SetPolygonMode(Renderer::PolygonMode::Line);
+		}
+		else
+		{
+			commandList.SetPrimitiveTopology(staticMeshRecordInfo.PrimitiveTopology);
+			commandList.SetPolygonMode(GetPrimitivePolygonMode(staticMeshRecordInfo.PrimitiveTopology));
+		}
+
+		commandList.SetCullMode(staticMeshRecordInfo.DoubleSided ? Renderer::CullMode::None : Renderer::CullMode::Back);
+		commandList.SetFrontFace(Renderer::FrontFace::CounterClockwise);
+
+		commandList.EnableDepthTest(true);
+		commandList.EnableDepthWrite(staticMeshRecordInfo.AlphaMode == Material::AlphaMode::Opaque);
+		commandList.SetDepthCompareOp(Renderer::CompareOp::Less);
+
+		commandList.EnableBlending(0, staticMeshRecordInfo.AlphaMode != Material::AlphaMode::Opaque);
+		commandList.SetBlendingFunction(0, Renderer::BlendFactor::SourceAlpha, Renderer::BlendFactor::OneMinusSourceAlpha, Renderer::BlendFactor::One, Renderer::BlendFactor::OneMinusSourceAlpha);
+		commandList.SetBlendingEquation(0, Renderer::BlendOp::Add, Renderer::BlendOp::Add);
+
+		if (staticMeshRecordInfo.IndexBuffer)
+		{
+		    drawContext.BindIndexBuffer(commandList, staticMeshRecordInfo.IndexBuffer, staticMeshRecordInfo.IndexType, staticMeshRecordInfo.IndexBufferOffset);
+			drawContext.DrawIndexed(commandList, staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, staticMeshRecordInfo.FirstVertex, mRecordInfo.FirstInstance);
+		}
+		else
+		{
+			drawContext.Draw(commandList, staticMeshRecordInfo.Count, mRecordInfo.InstanceCount, staticMeshRecordInfo.FirstIndex, mRecordInfo.FirstInstance);
+		}
+
+	    drawContext.EnableVertexBindings(commandList, 0, staticMeshRecordInfo.VertexBufferCount, false);
+	}
+}

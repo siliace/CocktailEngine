@@ -1,0 +1,102 @@
+#ifndef COCKTAILENGINE_VULKAN_SHADER_SHADERPROGRAM_HPP
+#define COCKTAILENGINE_VULKAN_SHADER_SHADERPROGRAM_HPP
+
+#include <CocktailEngine/Core/Utility/EnumMap.hpp>
+
+#include <CocktailEngine/Renderer/Shader/ShaderProgram.hpp>
+#include <CocktailEngine/Renderer/Shader/ShaderProgramCreateInfo.hpp>
+
+#include <CocktailEngine/Vulkan/Pipeline/Layout/PipelineLayout.hpp>
+#include <CocktailEngine/Vulkan/Shader/Shader.hpp>
+#include <CocktailEngine/Vulkan/Shader/UniformSlot.hpp>
+
+namespace Ck::Vulkan
+{
+	class RenderDevice;
+
+	/**
+	 * \brief 
+	 */
+	class ShaderProgram : public Renderer::ShaderProgram
+	{
+	public:
+
+		/**
+		 * \brief 
+		 * \param renderDevice 
+		 * \param createInfo 
+		 * \param allocationCallbacks 
+		 */
+		ShaderProgram(RenderDevice* renderDevice, const Renderer::ShaderProgramCreateInfo& createInfo, const VkAllocationCallbacks* allocationCallbacks);
+
+		/**
+		 * \brief 
+		 * \param name 
+		 */
+		void SetObjectName(const char* name) const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Renderer::RenderDevice* GetRenderDevice() const override;
+		
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Renderer::ShaderProgramType GetType() const override;
+
+		/**
+		 * \brief 
+		 * \param type 
+		 * \return 
+		 */
+		SharedPtr<Renderer::Shader> GetStage(Renderer::ShaderType type) const override;
+
+		/**
+		 * \brief 
+		 * \param name 
+		 * \return 
+		 */
+		Renderer::UniformSlot* FindUniformSlot(AsciiStringView name) const override;
+
+        /**
+         * \brief
+         *
+         * \return
+         */
+	    unsigned int GetUniformSlotCount() const override;
+
+	    unsigned int GetUniformSlots(Renderer::UniformSlot** slots, unsigned int slotCount, unsigned int firstSlot) const override;
+
+		/**
+		 * \brief
+		 * \return
+		 */
+		SharedPtr<PipelineLayout> GetPipelineLayout() const;
+
+	private:
+
+		/**
+		 * \brief 
+		 * \param staticSamplerCount 
+		 * \param staticSamplers 
+		 */
+		void CreatePipelineLayout(unsigned int staticSamplerCount, const Renderer::StaticSamplerInfo* staticSamplers);
+
+		/**
+		 * \brief Create uniform locations from the pipeline layout
+		 */
+		void CreateUniformSlots();
+
+		RenderDevice* mRenderDevice;
+		const VkAllocationCallbacks* mAllocationCallbacks;
+		Renderer::ShaderProgramType mType;
+		EnumMap<Renderer::ShaderType, SharedPtr<Shader>> mShaders;
+		Array<UniquePtr<UniformSlot>> mUniformSlots;
+		SharedPtr<PipelineLayout> mPipelineLayout;
+	};
+}
+
+#endif // COCKTAILENGINE_VULKAN_SHADER_SHADERPROGRAM_HPP

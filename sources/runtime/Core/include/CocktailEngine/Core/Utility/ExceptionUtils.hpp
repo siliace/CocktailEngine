@@ -1,0 +1,80 @@
+#ifndef COCKTAILENGINE_CORE_UTILITY_EXCEPTIONUTILS_HPP
+#define COCKTAILENGINE_CORE_UTILITY_EXCEPTIONUTILS_HPP
+
+#include <CocktailEngine/Core/Export.hpp>
+
+namespace Ck
+{
+	/**
+	 * \brief Utility class creating and throwing exceptions
+	 */
+	class COCKTAILENGINE_CORE_API ExceptionUtils
+	{
+	public:
+
+		/**
+		 * \brief Throws an NotImplemented error
+		 */
+		[[noreturn]] static void ThrowNotImplemented();
+
+		/**
+		 * \brief Throws an EmptyOptionalException error
+		 */
+		[[noreturn]] static void ThrowEmptyOptional();
+
+		/**
+		 * \brief Throws an EmptyOptionalException error
+		 *
+		 * \param message The message to use to create the exception thrown
+		 */
+		[[noreturn]] static void ThrowEmptyOptional(const TextChar* message);
+
+		/**
+		 * \brief Throws an ContainerEmpty error
+		 */
+		[[noreturn]] static void ThrowEmptyContainer();
+
+		/**
+		 * \brief Throws an ContainerEmpty error
+		 *
+		 * \param message The message to use to create the exception thrown
+		 */
+		[[noreturn]] static void ThrowEmptyContainer(const TextChar* message);
+
+		/**
+		 * \brief Throws an ContainerOutOfRange error
+		 *
+		 * This exception with be formatted using \p index and \p max.
+		 *
+		 * \param index The index used 
+		 * \param max The size of the container
+		 */
+		[[noreturn]] static void ThrowOutOfRange(Uint32 index, Uint32 max);
+
+		/**
+		 * \brief Throws an ContainerOutOfRange error
+		 *
+		 * This exception with be formatted using \p index and \p max.
+		 *
+		 * \param index The index used
+		 * \param max The size of the container
+		 */
+		[[noreturn]] static void ThrowOutOfRange(Uint64 index, Uint64 max);
+
+		/**
+		 * \brief Throw a CodepointEncodingException
+		 *
+		 * \param codepoint The codepoint failed to encode
+		 */
+		[[noreturn]] static void ThrowCodepointEncodingException(Uint32 codepoint);
+
+		/**
+		 * \brief Throw a CodepointDecodingException
+		 *
+		 * \param codepointIndex The index of the codepoint failed to decode
+		 */
+		[[noreturn]] static void ThrowCodepointDecodingException(unsigned int codepointIndex);
+	};
+}
+
+#endif // COCKTAILENGINE_CORE_UTILITY_EXCEPTIONUTILS_HPP

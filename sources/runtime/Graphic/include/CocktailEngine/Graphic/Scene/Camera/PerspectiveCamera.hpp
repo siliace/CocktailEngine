@@ -1,0 +1,89 @@
+#ifndef COCKTAIL_GRAPHIC_SCENE_CAMERA_PERSPECTIVECAMERA_HPP
+#define COCKTAIL_GRAPHIC_SCENE_CAMERA_PERSPECTIVECAMERA_HPP
+
+#include <CocktailEngine/Graphic/Scene/Camera/Camera.hpp>
+
+namespace Ck
+{
+	class Scene;
+
+	/**
+	 * \brief 
+	 */
+	class COCKTAILENGINE_GRAPHIC_API PerspectiveCamera : public Camera
+	{
+	public:
+
+		/**
+		 * \brief 
+		 * \param scene
+		 * \param name
+		 * \param fov 
+		 * \param aspectRatio 
+		 * \param zBounds 
+		 * \return 
+		 */
+		static PerspectiveCamera* Create(SharedPtr<Scene> scene, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+
+		/**
+		 * \brief 
+		 * \param transformationNode
+		 * \param name
+		 * \param fov 
+		 * \param aspectRatio 
+		 * \param zBounds 
+		 */
+		PerspectiveCamera(TransformationNode* transformationNode, String name, Angle<float> fov, float aspectRatio, Vector2<float> zBounds);
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Angle<float> GetFov() const;
+
+		/**
+		 * \brief 
+		 * \param fov 
+		 */
+		void SetFov(Angle<float> fov);
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		float GetAspectRatio() const;
+
+		/**
+		 * \brief 
+		 * \param aspectRatio 
+		 */
+		void SetAspectRatio(float aspectRatio);
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Frustum<float> ComputeFrustum() const override;
+
+		/**
+		 * \brief 
+		 * \return 
+		 */
+		Matrix4<float> ComputeProjectionViewMatrix() override;
+
+        /**
+         * \brief
+         * \return
+         */
+        Type GetType() const override;
+
+    private:
+
+		Angle<float> mFov;
+		float mAspectRatio;
+		Vector2<float> mZBounds;
+		Frustum<float> mFrustum;
+	};
+}
+
+#endif // COCKTAIL_GRAPHIC_SCENE_CAMERA_PERSPECTIVECAMERA_HPP
