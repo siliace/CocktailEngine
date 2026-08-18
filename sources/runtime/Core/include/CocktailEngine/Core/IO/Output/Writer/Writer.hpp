@@ -1,0 +1,121 @@
+#ifndef COCKTAILENGINE_CORE_IO_TEXTWRITER_HPP
+#define COCKTAILENGINE_CORE_IO_TEXTWRITER_HPP
+
+#include <CocktailEngine/Core/Utility/Encoding/Encoders.hpp>
+
+#include "CocktailEngine/Core/String.hpp"
+
+namespace Ck
+{
+    /**
+     * \brief Abstract base class for writing text data to various destinations
+     *
+     * This class defines a generic interface for writing text data (characters)
+     * to different outputs, such as files, memory buffers, or streams. The
+     * character encoding is defined by the template parameter.
+     *
+     * \tparam TEncoding The charset encoding used to encode the characters
+     */
+    template <typename TEncoding = Encoders::Text>
+    class Writer
+    {
+    public:
+
+        /**
+         * \brief The encoding type used by this writer
+         */
+        using EncodingType = TEncoding;
+
+        /**
+         * \brief Character type associated with the encoding
+         */
+        using CharType = typename EncodingType::CharType;
+
+        /**
+         * \brief Size type associated with the encoding
+         */
+        using SizeType = typename EncodingType::SizeType;
+
+        /**
+         * \brief Destructor
+         *
+         * Virtual destructor to allow proper cleanup of derived classes.
+         */
+        virtual ~Writer() = default;
+
+        /**
+         * \brief Write a single character to the output
+         *
+         * \param c The character to write
+         *
+         * \note Implementations should respect the character encoding defined
+         *       by \ref EncodingType.
+         */
+        virtual void Write(CharType c)
+        {
+            Write(&c, 1);
+        }
+
+        /**
+         * \brief Write null-terminated characters
+         *
+         * \param text Pointer to characters to write
+         *
+         * \note Implementations should respect the character encoding defined
+         *       by \ref EncodingType.
+         */
+        virtual void Write(const CharType* text)
+        {
+            Write(text, StringUtils<CharType, SizeType>::GetLength(text));
+        }
+
+        /**
+         * \brief Write an array of characters to the output
+         *
+         * \param text Pointer to the characters to write
+         * \param length Number of characters to write
+         *
+         * \note Implementations should respect the character encoding defined
+         *       by \ref EncodingType.
+         */
+        virtual void Write(const CharType* text, SizeType length) = 0;
+
+        /**
+         * \brief Write a string to the output
+         *
+         * \param string The string to write
+         *
+         * \note Implementations should respect the character encoding defined
+         *       by \ref EncodingType.
+         */
+        template <typename TAllocator>
+        void Write(const BasicString<TEncoding, TAllocator>& string)
+        {
+            Write(string.GetData(), string.GetLength());
+        }
+
+        /**
+         * \brief Write a string view into the internal string buffer
+         *
+         * \param string The string view to write
+         *
+         * \note Implementations should respect the character encoding defined
+         *       by \ref EncodingType.
+         */
+        void Write(BasicStringView<TEncoding> string)
+        {
+            Write(string.GetData(), string.GetLength());
+        }
+
+        /**
+         * \brief Flush the output
+         *
+         * Ensures that all buffered or pending characters are written to the
+         * underlying destination. After calling \ref Flush, no data should remain
+         * pending in the writer.
+         */
+        virtual void Flush() = 0;
+    };
+}
+
+#endif // COCKTAILENGINE_CORE_IO_TEXTWRITER_HPP
