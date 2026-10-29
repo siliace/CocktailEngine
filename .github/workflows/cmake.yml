@@ -2,9 +2,9 @@ name: CMake
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 env:
   BUILD_TYPE: Release
@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       # Keep building the other platform when one fails, so a platform-specific
-      # break does not hide the state of the other
+      # break does not hide the state of the other.
       fail-fast: false
       matrix:
         include:
@@ -26,36 +26,86 @@ jobs:
             os: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Install Linux dependencies
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev xvfb x11-utils
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev xvfb x11-utils
 
-    - name: Configure CMake
-      run: cmake --preset ${{env.BUILD_TYPE}}
+      - name: Configure CMake
+        run: cmake --preset ${{ env.BUILD_TYPE }}
 
-    - name: Build
-      run: cmake --build --preset ${{env.BUILD_TYPE}}
+      - name: Build
+        run: cmake --build --preset ${{ env.BUILD_TYPE }}
 
-    - name: Check X11
-      if: runner.os == 'Linux'
-      run: |
-        xvfb-run -a sh -c '
-          echo "DISPLAY=$DISPLAY"
-          xdpyinfo
-        '
+      - name: Check X11
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a sh -c '
+            echo "DISPLAY=$DISPLAY"
+            xdpyinfo
+          '
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build/${{env.BUILD_TYPE}}
-      if: runner.os == 'Linux'
-      run: xvfb-run -a ctest -C ${{env.BUILD_TYPE}} --output-on-failure --no-tests=error
+      - name: Test
+        working-directory: ${{ github.workspace }}/build/${{ env.BUILD_TYPE }}
+        if: runner.os == 'Linux'
+        run: xvfb-run -a ctest -C ${{ env.BUILD_TYPE }} --output-on-failure --no-tests=error
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build/${{env.BUILD_TYPE}}
-      if: runner.os == 'Windows'
-      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure --no-tests=error
+      - name: Test
+        working-directory: ${{ github.workspace }}/build/${{ env.BUILD_TYPE }}
+        if: runner.os == 'Windows'
+        run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure --no-tests=error
+
+  sanitizers:
+    name: Linux ASan/UBSan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev xvfb x11-utils
+
+      - name: Configure CMake with ASan/UBSan
+        run: |
+          cmake --preset Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address,undefined"
+
+      - name: Build
+        run: cmake --build --preset Debug
+
+      - name: Check X11
+        run: |
+          xvfb-run -a sh -c '
+            echo "DISPLAY=$DISPLAY"
+            xdpyinfo
+          '
+
+      - name: Test with ASan/UBSan
+        working-directory: ${{ github.workspace }}/build/Debug
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+        run: xvfb-run -a ctest -C Debug --output-on-failure --no-tests=error
+
+      - name: Upload CTest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanitizer-ctest-logs
+          path: |
+            build/Debug/Testing/Temporary/LastTest.log
+            build/Debug/Testing/Temporary/LastTestsFailed.log
+          if-no-files-found: ignore
+          retention-days: 7
+

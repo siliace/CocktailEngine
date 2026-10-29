@@ -2,14 +2,6 @@
     "version": 6,
     "configurePresets": [
         {
-            "name": "Asan",
-            "binaryDir": "${sourceDir}/build/Asan",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "ENABLE_ASAN": "On"
-            }
-        },
-        {
             "name": "Debug",
             "binaryDir": "${sourceDir}/build/Debug",
             "cacheVariables": {
@@ -25,13 +17,6 @@
         }
     ],
     "buildPresets": [
-        {
-            "name": "Asan",
-            "configurePreset": "Asan",
-            "configuration": "Debug",
-            "verbose": true,
-            "jobs": 16
-        },
         {
             "name": "Debug",
             "configurePreset": "Debug",
