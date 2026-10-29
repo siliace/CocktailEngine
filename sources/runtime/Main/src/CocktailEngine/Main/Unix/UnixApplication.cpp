@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <CocktailEngine/Core/System/SystemError.hpp>
+#include <CocktailEngine/Core/Utility/Finally.hpp>
 
 #include <CocktailEngine/Main/Unix/UnixApplication.hpp>
 
@@ -42,29 +43,42 @@ namespace Ck::Main::Unix
 
     bool UnixApplication::IsDebuggerPresent() const
     {
-        FILE* file = fopen("/proc/self/status", "r");
-        if (!file)
+        static const ssize_t BufferSize = 4096;
+
+        int fd = ::open("/proc/self/status", O_RDONLY);
+        if (fd == -1)
             return false;
 
-        char line[256];
-        while (fgets(line, sizeof(line), file))
+        Finally finally([&] {
+            close(fd);
+        });
+
+        char buffer[BufferSize];
+        ssize_t bytesRead = read(fd, buffer, sizeof(buffer) - 1);
+        if (bytesRead <= 0)
+            return false;
+
+        buffer[bytesRead] = '\0';
+
+        const char* line = buffer;
+        while (line < buffer + bytesRead)
         {
             if (std::strncmp(line, "TracerPid:", 10) == 0)
-            {
-                int tracer = atoi(line + 10);
-                fclose(file);
+                return std::atoi(line + 10) != 0;
 
-                return tracer != 0;
-            }
+            const char* newline = std::strchr(line, '\n');
+            if (!newline)
+                break;
+
+            line = newline + 1;
         }
-        fclose(file);
 
         return false;
     }
 
     Path UnixApplication::GetExecutablePath() const
     {
-        static const ssize_t BufferSize = 1024;
+        static const ssize_t BufferSize = 4096;
 
         Utf8Char buffer[BufferSize];
         ssize_t bufferLength = readlink("/proc/self/exe", reinterpret_cast<char*>(buffer), BufferSize);
@@ -78,21 +92,18 @@ namespace Ck::Main::Unix
     {
         static const ssize_t BufferSize = 4096;
 
-        int fd = ::open("/proc/self/cmdline", O_RDONLY);
-        if (fd == -1)
+        int file = ::open("/proc/self/cmdline", O_RDONLY);
+        if (file == -1)
             throw SystemError::GetLastError();
 
+        Finally finally([&] {
+            close(file);
+        });
+
         Utf8Char buffer[BufferSize];
-        ssize_t n = read(fd, buffer, BufferSize);
+        ssize_t n = read(file, buffer, BufferSize);
         if (n == -1)
-        {
-            SystemException lastError = SystemError::GetLastError();
-            close(fd);
-
-            throw lastError;
-        }
-
-        close(fd);
+            throw SystemError::GetLastError();
 
         return String(buffer, n);
     }
