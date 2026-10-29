@@ -208,7 +208,79 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
-        static Optional<SizeType> FindFirstOf(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, unsigned int count,
+        /**
+         * \brief Finds a counted occurrence of a character from the start of a buffer
+         *
+         * Searches forward from \p startIndex. A \p count of zero returns the first
+         * matching character; larger values skip that many preceding matches.
+         *
+         * \param haystack Pointer to the character buffer to search
+         * \param length Length of the buffer
+         * \param needle Character to find
+         * \param count Zero-based occurrence number to find
+         * \param startIndex Index from which to begin searching
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindFirstOf(const CharType* haystack, SizeType length, CharType needle, SizeType count, SizeType startIndex = 0,
+                                              bool caseSensitive = true)
+        {
+            assert(haystack && needle);
+
+            for (SizeType current = startIndex; current < length; ++current)
+            {
+                if (Equal(haystack[current], needle, caseSensitive))
+                {
+                    if (count == 0)
+                        return Optional<SizeType>::Of(current);
+
+                    --count;
+                }
+            }
+
+            return Optional<SizeType>::Empty();
+        }
+
+        /**
+         * \brief Finds a counted occurrence of a substring in a null-terminated string
+         *
+         * Searches forward from \p startIndex and considers overlapping occurrences.
+         * A \p count of zero returns the first matching substring; larger values skip
+         * that many preceding matches. An empty \p needle is never considered a match.
+         *
+         * \param haystack Pointer to the null-terminated character string to search
+         * \param needle Pointer to the null-terminated substring to find
+         * \param count Zero-based occurrence number to find
+         * \param startIndex Index from which to begin searching
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindFirstOf(const CharType* haystack, const CharType* needle, SizeType count, SizeType startIndex = 0,
+                                              bool caseSensitive = true)
+        {
+            return FindFirstOf(haystack, GetLength(haystack), needle, GetLength(needle), count, startIndex, caseSensitive);
+        }
+
+        /**
+         * \brief Finds a counted occurrence of a substring from the start of a buffer
+         *
+         * Searches forward from \p startIndex and considers overlapping occurrences.
+         * A \p count of zero returns the first matching substring; larger values skip
+         * that many preceding matches. An empty \p needle is never considered a match.
+         *
+         * \param haystack Pointer to the character buffer to search
+         * \param haystackLength Length of the buffer
+         * \param needle Pointer to the substring buffer to find
+         * \param needleLength Length of the substring
+         * \param count Zero-based occurrence number to find
+         * \param startIndex Index from which to begin searching
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindFirstOf(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, SizeType count,
                                               SizeType startIndex = 0, bool caseSensitive = true)
         {
             if (needleLength == 0 || haystackLength < needleLength)
@@ -221,7 +293,7 @@ namespace Ck
 
             for (SizeType current = startIndex; current <= last; ++current)
             {
-                if (Equal(&haystack[current], needleLength, needle, needleLength, caseSensitive) == 0)
+                if (Equal(&haystack[current], needleLength, needle, needleLength, caseSensitive))
                 {
                     if (count == 0)
                         return Optional<SizeType>::Of(current);
@@ -308,7 +380,21 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
-        static Optional<SizeType> FindLastOf(const CharType* haystack, SizeType length, CharType needle, unsigned int count, bool caseSensitive = true)
+        /**
+         * \brief Finds a counted occurrence of a character from the end of a buffer
+         *
+         * Searches backward from the end of the buffer. A \p count of zero returns
+         * the last matching character; larger values skip that many later matches.
+         *
+         * \param haystack Pointer to the character buffer to search
+         * \param length Length of the buffer
+         * \param needle Character to find
+         * \param count Zero-based occurrence number to find
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindLastOf(const CharType* haystack, SizeType length, CharType needle, SizeType count, bool caseSensitive = true)
         {
             assert(haystack && needle);
 
@@ -326,12 +412,44 @@ namespace Ck
             return Optional<SizeType>::Empty();
         }
 
-        static Optional<SizeType> FindLastOf(const CharType* haystack, const CharType* needle, unsigned int count, bool caseSensitive = true)
+        /**
+         * \brief Finds a counted occurrence of a substring in a null-terminated string
+         *
+         * Searches backward from the end of the string and considers overlapping
+         * occurrences. A \p count of zero returns the last matching substring;
+         * larger values skip that many later matches. An empty \p needle is never
+         * considered a match.
+         *
+         * \param haystack Pointer to the null-terminated character string to search
+         * \param needle Pointer to the null-terminated substring to find
+         * \param count Zero-based occurrence number to find
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindLastOf(const CharType* haystack, const CharType* needle, SizeType count, bool caseSensitive = true)
         {
             return FindLastOf(haystack, GetLength(haystack), needle, GetLength(needle), count, caseSensitive);
         }
 
-        static Optional<SizeType> FindLastOf(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, unsigned int count,
+        /**
+         * \brief Finds a counted occurrence of a substring from the end of a buffer
+         *
+         * Searches backward from the end of the buffer and considers overlapping
+         * occurrences. A \p count of zero returns the last matching substring;
+         * larger values skip that many later matches. An empty \p needle is never
+         * considered a match.
+         *
+         * \param haystack Pointer to the character buffer to search
+         * \param haystackLength Length of the buffer
+         * \param needle Pointer to the substring buffer to find
+         * \param needleLength Length of the substring
+         * \param count Zero-based occurrence number to find
+         * \param caseSensitive If false, case of letters is ignored
+         *
+         * \return Index wrapped in Optional, or Optional::Empty() if the occurrence is not found
+         */
+        static Optional<SizeType> FindLastOf(const CharType* haystack, SizeType haystackLength, const CharType* needle, SizeType needleLength, SizeType count,
                                              bool caseSensitive = true)
         {
             if (needleLength == 0 || haystackLength < needleLength)
@@ -341,7 +459,7 @@ namespace Ck
 
             for (;; --current)
             {
-                if (Equal(&haystack[current], needleLength, needle, needleLength, caseSensitive) == 0)
+                if (Equal(&haystack[current], needleLength, needle, needleLength, caseSensitive))
                 {
                     if (count == 0)
                         return Optional<SizeType>::Of(current);
