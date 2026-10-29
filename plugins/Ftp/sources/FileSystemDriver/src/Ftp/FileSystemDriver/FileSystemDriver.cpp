@@ -1,27 +1,15 @@
-﻿#include <CocktailEngine/Core/GenericException.hpp>
+﻿#include <Ftp/Core/Exception.hpp>
 
 #include <Ftp/FileSystemDriver/FileSystemDriver.hpp>
 
 namespace Ck::Ftp
 {
-    class FtpErrorCodeTranslator : public ErrorCodeTranslator<unsigned int>
-    {
-    public:
-
-        String TranslateErrorCode(unsigned int error) const override
-        {
-            return TranslatorCast<String>(error);
-        }
-    };
-
-    using FtpException = GenericException<unsigned int, FtpErrorCodeTranslator>;
-
     FileSystemDriver::FileSystemDriver(const IpAddress& remote, const FtpLoginInfo* loginInfo, unsigned short port) :
         mClient(remote, port)
     {
         Response response = mClient.WaitResponse();
         if (response.Code != 220)
-            throw FtpException(response.Code);
+            throw Exception(response.Code);
 
         if (loginInfo)
             Login(loginInfo->User, loginInfo->Password);
@@ -174,11 +162,11 @@ namespace Ck::Ftp
             mClient.Send(PasswordRequest(password));
             response = mClient.WaitResponse();
             if (response.Code != 230)
-                throw FtpException(response.Code);
+                throw Exception(response.Code);
         }
         else if (response.Code != 230)
         {
-            throw FtpException(response.Code);
+            throw Exception(response.Code);
         }
     }
 }
