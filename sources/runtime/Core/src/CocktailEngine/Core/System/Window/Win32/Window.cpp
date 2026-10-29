@@ -204,7 +204,7 @@ namespace Ck::Detail::Win32
         {
             DWORD lastError = GetLastError();
             if (lastError != ERROR_SUCCESS)
-                throw std::system_error(static_cast<int>(lastError), SystemError::GetSystemErrorCategory());
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
 
             return String::Empty;
         }
@@ -216,7 +216,7 @@ namespace Ck::Detail::Win32
         {
             const DWORD lastError = GetLastError();
             if (lastError != ERROR_SUCCESS)
-                throw std::system_error(static_cast<int>(lastError), SystemError::GetSystemErrorCategory());
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
 
             return String::Empty;
         }

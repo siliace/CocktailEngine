@@ -36,7 +36,7 @@ namespace Ck
      * Parent directories are never created implicitly: CreateFile(),
      * CreateDirectory() and the creating flavours of OpenFile() require the parent
      * directory to exist, exactly like the local driver does. Errors are reported by
-     * throwing \c std::system_error carrying a portable \c std::errc code.
+     * throwing \c FileSystemException carrying a portable \c FileSystemErrorCode value.
      *
      * \par Lifetime of the entries
      * A File or Directory handle keeps its entry alive. Removing an entry that is
@@ -101,7 +101,7 @@ namespace Ck
          *
          * \return Unique pointer to the directory watcher
          *
-         * \throw std::system_error If the directory does not exist in this driver
+         * \throw FileSystemException If the directory does not exist in this driver
          */
         UniquePtr<DirectoryWatcher> CreateWatcher(Directory& directory, bool recursive);
 

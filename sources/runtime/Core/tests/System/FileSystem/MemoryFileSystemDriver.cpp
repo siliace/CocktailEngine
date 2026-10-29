@@ -2,6 +2,7 @@
 
 #include <CocktailEngine/Core/IO/Input/Stream/FileInputStream.hpp>
 #include <CocktailEngine/Core/IO/Output/Stream/FileOutputStream.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryFileSystemDriver.hpp>
 
 namespace
@@ -61,12 +62,12 @@ TEST_CASE("Create entries in a memory filesystem", "[MemoryFileSystemDriver]")
     {
         driver.CreateDirectory(CK_TEXT("assets"));
 
-        REQUIRE_THROWS_AS(driver.CreateDirectory(CK_TEXT("assets")), std::system_error);
+        REQUIRE_THROWS_AS(driver.CreateDirectory(CK_TEXT("assets")), Ck::FileSystemException);
     }
 
     SECTION("Parent directories are not created implicitly")
     {
-        REQUIRE_THROWS_AS(driver.CreateFile(CK_TEXT("assets/textures/wood.png")), std::system_error);
+        REQUIRE_THROWS_AS(driver.CreateFile(CK_TEXT("assets/textures/wood.png")), Ck::FileSystemException);
 
         driver.CreateDirectory(CK_TEXT("assets"));
         driver.CreateDirectory(CK_TEXT("assets/textures"));
@@ -116,7 +117,7 @@ TEST_CASE("Read and write a file of a memory filesystem", "[MemoryFileSystemDriv
 
     SECTION("Opening a missing file for reading fails")
     {
-        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("nope.txt"), Ck::FileOpenFlagBits::Read), std::system_error);
+        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("nope.txt"), Ck::FileOpenFlagBits::Read), Ck::FileSystemException);
     }
 
     SECTION("Opening a missing file for writing creates it")
@@ -132,14 +133,14 @@ TEST_CASE("Read and write a file of a memory filesystem", "[MemoryFileSystemDriv
     {
         const Ck::FileOpenFlags flags = Ck::FileOpenFlags::Of(Ck::FileOpenFlagBits::Write, Ck::FileOpenFlagBits::Existing);
 
-        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("nope.txt"), flags), std::system_error);
+        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("nope.txt"), flags), Ck::FileSystemException);
     }
 
     SECTION("Opening a directory as a file fails")
     {
         driver.CreateDirectory(CK_TEXT("assets"));
 
-        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("assets"), Ck::FileOpenFlagBits::Read), std::system_error);
+        REQUIRE_THROWS_AS(driver.OpenFile(CK_TEXT("assets"), Ck::FileOpenFlagBits::Read), Ck::FileSystemException);
     }
 
     SECTION("What is written can be read back")
@@ -156,7 +157,7 @@ TEST_CASE("Read and write a file of a memory filesystem", "[MemoryFileSystemDriv
 
         Ck::UniquePtr<Ck::File> file = driver.OpenFile(CK_TEXT("hello.txt"), Ck::FileOpenFlagBits::Read);
 
-        REQUIRE_THROWS_AS(file->Write(CK_TEXT("nope"), 4 * CharacterSize), std::system_error);
+        REQUIRE_THROWS_AS(file->Write(CK_TEXT("nope"), 4 * CharacterSize), Ck::FileSystemException);
     }
 
     SECTION("Truncating drops the previous content")
@@ -190,7 +191,7 @@ TEST_CASE("Read and write a file of a memory filesystem", "[MemoryFileSystemDriv
         REQUIRE(file->SetCursor(Ck::FileCursorMode::End, 0) == 11 * CharacterSize);
         REQUIRE(file->SetCursor(Ck::FileCursorMode::Begin, 2) == 2);
         REQUIRE(file->SetCursor(Ck::FileCursorMode::Current, 2) == 4);
-        REQUIRE_THROWS_AS(file->SetCursor(Ck::FileCursorMode::Begin, -1), std::system_error);
+        REQUIRE_THROWS_AS(file->SetCursor(Ck::FileCursorMode::Begin, -1), Ck::InvalidParameterException);
 
         // Reading past the end yields nothing rather than failing
         file->SetCursor(Ck::FileCursorMode::End, 0);
@@ -283,8 +284,8 @@ TEST_CASE("Enumerate a directory of a memory filesystem", "[MemoryFileSystemDriv
 
     SECTION("Opening something else than a directory fails")
     {
-        REQUIRE_THROWS_AS(driver.OpenDirectory(CK_TEXT("assets/wood.png")), std::system_error);
-        REQUIRE_THROWS_AS(driver.OpenDirectory(CK_TEXT("nope")), std::system_error);
+        REQUIRE_THROWS_AS(driver.OpenDirectory(CK_TEXT("assets/wood.png")), Ck::FileSystemException);
+        REQUIRE_THROWS_AS(driver.OpenDirectory(CK_TEXT("nope")), Ck::FileSystemException);
     }
 }
 
@@ -308,7 +309,7 @@ TEST_CASE("Copy entries of a memory filesystem", "[MemoryFileSystemDriver]")
     {
         driver.CreateFile(CK_TEXT("assets/stone.png"));
 
-        REQUIRE_THROWS_AS(driver.CopyFile(CK_TEXT("assets/wood.png"), CK_TEXT("assets/stone.png"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.CopyFile(CK_TEXT("assets/wood.png"), CK_TEXT("assets/stone.png"), {}), Ck::FileSystemException);
 
         Ck::FileCopyOptions options;
         options.Overwrite = true;
@@ -357,7 +358,7 @@ TEST_CASE("Copy entries of a memory filesystem", "[MemoryFileSystemDriver]")
         Ck::DirectoryCopyOptions options;
         options.Recursive = true;
 
-        REQUIRE_THROWS_AS(driver.CopyDirectory(CK_TEXT("assets"), CK_TEXT("assets/backup"), options), std::system_error);
+        REQUIRE_THROWS_AS(driver.CopyDirectory(CK_TEXT("assets"), CK_TEXT("assets/backup"), options), Ck::InvalidParameterException);
     }
 }
 
@@ -382,7 +383,7 @@ TEST_CASE("Move entries of a memory filesystem", "[MemoryFileSystemDriver]")
     {
         WriteAll(driver, CK_TEXT("stone.png"), CK_TEXT("stone"));
 
-        REQUIRE_THROWS_AS(driver.MoveFile(CK_TEXT("assets/wood.png"), CK_TEXT("stone.png"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.MoveFile(CK_TEXT("assets/wood.png"), CK_TEXT("stone.png"), {}), Ck::FileSystemException);
 
         Ck::FileMoveOptions options;
         options.Overwrite = true;
@@ -394,7 +395,7 @@ TEST_CASE("Move entries of a memory filesystem", "[MemoryFileSystemDriver]")
 
     SECTION("Moving to a missing directory fails and changes nothing")
     {
-        REQUIRE_THROWS_AS(driver.MoveFile(CK_TEXT("assets/wood.png"), CK_TEXT("nope/wood.png"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.MoveFile(CK_TEXT("assets/wood.png"), CK_TEXT("nope/wood.png"), {}), Ck::FileSystemException);
         REQUIRE(driver.IsFile(CK_TEXT("assets/wood.png")));
     }
 
@@ -411,13 +412,13 @@ TEST_CASE("Move entries of a memory filesystem", "[MemoryFileSystemDriver]")
 
     SECTION("Moving a directory into itself is refused")
     {
-        REQUIRE_THROWS_AS(driver.MoveDirectory(CK_TEXT("assets"), CK_TEXT("assets/backup"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.MoveDirectory(CK_TEXT("assets"), CK_TEXT("assets/backup"), {}), Ck::InvalidParameterException);
         REQUIRE(driver.IsDirectory(CK_TEXT("assets")));
     }
 
     SECTION("The root cannot be moved")
     {
-        REQUIRE_THROWS_AS(driver.MoveDirectory(Ck::Path::Empty, CK_TEXT("backup"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.MoveDirectory(Ck::Path::Empty, CK_TEXT("backup"), {}), Ck::FileSystemException);
     }
 }
 
@@ -442,7 +443,7 @@ TEST_CASE("Remove entries of a memory filesystem", "[MemoryFileSystemDriver]")
         Ck::FileRemoveOptions options;
         options.IgnoreMissing = false;
 
-        REQUIRE_THROWS_AS(driver.RemoveFile(CK_TEXT("nope.png"), options), std::system_error);
+        REQUIRE_THROWS_AS(driver.RemoveFile(CK_TEXT("nope.png"), options), Ck::FileSystemException);
     }
 
     SECTION("An open handle survives the removal of its file")
@@ -456,7 +457,7 @@ TEST_CASE("Remove entries of a memory filesystem", "[MemoryFileSystemDriver]")
 
     SECTION("Removing a non empty directory requires Recursive")
     {
-        REQUIRE_THROWS_AS(driver.RemoveDirectory(CK_TEXT("assets"), {}), std::system_error);
+        REQUIRE_THROWS_AS(driver.RemoveDirectory(CK_TEXT("assets"), {}), Ck::FileSystemException);
 
         Ck::DirectoryRemoveOptions options;
         options.Recursive = true;
@@ -472,7 +473,7 @@ TEST_CASE("Remove entries of a memory filesystem", "[MemoryFileSystemDriver]")
         Ck::DirectoryRemoveOptions options;
         options.Recursive = true;
 
-        REQUIRE_THROWS_AS(driver.RemoveDirectory(Ck::Path::Empty, options), std::system_error);
+        REQUIRE_THROWS_AS(driver.RemoveDirectory(Ck::Path::Empty, options), Ck::FileSystemException);
     }
 
     SECTION("Clearing drops everything but the root")

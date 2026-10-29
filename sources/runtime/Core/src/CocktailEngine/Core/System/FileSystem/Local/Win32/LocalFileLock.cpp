@@ -37,8 +37,8 @@ namespace Ck::Detail::Win32
         BOOL success = LockFileEx(mFile->GetSystemHandle(), LOCKFILE_FAIL_IMMEDIATELY, 0, length.LowPart, length.HighPart, &overlapped);
         if (success == FALSE)
         {
-            if (DWORD error = GetLastError(); error != ERROR_IO_PENDING)
-                throw std::system_error(error, SystemError::GetSystemErrorCategory());
+            if (DWORD lastError = GetLastError(); lastError != ERROR_IO_PENDING)
+            throw SystemException(lastError, SystemError::GetSystemErrorCategory());
 
             return false;
         }

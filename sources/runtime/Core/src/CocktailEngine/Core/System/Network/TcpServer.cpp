@@ -52,16 +52,16 @@ namespace Ck
             clientHandle = ::accept(mHandle, reinterpret_cast<sockaddr*>(&sockAddr), (socklen_t*) &sockaddrlength);
             if (clientHandle == InvalidHandle)
             {
-                unsigned int error = SystemError::GetLastErrorCode();
-                if (error == EAGAIN || error == EWOULDBLOCK || error == EINTR)
+                unsigned int lastError = SystemError::GetLastErrorCode();
+                if (lastError == EAGAIN || lastError == EWOULDBLOCK || lastError == EINTR)
                 {
-                    if (error != EINTR)
+                    if (lastError != EINTR)
                         Thread::SleepFor(interval);
 
                     continue;
                 }
 
-                throw std::system_error((int) error, SystemError::GetSystemErrorCategory());
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
             }
 
             SocketAddress socketAddress(reinterpret_cast<const sockaddr&>(sockAddr), sockaddrlength);

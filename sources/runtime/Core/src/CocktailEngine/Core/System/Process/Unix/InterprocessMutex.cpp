@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp>
+#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadException.hpp>
 #include <CocktailEngine/Core/System/Process/InterprocessMutex.hpp>
 #include <CocktailEngine/Core/System/SystemError.hpp>
 
@@ -54,7 +54,7 @@ namespace Ck
             shm_unlink(handle.Name.GetData());
             close(sharedMemory);
 
-            throw std::system_error(error, SystemError::GetSystemErrorCategory());
+            throw SystemException(error, SystemError::GetSystemErrorCategory());
         }
 
         void* mapping = mmap(nullptr, sizeof(SharedMutex), PROT_READ | PROT_WRITE, MAP_SHARED, sharedMemory, 0);
@@ -66,7 +66,7 @@ namespace Ck
             int error = errno;
             shm_unlink(handle.Name.GetData());
 
-            throw std::system_error(error, SystemError::GetSystemErrorCategory());
+            throw SystemException(error, SystemError::GetSystemErrorCategory());
         }
 
         handle.Shared = static_cast<SharedMutex*>(mapping);
@@ -83,7 +83,7 @@ namespace Ck
             munmap(handle.Shared, sizeof(SharedMutex));
             shm_unlink(handle.Name.GetData());
 
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
         }
 
         pthread_mutexattr_destroy(&attributes);
@@ -112,7 +112,7 @@ namespace Ck
         }
 
         if (result != 0)
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
     }
 
     bool InterprocessMutex::TryLock()
@@ -127,7 +127,7 @@ namespace Ck
         if (result == EBUSY)
             return false;
 
-        throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+        throw Detail::Pthread::PthreadException(result);
     }
 
     void InterprocessMutex::Unlock()
@@ -136,6 +136,6 @@ namespace Ck
 
         int result = pthread_mutex_unlock(&handle.Shared->Mutex);
         if (result != 0)
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
     }
 }

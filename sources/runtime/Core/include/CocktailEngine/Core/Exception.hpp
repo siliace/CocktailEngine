@@ -4,7 +4,6 @@
 #include <exception>
 #include <type_traits>
 #include <typeinfo>
-#include <utility>
 
 #include <CocktailEngine/Core/String.hpp>
 
@@ -68,81 +67,112 @@
 namespace Ck
 {
     /**
-     * \brief
+     * \brief Base class for exceptions reported by Cocktail Engine.
+     *
+     * An exception owns a human-readable message and can retain a cloned Cocktail
+     * Engine exception that caused it. Derived exception types expose their
+     * concrete name through \ref GetName and support polymorphic cloning for
+     * exception nesting.
      */
     class COCKTAILENGINE_CORE_API Exception : public std::exception
     {
     public:
 
+        /**
+         * \brief Constructs an exception with an empty message.
+         */
         Exception();
 
         /**
-         * \brief
-         * \param message
+         * \brief Constructs an exception with a diagnostic message.
+         *
+         * \param message Message describing the failure.
          */
         explicit Exception(String message);
 
         /**
-         * \brief
-         * \param message
-         * \param nested
+         * \brief Constructs an exception caused by another engine exception.
+         *
+         * \param nested Exception that caused this exception. Its state is cloned.
+         * \param message Message describing the current failure.
          */
         Exception(const Exception& nested, String message);
 
         /**
-         * \brief
-         * \param other
+         * \brief Copies an exception and its nested exception state.
+         *
+         * \param other Exception to copy.
          */
         Exception(const Exception& other);
 
         /**
-         * \brief
-         * \param other
+         * \brief Moves an exception and transfers its nested exception state.
+         *
+         * \param other Exception to move from.
          */
         Exception(Exception&& other) noexcept;
 
         /**
-         * \brief
+         * \brief Destroys the exception and its owned nested exception.
          */
         ~Exception() override;
 
         /**
-         * \brief
-         * \param other
-         * \return
+         * \brief Assigns another exception to this instance.
+         *
+         * \param other Exception to assign.
+         *
+         * \return This exception.
          */
         Exception& operator=(const Exception& other);
 
         /**
-         * \brief
-         * \param other
-         * \return
+         * \brief Moves another exception into this instance.
+         *
+         * \param other Exception to move from.
+         *
+         * \return This exception.
          */
         Exception& operator=(Exception&& other) noexcept;
 
         /**
-         * \brief
-         * \return
+         * \brief Gets the static name of the exception type.
+         *
+         * \return A null-terminated narrow name suitable for \c std::exception
+         *         compatibility.
          */
         char const* what() const noexcept override;
 
         /**
-         * \brief
-         * \return
+         * \brief Gets the engine-text name of the concrete exception type.
+         *
+         * \return The exception type name.
          */
         virtual StringView GetName() const;
 
         /**
-         * \brief
-         * \return
+         * \brief Gets the diagnostic message associated with this exception.
+         *
+         * \return The stored message.
          */
         const String& GetMessage() const;
+
+        /**
+         * \brief Gets the exception that caused this exception.
+         *
+         * The returned pointer is non-owning and remains valid while this exception
+         * remains alive. It is null when no engine exception was provided as a cause.
+         *
+         * \return The nested exception, or null when this exception has no cause.
+         */
+        const Exception* GetNestedException() const noexcept;
 
     protected:
 
         /**
-         * \brief
-         * \return
+         * \brief Clones this exception while preserving its concrete type.
+         *
+         * \return A newly allocated copy of this exception.
          */
         virtual Exception* Clone() const;
 
@@ -161,13 +191,6 @@ namespace Ck
     COCKTAIL_DECLARE_EXCEPTION(RuntimeException);
     COCKTAIL_DECLARE_EXCEPTION_FROM(OutOfMemory, RuntimeException);
     COCKTAIL_DECLARE_EXCEPTION_FROM(EmptyOptionalException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(NoSuchFileOrDirectoryException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(CrossDeviceLinkException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(NotADirectoryException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(DirectoryNotEmptyException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(DirectoryAlreadyExistsException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(OperationNotSupportedException, RuntimeException);
-    COCKTAIL_DECLARE_EXCEPTION_FROM(FileAlreadyExistsException, RuntimeException);
 
     COCKTAIL_DECLARE_EXCEPTION_FROM(EncodingException, RuntimeException);
     COCKTAIL_DECLARE_EXCEPTION_FROM(CodepointEncodingException, EncodingException);

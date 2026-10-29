@@ -1,50 +1,28 @@
-#include <system_error>
-
+#include <CocktailEngine/Core/GenericException.hpp>
 #include <CocktailEngine/Core/System/Joystick/Win32/Joystick.hpp>
 #include <CocktailEngine/Core/System/Window/Window.hpp>
 
 namespace Ck::Detail::Win32
 {
-    class JoystickDisconnectException : public std::runtime_error
+    class JoystickErrorCodeTranslator : public ErrorCodeTranslator<unsigned int>
     {
     public:
 
-        JoystickDisconnectException() :
-            std::runtime_error("Joystick has been disconnected")
+        String TranslateErrorCode(unsigned int errorCode) const override
         {
-            /// Nothing
-        }
-    };
-
-    class JoystickErrorCategory : public std::error_category
-    {
-    public:
-
-        static const JoystickErrorCategory Instance;
-
-        const char* name() const noexcept override
-        {
-            return "JoystickErrorCategory";
-        }
-
-        std::string message(int _Errval) const override
-        {
-            switch (_Errval)
+            switch (errorCode)
             {
-                case JOYERR_NOERROR: return "NoError";
-
-                case JOYERR_PARMS: return "InvalidParameter";
-
-                case JOYERR_NOCANDO: return "InvalidOperation";
-
-                case JOYERR_UNPLUGGED: return "JoystickUnplugged";
+                case JOYERR_NOERROR: return CK_TEXT("NoError");
+                case JOYERR_PARMS: return CK_TEXT("InvalidParameter");
+                case JOYERR_NOCANDO: return CK_TEXT("InvalidOperation");
+                case JOYERR_UNPLUGGED: return CK_TEXT("JoystickUnplugged");
             }
 
-            COCKTAIL_UNREACHABLE();
+            return String::Format(CK_TEXT("Unknown joystick error (%u)"), errorCode);
         }
     };
 
-    const JoystickErrorCategory JoystickErrorCategory::Instance;
+    using JoystickException = GenericException<unsigned int, JoystickErrorCodeTranslator>;
 
     Joystick::Joystick(unsigned int index) :
         mIndex(index),
@@ -77,7 +55,7 @@ namespace Ck::Detail::Win32
     void Joystick::SetWindowCapture(const Window& window, const Duration& pollingFrequency, unsigned int axisThreshold)
     {
         if (!IsPlugged())
-            throw JoystickDisconnectException();
+            throw JoystickException(JOYERR_UNPLUGGED);
 
         if (mCaptureHandle)
             ReleaseWindowCapture();
@@ -87,11 +65,11 @@ namespace Ck::Detail::Win32
         unsigned int period = static_cast<unsigned int>(pollingFrequency.As(TimeUnit::Milliseconds()).GetCount());
         MMRESULT result = joySetCapture(captureHandle, mIndex, period, TRUE);
         if (result != JOYERR_NOERROR)
-            throw std::system_error(static_cast<int>(result), JoystickErrorCategory::Instance);
+            throw JoystickException(result);
 
         result = joySetThreshold(mIndex, axisThreshold);
         if (result != JOYERR_NOERROR)
-            throw std::system_error(static_cast<int>(result), JoystickErrorCategory::Instance);
+            throw JoystickException(result);
 
         mCaptureHandle = captureHandle;
     }
@@ -102,7 +80,7 @@ namespace Ck::Detail::Win32
             return;
 
         if (!IsPlugged())
-            throw JoystickDisconnectException();
+            throw JoystickException(JOYERR_UNPLUGGED);
 
         joyReleaseCapture(mIndex);
         mCaptureHandle = nullptr;
@@ -118,15 +96,10 @@ namespace Ck::Detail::Win32
         switch (axis)
         {
             case JoystickAxis::X: return GetInternalState(JOY_RETURNX).dwXpos;
-
             case JoystickAxis::Y: return GetInternalState(JOY_RETURNY).dwYpos;
-
             case JoystickAxis::Z: return GetInternalState(JOY_RETURNZ).dwZpos;
-
             case JoystickAxis::R: return GetInternalState(JOY_RETURNR).dwRpos;
-
             case JoystickAxis::U: return GetInternalState(JOY_RETURNU).dwUpos;
-
             case JoystickAxis::V: return GetInternalState(JOY_RETURNV).dwVpos;
         }
 
@@ -201,7 +174,7 @@ namespace Ck::Detail::Win32
 
         MMRESULT result = joyGetDevCaps(index, reinterpret_cast<JOYCAPS*>(&infoCaps), sizeof(JOYCAPS2));
         if (result != JOYERR_NOERROR)
-            throw std::system_error(static_cast<int>(result), JoystickErrorCategory::Instance);
+            throw JoystickException(result);
 
         name = infoCaps.szPname;
 
@@ -240,11 +213,8 @@ namespace Ck::Detail::Win32
         joystickState.dwFlags = flags;
 
         MMRESULT result = joyGetPosEx(mIndex, &joystickState);
-        if (result == JOYERR_UNPLUGGED)
-            throw JoystickDisconnectException();
-
         if (result != JOYERR_NOERROR)
-            throw std::system_error(static_cast<int>(result), JoystickErrorCategory::Instance);
+            throw JoystickException(result);
 
         return joystickState;
     }

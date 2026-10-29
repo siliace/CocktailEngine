@@ -1,3 +1,5 @@
+#include <utility>
+
 #include <CocktailEngine/Core/Exception.hpp>
 
 namespace Ck
@@ -46,9 +48,10 @@ namespace Ck
         if (this == &other)
             return *this;
 
-        std::exception::operator=(other);
-        mMessage = other.mMessage;
-        mNested = other.mNested;
+        Exception copy(other);
+        std::exception::operator=(copy);
+        mMessage = Move(copy.mMessage);
+        std::swap(mNested, copy.mNested);
 
         return *this;
     }
@@ -60,6 +63,7 @@ namespace Ck
 
         std::exception::operator=(other);
         mMessage = Move(other.mMessage);
+        delete mNested;
         mNested = std::exchange(other.mNested, nullptr);
 
         return *this;
@@ -78,6 +82,11 @@ namespace Ck
     const String& Exception::GetMessage() const
     {
         return mMessage;
+    }
+
+    const Exception* Exception::GetNestedException() const noexcept
+    {
+        return mNested;
     }
 
     Exception* Exception::Clone() const

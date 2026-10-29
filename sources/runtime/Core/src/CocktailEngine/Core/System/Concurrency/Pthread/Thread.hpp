@@ -3,9 +3,8 @@
 
 #include <pthread.h>
 
+#include <CocktailEngine/Core/System/Concurrency/Event.hpp>
 #include <CocktailEngine/Core/System/Concurrency/Thread.hpp>
-
-#include "CocktailEngine/Core/System/Concurrency/Event.hpp"
 
 namespace Ck::Detail::Pthread
 {

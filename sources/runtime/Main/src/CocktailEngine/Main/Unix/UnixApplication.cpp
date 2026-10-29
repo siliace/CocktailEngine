@@ -86,7 +86,7 @@ namespace Ck::Main::Unix
         ssize_t n = read(fd, buffer, BufferSize);
         if (n == -1)
         {
-            std::system_error lastError = SystemError::GetLastError();
+            SystemException lastError = SystemError::GetLastError();
             close(fd);
 
             throw lastError;

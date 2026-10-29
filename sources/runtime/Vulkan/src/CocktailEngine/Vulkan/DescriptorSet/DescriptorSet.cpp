@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include <CocktailEngine/Vulkan/DescriptorSet/Allocator/DescriptorPool.hpp>
 #include <CocktailEngine/Vulkan/DescriptorSet/DescriptorSet.hpp>
 #include <CocktailEngine/Vulkan/RenderDevice.hpp>
@@ -28,8 +30,12 @@ namespace Ck::Vulkan
 
     DescriptorSet::~DescriptorSet()
     {
-        if (mPool->SupportFree())
-            COCKTAIL_VK_CHECK(vkFreeDescriptorSets(mRenderDevice->GetHandle(), mPool->GetHandle(), 1, &mHandle));
+        if (!mPool->SupportFree())
+            return;
+
+        auto result = vkFreeDescriptorSets(mRenderDevice->GetHandle(), mPool->GetHandle(), 1, &mHandle);
+        assert(result == VK_SUCCESS);
+        (void) result;
     }
 
     void DescriptorSet::SetObjectName(const char* name) const

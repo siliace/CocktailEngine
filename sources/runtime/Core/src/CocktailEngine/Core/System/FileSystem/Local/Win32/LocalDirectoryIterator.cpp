@@ -68,11 +68,11 @@ namespace Ck::Detail::Win32
             {
                 if (FindNextFileW(mHandle, &mFindData) == FALSE)
                 {
-                    DWORD error = ::GetLastError();
-                    if (error == ERROR_NO_MORE_FILES)
+                    DWORD lastError = ::GetLastError();
+                    if (lastError == ERROR_NO_MORE_FILES)
                         return false;
 
-                    throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+                    throw SystemException(lastError, SystemError::GetSystemErrorCategory());
                 }
             }
 

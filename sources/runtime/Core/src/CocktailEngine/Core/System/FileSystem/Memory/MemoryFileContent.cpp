@@ -1,7 +1,7 @@
 #include <limits>
-#include <system_error>
 
 #include <CocktailEngine/Core/Memory/Memory.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryFileContent.hpp>
 
 namespace Ck::Detail
@@ -94,7 +94,7 @@ namespace Ck::Detail
     void MemoryFileContent::Reserve(Uint64 capacity)
     {
         if (capacity > MaxContentSize)
-            throw std::system_error(std::make_error_code(std::errc::file_too_large));
+            throw FileSystemException(FileSystemErrorCode::FileTooLarge);
 
         const Uint64 currentCapacity = mBuffer.GetSize();
         if (capacity <= currentCapacity)

@@ -1,7 +1,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp>
+#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadException.hpp>
 #include <CocktailEngine/Core/System/Concurrency/Pthread/ThreadManager.hpp>
 
 namespace Ck::Detail::Pthread
@@ -10,7 +10,7 @@ namespace Ck::Detail::Pthread
         mCurrentThreadKey()
     {
         if (int error = pthread_key_create(&mCurrentThreadKey, nullptr); error != 0)
-            throw std::system_error(error, PthreadErrorCategory::Instance);
+            throw PthreadException(error);
 
         mMainThread = MakeUnique<Thread>(pthread_self(), syscall(SYS_gettid), true);
         mMainThread->SetName(CK_TEXT("Main"));

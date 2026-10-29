@@ -23,7 +23,7 @@ namespace Ck::Detail::Win32
         {
             DWORD lastError = ::GetLastError();
             if (lastError != ERROR_BROKEN_PIPE)
-                throw std::system_error((int)lastError, SystemError::GetSystemErrorCategory());
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
 
             mEof = true;
             return 0;

@@ -561,7 +561,7 @@ namespace Ck
          */
         static bool IsPureAscii(const CharType* string)
         {
-            return IsPureAnsi(string, GetLength(string));
+            return IsPureAscii(string, GetLength(string));
         }
 
         /**

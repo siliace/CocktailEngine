@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
 
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryFileSystemDriver.hpp>
 #include <CocktailEngine/Core/System/FileSystem/StorageService.hpp>
 
@@ -115,7 +116,7 @@ TEST_CASE("Transfer entries between storage drivers", "[StorageService]")
 
         Ck::FileMoveOptions options;
         options.AllowCopyFallback = false;
-        REQUIRE_THROWS_AS(storage.MoveFile(SourceUri(CK_TEXT("readme.txt")), DestinationUri(CK_TEXT("moved.txt")), options), Ck::CrossDeviceLinkException);
+        REQUIRE_THROWS_AS(storage.MoveFile(SourceUri(CK_TEXT("readme.txt")), DestinationUri(CK_TEXT("moved.txt")), options), Ck::FileSystemException);
 
         REQUIRE(sourceDriver.IsFile(CK_TEXT("readme.txt")));
         REQUIRE_FALSE(destinationDriver.IsFile(CK_TEXT("moved.txt")));

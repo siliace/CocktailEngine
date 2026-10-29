@@ -15,22 +15,131 @@
 
 #include <CocktailEngine/Vulkan/Volk.hpp>
 
+#include "CocktailEngine/Core/GenericException.hpp"
+
+/**
+ * \brief Executes a Vulkan call and throws on a non-success result.
+ *
+ * \param call Vulkan expression returning a \c VkResult.
+ *
+ * \throws Ck::Vulkan::ApiException When \p call does not return \c VK_SUCCESS.
+ */
+#ifndef NDEBUG
 #define COCKTAIL_VK_CHECK(call)                                                                                                                                                    \
-    do                                                                                                                                                                             \
-    {                                                                                                                                                                              \
-        VkResult result_ = call;                                                                                                                                                   \
-        assert(result_ == VK_SUCCESS);                                                                                                                                             \
+    do                                                                                                                                                                   \
+    {                                                                                                                                                                    \
+        VkResult result_ = call;                                                                                                                                         \
+        if (result_ != VK_SUCCESS)\
+            throw Ck::Vulkan::ApiException(result_);\
     } while (0)
+#else
+    #define COCKTAIL_VK_CHECK(call) call
+#endif
 
 namespace Ck::Vulkan
 {
+    /**
+     * \brief Translates a Vulkan result code into its diagnostic identifier.
+     */
+    class ApiErrorCodeTranslator : public ErrorCodeTranslator<VkResult>
+    {
+    public:
+
+        /**
+         * \brief Converts a Vulkan result into an engine-text diagnostic message.
+         *
+         * \param errorCode Vulkan result to convert.
+         *
+         * \return The Vulkan identifier associated with \p errorCode, or a
+         *         fallback message for an unknown result.
+         */
+        String TranslateErrorCode(VkResult errorCode) const override
+        {
+            switch (errorCode)
+            {
+                case VK_SUCCESS: return CK_TEXT("VK_SUCCESS");
+                case VK_NOT_READY: return CK_TEXT("VK_NOT_READY");
+                case VK_TIMEOUT: return CK_TEXT("VK_TIMEOUT");
+                case VK_EVENT_SET: return CK_TEXT("VK_EVENT_SET");
+                case VK_EVENT_RESET: return CK_TEXT("VK_EVENT_RESET");
+                case VK_INCOMPLETE: return CK_TEXT("VK_INCOMPLETE");
+                case VK_ERROR_OUT_OF_HOST_MEMORY: return CK_TEXT("VK_ERROR_OUT_OF_HOST_MEMORY");
+                case VK_ERROR_OUT_OF_DEVICE_MEMORY: return CK_TEXT("VK_ERROR_OUT_OF_DEVICE_MEMORY");
+                case VK_ERROR_INITIALIZATION_FAILED: return CK_TEXT("VK_ERROR_INITIALIZATION_FAILED");
+                case VK_ERROR_DEVICE_LOST: return CK_TEXT("VK_ERROR_DEVICE_LOST");
+                case VK_ERROR_MEMORY_MAP_FAILED: return CK_TEXT("VK_ERROR_MEMORY_MAP_FAILED");
+                case VK_ERROR_LAYER_NOT_PRESENT: return CK_TEXT("VK_ERROR_LAYER_NOT_PRESENT");
+                case VK_ERROR_EXTENSION_NOT_PRESENT: return CK_TEXT("VK_ERROR_EXTENSION_NOT_PRESENT");
+                case VK_ERROR_FEATURE_NOT_PRESENT: return CK_TEXT("VK_ERROR_FEATURE_NOT_PRESENT");
+                case VK_ERROR_INCOMPATIBLE_DRIVER: return CK_TEXT("VK_ERROR_INCOMPATIBLE_DRIVER");
+                case VK_ERROR_TOO_MANY_OBJECTS: return CK_TEXT("VK_ERROR_TOO_MANY_OBJECTS");
+                case VK_ERROR_FORMAT_NOT_SUPPORTED: return CK_TEXT("VK_ERROR_FORMAT_NOT_SUPPORTED");
+                case VK_ERROR_FRAGMENTED_POOL: return CK_TEXT("VK_ERROR_FRAGMENTED_POOL");
+                case VK_ERROR_UNKNOWN: return CK_TEXT("VK_ERROR_UNKNOWN");
+                case VK_ERROR_VALIDATION_FAILED: return CK_TEXT("VK_ERROR_VALIDATION_FAILED");
+                case VK_ERROR_OUT_OF_POOL_MEMORY: return CK_TEXT("VK_ERROR_OUT_OF_POOL_MEMORY");
+                case VK_ERROR_INVALID_EXTERNAL_HANDLE: return CK_TEXT("VK_ERROR_INVALID_EXTERNAL_HANDLE");
+                case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS: return CK_TEXT("VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS");
+                case VK_ERROR_FRAGMENTATION: return CK_TEXT("VK_ERROR_FRAGMENTATION");
+                case VK_PIPELINE_COMPILE_REQUIRED: return CK_TEXT("VK_PIPELINE_COMPILE_REQUIRED");
+                case VK_ERROR_NOT_PERMITTED: return CK_TEXT("VK_ERROR_NOT_PERMITTED");
+                case VK_ERROR_SURFACE_LOST_KHR: return CK_TEXT("VK_ERROR_SURFACE_LOST_KHR");
+                case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR: return CK_TEXT("VK_ERROR_NATIVE_WINDOW_IN_USE_KHR");
+                case VK_SUBOPTIMAL_KHR: return CK_TEXT("VK_SUBOPTIMAL_KHR");
+                case VK_ERROR_OUT_OF_DATE_KHR: return CK_TEXT("VK_ERROR_OUT_OF_DATE_KHR");
+                case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR: return CK_TEXT("VK_ERROR_INCOMPATIBLE_DISPLAY_KHR");
+                case VK_ERROR_INVALID_SHADER_NV: return CK_TEXT("VK_ERROR_INVALID_SHADER_NV");
+                case VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR");
+                case VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR");
+                case VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR");
+                case VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR");
+                case VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR");
+                case VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR: return CK_TEXT("VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR");
+                case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT: return CK_TEXT("VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT");
+                case VK_ERROR_PRESENT_TIMING_QUEUE_FULL_EXT: return CK_TEXT("VK_ERROR_PRESENT_TIMING_QUEUE_FULL_EXT");
+                case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT: return CK_TEXT("VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT");
+                case VK_THREAD_IDLE_KHR: return CK_TEXT("VK_THREAD_IDLE_KHR");
+                case VK_THREAD_DONE_KHR: return CK_TEXT("VK_THREAD_DONE_KHR");
+                case VK_OPERATION_DEFERRED_KHR: return CK_TEXT("VK_OPERATION_DEFERRED_KHR");
+                case VK_OPERATION_NOT_DEFERRED_KHR: return CK_TEXT("VK_OPERATION_NOT_DEFERRED_KHR");
+                case VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR: return CK_TEXT("VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR");
+                case VK_ERROR_COMPRESSION_EXHAUSTED_EXT: return CK_TEXT("VK_ERROR_COMPRESSION_EXHAUSTED_EXT");
+                case VK_INCOMPATIBLE_SHADER_BINARY_EXT: return CK_TEXT("VK_INCOMPATIBLE_SHADER_BINARY_EXT");
+                case VK_PIPELINE_BINARY_MISSING_KHR: return CK_TEXT("VK_PIPELINE_BINARY_MISSING_KHR");
+                case VK_ERROR_NOT_ENOUGH_SPACE_KHR: return CK_TEXT("VK_ERROR_NOT_ENOUGH_SPACE_KHR");
+                case VK_RESULT_MAX_ENUM: return CK_TEXT("VK_RESULT_MAX_ENUM");
+            }
+
+            return String::Format(CK_TEXT("Unknown VkResult (%d)"), static_cast<int>(errorCode));
+        }
+    };
+
+    /**
+     * \brief Runtime exception that retains a failing Vulkan result.
+     *
+     * \ref COCKTAIL_VK_CHECK throws this exception when a Vulkan call does not
+     * return \c VK_SUCCESS. Use \ref GetErrorCode to inspect the original
+     * \c VkResult.
+     */
+    using ApiException = GenericException<VkResult, ApiErrorCodeTranslator>;
+
+    /**
+     * \brief Inserts \p rhs directly after \p lhs in a Vulkan structure chain.
+     *
+     * \param lhs Structure whose next pointer receives \p rhs.
+     * \param rhs Structure to insert. It can already lead its own chain only when
+     *         \p lhs has no next structure.
+     *
+     * \throws InvalidParameterException When both \p lhs and \p rhs already have
+     *         a next structure, which would discard the latter chain.
+     */
     template <typename T, typename U>
     void Chain(T& lhs, U& rhs)
     {
         if (lhs.pNext)
         {
-            if (rhs.pNext)
-                throw std::invalid_argument("Right chain object already has pNext");
+            if (rhs.pNext != nullptr)
+                throw InvalidParameterException(CK_TEXT("Cannot chain a structure that already has a next structure"));
 
             rhs.pNext = const_cast<void*>(lhs.pNext);
         }

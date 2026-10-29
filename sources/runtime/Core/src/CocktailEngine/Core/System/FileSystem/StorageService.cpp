@@ -1,7 +1,6 @@
-#include <system_error>
-
 #include <CocktailEngine/Core/IO/Input/Stream/FileInputStream.hpp>
 #include <CocktailEngine/Core/IO/Output/Stream/FileOutputStream.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/StorageService.hpp>
 #include <CocktailEngine/Core/Utility/FileUtils.hpp>
 
@@ -14,9 +13,9 @@ namespace Ck
             switch (driver.GetPathInfo(path).Type)
             {
                 case PathType::File: return;
-                case PathType::None: throw NoSuchFileOrDirectoryException();
-                case PathType::Directory: throw DirectoryAlreadyExistsException();
-                case PathType::Other: throw OperationNotSupportedException();
+                case PathType::None: throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
+                case PathType::Directory: throw FileSystemException(FileSystemErrorCode::IsADirectory);
+                case PathType::Other: throw FileSystemException(FileSystemErrorCode::NotSupported);
             }
         }
 
@@ -25,9 +24,9 @@ namespace Ck
             switch (driver.GetPathInfo(path).Type)
             {
                 case PathType::Directory: return;
-                case PathType::None: throw NoSuchFileOrDirectoryException();
-                case PathType::File: throw NotADirectoryException();
-                case PathType::Other: throw OperationNotSupportedException();
+                case PathType::None: throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
+                case PathType::File: throw FileSystemException(FileSystemErrorCode::NotADirectory);
+                case PathType::Other: throw FileSystemException(FileSystemErrorCode::NotSupported);
             }
         }
 
@@ -38,11 +37,11 @@ namespace Ck
                 case PathType::None: return;
                 case PathType::File:
                     if (!overwrite)
-                        throw FileAlreadyExistsException();
+                        throw FileSystemException(FileSystemErrorCode::FileExists);
 
                     return;
-                case PathType::Directory: throw DirectoryAlreadyExistsException();
-                case PathType::Other: throw OperationNotSupportedException();
+                case PathType::Directory: throw FileSystemException(FileSystemErrorCode::FileExists);
+                case PathType::Other: throw FileSystemException(FileSystemErrorCode::NotSupported);
             }
         }
 
@@ -52,7 +51,7 @@ namespace Ck
             if (pathInfo.Type != PathType::Directory)
             {
                 if (pathInfo.Type != PathType::None)
-                    throw NotADirectoryException();
+                    throw FileSystemException(FileSystemErrorCode::NotADirectory);
 
                 FileUtils::MakeDirectories(path, driver);
             }
@@ -63,20 +62,20 @@ namespace Ck
             switch (driver.GetPathInfo(path).Type)
             {
                 case PathType::None: return;
-                case PathType::File: throw NotADirectoryException();
-                case PathType::Other: throw OperationNotSupportedException();
+                case PathType::File: throw FileSystemException(FileSystemErrorCode::NotADirectory);
+                case PathType::Other: throw FileSystemException(FileSystemErrorCode::NotSupported);
                 case PathType::Directory: break;
             }
 
             if (!overwrite)
-                throw FileAlreadyExistsException();
+                throw FileSystemException(FileSystemErrorCode::FileExists);
 
             UniquePtr<DirectoryIterator> iterator = driver.CreateDirectoryIterator(path);
             if (iterator == nullptr)
-                throw OperationNotSupportedException();
+                throw FileSystemException(FileSystemErrorCode::NotSupported);
 
             if (!iterator->IsEnd())
-                throw DirectoryNotEmptyException();
+                throw FileSystemException(FileSystemErrorCode::DirectoryNotEmpty);
         }
 
         void CopyFileAcrossDrivers(FileSystemDriver& sourceDriver, const Path& source, FileSystemDriver& destinationDriver, const Path& destination, const FileCopyOptions& options)
@@ -97,13 +96,13 @@ namespace Ck
 
             UniquePtr<DirectoryIterator> iterator = sourceDriver.CreateDirectoryIterator(source);
             if (iterator == nullptr)
-                throw OperationNotSupportedException();
+                throw FileSystemException(FileSystemErrorCode::NotSupported);
 
             while (!iterator->IsEnd())
             {
                 const Path name = iterator->GetPath().GetFilename();
                 if (name.IsEmpty())
-                    throw OperationNotSupportedException();
+                    throw FileSystemException(FileSystemErrorCode::NotSupported);
 
                 const Path childSource = Path::Merge(source, name);
                 const Path childDestination = Path::Merge(destination, name);
@@ -119,7 +118,7 @@ namespace Ck
                             CopyDirectoryAcrossDrivers(sourceDriver, childSource, destinationDriver, childDestination, options);
                         break;
                     case PathType::None:
-                    case PathType::Other: throw OperationNotSupportedException();
+                    case PathType::Other: throw FileSystemException(FileSystemErrorCode::NotSupported);
                 }
 
                 iterator->Next();
@@ -202,7 +201,7 @@ namespace Ck
         }
 
         if (!options.AllowCopyFallback)
-            throw CrossDeviceLinkException();
+            throw FileSystemException(FileSystemErrorCode::CrossDeviceLink);
 
         CopyFileAcrossDrivers(sourceDriver, source.GetPath(), destinationDriver, destination.GetPath(), options);
         sourceDriver.RemoveFile(source.GetPath(), FileRemoveOptions{ true, false });
@@ -220,7 +219,7 @@ namespace Ck
         }
 
         if (!options.AllowCopyFallback)
-            throw CrossDeviceLinkException();
+            throw FileSystemException(FileSystemErrorCode::CrossDeviceLink);
 
         if (!options.Recursive || options.OnlyStructure)
             throw InvalidParameterException(CK_TEXT("Cannot move directory from non-recursive path"));

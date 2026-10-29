@@ -1,30 +1,27 @@
-﻿#include <system_error>
+﻿#include <CocktailEngine/Core/GenericException.hpp>
 
 #include <Ftp/FileSystemDriver/FileSystemDriver.hpp>
 
 namespace Ck::Ftp
 {
-    class FtpErrorCategory : public std::error_category
+    class FtpErrorCodeTranslator : public ErrorCodeTranslator<unsigned int>
     {
     public:
 
-        const char* name() const noexcept override
+        String TranslateErrorCode(unsigned int error) const override
         {
-            return "FtpErrorCategory";
-        }
-
-        std::string message(int error) const override
-        {
-            return std::to_string(error);
+            return TranslatorCast<String>(error);
         }
     };
+
+    using FtpException = GenericException<unsigned int, FtpErrorCodeTranslator>;
 
     FileSystemDriver::FileSystemDriver(const IpAddress& remote, const FtpLoginInfo* loginInfo, unsigned short port) :
         mClient(remote, port)
     {
         Response response = mClient.WaitResponse();
         if (response.Code != 220)
-            throw std::system_error(response.Code, FtpErrorCategory{});
+            throw FtpException(response.Code);
 
         if (loginInfo)
             Login(loginInfo->User, loginInfo->Password);
@@ -177,11 +174,11 @@ namespace Ck::Ftp
             mClient.Send(PasswordRequest(password));
             response = mClient.WaitResponse();
             if (response.Code != 230)
-                throw std::system_error(response.Code, FtpErrorCategory{});
+                throw FtpException(response.Code);
         }
         else if (response.Code != 230)
         {
-            throw std::system_error(response.Code, FtpErrorCategory{});
+            throw FtpException(response.Code);
         }
     }
 }

@@ -1,5 +1,4 @@
 #include <limits>
-#include <system_error>
 
 #include <CocktailEngine/Core/System/FileSystem/Storage.hpp>
 #include <CocktailEngine/Core/Utility/FileUtils.hpp>
@@ -40,7 +39,7 @@ namespace Ck
             const unsigned int requestSize = static_cast<unsigned int>(remainingSize > MaxReadSize ? MaxReadSize : remainingSize);
             const unsigned int read = file->Read(content.GetData() + readSize, requestSize);
             if (read == 0)
-                throw std::system_error(std::make_error_code(std::errc::io_error));
+                throw FileSystemException(FileSystemErrorCode::IoError);
 
             readSize += read;
         }

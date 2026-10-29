@@ -1,3 +1,5 @@
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
+
 #include <CocktailEngine/Main/Embedded/EmbdeddDirectory.hpp>
 #include <CocktailEngine/Main/Embedded/EmbdeddDirectoryIterator.hpp>
 #include <CocktailEngine/Main/Embedded/EmbdeddFile.hpp>
@@ -25,19 +27,19 @@ namespace Ck
 
     void EmbeddedFileSystemDriver::CreateFile(const Path& path)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::CreateDirectory(const Path& path)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     UniquePtr<File> EmbeddedFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
     {
         AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
         if (!mFileSystem.is_file(p.GetData()))
-            throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
         return MakeUnique<EmbeddedFile>(mFileSystem, path, flags);
     }
@@ -46,7 +48,7 @@ namespace Ck
     {
         AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
         if (!mFileSystem.is_directory(p.GetData()))
-            throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
         return MakeUnique<EmbeddedDirectory>(mFileSystem, path);
     }
@@ -55,39 +57,39 @@ namespace Ck
     {
         AsciiString p = AsciiString::Convert(path.ToFormat(Path::Format::Generic).ToString());
         if (!mFileSystem.is_directory(p.GetData()))
-            throw std::system_error(std::make_error_code(std::errc::no_such_file_or_directory));
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
         return MakeUnique<EmbeddedDirectoryIterator>(mFileSystem, path);
     }
 
     void EmbeddedFileSystemDriver::CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::MoveDirectory(const Path& source, const Path& destination, const DirectoryMoveOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::RemoveFile(const Path& path, const FileRemoveOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     void EmbeddedFileSystemDriver::RemoveDirectory(const Path& path, const DirectoryRemoveOptions& options)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     Path EmbeddedFileSystemDriver::MakeCanonical(const Path& path)

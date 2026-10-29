@@ -1,6 +1,5 @@
-#include <system_error>
-
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryFile.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 
 namespace Ck::Detail
 {
@@ -19,7 +18,7 @@ namespace Ck::Detail
     unsigned int MemoryFile::Read(void* buffer, unsigned int length)
     {
         if (!(mFlags & FileOpenFlagBits::Read))
-            throw std::system_error(std::make_error_code(std::errc::permission_denied));
+            throw FileSystemException(FileSystemErrorCode::PermissionDenied);
 
         const Uint64 read = mNode->Content.Read(mCursor, buffer, length);
 
@@ -32,7 +31,7 @@ namespace Ck::Detail
     unsigned int MemoryFile::Write(const void* buffer, unsigned int length)
     {
         if (!(mFlags & FileOpenFlagBits::Write))
-            throw std::system_error(std::make_error_code(std::errc::permission_denied));
+            throw FileSystemException(FileSystemErrorCode::PermissionDenied);
 
         // An appending handle always writes at the end, wherever the cursor was left
         if (mFlags & FileOpenFlagBits::Append)
@@ -60,15 +59,13 @@ namespace Ck::Detail
         switch (mode)
         {
             case FileCursorMode::Begin: origin = 0; break;
-
             case FileCursorMode::Current: origin = static_cast<Int64>(mCursor); break;
-
             case FileCursorMode::End: origin = static_cast<Int64>(mNode->Content.GetSize()); break;
         }
 
         const Int64 cursor = origin + offset;
         if (cursor < 0)
-            throw std::system_error(std::make_error_code(std::errc::invalid_argument));
+            throw InvalidParameterException();
 
         // Seeking past the end is legal, the hole is only materialized on write
         mCursor = static_cast<Uint64>(cursor);

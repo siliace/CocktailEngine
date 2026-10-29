@@ -51,7 +51,7 @@ namespace Ck
             if (lastError == ERROR_TIMEOUT)
                 return false;
 
-            throw std::system_error(static_cast<int>(lastError), SystemError::GetSystemErrorCategory());
+            throw SystemException(lastError, SystemError::GetSystemErrorCategory());
         }
 
         return true;

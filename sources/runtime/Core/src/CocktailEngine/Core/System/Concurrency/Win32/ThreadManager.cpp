@@ -8,9 +8,9 @@ namespace Ck::Detail::Win32
         mTlsIndex = TlsAlloc();
         if (mTlsIndex == 0)
         {
-            DWORD error = ::GetLastError();
-            if (error != NO_ERROR)
-                throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+            DWORD lastError = ::GetLastError();
+            if (lastError != NO_ERROR)
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
         }
 
         mMainThread = MakeUnique<Thread>(::GetCurrentThread(), ::GetCurrentThreadId(), true);

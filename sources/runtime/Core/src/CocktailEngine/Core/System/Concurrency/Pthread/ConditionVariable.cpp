@@ -1,10 +1,9 @@
 #include <cassert>
 #include <cerrno>
-#include <ctime>
 #include <pthread.h>
 
 #include <CocktailEngine/Core/System/Concurrency/ConditionVariable.hpp>
-#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp>
+#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadException.hpp>
 
 namespace Ck
 {
@@ -19,7 +18,7 @@ namespace Ck
         /// the deadlines it is given.
         const int result = pthread_cond_init(static_cast<pthread_cond_t*>(mHandle.GetAddress()), nullptr);
         if (result != 0)
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
     }
 
     ConditionVariable::~ConditionVariable()
@@ -36,7 +35,7 @@ namespace Ck
         const int result = pthread_cond_wait(static_cast<pthread_cond_t*>(mHandle.GetAddress()), static_cast<pthread_mutex_t*>(mutex.GetSystemHandle()));
 
         if (result != 0)
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
     }
 
     bool ConditionVariable::WaitFor(Mutex& mutex, const Duration& timeout)
@@ -69,7 +68,7 @@ namespace Ck
         if (result != 0)
         {
             if (result != ETIMEDOUT)
-                throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+                throw Detail::Pthread::PthreadException(result);
 
             return false;
         }

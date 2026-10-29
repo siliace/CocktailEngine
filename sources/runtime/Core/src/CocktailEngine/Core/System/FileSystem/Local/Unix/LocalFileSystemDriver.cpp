@@ -10,6 +10,8 @@
 #include <CocktailEngine/Core/System/FileSystem/Local/Unix/LocalFileSystemDriver.hpp>
 #include <CocktailEngine/Core/System/SystemError.hpp>
 
+#include "CocktailEngine/Core/System/FileSystem/FileSystemException.hpp"
+
 namespace Ck::Detail::Unix
 {
     LocalFileSystemDriver::LocalFileSystemDriver(Path base) :
@@ -172,7 +174,7 @@ namespace Ck::Detail::Unix
         if (rename(reinterpret_cast<const char*>(fullSource.ToString().GetData()), reinterpret_cast<const char*>(fullDestination.ToString().GetData())) < 0)
         {
             if (!options.AllowCopyFallback)
-                throw std::system_error(errno, std::generic_category());
+                throw SystemError::GetLastError();
 
             CopyFile(source, destination, options);
             RemoveFile(source, FileRemoveOptions{ true, false });
@@ -184,27 +186,29 @@ namespace Ck::Detail::Unix
         Path fullSource = Path::Merge(mBase, source);
         Path fullDestination = Path::Merge(mBase, destination);
 
-        if (rename(reinterpret_cast<const char*>(fullSource.ToString().GetData()), reinterpret_cast<const char*>(fullDestination.ToString().GetData())) < 0)
+        const char* old = reinterpret_cast<const char*>(fullSource.ToString().GetData());
+        const char* next = reinterpret_cast<const char*>(fullDestination.ToString().GetData());
+        if (rename(old, next) == 0)
+            return;
+
+        if (options.AllowCopyFallback && errno == EXDEV)
         {
-            if (options.AllowCopyFallback && errno == EXDEV)
-            {
-                DirectoryCopyOptions copyOptions;
-                copyOptions.Overwrite = options.Overwrite;
-                copyOptions.PreserveMetadata = options.PreserveMetadata;
-                copyOptions.Recursive = options.Recursive;
-                copyOptions.OnlyStructure = options.OnlyStructure;
+            DirectoryCopyOptions copyOptions;
+            copyOptions.Overwrite = options.Overwrite;
+            copyOptions.PreserveMetadata = options.PreserveMetadata;
+            copyOptions.Recursive = options.Recursive;
+            copyOptions.OnlyStructure = options.OnlyStructure;
 
-                CopyDirectory(source, destination, copyOptions);
+            CopyDirectory(source, destination, copyOptions);
 
-                DirectoryRemoveOptions removeOptions;
-                removeOptions.Recursive = true;
-                removeOptions.Force = true;
+            DirectoryRemoveOptions removeOptions;
+            removeOptions.Recursive = true;
+            removeOptions.Force = true;
 
-                RemoveDirectory(source, removeOptions);
-            }
-
-            throw std::system_error(errno, std::generic_category());
+            RemoveDirectory(source, removeOptions);
         }
+
+        throw SystemError::GetLastError();
     }
 
     void LocalFileSystemDriver::RemoveFile(const Path& path, const FileRemoveOptions& options)
@@ -216,7 +220,7 @@ namespace Ck::Detail::Unix
             if (errno == ENOENT && options.IgnoreMissing)
                 return;
 
-            throw std::system_error(errno, std::generic_category());
+            throw SystemError::GetLastError();
         }
     }
 
@@ -261,7 +265,7 @@ namespace Ck::Detail::Unix
             if (errno == ENOENT && options.IgnoreMissing)
                 return;
 
-            throw std::system_error(errno, std::generic_category());
+            throw SystemError::GetLastError();
         }
     }
 
@@ -277,7 +281,7 @@ namespace Ck::Detail::Unix
 
     Path LocalFileSystemDriver::MakeCanonical(const Path& path)
     {
-        return TryMakeCanonical(path).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+        return TryMakeCanonical(path).GetOrThrow<FileSystemException>(FileSystemErrorCode::NoSuchFileOrDirectory);
     }
 
     Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
@@ -305,7 +309,7 @@ namespace Ck::Detail::Unix
         if (result != 0)
         {
             if (errno != ENOENT)
-                throw std::system_error(errno, std::generic_category());
+                throw SystemError::GetLastError();
 
             return pathInfo;
         }

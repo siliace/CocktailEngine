@@ -1,6 +1,6 @@
-#include <cstring>
-
 #include <CocktailEngine/Core/String.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
+
 #include <CocktailEngine/Main/Embedded/EmbdeddFile.hpp>
 
 namespace Ck
@@ -10,7 +10,7 @@ namespace Ck
     {
         mPath.ToFormatInPlace(Path::Format::Generic);
         if (flags & FileOpenFlagBits::Truncate | flags & FileOpenFlagBits::Write)
-            throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+            throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
 
         Utf8String utf8Path = Utf8String::Convert(path.ToString());
         mHandle = fileSystem.open(reinterpret_cast<const char*>(utf8Path.GetData()));
@@ -28,7 +28,7 @@ namespace Ck
 
     unsigned EmbeddedFile::Write(const void* buffer, unsigned length)
     {
-        throw std::system_error(std::make_error_code(std::errc::read_only_file_system));
+        throw FileSystemException(FileSystemErrorCode::ReadOnlyFileSystem);
     }
 
     Uint64 EmbeddedFile::GetCursor() const
@@ -41,9 +41,7 @@ namespace Ck
         switch (mode)
         {
             case FileCursorMode::Begin: mCursor = mHandle.cbegin() + offset; break;
-
             case FileCursorMode::Current: mCursor = mCursor + offset; break;
-
             case FileCursorMode::End: mCursor = mHandle.cend() - offset; break;
         }
 

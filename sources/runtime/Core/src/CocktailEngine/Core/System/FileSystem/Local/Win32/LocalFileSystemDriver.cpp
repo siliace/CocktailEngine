@@ -1,3 +1,4 @@
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Local/Win32/LocalDirectory.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Local/Win32/LocalDirectoryIterator.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Local/Win32/LocalDirectoryWatcher.hpp>
@@ -104,7 +105,7 @@ namespace Ck::Detail::Win32
         {
             DWORD error = ::GetLastError();
             if (error != ERROR_ALREADY_EXISTS || !IsDirectory(destination))
-                throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+                throw SystemException(error, SystemError::GetSystemErrorCategory());
         }
 
         const String pattern = fullSource.ToString() + CK_TEXT("\\*");
@@ -142,7 +143,7 @@ namespace Ck::Detail::Win32
         const DWORD findError = ::GetLastError();
         FindClose(hFind);
         if (findError != ERROR_NO_MORE_FILES)
-            throw std::system_error(static_cast<int>(findError), SystemError::GetSystemErrorCategory());
+            throw SystemException(findError, SystemError::GetSystemErrorCategory());
 
         if (options.PreserveMetadata)
         {
@@ -183,10 +184,10 @@ namespace Ck::Detail::Win32
         {
             DWORD error = ::GetLastError();
             if (!options.AllowCopyFallback || error != ERROR_NOT_SAME_DEVICE)
-                throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+                throw SystemException(error, SystemError::GetSystemErrorCategory());
 
             if (!options.Recursive || options.OnlyStructure)
-                throw std::system_error(std::make_error_code(std::errc::invalid_argument));
+                throw InvalidParameterException();
 
             DirectoryCopyOptions copyOptions;
             copyOptions.Overwrite = options.Overwrite;
@@ -225,7 +226,7 @@ namespace Ck::Detail::Win32
             if (error == ERROR_FILE_NOT_FOUND && options.IgnoreMissing)
                 return;
 
-            throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+            throw SystemException(error, SystemError::GetSystemErrorCategory());
         }
     }
 
@@ -269,7 +270,7 @@ namespace Ck::Detail::Win32
             if (error == ERROR_FILE_NOT_FOUND && options.IgnoreMissing)
                 return;
 
-            throw std::system_error(static_cast<int>(error), SystemError::GetSystemErrorCategory());
+            throw SystemException(error, SystemError::GetSystemErrorCategory());
         }
     }
 
@@ -285,7 +286,7 @@ namespace Ck::Detail::Win32
 
     Path LocalFileSystemDriver::MakeCanonical(const Path& path)
     {
-        return TryMakeCanonical(Path::Merge(mBase, path)).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+        return TryMakeCanonical(Path::Merge(mBase, path)).GetOrThrow<FileSystemException>(FileSystemErrorCode::NoSuchFileOrDirectory);
     }
 
     Optional<Path> LocalFileSystemDriver::TryMakeCanonical(const Path& path)
@@ -298,7 +299,7 @@ namespace Ck::Detail::Win32
             if (lastError == ERROR_FILE_NOT_FOUND)
                 return Optional<Path>::Empty();
 
-            throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+            throw SystemException(lastError, SystemError::GetSystemErrorCategory());
         }
 
         HANDLE hFile = ::CreateFileW(fullPath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
@@ -315,7 +316,7 @@ namespace Ck::Detail::Win32
             if (lastError == ERROR_FILE_NOT_FOUND)
                 return Optional<Path>::Empty();
 
-            throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+            throw SystemException(lastError, SystemError::GetSystemErrorCategory());
         }
 
         return Optional<Path>::Of(InPlace, finalPath, finalPathLength);
@@ -332,7 +333,7 @@ namespace Ck::Detail::Win32
         {
             DWORD lastError = ::GetLastError();
             if (lastError != ERROR_FILE_NOT_FOUND && lastError != ERROR_PATH_NOT_FOUND)
-                throw std::system_error(lastError, SystemError::GetSystemErrorCategory());
+                throw SystemException(lastError, SystemError::GetSystemErrorCategory());
 
             return pathInfo;
         }

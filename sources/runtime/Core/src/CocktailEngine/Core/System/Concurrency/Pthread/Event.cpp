@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 #include <CocktailEngine/Core/System/Concurrency/Event.hpp>
-#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp>
+#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadException.hpp>
 #include <CocktailEngine/Core/Utility/Time/Instant.hpp>
 
 namespace Ck
@@ -86,7 +86,7 @@ namespace Ck
 
         int result = pthread_mutex_init(&handle.Mutex, nullptr);
         if (result != 0)
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
 
         /// The default condition attributes use CLOCK_REALTIME, which is the clock
         /// Instant::Now() reads from. Both must stay in sync for WaitUntil to honor
@@ -95,7 +95,7 @@ namespace Ck
         if (result != 0)
         {
             pthread_mutex_destroy(&handle.Mutex);
-            throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+            throw Detail::Pthread::PthreadException(result);
         }
     }
 
@@ -145,7 +145,7 @@ namespace Ck
         {
             const int result = pthread_cond_wait(&handle.Condition, &handle.Mutex);
             if (result != 0)
-                throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+                throw Detail::Pthread::PthreadException(result);
         }
 
         if (mResetMode == ResetMode::Auto)
@@ -175,7 +175,7 @@ namespace Ck
                 continue;
 
             if (result != ETIMEDOUT)
-                throw std::system_error(result, Detail::Pthread::PthreadErrorCategory::Instance);
+                throw Detail::Pthread::PthreadException(result);
 
             /// A signal can land together with the timeout, the mutex being reacquired
             /// before the call returns either way.

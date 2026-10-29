@@ -1,5 +1,4 @@
-#include <system_error>
-
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryDirectory.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryDirectoryIterator.hpp>
 #include <CocktailEngine/Core/System/FileSystem/Memory/MemoryFile.hpp>
@@ -76,11 +75,6 @@ namespace Ck
         {
             return NormalizePath(Path::Merge(parent, name));
         }
-
-        [[noreturn]] void ThrowError(std::errc error)
-        {
-            throw std::system_error(std::make_error_code(error));
-        }
     }
 
     MemoryFileSystemDriver::MemoryFileSystemDriver()
@@ -115,8 +109,8 @@ namespace Ck
         {
             // Creating an already existing file is not an error, like the local driver
             if (node->Type != PathType::File)
-                ThrowError(std::errc::is_a_directory);
-
+                throw FileSystemException(FileSystemErrorCode::IsADirectory);
+            
             return;
         }
 
@@ -127,7 +121,7 @@ namespace Ck
     {
         const Path normalized = NormalizePath(path);
         if (FindNode(normalized).Get() != nullptr)
-            ThrowError(std::errc::file_exists);
+            throw FileSystemException(FileSystemErrorCode::FileExists);
 
         CreateNode(normalized, PathType::Directory);
     }
@@ -150,19 +144,19 @@ namespace Ck
     UniquePtr<File> MemoryFileSystemDriver::OpenFile(const Path& path, const FileOpenFlags& flags)
     {
         if (!(flags & FileOpenFlagBits::Read) && !(flags & FileOpenFlagBits::Write))
-            ThrowError(std::errc::invalid_argument);
+            throw InvalidParameterException();
 
         const Path normalized = NormalizePath(path);
 
         SharedPtr<Node> node = FindNode(normalized);
         if (node.Get() != nullptr && node->Type != PathType::File)
-            ThrowError(std::errc::is_a_directory);
+            throw FileSystemException(FileSystemErrorCode::IsADirectory);
 
         if (node.Get() == nullptr)
         {
             const bool create = (flags & FileOpenFlagBits::Write) && !(flags & FileOpenFlagBits::Existing);
             if (!create)
-                ThrowError(std::errc::no_such_file_or_directory);
+                throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
             node = CreateNode(normalized, PathType::File);
         }
@@ -219,7 +213,7 @@ namespace Ck
 
         // Copying a directory into itself would recurse forever
         if (IsInSubTree(normalizedDestination, normalizedSource))
-            ThrowError(std::errc::invalid_argument);
+            throw InvalidParameterException();
 
         SharedPtr<Node> destinationNode = FindNode(normalizedDestination);
         if (destinationNode.Get() == nullptr)
@@ -228,7 +222,7 @@ namespace Ck
         }
         else if (destinationNode->Type != PathType::Directory)
         {
-            ThrowError(std::errc::not_a_directory);
+            throw FileSystemException(FileSystemErrorCode::NotADirectory);
         }
 
         // The recursion mutates the children of the source, walk a snapshot of them
@@ -275,10 +269,10 @@ namespace Ck
         if (destinationNode.Get() != nullptr)
         {
             if (destinationNode->Type != PathType::File)
-                ThrowError(std::errc::is_a_directory);
+                throw FileSystemException(FileSystemErrorCode::IsADirectory);
 
             if (!options.Overwrite)
-                ThrowError(std::errc::file_exists);
+                throw FileSystemException(FileSystemErrorCode::FileExists);
         }
 
         // Nothing must be unlinked before the destination is known to be reachable
@@ -299,26 +293,26 @@ namespace Ck
 
         const SharedPtr<Node> sourceNode = RequireDirectory(normalizedSource);
         if (normalizedSource.IsEmpty())
-            ThrowError(std::errc::device_or_resource_busy);
+            throw FileSystemException(FileSystemErrorCode::DeviceOrResourceBusy);
 
         if (normalizedSource == normalizedDestination)
             return;
 
         // Moving a directory inside itself would detach it from the tree
         if (IsInSubTree(normalizedDestination, normalizedSource))
-            ThrowError(std::errc::invalid_argument);
+            throw InvalidParameterException();
 
         const SharedPtr<Node> destinationNode = FindNode(normalizedDestination);
         if (destinationNode.Get() != nullptr)
         {
             if (destinationNode->Type != PathType::Directory)
-                ThrowError(std::errc::not_a_directory);
+                throw FileSystemException(FileSystemErrorCode::NotADirectory);
 
             if (!options.Overwrite)
-                ThrowError(std::errc::file_exists);
+                throw FileSystemException(FileSystemErrorCode::FileExists);
 
             if (!destinationNode->Children.IsEmpty())
-                ThrowError(std::errc::directory_not_empty);
+                throw FileSystemException(FileSystemErrorCode::DirectoryNotEmpty);
         }
 
         // Nothing must be unlinked before the destination is known to be reachable
@@ -340,11 +334,11 @@ namespace Ck
             if (options.IgnoreMissing)
                 return;
 
-            ThrowError(std::errc::no_such_file_or_directory);
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
         }
 
         if (node->Type != PathType::File)
-            ThrowError(std::errc::is_a_directory);
+            throw FileSystemException(FileSystemErrorCode::IsADirectory);
 
         // An in-memory file has no read-only attribute, options.Force is a no-op
         DetachNode(node);
@@ -360,18 +354,18 @@ namespace Ck
             if (options.IgnoreMissing)
                 return;
 
-            ThrowError(std::errc::no_such_file_or_directory);
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
         }
 
         if (node->Type != PathType::Directory)
-            ThrowError(std::errc::not_a_directory);
+            throw FileSystemException(FileSystemErrorCode::NotADirectory);
 
         // The root is the anchor of the whole tree, it can only be emptied
         if (normalized.IsEmpty())
-            ThrowError(std::errc::device_or_resource_busy);
+            throw FileSystemException(FileSystemErrorCode::DeviceOrResourceBusy);
 
         if (!node->Children.IsEmpty() && !options.Recursive)
-            ThrowError(std::errc::directory_not_empty);
+            throw FileSystemException(FileSystemErrorCode::DirectoryNotEmpty);
 
         DropSubTree(node);
         DetachNode(node);
@@ -379,7 +373,7 @@ namespace Ck
 
     Path MemoryFileSystemDriver::MakeCanonical(const Path& path)
     {
-        return TryMakeCanonical(path).GetOrThrow<std::system_error>(std::make_error_code(std::errc::no_such_file_or_directory));
+        return TryMakeCanonical(path).GetOrThrow<FileSystemException>(FileSystemErrorCode::NoSuchFileOrDirectory);
     }
 
     Optional<Path> MemoryFileSystemDriver::TryMakeCanonical(const Path& path)
@@ -439,10 +433,10 @@ namespace Ck
     {
         SharedPtr<Node> node = FindNode(path);
         if (node.Get() == nullptr)
-            ThrowError(std::errc::no_such_file_or_directory);
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
         if (node->Type != PathType::Directory)
-            ThrowError(std::errc::not_a_directory);
+            throw FileSystemException(FileSystemErrorCode::NotADirectory);
 
         return node;
     }
@@ -451,10 +445,10 @@ namespace Ck
     {
         SharedPtr<Node> node = FindNode(path);
         if (node.Get() == nullptr)
-            ThrowError(std::errc::no_such_file_or_directory);
+            throw FileSystemException(FileSystemErrorCode::NoSuchFileOrDirectory);
 
         if (node->Type != PathType::File)
-            ThrowError(std::errc::is_a_directory);
+            throw FileSystemException(FileSystemErrorCode::IsADirectory);
 
         return node;
     }
@@ -462,7 +456,7 @@ namespace Ck
     SharedPtr<Detail::MemoryFileSystemNode> MemoryFileSystemDriver::CreateNode(const Path& path, PathType type)
     {
         if (path.IsEmpty())
-            ThrowError(std::errc::file_exists);
+            throw FileSystemException(FileSystemErrorCode::FileExists);
 
         // Parent directories are never created implicitly, like the local driver
         const SharedPtr<Node> parent = RequireDirectory(path.GetParent());
@@ -489,10 +483,10 @@ namespace Ck
             return CreateNode(path, PathType::File);
 
         if (node->Type != PathType::File)
-            ThrowError(std::errc::is_a_directory);
+            throw FileSystemException(FileSystemErrorCode::IsADirectory);
 
         if (!overwrite)
-            ThrowError(std::errc::file_exists);
+            throw FileSystemException(FileSystemErrorCode::FileExists);
 
         node->Content.Clear();
 

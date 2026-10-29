@@ -3,6 +3,7 @@
 
 #include <CocktailEngine/Core/HashMap.hpp>
 #include <CocktailEngine/Core/System/FileSystem/FileSystemDriver.hpp>
+#include <CocktailEngine/Core/System/FileSystem/FileSystemException.hpp>
 #include <CocktailEngine/Core/System/FileSystem/URI.hpp>
 #include <CocktailEngine/Core/Utility/Optional.hpp>
 
@@ -22,7 +23,9 @@ namespace Ck
      * Operations between two URIs use the native driver operation when both URIs
      * resolve to the same driver object, even when their schemes differ. Operations
      * between distinct drivers use the service's generic copy or copy-and-remove
-     * fallback where supported.
+     * fallback where supported. Validation failures raised by these generic
+     * fallbacks use \ref FileSystemException. Native driver operations retain the
+     * error contract of the resolved driver.
      *
      * \see URI
      * \see FileSystemDriver
@@ -141,6 +144,9 @@ namespace Ck
          * \param destination URI of the target file.
          * \param options Copy behaviour options.
          *
+         * \throws FileSystemException When the generic cross-driver fallback
+         *         rejects the source or destination state. Inspect
+         *         \ref FileSystemException::GetErrorCode for the condition.
          * \throws NoSuchDriverException When either URI cannot be resolved.
          */
         void CopyFile(const URI& source, const URI& destination, const FileCopyOptions& options);
@@ -157,6 +163,9 @@ namespace Ck
          * \param destination URI of the target directory.
          * \param options Copy behaviour options.
          *
+         * \throws FileSystemException When the generic cross-driver fallback
+         *         rejects the source or destination state. Inspect
+         *         \ref FileSystemException::GetErrorCode for the condition.
          * \throws NoSuchDriverException When either URI cannot be resolved.
          */
         void CopyDirectory(const URI& source, const URI& destination, const DirectoryCopyOptions& options);
@@ -173,8 +182,10 @@ namespace Ck
          * \param destination URI of the target file.
          * \param options Move behaviour options.
          *
-         * \throws CrossDeviceLinkException When an inter-driver move disallows the
-         *         copy fallback.
+         * \throws FileSystemException When the generic cross-driver fallback
+         *         rejects a filesystem state. The error code is
+         *         \ref FileSystemErrorCode::CrossDeviceLink when
+         *         \p options.AllowCopyFallback is false.
          * \throws NoSuchDriverException When either URI cannot be resolved.
          */
         void MoveFile(const URI& source, const URI& destination, const FileMoveOptions& options);
@@ -192,8 +203,10 @@ namespace Ck
          * \param destination URI of the target directory.
          * \param options Move behaviour options.
          *
-         * \throws CrossDeviceLinkException When an inter-driver move disallows the
-         *         copy fallback.
+         * \throws FileSystemException When the generic cross-driver fallback
+         *         rejects a filesystem state. The error code is
+         *         \ref FileSystemErrorCode::CrossDeviceLink when
+         *         \p options.AllowCopyFallback is false.
          * \throws InvalidParameterException When the inter-driver fallback options
          *         are incompatible or the source designates a driver root.
          * \throws NoSuchDriverException When either URI cannot be resolved.

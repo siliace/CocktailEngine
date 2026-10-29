@@ -20,10 +20,10 @@ namespace Ck::Detail::Win32
 
         if (!SetHandleInformation(readHandle, HANDLE_FLAG_INHERIT, 0))
         {
-            DWORD error = GetLastError();
+            DWORD lastError = GetLastError();
             CloseHandle(readHandle);
             CloseHandle(writeHandle);
-            throw std::system_error((int) error, SystemError::GetSystemErrorCategory());
+            throw SystemException(lastError, SystemError::GetSystemErrorCategory());
         }
 
         mReader = MakeUnique<PipeReader>(readHandle);

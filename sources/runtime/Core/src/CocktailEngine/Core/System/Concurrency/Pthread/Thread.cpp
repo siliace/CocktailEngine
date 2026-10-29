@@ -8,14 +8,12 @@
 #include <CocktailEngine/Core/Exception.hpp>
 #include <CocktailEngine/Core/Log/Log.hpp>
 #include <CocktailEngine/Core/Log/LogLevel.hpp>
-#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadErrorCategory.hpp>
+#include <CocktailEngine/Core/System/Concurrency/Pthread/PthreadException.hpp>
 #include <CocktailEngine/Core/System/Concurrency/Pthread/Thread.hpp>
 #include <CocktailEngine/Core/System/Concurrency/Pthread/ThreadManager.hpp>
 #include <CocktailEngine/Core/System/Concurrency/Runnable.hpp>
 #include <CocktailEngine/Core/System/SystemError.hpp>
 #include <CocktailEngine/Core/System/Unix/UnixServiceProvider.hpp>
-
-#include "CocktailEngine/Core/System/Concurrency/Event.hpp"
 
 namespace Ck
 {
@@ -182,7 +180,7 @@ namespace Ck
             AnsiChar buffer[ThreadNameMaxSize];
             int error = pthread_getname_np(mHandle, buffer, ThreadNameMaxSize);
             if (error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
         }
 
         Thread::Thread(Runnable* runnable, StringView name, unsigned int stackSize) :
@@ -200,13 +198,13 @@ namespace Ck
             {
                 int error = pthread_attr_setstacksize(&attributes, stackSize);
                 if (error != 0)
-                    throw std::system_error(error, PthreadErrorCategory::Instance);
+                    throw PthreadException(error);
             }
 
             int error = pthread_create(&mHandle, &attributes, &Thread::Run, this);
             pthread_attr_destroy(&attributes);
             if (error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
 
             mStarted.Wait();
         }
@@ -220,7 +218,7 @@ namespace Ck
         void Thread::Join()
         {
             if (int error = pthread_join(mHandle, nullptr); error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
 
             mJoined = true;
         }
@@ -246,7 +244,7 @@ namespace Ck
                 if (error == ETIMEDOUT)
                     return false;
 
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
             }
 
             mJoined = true;
@@ -273,7 +271,7 @@ namespace Ck
             int policy = SCHED_OTHER;
 
             if (int error = pthread_getschedparam(mHandle, &policy, &schedulerParameters); error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
 
             id_t id = GetId();
 
@@ -292,7 +290,7 @@ namespace Ck
                         return;
                     }
 
-                    throw std::system_error(error, PthreadErrorCategory::Instance);
+                    throw PthreadException(error);
                 }
             }
             else
@@ -342,7 +340,7 @@ namespace Ck
 
             int error = pthread_setaffinity_np(mHandle, sizeof(cpu_set_t), &threadAffinity);
             if (error != 0)
-                throw std::system_error(error, PthreadErrorCategory::Instance);
+                throw PthreadException(error);
         }
 
         void Thread::SetName(StringView name)
@@ -352,7 +350,7 @@ namespace Ck
                 StringView truncatedName = name.SubStringView(0, 15); /// Pthread does not support thread names with more than 15 chars
                 int error = pthread_setname_np(mHandle, AsciiString::Convert(truncatedName).GetData());
                 if (error != 0 && error != ESRCH)
-                    throw std::system_error(error, PthreadErrorCategory::Instance);
+                    throw PthreadException(error);
 
                 mName = String::FromView(name);
             }
@@ -360,7 +358,7 @@ namespace Ck
             {
                 int error = pthread_setname_np(mHandle, "");
                 if (error != 0 && error != ESRCH)
-                    throw std::system_error(error, PthreadErrorCategory::Instance);
+                    throw PthreadException(error);
 
                 mName = String::Empty;
             }
