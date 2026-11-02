@@ -133,3 +133,83 @@ TEST_CASE("Result special member functions follow its alternatives", "[Result]")
     STATIC_REQUIRE(std::is_move_constructible_v<MoveOnlyResult>);
     STATIC_REQUIRE(std::is_move_assignable_v<MoveOnlyResult>);
 }
+
+TEST_CASE("Create a void Result", "[Result]")
+{
+    SECTION("with a successful operation")
+    {
+        Ck::Result<void, Ck::String> result = Ck::Result<void, Ck::String>::Success();
+
+        REQUIRE(result.IsSuccess());
+        REQUIRE_FALSE(result.IsFailure());
+        REQUIRE(static_cast<bool>(result));
+        REQUIRE_FALSE(result.TryGetError().HasValue());
+        REQUIRE_THROWS_AS(result.GetError(), Ck::BadResultAccessException);
+    }
+
+    SECTION("with an error")
+    {
+        Ck::Result<void, Ck::String> result = Ck::Result<void, Ck::String>::Failure(CK_TEXT("Failure"));
+        const Ck::Result<void, Ck::String>& constResult = result;
+        auto error = result.TryGetError();
+        auto constError = constResult.TryGetError();
+
+        REQUIRE_FALSE(result.IsSuccess());
+        REQUIRE(result.IsFailure());
+        REQUIRE_FALSE(static_cast<bool>(result));
+        REQUIRE(error.HasValue());
+        REQUIRE(&error.Get() == &result.GetError());
+        REQUIRE(constError.HasValue());
+        REQUIRE(&constError.Get() == &constResult.GetError());
+        REQUIRE(result.GetError() == CK_TEXT("Failure"));
+    }
+}
+
+TEST_CASE("Copy and move a void Result", "[Result]")
+{
+    SECTION("when it represents a success")
+    {
+        Ck::Result<void, Ck::String> source = Ck::Result<void, Ck::String>::Success();
+        Ck::Result<void, Ck::String> copy(source);
+        Ck::Result<void, Ck::String> destination(Move(source));
+
+        REQUIRE(source.IsSuccess());
+        REQUIRE(copy.IsSuccess());
+        REQUIRE(destination.IsSuccess());
+    }
+
+    SECTION("when it represents an error")
+    {
+        Ck::Result<void, Ck::String> source = Ck::Result<void, Ck::String>::Failure(CK_TEXT("Failure"));
+        Ck::Result<void, Ck::String> copy(source);
+        Ck::Result<void, Ck::String> destination = Ck::Result<void, Ck::String>::Success();
+
+        destination = source;
+
+        REQUIRE(copy.GetError() == CK_TEXT("Failure"));
+        REQUIRE(destination.GetError() == CK_TEXT("Failure"));
+
+        destination = Move(source);
+
+        REQUIRE(source.IsFailure());
+        REQUIRE(destination.IsFailure());
+        REQUIRE(destination.GetError() == CK_TEXT("Failure"));
+    }
+}
+
+TEST_CASE("Void Result special member functions follow its error type", "[Result]")
+{
+    using CopyableResult = Ck::Result<void, Ck::String>;
+    using MoveOnlyResult = Ck::Result<void, MoveOnlyError>;
+
+    STATIC_REQUIRE_FALSE(std::is_default_constructible_v<CopyableResult>);
+    STATIC_REQUIRE(std::is_copy_constructible_v<CopyableResult>);
+    STATIC_REQUIRE(std::is_copy_assignable_v<CopyableResult>);
+    STATIC_REQUIRE(std::is_move_constructible_v<CopyableResult>);
+    STATIC_REQUIRE(std::is_move_assignable_v<CopyableResult>);
+
+    STATIC_REQUIRE_FALSE(std::is_copy_constructible_v<MoveOnlyResult>);
+    STATIC_REQUIRE_FALSE(std::is_copy_assignable_v<MoveOnlyResult>);
+    STATIC_REQUIRE(std::is_move_constructible_v<MoveOnlyResult>);
+    STATIC_REQUIRE(std::is_move_assignable_v<MoveOnlyResult>);
+}

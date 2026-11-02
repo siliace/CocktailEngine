@@ -16,7 +16,8 @@ namespace Ck::Ftp
 
     void Client::Send(const Request& request) const
     {
-        OutputStreamWriter<Encoders::Utf8> writer(mControlSocket.GetOutputStream());
+        TcpClientOutputStream socketStream(mControlSocket);
+        OutputStreamWriter<Encoders::Utf8> writer(socketStream);
         BufferedWriter<Encoders::Utf8, LinearAllocator<1024>> bufferedWriter(writer, 1024);
 
         request.Serialize(bufferedWriter);
@@ -26,7 +27,8 @@ namespace Ck::Ftp
 
     Response Client::WaitResponse() const
     {
-        InputStreamReader<Encoders::Utf8> reader(mControlSocket.GetInputStream());
+        TcpClientInputStream socketStream(mControlSocket);
+        InputStreamReader<Encoders::Utf8> reader(socketStream);
         BufferedReader<Encoders::Utf8, LinearAllocator<1024>> bufferedReader(reader, 1024);
 
         Utf8Char buffer[1024];

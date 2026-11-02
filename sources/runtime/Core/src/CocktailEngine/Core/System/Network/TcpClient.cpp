@@ -1,162 +1,211 @@
-#include <CocktailEngine/Core/System/Network/SocketAddress.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketAddress.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketException.hpp>
 #include <CocktailEngine/Core/System/Network/TcpClient.hpp>
-#include <CocktailEngine/Core/System/SystemError.hpp>
 
 namespace Ck
 {
-    class SocketInputStream : public InputStream<>
+    TcpClient::TcpClient(const IpAddress& address, unsigned short port)
     {
-    public:
+        Connect(address, port);
+    }
 
-        explicit SocketInputStream(TcpClient* tcpClient) :
-            mTcpClient(tcpClient),
-            mReceiveClosed(false)
-        {
-            /// Nothing
-        }
-
-        SizeType Read(Byte* buffer, SizeType length) override
-        {
-            if (mReceiveClosed || length == 0)
-                return 0;
-
-            SizeType received = mTcpClient->Receive(buffer, length);
-            if (received == 0)
-                mReceiveClosed = true;
-
-            return received;
-        }
-
-        bool HasCursor() const override
-        {
-            return false;
-        }
-
-        Uint64 Seek(Uint64 position) override
-        {
-            ExceptionUtils::ThrowNotImplemented();
-        }
-
-        void Rewind() override
-        {
-            ExceptionUtils::ThrowNotImplemented();
-        }
-
-        Uint64 Tell() const override
-        {
-            ExceptionUtils::ThrowNotImplemented();
-        }
-
-        SizeType GetSize() const override
-        {
-            return mTcpClient->GetPendingLength();
-        }
-
-        bool IsEof() const override
-        {
-            return mReceiveClosed;
-        }
-
-    private:
-
-        TcpClient* mTcpClient;
-        bool mReceiveClosed;
-    };
-
-    class SocketOutputStream : public OutputStream<>
+    TcpClient::TcpClient(const IpAddress& address, unsigned short port, const IpAddress& localAddress, unsigned short localPort)
     {
-    public:
+        Bind(localAddress, localPort);
+        Connect(address, port);
+    }
 
-        explicit SocketOutputStream(TcpClient* tcpClient) :
-            mTcpClient(tcpClient)
-        {
-            /// Nothing
-        }
+    void TcpClient::Create(IpAddress::Protocol protocol)
+    {
+       SocketOwner::Create(protocol, Socket::Type::Tcp);
+    }
 
-        SizeType Write(const Byte* data, SizeType length) override
-        {
-            SizeType result = 0;
-            for (SizeType sent = 0; sent < length; sent += result)
-                result = mTcpClient->Send(data + sent, length - sent);
+    void TcpClient::Bind(const IpAddress& localAddress, unsigned short localPort)
+    {
+        assert(localPort != 0);
 
-            return result;
-        }
+        if (!mSocket.IsValid())
+            Create(localAddress.GetProtocol());
 
-        void Flush() override
-        {
-        }
+        Result<void, SocketErrorCode> bindResult = mSocket.Bind(localAddress, localPort);
+        if (bindResult.IsFailure())
+            throw SocketException(bindResult.GetError());
+    }
 
-    private:
-
-        TcpClient* mTcpClient;
-    };
-
-    TcpClient::TcpClient(const IpAddress& remoteAddress, unsigned short port) :
-        Socket(remoteAddress.GetProtocol(), Type::Tcp),
-        mRemotePort(0)
+    void TcpClient::Connect(const IpAddress& address, unsigned short port)
     {
         assert(port != 0);
-        assert(mHandle != InvalidHandle);
 
-        SocketAddress socketAddress = SocketAddress::Of(remoteAddress, port);
+        if (!mSocket.IsValid())
+            Create(address.GetProtocol());
 
-        int error = ::connect(mHandle, socketAddress.AsSockAddr(), socketAddress.GetLength());
-        if (error == -1)
-            throw SystemError::GetLastError();
+        Result<void, SocketErrorCode> connectResult = mSocket.Connect(address, port);
+        if (connectResult.IsFailure())
+            throw SocketException(connectResult.GetError());
 
-        mInputStream = MakeUnique<SocketInputStream>(this);
-        mOutputStream = MakeUnique<SocketOutputStream>(this);
+        mRemoteAddress = SocketAddress(address, port);
     }
 
-    InputStream<>& TcpClient::GetInputStream() const
+    void TcpClient::Send(const void* data, unsigned int length) const
     {
-        return *mInputStream;
-    }
+        assert(mSocket.IsValid());
 
-    OutputStream<>& TcpClient::GetOutputStream() const
-    {
-        return *mOutputStream;
-    }
+        if (data && length)
+        {
+            for (unsigned int sent = 0; sent < length;)
+            {
+                Result<unsigned int, SocketErrorCode> result = mSocket.Send(static_cast<const Byte*>(data) + sent, length - sent);
+                if (result.IsFailure())
+                    throw SocketException(result.GetError());
 
-    const IpAddress* TcpClient::GetRemoteAddress() const
-    {
-        return mRemoteAddress.Get();
-    }
-
-    unsigned short TcpClient::GetRemotePort() const
-    {
-        return mRemotePort;
-    }
-
-    TcpClient::TcpClient(Handle handle, UniquePtr<IpAddress> remoteAddress, unsigned short remotePort) :
-        Socket(handle),
-        mRemoteAddress(Move(remoteAddress)),
-        mRemotePort(remotePort)
-    {
-        /// Nothing
-    }
-
-    unsigned int TcpClient::Send(const void* data, unsigned int length) const
-    {
-        assert(data && length);
-        assert(mHandle != InvalidHandle);
-
-        long result = ::send(mHandle, static_cast<const char*>(data), static_cast<int>(length), 0);
-        if (result == -1)
-            throw SystemError::GetLastError();
-
-        return static_cast<unsigned int>(result);
+                sent += result.GetValue();
+            }
+        }
     }
 
     unsigned int TcpClient::Receive(void* data, unsigned int length) const
     {
-        assert(data && length);
-        assert(mHandle != InvalidHandle);
+        assert(mSocket.IsValid());
 
-        long received = ::recv(mHandle, static_cast<char*>(data), static_cast<int>(length), 0);
-        if (received == -1)
-            throw SystemError::GetLastError();
+        if (data && length)
+        {
+            Result<unsigned int, SocketErrorCode> result = mSocket.Receive(data, length);
+            if (result.IsFailure())
+                throw SocketException(result.GetError());
 
-        return received;
+            return result.GetValue();
+        }
+
+        return 0;
+    }
+
+    void TcpClient::Close()
+    {
+        SocketOwner::Close();
+        mRemoteAddress = {};
+    }
+
+    Optional<const IpAddress&> TcpClient::GetRemoteAddress() const
+    {
+        if (!mSocket.IsValid())
+            return Optional<const IpAddress&>::Empty();
+
+        switch (mRemoteAddress.GetProtocol())
+        {
+            case IpAddress::Protocol::Ipv4: return Optional<const IpAddress&>::Of(mRemoteAddress.GetAddressV4());
+            case IpAddress::Protocol::Ipv6: return Optional<const IpAddress&>::Of(mRemoteAddress.GetAddressV6());
+        }
+
+        return Optional<const IpAddress&>::Empty();
+    }
+
+    Optional<unsigned short> TcpClient::GetRemotePort() const
+    {
+        if (!mSocket.IsValid())
+            return Optional<unsigned short>::Empty();
+
+        return Optional<unsigned short>::Of(mRemoteAddress.GetPort());
+    }
+
+    bool TcpClient::GetNoDelay() const
+    {
+        return GetSocketOption(SocketOptions::TcpNoDelay);
+    }
+
+    void TcpClient::SetNoDelay(bool noDelay) const
+    {
+        SetSocketOption(SocketOptions::TcpNoDelay, noDelay);
+    }
+
+    bool TcpClient::GetKeepAlive() const
+    {
+        return GetSocketOption(SocketOptions::KeepAlive);
+    }
+
+    void TcpClient::SetKeepAlive(bool keepAlive) const
+    {
+        SetSocketOption(SocketOptions::KeepAlive, keepAlive);
+    }
+
+    bool TcpClient::GetOutOfBandInline() const
+    {
+        return GetSocketOption(SocketOptions::OutOfBandInline);
+    }
+
+    void TcpClient::SetOutOfBandInline(bool outOfBandInline) const
+    {
+        SetSocketOption(SocketOptions::OutOfBandInline, outOfBandInline);
+    }
+
+    bool TcpClient::GetReuseAddress() const
+    {
+        return GetSocketOption(SocketOptions::ReuseAddress);
+    }
+
+    void TcpClient::SetReuseAddress(bool reuseAddress) const
+    {
+        SetSocketOption(SocketOptions::ReuseAddress, reuseAddress);
+    }
+
+    unsigned int TcpClient::GetReceiveBufferSize() const
+    {
+        return GetSocketOption(SocketOptions::ReceiveBuffer);
+    }
+
+    void TcpClient::SetReceiveBufferSize(unsigned int bufferSize) const
+    {
+        SetSocketOption(SocketOptions::ReceiveBuffer, bufferSize);
+    }
+
+    unsigned int TcpClient::GetSendBufferSize() const
+    {
+        return GetSocketOption(SocketOptions::SendBuffer);
+    }
+
+    void TcpClient::SetSendBufferSize(unsigned int bufferSize) const
+    {
+        SetSocketOption(SocketOptions::SendBuffer, bufferSize);
+    }
+
+    SocketLinger TcpClient::GetLinger() const
+    {
+        return GetSocketOption(SocketOptions::Linger);
+    }
+
+    void TcpClient::SetLinger(const SocketLinger& linger) const
+    {
+        SetSocketOption(SocketOptions::Linger, linger);
+    }
+
+    Duration TcpClient::GetReceiveTimeout() const
+    {
+        return GetSocketOption(SocketOptions::ReceiveTimeout);
+    }
+
+    void TcpClient::SetReceiveTimeout(const Duration& timeout) const
+    {
+        SetSocketOption(SocketOptions::ReceiveTimeout, timeout);
+    }
+
+    Duration TcpClient::GetSendTimeout() const
+    {
+        return GetSocketOption(SocketOptions::SendTimeout);
+    }
+
+    void TcpClient::SetSendTimeout(const Duration& timeout) const
+    {
+        SetSocketOption(SocketOptions::SendTimeout, timeout);
+    }
+
+    unsigned int TcpClient::GetPendingLength() const
+    {
+        return mSocket.GetPendingLength();
+    }
+
+    TcpClient::TcpClient(Socket socket, SocketAddress remoteAddress) :
+        SocketOwner(Move(socket)),
+        mRemoteAddress(Move(remoteAddress))
+    {
+        assert(mSocket.IsValid());
     }
 }

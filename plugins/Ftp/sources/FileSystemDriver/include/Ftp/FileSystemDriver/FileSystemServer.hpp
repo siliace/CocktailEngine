@@ -4,7 +4,7 @@
 #include <CocktailEngine/Core/System/Concurrency/Thread.hpp>
 #include <CocktailEngine/Core/System/FileSystem/FileSystemDriver.hpp>
 #include <CocktailEngine/Core/System/Network/TcpClient.hpp>
-#include <CocktailEngine/Core/System/Network/TcpServer.hpp>
+#include <CocktailEngine/Core/System/Network/TcpListener.hpp>
 
 #include <Ftp/FileSystemDriver/Export.hpp>
 
@@ -25,7 +25,7 @@ namespace Ck
             FileSystemDriver* mDriver;
             UniquePtr<Thread> mAcceptThread;
             UniquePtr<Runnable> mAcceptRunnable;
-            TcpServer mServer;
+            TcpListener mServer;
             Mutex mClientsMutex;
             Array<TcpClient> mClients;
             UniquePtr<ThreadPool> mThreadPool;

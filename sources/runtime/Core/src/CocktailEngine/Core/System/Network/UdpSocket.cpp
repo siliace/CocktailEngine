@@ -1,52 +1,57 @@
-#include <CocktailEngine/Core/System/Network/SocketAddress.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketAddress.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketException.hpp>
 #include <CocktailEngine/Core/System/Network/UdpSocket.hpp>
 #include <CocktailEngine/Core/System/SystemError.hpp>
 
 namespace Ck
 {
-    UdpSocket::UdpSocket(IpAddress::Protocol protocol) :
-        Socket(protocol, Type::Udp)
+    UdpSocket::UdpSocket(IpAddress::Protocol protocol)
     {
-        assert(mHandle != InvalidHandle);
+        Create(protocol, Socket::Type::Udp);
     }
 
-    UdpSocket::UdpSocket(unsigned short port, const IpAddress& host) :
-        Socket(host.GetProtocol(), Type::Udp)
+    UdpSocket::UdpSocket(const IpAddress& localAddress, unsigned short localPort)
     {
-        assert(port != 0);
-        assert(mHandle != InvalidHandle);
-
-        SocketAddress socketAddress = SocketAddress::Of(host, port);
-        int error = ::bind(mHandle, socketAddress.AsSockAddr(), socketAddress.GetLength());
-        if (error == -1)
-            throw SystemError::GetLastError();
+        Bind(localAddress, localPort);
     }
 
-    std::tuple<std::size_t, UniquePtr<IpAddress>, unsigned short> UdpSocket::Receive(void* data, std::size_t length) const
+    void UdpSocket::Bind(const IpAddress& localAddress, unsigned short localPort)
     {
-        assert(data && length);
-        assert(mHandle != InvalidHandle);
+        if (!mSocket.IsValid())
+            Create(localAddress.GetProtocol(), Socket::Type::Udp);
 
-        sockaddr_in6 sockAddr;
-        int sockaddrlength = sizeof(sockaddr_in6);
-        int received = ::recvfrom(mHandle, static_cast<char*>(data), static_cast<int>(length), 0, reinterpret_cast<sockaddr*>(&sockAddr), (socklen_t*) &sockaddrlength);
-        if (received == -1)
-            throw SystemError::GetLastError();
-
-        SocketAddress socketAddress(reinterpret_cast<const sockaddr&>(sockAddr), sockaddrlength);
-        return std::make_tuple(received, socketAddress.ToIpAddress(), socketAddress.GetPort());
+        Result<void, SocketErrorCode> bindResult = mSocket.Bind(localAddress, localPort);
+        if (bindResult.IsFailure())
+            throw SocketException(bindResult.GetError());
     }
 
-    std::size_t UdpSocket::Send(const void* data, std::size_t length, const IpAddress& remoteAddress, unsigned short port) const
+    unsigned int UdpSocket::Receive(void* data, std::size_t length, SocketAddress& clientAddress) const
     {
-        assert(data && length);
-        assert(mHandle != InvalidHandle);
+        assert(mSocket.IsValid());
 
-        SocketAddress socketAddress = SocketAddress::Of(remoteAddress, port);
-        int sent = ::sendto(mHandle, static_cast<const char*>(data), static_cast<int>(length), 0, socketAddress.AsSockAddr(), socketAddress.GetLength());
-        if (sent == -1)
-            throw SystemError::GetLastError();
+        if (data && length)
+        {
+            Result<unsigned int, SocketErrorCode> result = mSocket.ReceiveFrom(data, length, clientAddress);
+            if (result.IsFailure())
+                throw SocketException(result.GetError());
 
-        return sent;
+            return result.GetValue();
+        }
+
+        return 0;
+    }
+
+    void UdpSocket::Send(const void* data, std::size_t length, const IpAddress& address, unsigned short port) const
+    {
+        assert(mSocket.IsValid());
+
+        if (!data || length == 0)
+            return;
+
+        Result<unsigned int, SocketErrorCode> result = mSocket.SendTo(data, static_cast<unsigned int>(length), address, port);
+        if (result.IsFailure())
+            throw SocketException(result.GetError());
+
+        assert(result.GetValue() == length);
     }
 }

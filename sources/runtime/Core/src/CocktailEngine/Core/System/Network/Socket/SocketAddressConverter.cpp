@@ -1,10 +1,8 @@
-#include <cstring>
-
-#include <CocktailEngine/Core/System/Network/SocketAddress.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketAddressConverter.hpp>
 
 namespace Ck
 {
-    SocketAddress SocketAddress::Of(const IpAddress& ipAddress, unsigned short port)
+    SocketAddressConverter SocketAddressConverter::Of(const IpAddress& ipAddress, unsigned short port)
     {
         if (ipAddress.GetProtocol() == IpAddress::Protocol::Ipv4)
         {
@@ -18,7 +16,7 @@ namespace Ck
             for (std::size_t i = 0; i < ipAddress.GetLength(); i++)
                 bytes[i] = ipAddress.GetByte(i);
 
-            return SocketAddress(sockAddr);
+            return SocketAddressConverter(sockAddr);
         }
 
         sockaddr_in6 sockAddr;
@@ -31,22 +29,22 @@ namespace Ck
         for (std::size_t i = 0; i < ipAddress.GetLength(); i++)
             bytes[i] = ipAddress.GetByte(i);
 
-        return SocketAddress(sockAddr);
+        return SocketAddressConverter(sockAddr);
     }
 
-    SocketAddress::SocketAddress(const sockaddr_in& sockaddr) :
+    SocketAddressConverter::SocketAddressConverter(const sockaddr_in& sockaddr) :
         mLength(sizeof(sockaddr_in))
     {
         mAddress.V4 = sockaddr;
     }
 
-    SocketAddress::SocketAddress(const sockaddr_in6& sockaddr) :
+    SocketAddressConverter::SocketAddressConverter(const sockaddr_in6& sockaddr) :
         mLength(sizeof(sockaddr_in6))
     {
         mAddress.V6 = sockaddr;
     }
 
-    SocketAddress::SocketAddress(const sockaddr& sockAddr, int sockAddrLength)
+    SocketAddressConverter::SocketAddressConverter(const sockaddr& sockAddr, int sockAddrLength)
     {
         if (sockAddr.sa_family == AF_INET)
         {
@@ -64,57 +62,66 @@ namespace Ck
         }
     }
 
-    const sockaddr* SocketAddress::AsSockAddr() const
+    const sockaddr* SocketAddressConverter::AsSockAddr() const
     {
         return reinterpret_cast<const sockaddr*>(&mAddress);
     }
 
-    UniquePtr<IpAddress> SocketAddress::ToIpAddress() const
+    IpAddress::Protocol SocketAddressConverter::GetProtocol() const
     {
         switch (AsSockAddr()->sa_family)
         {
-            case AF_INET: return ToIpAddressV4();
+            case AF_INET: return IpAddress::Protocol::Ipv4;
+            case AF_INET6: return IpAddress::Protocol::Ipv6;
+        }
 
-            case AF_INET6: return ToIpAddressV6();
+        COCKTAIL_UNREACHABLE();
+    }
+
+    UniquePtr<IpAddress> SocketAddressConverter::ToIpAddress() const
+    {
+        switch (AsSockAddr()->sa_family)
+        {
+            case AF_INET: return MakeUnique<IpAddressV4>(ToIpAddressV4());
+            case AF_INET6: return MakeUnique<IpAddressV6>(ToIpAddressV6());
         }
 
         return nullptr;
     }
 
-    unsigned short SocketAddress::GetPort() const
+    IpAddressV4 SocketAddressConverter::ToIpAddressV4() const
+    {
+        const sockaddr_in* addr = reinterpret_cast<const sockaddr_in*>(this);
+        const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin_addr);
+
+        return IpAddressV4(bytes[0], bytes[1], bytes[2], bytes[3]);
+    }
+
+    IpAddressV6 SocketAddressConverter::ToIpAddressV6() const
+    {
+        const sockaddr_in6* addr = reinterpret_cast<const sockaddr_in6*>(this);
+        const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin6_addr);
+
+        IpAddressV6 ipAddress;
+        for (std::size_t i = 0; i < 16; i++)
+            ipAddress.SetByte(i, bytes[i]);
+
+        return ipAddress;
+    }
+
+    unsigned short SocketAddressConverter::GetPort() const
     {
         switch (AsSockAddr()->sa_family)
         {
             case AF_INET: return ntohs(reinterpret_cast<const sockaddr_in*>(this)->sin_port);
-
             case AF_INET6: return ntohs(reinterpret_cast<const sockaddr_in6*>(this)->sin6_port);
         }
 
         return 0;
     }
 
-    int SocketAddress::GetLength() const
+    int SocketAddressConverter::GetLength() const
     {
         return mLength;
-    }
-
-    UniquePtr<IpAddressV4> SocketAddress::ToIpAddressV4() const
-    {
-        const sockaddr_in* addr = reinterpret_cast<const sockaddr_in*>(this);
-        const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin_addr);
-
-        return MakeUnique<IpAddressV4>(bytes[0], bytes[1], bytes[2], bytes[3]);
-    }
-
-    UniquePtr<IpAddressV6> SocketAddress::ToIpAddressV6() const
-    {
-        const sockaddr_in6* addr = reinterpret_cast<const sockaddr_in6*>(this);
-        const Uint8* bytes = reinterpret_cast<const Uint8*>(&addr->sin6_addr);
-
-        UniquePtr<IpAddressV6> ipAddress = MakeUnique<IpAddressV6>();
-        for (std::size_t i = 0; i < 16; i++)
-            ipAddress->SetByte(i, bytes[i]);
-
-        return ipAddress;
     }
 }

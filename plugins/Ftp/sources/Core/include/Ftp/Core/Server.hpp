@@ -2,7 +2,7 @@
 #define COCKTAILENGINE_FTP_CORE_SERVER_HPP
 
 #include <CocktailEngine/Core/System/Network/TcpClient.hpp>
-#include <CocktailEngine/Core/System/Network/TcpServer.hpp>
+#include <CocktailEngine/Core/System/Network/TcpListener.hpp>
 #include <CocktailEngine/Core/Utility/Time/Duration.hpp>
 
 #include <Ftp/Core/Request.hpp>
@@ -38,14 +38,14 @@ namespace Ck::Ftp
          *
          * \throw ConnectionClosedException The peer closed the connection
          */
-        Optional<GenericRequest> ReadRequest() const;
+        Optional<GenericRequest> ReadRequest();
 
         /**
          * \brief Send a reply to the remote client
          *
          * \param response The response to serialize onto the control channel
          */
-        void SendResponse(const Response& response) const;
+        void SendResponse(const Response& response);
 
         /**
          * \brief Retrieve the underlying control socket
@@ -84,7 +84,7 @@ namespace Ck::Ftp
          *
          * \return The accepted connection
          */
-        Connection Accept() const;
+        Connection Accept();
 
         /**
          * \brief Attempt to accept a client within a bounded amount of time
@@ -94,11 +94,11 @@ namespace Ck::Ftp
          *
          * \return The accepted connection, or an empty optional on timeout
          */
-        Optional<Connection> TryAccept(const Duration& timeout, const Duration& interval) const;
+        Optional<Connection> TryAccept(const Duration& timeout, const Duration& interval);
 
     private:
 
-        TcpServer mControlSocket;
+        TcpListener mControlSocket;
     };
 }
 

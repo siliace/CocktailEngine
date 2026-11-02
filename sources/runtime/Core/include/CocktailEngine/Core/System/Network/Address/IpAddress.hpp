@@ -1,10 +1,41 @@
 #ifndef COCKTAILENGINE_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESS_HPP
 #define COCKTAILENGINE_CORE_SYSTEM_NETWORK_ADDRESS_IPADDRESS_HPP
 
+#include <CocktailEngine/Core/GenericException.hpp>
 #include <CocktailEngine/Core/String.hpp>
 
 namespace Ck
 {
+    /**
+     * \brief Translates native name-resolution error codes into diagnostic text.
+     *
+     * On Windows, the code is the Windows Sockets error returned by
+     * GetAddrInfoW. On Unix-like platforms, it is the \c EAI_* value returned
+     * by getaddrinfo.
+     */
+    class COCKTAILENGINE_CORE_API AddressResolutionErrorCodeTranslator : public ErrorCodeTranslator<int>
+    {
+    public:
+
+        /**
+         * \brief Translates a native name-resolution error code.
+         *
+         * \param errorCode Error code returned by the native resolver.
+         *
+         * \return A platform-provided diagnostic message, or a fallback message
+         *         containing the code when no description is available.
+         */
+        String TranslateErrorCode(int errorCode) const override;
+    };
+
+    /**
+     * \brief Runtime exception that preserves a native name-resolution error.
+     *
+     * Catch this exception by reference and inspect GetErrorCode to distinguish
+     * the Windows Sockets or \c EAI_* result returned by the platform resolver.
+     */
+    using AddressResolutionException = GenericException<int, AddressResolutionErrorCodeTranslator>;
+
     /**
      * \brief Base interface for ip address classes
      */
@@ -29,9 +60,16 @@ namespace Ck
         };
 
         /**
-         * \brief
-         * \param hostname
-         * \return
+         * \brief Resolves a host name to its numeric IP addresses.
+         *
+         * Both IPv4 and IPv6 addresses can be returned. The resolver result is
+         * copied before its native storage is released.
+         *
+         * \param hostname Host name or numeric IP address to resolve.
+         *
+         * \return The IPv4 and IPv6 addresses returned by the platform resolver.
+         *
+         * \throws AddressResolutionException If name resolution fails.
          */
         static Array<UniquePtr<IpAddress>> Resolve(StringView hostname);
 

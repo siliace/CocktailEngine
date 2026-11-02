@@ -1,11 +1,25 @@
 #include <CocktailEngine/Core/System/Network/Address/IpAddress.hpp>
 #include <CocktailEngine/Core/System/Network/Address/IpAddressV4.hpp>
 #include <CocktailEngine/Core/System/Network/Address/IpAddressV6.hpp>
-#include <CocktailEngine/Core/System/Network/SocketHeader.hpp>
+#include <CocktailEngine/Core/System/Network/Socket/SocketHeader.hpp>
 #include <CocktailEngine/Core/System/SystemError.hpp>
+#include <CocktailEngine/Core/Utility/Finally.hpp>
 
 namespace Ck
 {
+    String AddressResolutionErrorCodeTranslator::TranslateErrorCode(int errorCode) const
+    {
+#ifdef COCKTAIL_OS_WINDOWS
+        return SystemErrorCodeTranslator::Instance.TranslateErrorCode(static_cast<unsigned int>(errorCode));
+#else
+        const char* description = ::gai_strerror(errorCode);
+        if (description != nullptr)
+            return String(reinterpret_cast<const Utf8Char*>(description));
+
+        return String::Format(CK_TEXT("Unknown address-resolution error (%d)"), errorCode);
+#endif
+    }
+
 #ifdef COCKTAIL_OS_WINDOWS
     Array<UniquePtr<IpAddress>> IpAddress::Resolve(StringView hostname)
     {
@@ -13,9 +27,14 @@ namespace Ck
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
 
-        ADDRINFOW* results;
-        if (GetAddrInfoW(hostname.GetData(), nullptr, &hints, &results) != 0)
-            throw SystemError::GetLastError();
+        ADDRINFOW* results = nullptr;
+        int errorCode = GetAddrInfoW(hostname.GetData(), nullptr, &hints, &results);
+        if (errorCode != 0)
+            throw AddressResolutionException(errorCode);
+
+        Finally finally([results] {
+            FreeAddrInfoW(results);
+        });
 
         Array<UniquePtr<IpAddress>> ipAddresses;
         for (ADDRINFOW* result = results; result; result = result->ai_next)
@@ -58,9 +77,14 @@ namespace Ck
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
 
-        addrinfo* results;
-        if (getaddrinfo(reinterpret_cast<const AnsiChar*>(hostname.GetData()), nullptr, &hints, &results) != 0)
-            throw SystemError::GetLastError();
+        addrinfo* results = nullptr;
+        int errorCode = ::getaddrinfo(reinterpret_cast<const AnsiChar*>(hostname.GetData()), nullptr, &hints, &results);
+        if (errorCode != 0)
+            throw AddressResolutionException(errorCode);
+
+        Finally finally([results] {
+            ::freeaddrinfo(results);
+        });
 
         Array<UniquePtr<IpAddress>> ipAddresses;
         for (addrinfo* result = results; result; result = result->ai_next)

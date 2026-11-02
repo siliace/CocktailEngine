@@ -44,6 +44,14 @@ namespace Ck
 
             TError Error;
         };
+
+        struct ResultSuccess
+        {
+            explicit ResultSuccess(InPlaceTag)
+            {
+                /// Nothing
+            }
+        };
     }
 
     /**
@@ -357,6 +365,247 @@ namespace Ck
         [[noreturn]] void ThrowBadValueAccess() const
         {
             throw BadResultAccessException(CK_TEXT("Cannot retrieve a value from a failed Result."));
+        }
+
+        [[noreturn]] void ThrowBadErrorAccess() const
+        {
+            throw BadResultAccessException(CK_TEXT("Cannot retrieve an error from a successful Result."));
+        }
+
+        Storage mStorage;
+    };
+
+    /**
+     * \brief Represents a successful operation with no value or an error.
+     *
+     * A Result<void, TError> is created with Success or Failure and has no default
+     * state. Its successful state carries no value; use IsSuccess or the boolean
+     * conversion to inspect it. A moved-from Result remains successful or failed,
+     * although a moved-from error has the state defined by its move constructor.
+     *
+     * References held by the Optionals returned by TryGetError, as well as those
+     * returned by GetError, remain valid until the Result is assigned to or
+     * destroyed.
+     *
+     * \tparam TError Type of the error value.
+     */
+    template <typename TError>
+    class Result<void, TError>
+    {
+        static_assert(std::is_object_v<TError>, "Result errors must be object types");
+        static_assert(std::is_nothrow_destructible_v<TError>, "Result errors must have non-throwing destructors");
+
+        using SuccessStorage = Detail::ResultSuccess;
+        using ErrorStorage = Detail::ResultError<TError>;
+        using Storage = Variant<SuccessStorage, ErrorStorage>;
+
+        static constexpr bool CanCopy = std::is_copy_constructible_v<TError>;
+        static constexpr bool CanMove = std::is_move_constructible_v<TError>;
+        static constexpr bool HasNoThrowMove = std::is_nothrow_move_constructible_v<TError>;
+
+    public:
+
+        /**
+         * \brief Result instances must be explicitly successful or failed.
+         */
+        Result() = delete;
+
+        /**
+         * \brief Copy-constructs a Result.
+         *
+         * \param other Result to copy.
+         */
+        Result(const Result& other) requires(CanCopy) = default;
+
+        Result(const Result&) requires(!CanCopy) = delete;
+
+        /**
+         * \brief Move-constructs a Result without changing its state.
+         *
+         * The source keeps its successful or failed state. A failed source retains
+         * a moved-from error with the state defined by \p TError.
+         *
+         * \param other Result to move from.
+         */
+        Result(Result&& other) noexcept(HasNoThrowMove) requires(CanMove)
+        {
+            MoveFrom(other);
+        }
+
+        Result(Result&&) requires(!CanMove) = delete;
+
+        /**
+         * \brief Replaces this Result with a copy of another Result.
+         *
+         * \param other Result to copy.
+         *
+         * \return This Result.
+         */
+        Result& operator=(const Result& other) requires(CanCopy) = default;
+
+        Result& operator=(const Result&) requires(!CanCopy) = delete;
+
+        /**
+         * \brief Replaces this Result by moving the contents of another Result.
+         *
+         * The source keeps its successful or failed state. A failed source retains
+         * a moved-from error with the state defined by \p TError.
+         *
+         * \param other Result to move from.
+         *
+         * \return This Result.
+         */
+        Result& operator=(Result&& other) noexcept(HasNoThrowMove) requires(CanMove)
+        {
+            if (this != &other)
+            {
+                MoveFrom(other);
+            }
+
+            return *this;
+        }
+
+        Result& operator=(Result&&) requires(!CanMove) = delete;
+
+        /**
+         * \brief Creates a successful Result with no value.
+         *
+         * \return A successful Result.
+         */
+        static Result Success()
+        {
+            return Result(InPlaceType<SuccessStorage>);
+        }
+
+        /**
+         * \brief Creates a failed Result by constructing its error in place.
+         *
+         * \tparam TArgs Constructor argument types for \p TError.
+         *
+         * \param args Arguments forwarded to the constructor of \p TError.
+         *
+         * \return A failed Result containing the constructed error.
+         */
+        template <typename... TArgs>
+            requires std::constructible_from<TError, TArgs&&...>
+        static Result Failure(TArgs&&... args)
+        {
+            return Result(InPlaceType<ErrorStorage>, Forward<TArgs>(args)...);
+        }
+
+        /**
+         * \brief Checks whether this Result represents a successful operation.
+         *
+         * \return \c true when this Result is successful, \c false otherwise.
+         */
+        bool IsSuccess() const
+        {
+            return mStorage.template Is<SuccessStorage>();
+        }
+
+        /**
+         * \brief Checks whether this Result contains an error.
+         *
+         * \return \c true when this Result is failed, \c false otherwise.
+         */
+        bool IsFailure() const
+        {
+            return mStorage.template Is<ErrorStorage>();
+        }
+
+        /**
+         * \brief Tests whether this Result represents a successful operation.
+         *
+         * This enables direct use in boolean contexts such as \c if (result).
+         *
+         * \return \c true when this Result is successful, \c false otherwise.
+         */
+        explicit operator bool() const
+        {
+            return IsSuccess();
+        }
+
+        /**
+         * \brief Retrieves the error as a mutable reference.
+         *
+         * \return Mutable reference to the error.
+         *
+         * \throws BadResultAccessException If this Result is successful.
+         */
+        TError& GetError()
+        {
+            Optional<TError&> error = TryGetError();
+            if (error.HasValue())
+                return error.Get();
+
+            ThrowBadErrorAccess();
+        }
+
+        /**
+         * \brief Retrieves the error as a const reference.
+         *
+         * \return Const reference to the error.
+         *
+         * \throws BadResultAccessException If this Result is successful.
+         */
+        const TError& GetError() const
+        {
+            Optional<const TError&> error = TryGetError();
+            if (error.HasValue())
+                return error.Get();
+
+            ThrowBadErrorAccess();
+        }
+
+        /**
+         * \brief Attempts to retrieve the error as a mutable Optional reference.
+         *
+         * \return An Optional containing a mutable reference to the error, or an
+         *         empty Optional when this Result is successful.
+         */
+        Optional<TError&> TryGetError()
+        {
+            ErrorStorage* error = mStorage.template TryGet<ErrorStorage>();
+            if (error != nullptr)
+                return Optional<TError&>::Of(error->Error);
+
+            return Optional<TError&>::Empty();
+        }
+
+        /**
+         * \brief Attempts to retrieve the error as a const Optional reference.
+         *
+         * \return An Optional containing a const reference to the error, or an
+         *         empty Optional when this Result is successful.
+         */
+        Optional<const TError&> TryGetError() const
+        {
+            const ErrorStorage* error = mStorage.template TryGet<ErrorStorage>();
+            if (error != nullptr)
+                return Optional<const TError&>::Of(error->Error);
+
+            return Optional<const TError&>::Empty();
+        }
+
+    private:
+
+        template <typename TStorage, typename... TArgs>
+        explicit Result(InPlaceTypeTag<TStorage>, TArgs&&... args) :
+            mStorage(InPlaceType<TStorage>, InPlace, Forward<TArgs>(args)...)
+        {
+            /// Nothing
+        }
+
+        void MoveFrom(Result& other) requires(CanMove)
+        {
+            if (other.IsSuccess())
+            {
+                mStorage.template Emplace<SuccessStorage>(InPlace);
+            }
+            else
+            {
+                mStorage.template Emplace<ErrorStorage>(InPlace, Move(other.GetError()));
+            }
         }
 
         [[noreturn]] void ThrowBadErrorAccess() const

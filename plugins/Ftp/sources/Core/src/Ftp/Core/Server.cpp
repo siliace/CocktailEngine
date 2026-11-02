@@ -14,9 +14,10 @@ namespace Ck::Ftp
         /// Nothing
     }
 
-    Optional<GenericRequest> Connection::ReadRequest() const
+    Optional<GenericRequest> Connection::ReadRequest()
     {
-        InputStreamReader<Encoders::Utf8> reader(mControlSocket.GetInputStream());
+        TcpClientInputStream socketStream(mControlSocket);
+        InputStreamReader<Encoders::Utf8> reader(socketStream);
         LineReader<Encoders::Utf8, HeapAllocator> lineReader(reader);
 
         Utf8String line;
@@ -26,9 +27,10 @@ namespace Ck::Ftp
         return Request::Parse(line);
     }
 
-    void Connection::SendResponse(const Response& response) const
+    void Connection::SendResponse(const Response& response)
     {
-        OutputStreamWriter<Encoders::Utf8> writer(mControlSocket.GetOutputStream());
+        TcpClientOutputStream socketStream(mControlSocket);
+        OutputStreamWriter<Encoders::Utf8> writer(socketStream);
         BufferedWriter<Encoders::Utf8, LinearAllocator<1024>> bufferedWriter(writer, 1024);
 
         response.Serialize(bufferedWriter);
@@ -42,12 +44,12 @@ namespace Ck::Ftp
         /// Nothing
     }
 
-    Connection Server::Accept() const
+    Connection Server::Accept()
     {
         return Connection(mControlSocket.Accept());
     }
 
-    Optional<Connection> Server::TryAccept(const Duration& timeout, const Duration& interval) const
+    Optional<Connection> Server::TryAccept(const Duration& timeout, const Duration& interval)
     {
         Optional<TcpClient> client = mControlSocket.TryAccept(timeout, interval);
         if (client.IsEmpty())

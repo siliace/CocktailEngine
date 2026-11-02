@@ -8,10 +8,16 @@
 #else
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
 #endif
 
 #endif // COCKTAILENGINE_CORE_SYSTEM_NETWORK_SOCKETHEADER_HPP
