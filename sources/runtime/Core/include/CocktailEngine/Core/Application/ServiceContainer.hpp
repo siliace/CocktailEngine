@@ -64,6 +64,18 @@ namespace Ck
             virtual const std::type_info& GetResolvedType() const = 0;
 
             /**
+             * \brief Resolves the service as an untyped pointer to its concrete instance
+             *
+             * The returned pointer addresses the most-derived (concrete) service
+             * object produced by the binding. Callers must convert it back to the
+             * concrete type, or to one of its bases through a conversion that is aware
+             * of the concrete type, before dereferencing it.
+             *
+             * \return Pointer to the concrete service instance, or nullptr
+             */
+            virtual void* Resolve() = 0;
+
+            /**
              * \brief Retains a supplier binding required by this binding
              *
              * \param dependency Binding that must outlive this consumer binding
@@ -91,13 +103,6 @@ namespace Ck
         class ServiceBinding : public ServiceBindingBase
         {
         public:
-
-            /**
-             * \brief Resolves the service represented by this binding
-             *
-             * \return Resolved service instance, or nullptr when the binding represents a null instance
-             */
-            virtual T* Resolve() = 0;
 
             /**
              * \brief Gets the concrete type resolved by this typed binding
@@ -199,11 +204,12 @@ namespace Ck
              * \brief Resolves the singleton service instance
              *
              * Creates the instance through its resolver and decorators on the first
-             * call when the binding is configured as lazy.
+             * call when the binding is configured as lazy. The returned pointer
+             * addresses the concrete instance owned by this binding.
              *
-             * \return Owned singleton service instance
+             * \return Pointer to the owned singleton service instance, or nullptr
              */
-            T* Resolve() override
+            void* Resolve() override
             {
                 if (mLazy && !mInstance)
                 {
@@ -250,7 +256,7 @@ namespace Ck
              *
              * \return Pointer supplied to the constructor, which may be null
              */
-            T* Resolve() override
+            void* Resolve() override
             {
                 return mInstance;
             }
@@ -327,7 +333,10 @@ namespace Ck
         void Alias()
         {
             if constexpr (!std::is_same_v<Abstract, Concrete>)
+            {
+                RegisterUpcast<Abstract, Concrete>();
                 Alias(typeid(Abstract), typeid(Concrete));
+            }
         }
 
         /**
@@ -452,8 +461,16 @@ namespace Ck
             const std::type_info& abstract = typeid(T);
             const std::type_info& concrete = GetConcrete(abstract);
             return mResolvingTable.TryGet(concrete)
-                .Map([](Ptr<Detail::ServiceBindingBase> binding) {
-                    return static_cast<Detail::ServiceBinding<T>*>(binding.Get())->Resolve();
+                .Map([&](Ptr<Detail::ServiceBindingBase> binding) -> T* {
+                    void* instance = binding->Resolve();
+                    if (!instance)
+                        return nullptr;
+
+                    // The binding owns an object whose concrete type is reported by
+                    // GetResolvedType(). Converting that concrete pointer to T requires
+                    // the pointer adjustment registered when the alias was declared,
+                    // which is the only context where both types are statically known.
+                    return static_cast<T*>(Upcast(instance, binding->GetResolvedType(), abstract));
                 })
                 .GetOr(nullptr);
         }
@@ -618,9 +635,54 @@ namespace Ck
          */
         const std::type_info& GetConcrete(const std::type_info& abstract) const;
 
+        /**
+         * \brief Pointer-adjusting conversion from a concrete instance to a base
+         *
+         * A thunk receives the address of a concrete service instance and returns
+         * the address of one of its base subobjects, applying the offset mandated by
+         * the class layout (including multiple inheritance).
+         */
+        using UpcastThunk = void* (*)(void*);
+
+        /**
+         * \brief Records the conversion from a concrete type to one of its bases
+         *
+         * The thunk is instantiated where both \p Concrete and \p Abstract are
+         * statically known, so the compiler emits the correct pointer adjustment.
+         *
+         * \tparam Abstract Base type exposed to consumers
+         * \tparam Concrete Concrete implementation convertible to \p Abstract
+         */
+        template <typename Abstract, typename Concrete>
+        void RegisterUpcast()
+        {
+            UpcastThunk thunk = [](void* instance) -> void* {
+                return static_cast<Abstract*>(static_cast<Concrete*>(instance));
+            };
+
+            mUpcasts[std::type_index(typeid(Concrete))].Put(std::type_index(typeid(Abstract)), thunk);
+        }
+
+        /**
+         * \brief Converts a concrete instance pointer to a requested base type
+         *
+         * When \p requested denotes \p concrete, the pointer is returned unchanged.
+         * Otherwise the conversion registered for the pair is applied, falling back
+         * to the unadjusted pointer when no thunk is available (for example, aliases
+         * declared through the runtime overload, which cannot capture the types).
+         *
+         * \param instance Pointer to the concrete service instance
+         * \param concrete Runtime type of the concrete instance
+         * \param requested Type expected by the caller
+         *
+         * \return Pointer adjusted to the requested base subobject
+         */
+        void* Upcast(void* instance, const std::type_info& concrete, const std::type_info& requested) const;
+
         HashMap<std::type_index, SharedPtr<Detail::ServiceBindingBase>> mResolvingTable; /*!< Owns the resolvable binding registered for each concrete service type */
         HashMap<std::type_index, std::reference_wrapper<const std::type_info>> mAliases; /*!< Maps exposed abstract types to their concrete implementation types */
         HashMap<std::type_index, Array<WeakPtr<Detail::ServiceBindingBase>>> mPendingDependencies; /*!< Stores consumers waiting for each not-yet-registered dependency */
+        HashMap<std::type_index, HashMap<std::type_index, UpcastThunk>> mUpcasts; /*!< Pointer-adjusting conversions from each concrete type to its registered bases */
     };
 }
 

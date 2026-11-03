@@ -98,6 +98,43 @@ private:
     DestructionOrder* mDestructionOrder;
 };
 
+// Interfaces used to exercise pointer adjustment under multiple inheritance.
+// FirstInterface is the primary base (offset 0), while SecondInterface is a
+// non-primary base whose subobject does not start at the concrete object's
+// address, so converting a concrete pointer to it requires an offset.
+class FirstInterface
+{
+public:
+
+    virtual ~FirstInterface() = default;
+
+    virtual int First() const = 0;
+};
+
+class SecondInterface
+{
+public:
+
+    virtual ~SecondInterface() = default;
+
+    virtual int Second() const = 0;
+};
+
+class MultipleInheritanceService : public FirstInterface, public SecondInterface
+{
+public:
+
+    int First() const override
+    {
+        return 1;
+    }
+
+    int Second() const override
+    {
+        return 2;
+    }
+};
+
 TEST_CASE("Service container can resolve bindings", "[ServiceContainer]")
 {
     Ck::ServiceContainer serviceContainer;
@@ -133,6 +170,29 @@ TEST_CASE("Service container can resolve aliases", "[ServiceContainer]")
     serviceContainer.Alias<InterfaceDummyService, DummyService>();
 
     REQUIRE(serviceContainer.Resolve<InterfaceDummyService>());
+}
+
+TEST_CASE("Service container adjusts pointers across multiple inheritance", "[ServiceContainer]")
+{
+    Ck::ServiceContainer serviceContainer;
+    serviceContainer.Singleton<FirstInterface, MultipleInheritanceService>();
+    serviceContainer.Alias<SecondInterface, MultipleInheritanceService>();
+
+    MultipleInheritanceService* concrete = serviceContainer.Resolve<MultipleInheritanceService>();
+    REQUIRE(concrete != nullptr);
+
+    FirstInterface* first = serviceContainer.Resolve<FirstInterface>();
+    SecondInterface* second = serviceContainer.Resolve<SecondInterface>();
+
+    // Each interface pointer must match the pointer obtained from a direct,
+    // type-aware static_cast of the concrete instance. For SecondInterface this
+    // implies a non-zero offset relative to the concrete object.
+    REQUIRE(first == static_cast<FirstInterface*>(concrete));
+    REQUIRE(second == static_cast<SecondInterface*>(concrete));
+
+    // Calling through the adjusted pointers must dispatch to the right vtable slot.
+    REQUIRE(first->First() == 1);
+    REQUIRE(second->Second() == 2);
 }
 
 TEST_CASE("Service container keeps an aliased dependency alive through teardown", "[ServiceContainer]")
