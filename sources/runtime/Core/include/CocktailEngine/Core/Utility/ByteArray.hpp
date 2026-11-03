@@ -83,18 +83,21 @@ namespace Ck
          * \pre length > 0
          */
         template <typename T>
-        BasicByteArray(const T* data, SizeType length)
+        BasicByteArray(const T* data, SizeType length) :
+            mSize(0)
         {
-            assert(data != nullptr);
-            assert(length > 0);
+            if (length > 0)
+            {
+                assert(data != nullptr);
 
-            if constexpr (!std::is_void_v<T>)
-                length *= sizeof(T);
+                if constexpr (!std::is_void_v<T>)
+                    length *= sizeof(T);
 
-            mSize = length;
-            mData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, mSize);
+                mSize = length;
+                mData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, mSize);
 
-            Memory::Copy(mData.Get(), data, mSize);
+                Memory::Copy(mData.Get(), data, mSize);
+            }
         }
 
         /**
@@ -194,6 +197,9 @@ namespace Ck
          */
         BasicByteArray& Append(const BasicByteArray& other)
         {
+            if (other.IsEmpty())
+                return *this;
+
             return Insert(mSize, other);
         }
 
@@ -276,6 +282,9 @@ namespace Ck
          */
         BasicByteArray& Insert(SizeType where, const BasicByteArray& other)
         {
+            if (other.IsEmpty())
+                return *this;
+
             return Insert(where, other.GetData(), other.GetSize());
         }
 
@@ -379,8 +388,10 @@ namespace Ck
          */
         BasicByteArray Slice(SizeType offset, SizeType length) const
         {
-            assert(offset + length <= mSize);
+            if (length == 0)
+                return BasicByteArray();
 
+            assert(offset + length <= mSize);
             return BasicByteArray(mData.Get() + offset, length);
         }
 
@@ -458,14 +469,17 @@ namespace Ck
             }
 
             auto newData = MakeUniqueWithAllocator<Byte[], AllocatorType>(mAllocator, newSize);
-            if (newSize > mSize)
+            if (mSize)
             {
-                Memory::Copy(newData.Get(), mData.Get(), mSize);
-                Memory::Set(newData.Get() + mSize, value, newSize - mSize);
-            }
-            else
-            {
-                Memory::Copy(newData.Get(), mData.Get(), newSize);
+                if (newSize > mSize)
+                {
+                    Memory::Copy(newData.Get(), mData.Get(), mSize);
+                    Memory::Set(newData.Get() + mSize, value, newSize - mSize);
+                }
+                else
+                {
+                    Memory::Copy(newData.Get(), mData.Get(), newSize);
+                }
             }
 
             mSize = newSize;

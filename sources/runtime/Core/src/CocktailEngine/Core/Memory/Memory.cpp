@@ -42,16 +42,19 @@ namespace Ck
 
     void Memory::Set(void* destination, Byte value, std::size_t size)
     {
+        assert(destination);
         std::memset(destination, value, size);
     }
 
     void Memory::Copy(void* destination, const void* source, std::size_t size)
     {
+        assert(destination && source);
         std::memcpy(destination, source, size);
     }
 
     void Memory::Move(void* destination, const void* source, std::size_t size)
     {
+        assert(destination && source);
         std::memmove(destination, source, size);
     }
 
