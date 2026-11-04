@@ -10,7 +10,10 @@ namespace Ck
     {
         void ServiceBindingBase::AddDependency(ServiceBindingBase* dependency)
         {
-            mDependencies.Add(dependency->AsShared());
+            assert(dependency != nullptr);
+
+            if (dependency != this)
+                mDependencies.Add(dependency->AsShared());
         }
 
         ServiceBindingBase::ServiceBindingBase()
@@ -21,19 +24,44 @@ namespace Ck
 
     void ServiceContainer::Alias(const std::type_info& abstract, const std::type_info& concrete)
     {
-        if (abstract == concrete)
+        const TypeKey abstractType(abstract);
+        const TypeKey concreteType(concrete);
+
+        if (abstractType == concreteType)
             return;
 
-        mAliases.Put(abstract, concrete);
+        if (const std::reference_wrapper<const std::type_info>* existing = mAliases.Get(abstractType))
+        {
+            if (existing->get() == concrete)
+                return;
 
-        mPendingDependencies.TryGet(abstract).Then([&](const Array<WeakPtr<Detail::ServiceBindingBase>>& pendingDependencies) {
-            pendingDependencies.ForEach([&](const WeakPtr<Detail::ServiceBindingBase>& pendingBinding) {
+            throw LogicException(CK_TEXT("A service alias cannot be retargeted"));
+        }
+
+        for (TypeKey currentType = concreteType;;)
+        {
+            if (currentType == abstractType)
+                throw LogicException(CK_TEXT("A service alias cannot form a cycle"));
+
+            const std::reference_wrapper<const std::type_info>* next = mAliases.Get(currentType);
+            if (!next)
+                break;
+
+            currentType = TypeKey(next->get());
+        }
+
+        mAliases.Put(abstractType, std::cref(concrete));
+
+        if (const Array<WeakPtr<Detail::ServiceBindingBase>>* pendingDependencies = mPendingDependencies.Get(abstractType))
+        {
+            Array<WeakPtr<Detail::ServiceBindingBase>> waitingBindings(*pendingDependencies);
+            mPendingDependencies.Remove(abstractType);
+
+            waitingBindings.ForEach([&](const WeakPtr<Detail::ServiceBindingBase>& pendingBinding) {
                 if (SharedPtr<Detail::ServiceBindingBase> resolvedPendingBinding = pendingBinding.ToStrong())
                     SetupDependency(resolvedPendingBinding.Get(), concrete);
             });
-        });
-
-        mPendingDependencies.Remove(abstract);
+        }
     }
 
     void ServiceContainer::Clear()
@@ -46,38 +74,41 @@ namespace Ck
 
     void ServiceContainer::SetupDependency(Detail::ServiceBindingBase* binding, const std::type_info& dependency)
     {
-        const std::type_info& concrete = GetConcrete(dependency);
+        const TypeKey dependencyType(GetConcrete(dependency));
+        if (BindingRecord* dependencyBinding = mResolvingTable.Get(dependencyType))
+        {
+            binding->AddDependency(dependencyBinding->Binding.Get());
+            return;
+        }
 
-        mResolvingTable.TryGet(concrete).Then([&](Ptr<Detail::ServiceBindingBase> dependencyBinding) {
-            binding->AddDependency(dependencyBinding.Get());
-        }).Or([&]() {
-            mPendingDependencies[concrete].Add(binding->AsWeak());
-        });
+        mPendingDependencies[dependencyType].Add(binding->AsWeak());
     }
 
-    void ServiceContainer::RegisterResolvableBinding(SharedPtr<Detail::ServiceBindingBase> binding)
+    void ServiceContainer::RegisterResolvableBinding(SharedPtr<Binding> binding, BindingResolver resolver)
     {
-        const std::type_index resolvedType(binding->GetResolvedType());
+        const TypeKey resolvedType(binding->GetResolvedType());
 
-        mPendingDependencies.TryGet(resolvedType).Then([&](const Array<WeakPtr<Detail::ServiceBindingBase>>& pendingBindings) {
-            pendingBindings.ForEach([&](const WeakPtr<Detail::ServiceBindingBase>& pendingBinding) {
+        if (const Array<WeakPtr<Detail::ServiceBindingBase>>* pendingBindings = mPendingDependencies.Get(resolvedType))
+        {
+            Array<WeakPtr<Detail::ServiceBindingBase>> waitingBindings(*pendingBindings);
+            mPendingDependencies.Remove(resolvedType);
+
+            waitingBindings.ForEach([&](const WeakPtr<Detail::ServiceBindingBase>& pendingBinding) {
                 if (SharedPtr<Detail::ServiceBindingBase> resolvedPendingBinding = pendingBinding.ToStrong())
                     resolvedPendingBinding->AddDependency(binding.Get());
             });
-            mPendingDependencies.Remove(resolvedType);
-        });
+        }
 
-        mResolvingTable.Put(resolvedType, Move(binding));
+        mResolvingTable.Put(resolvedType, BindingRecord{ Move(binding), resolver });
     }
 
     const std::type_info& ServiceContainer::GetConcrete(const std::type_info& abstract) const
     {
-        const std::type_index abstractKey(abstract);
+        const std::type_info* concrete = &abstract;
+        while (const std::reference_wrapper<const std::type_info>* alias = mAliases.Get(TypeKey(*concrete)))
+            concrete = &alias->get();
 
-        if (Optional<const std::reference_wrapper<const std::type_info>&> concrete = mAliases.TryGet(abstractKey); !concrete.IsEmpty())
-            return GetConcrete(concrete.Get());
-
-        return abstract; // NOLINT(bugprone-return-const-ref-from-parameter)
+        return *concrete;
     }
 
     void* ServiceContainer::Upcast(void* instance, const std::type_info& concrete, const std::type_info& requested) const
@@ -110,12 +141,8 @@ namespace Ck
             const std::type_index& abstractSide = hop.first;
             const std::type_index& concreteSide = hop.second;
 
-            // mUpcasts is keyed by concrete type, then by target base type.
-            if (const HashMap<std::type_index, UpcastThunk>* thunks = mUpcasts.Get(concreteSide))
-            {
-                if (const UpcastThunk* thunk = thunks->Get(abstractSide))
-                    instance = (*thunk)(instance);
-            }
+            if (const UpcastThunk* thunk = mUpcasts.Get(UpcastKey{ concreteSide, abstractSide }))
+                instance = (*thunk)(instance);
         }
 
         return instance;

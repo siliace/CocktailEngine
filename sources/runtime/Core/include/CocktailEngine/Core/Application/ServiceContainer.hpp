@@ -1,7 +1,11 @@
 #ifndef COCKTAILENGINE_CORE_APPLICATION_SERVICECONTAINER_HPP
 #define COCKTAILENGINE_CORE_APPLICATION_SERVICECONTAINER_HPP
 
+#include <functional>
+#include <tuple>
 #include <typeindex>
+#include <type_traits>
+#include <utility>
 
 #include <CocktailEngine/Core/HashMap.hpp>
 #include <CocktailEngine/Core/HashSet.hpp>
@@ -64,21 +68,12 @@ namespace Ck
             virtual const std::type_info& GetResolvedType() const = 0;
 
             /**
-             * \brief Resolves the service as an untyped pointer to its concrete instance
+             * \brief Retains a supplier binding required by this binding.
              *
-             * The returned pointer addresses the most-derived (concrete) service
-             * object produced by the binding. Callers must convert it back to the
-             * concrete type, or to one of its bases through a conversion that is aware
-             * of the concrete type, before dereferencing it.
+             * Adding this binding itself has no effect, which prevents a direct
+             * self-dependency from keeping its binding alive during Clear.
              *
-             * \return Pointer to the concrete service instance, or nullptr
-             */
-            virtual void* Resolve() = 0;
-
-            /**
-             * \brief Retains a supplier binding required by this binding
-             *
-             * \param dependency Binding that must outlive this consumer binding
+             * \param dependency Binding that must outlive this consumer binding.
              */
             void AddDependency(ServiceBindingBase* dependency);
 
@@ -103,6 +98,13 @@ namespace Ck
         class ServiceBinding : public ServiceBindingBase
         {
         public:
+
+            /**
+             * \brief Resolves the concrete service instance owned by this binding.
+             *
+             * \return Pointer to the concrete service instance, or nullptr.
+             */
+            virtual T* Resolve() = 0;
 
             /**
              * \brief Gets the concrete type resolved by this typed binding
@@ -137,7 +139,7 @@ namespace Ck
              */
             void Decorate(ServiceDecoratorFactory<T> extender)
             {
-                mDecoratorFactories.push_back(extender);
+                mDecoratorFactories.Add(Move(extender));
             }
 
             /**
@@ -201,22 +203,26 @@ namespace Ck
             }
 
             /**
-             * \brief Resolves the singleton service instance
+             * \brief Resolves the singleton service instance.
              *
              * Creates the instance through its resolver and decorators on the first
              * call when the binding is configured as lazy. The returned pointer
              * addresses the concrete instance owned by this binding.
              *
-             * \return Pointer to the owned singleton service instance, or nullptr
+             * This method serializes lazy construction of one binding. Registration,
+             * replacement, Clear, and concurrent access to the same ServiceContainer
+             * still require external synchronization.
+             *
+             * \return Pointer to the owned singleton service instance, or nullptr.
              */
-            void* Resolve() override
+            T* Resolve() override
             {
-                if (mLazy && !mInstance)
-                {
-                    LockGuard<Mutex> lg(mLock);
-                    if (!mInstance)
-                        mInstance = CallableServiceBinding<T>::InvokeDecorators(mResolver(mOwner));
-                }
+                if (!mLazy)
+                    return mInstance.Get();
+
+                LockGuard<Mutex> lock(mLock);
+                if (!mInstance)
+                    mInstance = CallableServiceBinding<T>::InvokeDecorators(mResolver(mOwner));
 
                 return mInstance.Get();
             }
@@ -225,7 +231,7 @@ namespace Ck
 
             ServiceContainer* mOwner; /*!< Container that owns this binding. */
             ServiceResolver<T> mResolver; /*!< Factory used to create the service. */
-            bool mLazy; /*!< Whether service creation is deferred until resolution. */
+            const bool mLazy; /*!< Whether service creation is deferred until resolution. */
             Mutex mLock; /*!< Serializes lazy instance creation. */
             UniquePtr<T> mInstance; /*!< Owned singleton instance. */
         };
@@ -256,7 +262,7 @@ namespace Ck
              *
              * \return Pointer supplied to the constructor, which may be null
              */
-            void* Resolve() override
+            T* Resolve() override
             {
                 return mInstance;
             }
@@ -340,13 +346,18 @@ namespace Ck
         }
 
         /**
-         * \brief Associates an abstract service type with a concrete implementation
+         * \brief Associates an abstract service type with a concrete implementation.
          *
-         * This non-template overload supports runtime registration. It has
-         * no effect when \p abstract and \p concrete denote the same type.
+         * This non-template overload supports runtime registration. It has no
+         * effect when \p abstract and \p concrete denote the same type. An alias
+         * cannot be retargeted and may not form a cycle, because either case
+         * makes resolution and pending dependency tracking ambiguous.
          *
-         * \param abstract Type exposed to consumers
-         * \param concrete Type whose binding resolves the abstract type
+         * \param abstract Type exposed to consumers.
+         * \param concrete Type whose binding resolves the abstract type.
+         *
+         * \throws LogicException If \p abstract already aliases a different type
+         *         or the new alias would create a cycle.
          */
         void Alias(const std::type_info& abstract, const std::type_info& concrete);
 
@@ -364,7 +375,8 @@ namespace Ck
         template <typename Abstract>
         void Instance(Abstract* instance)
         {
-            RegisterResolvableBinding(MakeShared<Detail::InstanceServiceBinding<Abstract>>(instance));
+            SharedPtr<Detail::InstanceServiceBinding<Abstract>> binding = MakeShared<Detail::InstanceServiceBinding<Abstract>>(instance);
+            RegisterResolvableBinding<Abstract>(Move(binding));
         }
 
         /**
@@ -417,32 +429,32 @@ namespace Ck
             using BindingDependencyHelperType = typename FunctionTraits<Callable>::Arguments::template Apply<BindingDependencyHelper>;
             BindingDependencyHelperType::Setup(this, binding.Get());
 
-            RegisterResolvableBinding(Move(binding));
+            RegisterResolvableBinding<Abstract>(Move(binding));
         }
 
         /**
-         * \brief Adds a decorator to an existing callable binding
+         * \brief Adds a decorator to a callable binding registered for its concrete type.
          *
-         * The decorator is applied when the binding creates its service
-         * instance. The call is ignored when no binding exists for \p Abstract or
-         * when that binding is not callable.
+         * Decorators are applied in registration order when a lazy binding first
+         * creates its instance. The call is ignored when no binding is registered
+         * directly for \p Abstract or when that binding is not callable. An alias
+         * is not decorated, because a decorator returning a different abstract
+         * implementation would no longer be safely resolvable as the concrete type.
          *
-         * \tparam Abstract Type exposed by the binding to decorate
+         * \tparam Abstract Concrete service type registered by the binding.
          *
-         * \param extender Decorator factory to append to the binding
+         * \param extender Decorator factory to append to the binding.
          */
         template <typename Abstract>
         void Decorate(ServiceDecoratorFactory<Abstract> extender)
         {
-            const std::type_info& abstract = typeid(Abstract);
-            const std::type_info& concrete = GetConcrete(abstract);
-            mResolvingTable.TryGet(concrete).Then([&](Ptr<Detail::ServiceBindingBase> binding) {
-                if (binding->IsCallable())
-                {
-                    auto callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(binding.Get());
-                    callableBinding->Decorate(Move(extender));
-                }
-            });
+            const TypeKey serviceType(typeid(Abstract));
+            BindingRecord* bindingRecord = mResolvingTable.Get(serviceType);
+            if (!bindingRecord || !bindingRecord->Binding->IsCallable())
+                return;
+
+            auto* callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(bindingRecord->Binding.Get());
+            callableBinding->Decorate(Move(extender));
         }
 
         /**
@@ -461,8 +473,8 @@ namespace Ck
             const std::type_info& abstract = typeid(T);
             const std::type_info& concrete = GetConcrete(abstract);
             return mResolvingTable.TryGet(concrete)
-                .Map([&](Ptr<Detail::ServiceBindingBase> binding) -> T* {
-                    void* instance = binding->Resolve();
+                .Map([&](const BindingRecord& bindingRecord) -> T* {
+                    void* instance = bindingRecord.Resolver(*bindingRecord.Binding);
                     if (!instance)
                         return nullptr;
 
@@ -470,7 +482,7 @@ namespace Ck
                     // GetResolvedType(). Converting that concrete pointer to T requires
                     // the pointer adjustment registered when the alias was declared,
                     // which is the only context where both types are statically known.
-                    return static_cast<T*>(Upcast(instance, binding->GetResolvedType(), abstract));
+                    return static_cast<T*>(Upcast(instance, bindingRecord.Binding->GetResolvedType(), abstract));
                 })
                 .GetOr(nullptr);
         }
@@ -520,6 +532,79 @@ namespace Ck
 
     private:
 
+        using TypeKey = std::type_index;
+        using Binding = Detail::ServiceBindingBase;
+        using BindingResolver = void* (*)(Binding&);
+
+        /**
+         * \brief Couples an owned binding with its type-generated resolver.
+         *
+         * The container needs this small erased boundary to store bindings of
+         * arbitrary concrete types in one registry. The resolver itself is
+         * generated where the concrete type remains known.
+         */
+        struct BindingRecord
+        {
+            SharedPtr<Binding> Binding;
+            BindingResolver Resolver;
+        };
+
+        /**
+         * \brief Resolves a binding through its statically known concrete type.
+         *
+         * \tparam T Concrete service type resolved by the binding.
+         *
+         * \param binding Binding created for \p T.
+         *
+         * \return Pointer returned by ServiceBinding<T>::Resolve.
+         */
+        template <typename T>
+        static void* ResolveBinding(Binding& binding)
+        {
+            return static_cast<Detail::ServiceBinding<T>&>(binding).Resolve();
+        }
+
+        /**
+         * \brief Registers a typed binding through a generated resolver thunk.
+         *
+         * \tparam T Concrete service type resolved by \p binding.
+         * \tparam BindingType Concrete binding implementation.
+         *
+         * \param binding Binding to register.
+         */
+        template <typename T, typename BindingType>
+        void RegisterResolvableBinding(SharedPtr<BindingType> binding)
+        {
+            static_assert(std::is_base_of_v<Detail::ServiceBinding<T>, BindingType>);
+
+            RegisterResolvableBinding(Move(binding), &ResolveBinding<T>);
+        }
+
+        /**
+         * \brief Identifies one concrete-to-abstract pointer conversion.
+         */
+        struct UpcastKey
+        {
+            TypeKey Concrete;
+            TypeKey Abstract;
+
+            bool operator==(const UpcastKey& other) const = default;
+        };
+
+        /**
+         * \brief Hashes a concrete-to-abstract pointer conversion key.
+         */
+        struct UpcastKeyHasher
+        {
+            std::size_t operator()(const UpcastKey& key) const
+            {
+                std::size_t hash = std::hash<TypeKey>{}(key.Concrete);
+                hash ^= std::hash<TypeKey>{}(key.Abstract) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+
+                return hash;
+            }
+        };
+
         /**
          * \brief Resolves a pack of factory parameter types into service pointers
          *
@@ -563,6 +648,8 @@ namespace Ck
         {
             static void Setup(ServiceContainer* container, Detail::ServiceBindingBase* binding)
             {
+                static_assert((std::is_pointer_v<std::decay_t<Ts>> && ...), "Service factories must only take service pointers");
+
                 (container->SetupDependency(binding, typeid(std::remove_pointer_t<std::decay_t<Ts>>)), ...);
             }
         };
@@ -613,21 +700,19 @@ namespace Ck
         void SetupDependency(Detail::ServiceBindingBase* binding, const std::type_info& dependency);
 
         /**
-         * \brief Registers a binding that can resolve a concrete service type
-         *
-         * Any live consumers waiting for this service receive a strong
-         * reference to \p binding before it is stored in the resolving table.
+         * \brief Registers a binding together with its concrete resolver thunk.
          *
          * \param binding Binding to register. Ownership is transferred to the
-         *                resolving table
+         *                resolving table.
+         * \param resolver Type-generated function that resolves \p binding.
          */
-        void RegisterResolvableBinding(SharedPtr<Detail::ServiceBindingBase> binding);
+        void RegisterResolvableBinding(SharedPtr<Binding> binding, BindingResolver resolver);
 
         /**
          * \brief Returns the concrete service type associated with an exposed type
          *
-         * Aliases are followed recursively until an unaliased concrete
-         * type is reached.
+         * Aliases are followed iteratively until an unaliased concrete type is
+         * reached. Alias registration rejects cycles, so this walk terminates.
          *
          * \param abstract Type requested by a consumer
          *
@@ -660,7 +745,7 @@ namespace Ck
                 return static_cast<Abstract*>(static_cast<Concrete*>(instance));
             };
 
-            mUpcasts[std::type_index(typeid(Concrete))].Put(std::type_index(typeid(Abstract)), thunk);
+            mUpcasts.Put(UpcastKey{ TypeKey(typeid(Concrete)), TypeKey(typeid(Abstract)) }, thunk);
         }
 
         /**
@@ -679,10 +764,10 @@ namespace Ck
          */
         void* Upcast(void* instance, const std::type_info& concrete, const std::type_info& requested) const;
 
-        HashMap<std::type_index, SharedPtr<Detail::ServiceBindingBase>> mResolvingTable; /*!< Owns the resolvable binding registered for each concrete service type */
-        HashMap<std::type_index, std::reference_wrapper<const std::type_info>> mAliases; /*!< Maps exposed abstract types to their concrete implementation types */
-        HashMap<std::type_index, Array<WeakPtr<Detail::ServiceBindingBase>>> mPendingDependencies; /*!< Stores consumers waiting for each not-yet-registered dependency */
-        HashMap<std::type_index, HashMap<std::type_index, UpcastThunk>> mUpcasts; /*!< Pointer-adjusting conversions from each concrete type to its registered bases */
+        HashMap<TypeKey, BindingRecord> mResolvingTable; /*!< Owns resolvable bindings and their type-generated resolver thunks */
+        HashMap<TypeKey, std::reference_wrapper<const std::type_info>> mAliases; /*!< Maps exposed abstract types to their concrete implementation types */
+        HashMap<TypeKey, Array<WeakPtr<Detail::ServiceBindingBase>>> mPendingDependencies; /*!< Stores consumers waiting for each not-yet-registered dependency */
+        HashMap<UpcastKey, UpcastThunk, UpcastKeyHasher> mUpcasts; /*!< Pointer-adjusting conversions for every registered concrete-to-base pair */
     };
 }
 

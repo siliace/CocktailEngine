@@ -266,3 +266,150 @@ TEST_CASE("Service container tracks dependencies when aliases are registered lat
     REQUIRE(destructionOrder.Consumer == 1);
     REQUIRE(destructionOrder.Provider == 2);
 }
+
+class CountingService
+{
+public:
+
+    explicit CountingService(int* constructionCount) :
+        mConstructionCount(constructionCount)
+    {
+        ++*mConstructionCount;
+    }
+
+private:
+
+    int* mConstructionCount;
+};
+
+class DecoratedService
+{
+public:
+
+    explicit DecoratedService(int value = 0) :
+        mValue(value)
+    {
+        /// Nothing
+    }
+
+    void Add(int value)
+    {
+        mValue += value;
+    }
+
+    int GetValue() const
+    {
+        return mValue;
+    }
+
+private:
+
+    int mValue;
+};
+
+class RuntimeAliasA
+{
+};
+
+class RuntimeAliasB
+{
+};
+
+class RuntimeAliasC
+{
+};
+
+TEST_CASE("Service container respects singleton creation mode", "[ServiceContainer]")
+{
+    SECTION("Lazy bindings are created once on first resolution")
+    {
+        Ck::ServiceContainer serviceContainer;
+        int constructionCount = 0;
+
+        serviceContainer.Singleton<CountingService>([&constructionCount]() {
+            return Ck::MakeUnique<CountingService>(&constructionCount);
+        });
+
+        REQUIRE(constructionCount == 0);
+        REQUIRE(serviceContainer.Resolve<CountingService>() != nullptr);
+        REQUIRE(serviceContainer.Resolve<CountingService>() != nullptr);
+        REQUIRE(constructionCount == 1);
+    }
+
+    SECTION("Eager bindings are created while registering")
+    {
+        Ck::ServiceContainer serviceContainer;
+        int constructionCount = 0;
+
+        serviceContainer.Singleton<CountingService>([&constructionCount]() {
+            return Ck::MakeUnique<CountingService>(&constructionCount);
+        }, false);
+
+        REQUIRE(constructionCount == 1);
+        REQUIRE(serviceContainer.Resolve<CountingService>() != nullptr);
+        REQUIRE(constructionCount == 1);
+    }
+}
+
+TEST_CASE("Service container resolves instance bindings without ownership", "[ServiceContainer]")
+{
+    Ck::ServiceContainer serviceContainer;
+    DummyService instance;
+
+    serviceContainer.Instance(&instance);
+    serviceContainer.Alias<InterfaceDummyService, DummyService>();
+
+    REQUIRE(serviceContainer.Resolve<DummyService>() == &instance);
+    REQUIRE(serviceContainer.Resolve<InterfaceDummyService>() == static_cast<InterfaceDummyService*>(&instance));
+
+    serviceContainer.Instance<DummyService>(nullptr);
+    REQUIRE(serviceContainer.Resolve<DummyService>() == nullptr);
+}
+
+TEST_CASE("Service container decorates an unresolved concrete singleton", "[ServiceContainer]")
+{
+    Ck::ServiceContainer serviceContainer;
+    int factoryCalls = 0;
+
+    serviceContainer.Singleton<DecoratedService>([&factoryCalls]() {
+        ++factoryCalls;
+        return Ck::MakeUnique<DecoratedService>();
+    });
+    serviceContainer.Decorate<DecoratedService>([](Ck::UniquePtr<DecoratedService> service) {
+        service->Add(2);
+        return service;
+    });
+    serviceContainer.Decorate<DecoratedService>([](Ck::UniquePtr<DecoratedService> service) {
+        service->Add(3);
+        return service;
+    });
+
+    DecoratedService* service = serviceContainer.Resolve<DecoratedService>();
+    REQUIRE(service != nullptr);
+    REQUIRE(service->GetValue() == 5);
+    REQUIRE(serviceContainer.Resolve<DecoratedService>() == service);
+    REQUIRE(factoryCalls == 1);
+}
+
+TEST_CASE("Service container invokes callables with resolved services", "[ServiceContainer]")
+{
+    Ck::ServiceContainer serviceContainer;
+    DummyService instance;
+    serviceContainer.Instance(&instance);
+
+    REQUIRE(serviceContainer.Invoke([] {
+        return 42;
+    }) == 42);
+    REQUIRE(serviceContainer.Invoke([](DummyService* service) {
+        return service;
+    }) == &instance);
+}
+
+TEST_CASE("Service container rejects cyclic and retargeted runtime aliases", "[ServiceContainer]")
+{
+    Ck::ServiceContainer serviceContainer;
+
+    serviceContainer.Alias(typeid(RuntimeAliasA), typeid(RuntimeAliasB));
+    REQUIRE_THROWS_AS(serviceContainer.Alias(typeid(RuntimeAliasB), typeid(RuntimeAliasA)), Ck::LogicException);
+    REQUIRE_THROWS_AS(serviceContainer.Alias(typeid(RuntimeAliasA), typeid(RuntimeAliasC)), Ck::LogicException);
+}
