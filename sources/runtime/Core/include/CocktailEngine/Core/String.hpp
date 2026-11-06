@@ -2,6 +2,7 @@
 #define COCKTAILENGINE_CORE_STRING_HPP
 
 #include <CocktailEngine/Core/Array.hpp>
+#include <CocktailEngine/Core/ArrayView.hpp>
 #include <CocktailEngine/Core/Utility/Encoding/Encoders.hpp>
 #include <CocktailEngine/Core/Utility/StringFormater.hpp>
 #include <CocktailEngine/Core/Utility/StringUtils.hpp>
@@ -50,12 +51,7 @@ namespace Ck
          *
          * Creates an empty string view pointing to no data.
          */
-        constexpr BasicStringView() :
-            mString(nullptr),
-            mLength(0)
-        {
-            /// Nothing
-        }
+        constexpr BasicStringView() = default;
 
         /**
          * \brief Constructs a string view from a BasicString
@@ -96,8 +92,7 @@ namespace Ck
          * \param length The number of characters in the view
          */
         constexpr BasicStringView(const CharType* string, SizeType length) :
-            mString(string),
-            mLength(length)
+            mView(string, length)
         {
             /// Nothing
         }
@@ -116,8 +111,7 @@ namespace Ck
         template <typename TAllocator>
         BasicStringView operator=(const BasicString<TEncoding, TAllocator>& string)
         {
-            mString = string.GetData();
-            mLength = string.GetLength();
+            mView = ArrayView<CharType, SizeType>(string.GetData(), string.GetLength());
 
             return *this;
         }
@@ -134,8 +128,7 @@ namespace Ck
          */
         BasicStringView operator=(const CharType* string)
         {
-            mString = string;
-            mLength = StringUtils<CharType, SizeType>::GetLength(string);
+            mView = ArrayView<CharType, SizeType>(string, StringUtils<CharType, SizeType>::GetLength(string));
 
             return *this;
         }
@@ -154,33 +147,11 @@ namespace Ck
          */
         const CharType& At(SizeType index) const
         {
-            if (index >= mLength)
-                ExceptionUtils::ThrowOutOfRange(index, mLength);
-
-            return mString[index];
+            return mView.At(index);
         }
 
         /**
          * \brief Attempts to access the character at the given index
-         *
-         * Returns an Optional containing a reference to the character at \p index if the index
-         * is within bounds. If \p index is out of range, an empty Optional is returned instead.
-         *
-         * \param index The zero-based index of the character to retrieve
-         *
-         * \return An Optional containing a reference to the character if valid,
-         *         or an empty Optional otherwise
-         */
-        Optional<CharType&> TryAt(SizeType index)
-        {
-            if (index >= mLength)
-                return Optional<CharType&>::Empty();
-
-            return Optional<CharType&>::Of(mString[index]);
-        }
-
-        /**
-         * \brief Attempts to access the character at the given index (const)
          *
          * Returns an Optional containing a const reference to the character at \p index if the index
          * is within bounds. If \p index is out of range, an empty Optional is returned instead.
@@ -192,28 +163,7 @@ namespace Ck
          */
         Optional<const CharType&> TryAt(SizeType index) const
         {
-            if (index >= mLength)
-                return Optional<const CharType&>::Empty();
-
-            return Optional<const CharType&>::Of(mString[index]);
-        }
-
-        /**
-         * \brief Returns a reference to the first character in the view
-         *
-         * Provides direct access to the first character.
-         * If the view is empty, an exception is thrown.
-         *
-         * \return A reference to the first character
-         *
-         * \throws Exception If the view is empty
-         */
-        CharType& First()
-        {
-            if (Optional<CharType&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mView.TryAt(index);
         }
 
         /**
@@ -228,31 +178,11 @@ namespace Ck
          */
         const CharType& First() const
         {
-            if (Optional<const CharType&> first = TryFirst(); !first.IsEmpty())
-                return first.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mView.First();
         }
 
         /**
          * \brief Attempts to access the first character
-         *
-         * Returns an Optional containing a reference to the first character if the view
-         * is not empty. Returns an empty Optional if the view is empty.
-         *
-         * \return An Optional containing a reference to the first character,
-         *         or empty if the view is empty
-         */
-        Optional<CharType&> TryFirst()
-        {
-            if (IsEmpty())
-                return Optional<CharType&>::Empty();
-
-            return Optional<CharType&>::Of(At(0));
-        }
-
-        /**
-         * \brief Attempts to access the first character (const)
          *
          * Returns an Optional containing a const reference to the first character if the view
          * is not empty. Returns an empty Optional if the view is empty.
@@ -262,28 +192,7 @@ namespace Ck
          */
         Optional<const CharType&> TryFirst() const
         {
-            if (IsEmpty())
-                return Optional<const CharType&>::Empty();
-
-            return Optional<const CharType&>::Of(At(0));
-        }
-
-        /**
-         * \brief Returns a reference to the last character in the view
-         *
-         * Provides direct access to the last character.
-         * If the view is empty, an exception is thrown.
-         *
-         * \return A reference to the last character
-         *
-         * \throws Exception If the view is empty
-         */
-        CharType& Last()
-        {
-            if (Optional<CharType&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mView.TryFirst();
         }
 
         /**
@@ -298,31 +207,11 @@ namespace Ck
          */
         const CharType& Last() const
         {
-            if (Optional<const CharType&> last = TryLast(); !last.IsEmpty())
-                return last.Get();
-
-            ExceptionUtils::ThrowEmptyContainer();
+            return mView.Last();
         }
 
         /**
          * \brief Attempts to access the last character
-         *
-         * Returns an Optional containing a reference to the last character if the view
-         * is not empty. Returns an empty Optional if the view is empty.
-         *
-         * \return An Optional containing a reference to the last character,
-         *         or empty if the view is empty
-         */
-        Optional<CharType&> TryLast()
-        {
-            if (IsEmpty())
-                return Optional<CharType&>::Empty();
-
-            return Optional<CharType&>::Of(At(GetLength() - 1));
-        }
-
-        /**
-         * \brief Attempts to access the last character (const)
          *
          * Returns an Optional containing a const reference to the last character if the view
          * is not empty. Returns an empty Optional if the view is empty.
@@ -332,10 +221,7 @@ namespace Ck
          */
         Optional<const CharType&> TryLast() const
         {
-            if (IsEmpty())
-                return Optional<const CharType&>::Empty();
-
-            return Optional<const CharType&>::Of(At(GetLength() - 1));
+            return mView.TryLast();
         }
 
         /**
@@ -351,7 +237,7 @@ namespace Ck
          */
         Optional<SizeType> FindFirst(CharType search, SizeType startIndex = 0, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindFirst(mString, mLength, search, startIndex, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindFirst(mView.GetData(), mView.GetSize(), search, startIndex, caseSensitive);
         }
 
         /**
@@ -421,12 +307,12 @@ namespace Ck
          */
         Optional<SizeType> FindFirst(const CharType* search, SizeType length, SizeType startIndex = 0, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindFirst(mString, mLength, search, length, startIndex, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindFirst(mView.GetData(), mView.GetSize(), search, length, startIndex, caseSensitive);
         }
 
         Optional<SizeType> FindFirstOf(const CharType* search, SizeType length, unsigned int count, SizeType startIndex = 0, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindFirstOf(mString, mLength, search, length, count, startIndex, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindFirstOf(mView.GetData(), mView.GetSize(), search, length, count, startIndex, caseSensitive);
         }
 
         /**
@@ -441,7 +327,7 @@ namespace Ck
          */
         Optional<SizeType> FindLast(CharType search, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLast(mString, mLength, search, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLast(mView.GetData(), mView.GetSize(), search, caseSensitive);
         }
 
         /**
@@ -506,33 +392,33 @@ namespace Ck
          */
         Optional<SizeType> FindLast(const CharType* search, SizeType length, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLast(mString, mLength, search, length, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLast(mView.GetData(), mView.GetSize(), search, length, caseSensitive);
         }
 
         Optional<SizeType> FindLastOf(CharType search, unsigned int count, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLastOf(mString, mLength, search, count, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLastOf(mView.GetData(), mView.GetSize(), search, count, caseSensitive);
         }
 
         Optional<SizeType> FindLastOf(BasicStringView search, unsigned int count, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLastOf(mString, mLength, search, count, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLastOf(mView.GetData(), mView.GetSize(), search, count, caseSensitive);
         }
 
         template <typename TAllocator>
         Optional<SizeType> FindLastOf(const BasicString<TEncoding, TAllocator>& search, unsigned int count, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLastOf(mString, mLength, search, count, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLastOf(mView.GetData(), mView.GetSize(), search, count, caseSensitive);
         }
 
         Optional<SizeType> FindLastOf(const CharType* search, unsigned int count, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLastOf(mString, mLength, search, count, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLastOf(mView.GetData(), mView.GetSize(), search, count, caseSensitive);
         }
 
         Optional<SizeType> FindLastOf(const CharType* search, SizeType length, unsigned int count, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::FindLastOf(mString, mLength, search, length, count, caseSensitive);
+            return StringUtils<CharType, SizeType>::FindLastOf(mView.GetData(), mView.GetSize(), search, length, count, caseSensitive);
         }
 
         bool Contains(CharType search, bool caseSensitive = true) const
@@ -677,7 +563,7 @@ namespace Ck
          */
         BasicStringView SubStringView(SizeType start) const
         {
-            return SubStringView(start, GetLength() - start);
+            return BasicStringView(mView.Slice(start));
         }
 
         /**
@@ -694,7 +580,7 @@ namespace Ck
          */
         BasicStringView SubStringView(SizeType start, SizeType length) const
         {
-            return BasicStringView(GetData() + start, std::min(length, GetLength() - start));
+            return BasicStringView(mView.Slice(start, length));
         }
 
         /**
@@ -764,7 +650,7 @@ namespace Ck
          */
         int Compare(const CharType* string, SizeType length, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::Compare(mString, mLength, string, length, caseSensitive);
+            return StringUtils<CharType, SizeType>::Compare(mView.GetData(), mView.GetSize(), string, length, caseSensitive);
         }
 
         /**
@@ -777,7 +663,7 @@ namespace Ck
          */
         bool StartsWith(CharType search, bool caseSensitive = true) const
         {
-            return IsEmpty() ? false : StringUtils<CharType, SizeType>::Equal(mString[0], search, caseSensitive);
+            return IsEmpty() ? false : StringUtils<CharType, SizeType>::Equal(mView.GetData()[0], search, caseSensitive);
         }
 
         /**
@@ -790,7 +676,7 @@ namespace Ck
          */
         bool StartsWith(BasicStringView search, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::StartsWith(mString, mLength, search.GetData(), search.GetLength(), caseSensitive);
+            return StringUtils<CharType, SizeType>::StartsWith(mView.GetData(), mView.GetSize(), search.GetData(), search.GetLength(), caseSensitive);
         }
 
         /**
@@ -806,7 +692,7 @@ namespace Ck
         template <typename TAllocator>
         bool StartsWith(const BasicString<TEncoding, TAllocator>& search, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::StartsWith(mString, mLength, search.GetData(), search.GetLength(), caseSensitive);
+            return StringUtils<CharType, SizeType>::StartsWith(mView.GetData(), mView.GetSize(), search.GetData(), search.GetLength(), caseSensitive);
         }
 
         /**
@@ -820,7 +706,7 @@ namespace Ck
          */
         bool StartsWith(const CharType* string, SizeType length, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::StartsWith(mString, mLength, string, length, caseSensitive);
+            return StringUtils<CharType, SizeType>::StartsWith(mView.GetData(), mView.GetSize(), string, length, caseSensitive);
         }
 
         /**
@@ -833,7 +719,7 @@ namespace Ck
          */
         bool EndsWith(CharType search, bool caseSensitive = true) const
         {
-            return IsEmpty() ? false : StringUtils<CharType, SizeType>::Equal(mString[mLength - 1], search, caseSensitive);
+            return IsEmpty() ? false : StringUtils<CharType, SizeType>::Equal(mView.GetData()[mView.GetSize() - 1], search, caseSensitive);
         }
 
         /**
@@ -846,7 +732,7 @@ namespace Ck
          */
         bool EndsWith(BasicStringView search, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::StartsWith(mString, mLength, search.GetData(), search.GetLength(), caseSensitive);
+            return StringUtils<CharType, SizeType>::StartsWith(mView.GetData(), mView.GetSize(), search.GetData(), search.GetLength(), caseSensitive);
         }
 
         /**
@@ -862,7 +748,7 @@ namespace Ck
         template <typename TAllocator>
         bool EndsWith(const BasicString<TEncoding, TAllocator>& search, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::StartsWith(mString, mLength, search.GetData(), search.GetLength(), caseSensitive);
+            return StringUtils<CharType, SizeType>::StartsWith(mView.GetData(), mView.GetSize(), search.GetData(), search.GetLength(), caseSensitive);
         }
 
         /**
@@ -876,7 +762,7 @@ namespace Ck
          */
         bool EndsWith(const CharType* string, SizeType length, bool caseSensitive = true) const
         {
-            return StringUtils<CharType, SizeType>::EndsWith(mString, mLength, string, length, caseSensitive);
+            return StringUtils<CharType, SizeType>::EndsWith(mView.GetData(), mView.GetSize(), string, length, caseSensitive);
         }
 
         /**
@@ -886,7 +772,7 @@ namespace Ck
          */
         bool IsEmpty() const
         {
-            return mLength == 0;
+            return mView.IsEmpty();
         }
 
         /**
@@ -898,7 +784,7 @@ namespace Ck
          */
         SizeType GetLength() const
         {
-            return mLength;
+            return mView.GetSize();
         }
 
         /**
@@ -911,7 +797,7 @@ namespace Ck
          */
         const CharType* GetData() const
         {
-            return mString;
+            return mView.GetData();
         }
 
         /**
@@ -926,13 +812,26 @@ namespace Ck
          */
         const CharType& operator[](SizeType index) const
         {
-            return mString[index];
+            return mView[index];
         }
 
     private:
 
-        const CharType* mString;
-        SizeType mLength;
+        template <typename, typename>
+        friend class BasicString;
+
+        /**
+         * \brief Constructs a string view from an ArrayView of characters
+         *
+         * \param characters The characters to view
+         */
+        constexpr BasicStringView(ArrayView<CharType, SizeType> characters) :
+            mView(characters)
+        {
+            /// Nothing
+        }
+
+        ArrayView<CharType, SizeType> mView;
     };
 
     template <typename TEncoding>
