@@ -1,6 +1,8 @@
 #ifndef COCKTAILENGINE_VULKAN_VULKANUTILS_HPP
 #define COCKTAILENGINE_VULKAN_VULKANUTILS_HPP
 
+#include <CocktailEngine/Core/GenericException.hpp>
+
 #include <CocktailEngine/Renderer/Buffer/BufferUsage.hpp>
 #include <CocktailEngine/Renderer/Buffer/IndexType.hpp>
 #include <CocktailEngine/Renderer/ColorSpace.hpp>
@@ -14,8 +16,6 @@
 #include <CocktailEngine/Renderer/Texture/TextureSwizzle.hpp>
 
 #include <CocktailEngine/Vulkan/Volk.hpp>
-
-#include "CocktailEngine/Core/GenericException.hpp"
 
 /**
  * \brief Executes a Vulkan call and throws on a non-success result.

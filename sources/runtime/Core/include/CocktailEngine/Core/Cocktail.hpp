@@ -39,6 +39,18 @@
 #endif
 #endif
 
+#ifndef NDEBUG
+#ifdef COCKTAIL_OS_WINDOWS
+#define CK_DEBUG_BREAK() __debugbreak()
+#elif defined(COCKTAIL_COMPILER_CLANG) || defined(COCKTAIL_COMPILER_GCC)
+#define CK_DEBUG_BREAK() __builtin_trap()
+#else
+#define CK_DEBUG_BREAK() std::abort()
+#endif
+#else
+#define CK_DEBUG_BREAK()
+#endif
+
 #ifndef COCKTAIL_STATIC
 #if defined COCKTAIL_COMPILER_MSC
 #define CK_EXPORT_API __declspec(dllexport)
