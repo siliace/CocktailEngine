@@ -1,5 +1,3 @@
-#include <CocktailEngine/Core/IO/Input/Reader/BufferedReader.hpp>
-#include <CocktailEngine/Core/IO/Input/Reader/InputStreamReader.hpp>
 #include <CocktailEngine/Core/IO/Output/Writer/BufferedWriter.hpp>
 #include <CocktailEngine/Core/IO/Output/Writer/OutputStreamWriter.hpp>
 #include <CocktailEngine/Core/Memory/Allocator/SizedLinearAllocator.hpp>
@@ -27,51 +25,62 @@ namespace Ck::Ftp
 
     Response Client::WaitResponse() const
     {
-        TcpClientInputStream socketStream(mControlSocket);
-        InputStreamReader<Encoders::Utf8> reader(socketStream);
-        BufferedReader<Encoders::Utf8, LinearAllocator<1024>> bufferedReader(reader, 1024);
-
-        Utf8Char buffer[1024];
-        Utf8String responseContent;
-        while (!ResponseIsComplete(responseContent))
+        // Receive returns as soon as some bytes are available, a buffered reader would wait for its whole buffer to be filled
+        Byte buffer[1024];
+        for (;;)
         {
-            std::size_t received = bufferedReader.Read(buffer, 1024);
-            if (bufferedReader.IsEof())
+            // Several replies can be received at once (e.g. 150 then 226), only the first one is consumed
+            Optional<unsigned int> length = GetResponseLength(mPending);
+            if (!length.IsEmpty())
+            {
+                Utf8String content = mPending.SubString(0, length.Get());
+                mPending = mPending.SubString(length.Get());
+
+                return Response::Parse(content);
+            }
+
+            unsigned int received = mControlSocket.Receive(buffer, sizeof(buffer));
+            if (received == 0)
                 throw ConnectionClosedException();
 
-            assert(received > 0);
-            responseContent.Append(buffer, received);
+            mPending.Append(reinterpret_cast<const Utf8Char*>(buffer), received);
         }
-
-        return Response::Parse(responseContent);
     }
 
-    bool Client::ResponseIsComplete(const Utf8String& response)
+    Optional<unsigned int> Client::GetResponseLength(const Utf8String& content)
     {
-        if (response.GetLength() < 5)
-            return false;
+        if (content.GetLength() < MessageTerminator.GetLength())
+            return Optional<unsigned int>::Empty();
 
-        if (response[3] == CK_UTF8_CHAR('-'))
+        Optional<unsigned int> firstTerminator = content.FindFirst(MessageTerminator);
+        if (firstTerminator.IsEmpty() || firstTerminator.Get() < 3)
+            return Optional<unsigned int>::Empty();
+
+        unsigned int firstLineEnd = firstTerminator.Get() + MessageTerminator.GetLength();
+
+        // A single line reply is "<code> <text>\r\n", a code followed by nothing is accepted as well
+        if (content.GetLength() < 4 || content[3] != CK_UTF8_CHAR('-'))
+            return Optional<unsigned int>::Of(firstLineEnd);
+
+        // A multi-line reply ends with a line starting with "<code> "
+        const Utf8Char* code = content.GetData();
+
+        unsigned int lineStart = firstLineEnd;
+        while (lineStart < content.GetLength())
         {
-            Utf8StringView code = response.SubString(0, 3);
+            Optional<unsigned int> terminator = content.FindFirst(MessageTerminator, lineStart);
+            if (terminator.IsEmpty())
+                return Optional<unsigned int>::Empty();
 
-            Optional<unsigned int> lastTerminator = response.FindLastOf(MessageTerminator, 1);
-            if (!lastTerminator)
-                return false;
+            unsigned int lineEnd = terminator.Get() + MessageTerminator.GetLength();
 
-            unsigned int lastLineStart = lastTerminator.Get() + MessageTerminator.GetLength();
-            if (lastLineStart + 4 > response.GetLength()) // A valid last line will starts with its code then a space
-                return false;
+            const Utf8Char* line = content.GetData() + lineStart;
+            if (terminator.Get() - lineStart >= 4 && line[0] == code[0] && line[1] == code[1] && line[2] == code[2] && line[3] == CK_UTF8_CHAR(' '))
+                return Optional<unsigned int>::Of(lineEnd);
 
-            Utf8StringView lastLine = response.SubStringView(lastLineStart);
-            if (!lastLine.StartsWith(code) || lastLine[3] != CK_UTF8_CHAR(' '))
-                return false;
-        }
-        else if (response[3] != CK_UTF8_CHAR(' '))
-        {
-            return false;
+            lineStart = lineEnd;
         }
 
-        return response.EndsWith(MessageTerminator);
+        return Optional<unsigned int>::Empty();
     }
 }

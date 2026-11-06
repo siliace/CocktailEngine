@@ -18,11 +18,29 @@ namespace Ck::Ftp
         void Send(const Request& request) const;
         Response WaitResponse() const;
 
+        /**
+         * \brief Retrieve the address of the server the control connection is established with
+         *
+         * Useful to open data connections towards the same host.
+         *
+         * \return The remote address, or an empty optional if it is unknown
+         */
+        Optional<const IpAddress&> GetRemoteAddress() const
+        {
+            return mControlSocket.GetRemoteAddress();
+        }
+
     private:
 
-        static bool ResponseIsComplete(const Utf8String& response);
+        /**
+         * \brief Compute the length of the first complete reply of a received content
+         *
+         * \return The length, including the terminator, or an empty optional if more bytes must be received
+         */
+        static Optional<unsigned int> GetResponseLength(const Utf8String& content);
 
         TcpClient mControlSocket;
+        mutable Utf8String mPending;
     };
 }
 

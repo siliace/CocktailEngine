@@ -35,6 +35,7 @@ namespace Ck::Ftp
             Mdtm,
             Mff,
             Mkd,
+            Mlsd,
             Mlst,
             Mode,
             Nlst,
@@ -307,6 +308,16 @@ namespace Ck::Ftp
             static Utf8StringView ToString()
             {
                 static Utf8StringView value(CK_UTF8_TEXT("MKD"));
+                return value;
+            }
+        };
+
+        template <>
+        struct Command<Request::Code::Mlsd>
+        {
+            static Utf8StringView ToString()
+            {
+                static Utf8StringView value(CK_UTF8_TEXT("MLSD"));
                 return value;
             }
         };
@@ -633,7 +644,8 @@ namespace Ck::Ftp
             {
                 writer.Write(Command<TCode>::ToString());
                 writer.Write(CK_UTF8_TEXT(" "));
-                writer.Write(mParameter);
+                if (!mParameter.IsEmpty()) // Writing an empty string is not supported by the writers
+                    writer.Write(mParameter);
                 writer.Write(MessageTerminator);
             }
 
@@ -707,6 +719,7 @@ namespace Ck::Ftp
     using ModificationTimeRequest = Detail::OneParameterRequest<Request::Code::Mdtm>;
     using ModifyFactRequest = Detail::OneParameterRequest<Request::Code::Mff>; /// TODO: multiple facts and pathname
     using MakeDirectoryRequest = Detail::OneParameterRequest<Request::Code::Mkd>;
+    using MachineListDirectoryRequest = Detail::OneParameterRequest<Request::Code::Mlsd>;
     using MachineListRequest = Detail::OneParameterRequest<Request::Code::Mlst>; /// TODO: optional pathname
     using TransferModeRequest = Detail::OneParameterRequest<Request::Code::Mode>;
     using NameListRequest = Detail::OneParameterRequest<Request::Code::Nlst>; /// TODO: optional path argument

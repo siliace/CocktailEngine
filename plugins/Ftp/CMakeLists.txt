@@ -13,3 +13,11 @@ ck_add_module(
         CocktailEngine::Core
         Ftp::Core
 )
+
+ck_add_module(
+    FileSystemServer
+    MODULE_CLASS OFF
+    DEPENDS
+        CocktailEngine::Core
+        Ftp::Core
+)

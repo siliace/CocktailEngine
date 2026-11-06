@@ -25,6 +25,7 @@ namespace Ck::Ftp
         case Code::Mdtm: return Detail::Command<Code::Mdtm>::ToString();
         case Code::Mff:  return Detail::Command<Code::Mff>::ToString();
         case Code::Mkd:  return Detail::Command<Code::Mkd>::ToString();
+        case Code::Mlsd: return Detail::Command<Code::Mlsd>::ToString();
         case Code::Mlst: return Detail::Command<Code::Mlst>::ToString();
         case Code::Mode: return Detail::Command<Code::Mode>::ToString();
         case Code::Nlst: return Detail::Command<Code::Nlst>::ToString();
@@ -67,7 +68,7 @@ namespace Ck::Ftp
             Code::Abor, Code::Acct, Code::Allo, Code::Appe, Code::Auth, Code::Ccc,
             Code::Cdup, Code::Conf, Code::Cwd,  Code::Dele, Code::Eprt, Code::Epsv,
             Code::Feat, Code::Help, Code::Lang, Code::List, Code::Mdtm, Code::Mff,
-            Code::Mkd,  Code::Mlst, Code::Mode, Code::Nlst, Code::Noop, Code::Opts,
+            Code::Mkd,  Code::Mlsd, Code::Mlst, Code::Mode, Code::Nlst, Code::Noop, Code::Opts,
             Code::Pass, Code::Pasv, Code::Pbsz, Code::Port, Code::Prot, Code::Pwd,
             Code::Quit, Code::Rein, Code::Rest, Code::Retr, Code::Rmd,  Code::Rnfr,
             Code::Rnto, Code::Site, Code::Size, Code::Smnt, Code::Stat, Code::Stor,

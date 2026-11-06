@@ -24,6 +24,10 @@ namespace Ck::Ftp
         if (!lineReader.ReadLine(line, false))
             throw ConnectionClosedException();
 
+        // FTP lines end with CRLF, LineReader only removes the CR on Windows
+        if (!line.IsEmpty() && line[line.GetLength() - 1] == CK_UTF8_CHAR('\r'))
+            line = line.SubString(0, line.GetLength() - 1);
+
         return Request::Parse(line);
     }
 
@@ -39,7 +43,7 @@ namespace Ck::Ftp
     }
 
     Server::Server(unsigned short port, const IpAddress& host) :
-        mControlSocket(port, host)
+        mControlSocket(port, host, -1)
     {
         /// Nothing
     }

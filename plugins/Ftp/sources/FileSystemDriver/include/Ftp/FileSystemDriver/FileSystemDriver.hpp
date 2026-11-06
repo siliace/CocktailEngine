@@ -27,8 +27,8 @@ namespace Ck
             void CreateFile(const Path& path) override;
             void CreateDirectory(const Path& path) override;
             UniquePtr<DirectoryIterator> CreateDirectoryIterator(const Path& path) override;
-            UniquePtr<File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
-            UniquePtr<Directory> OpenDirectory(const Path& path) override;
+            UniquePtr<Ck::File> OpenFile(const Path& path, const FileOpenFlags& flags) override;
+            UniquePtr<Ck::Directory> OpenDirectory(const Path& path) override;
             void CopyFile(const Path& source, const Path& destination, const FileCopyOptions& options) override;
             void CopyDirectory(const Path& source, const Path& destination, const DirectoryCopyOptions& options) override;
             void MoveFile(const Path& source, const Path& destination, const FileMoveOptions& options) override;
@@ -41,6 +41,7 @@ namespace Ck
 
         private:
 
+            void Rename(const Path& source, const Path& destination);
             void Login(const Utf8String& user, const Utf8String& password) const;
 
             Client mClient;
