@@ -15,7 +15,7 @@ namespace Ck::Vulkan
         VkPhysicalDevice physicalDevice = mRenderDevice->GetPhysicalDeviceHandle();
 
         const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-        Array<unsigned int> presentationFamilyQueueIndexes = queueFamilyContext.FindFamilyIndexes([&](const QueueFamily& queueFamily) {
+        QueueFamilyIndexList presentationFamilyQueueIndexes = queueFamilyContext.FindFamilyIndexes([&](const QueueFamily& queueFamily) {
             return WSI::GetPhysicalDevicePresentationSupport(physicalDevice, queueFamily.GetIndex());
         });
 

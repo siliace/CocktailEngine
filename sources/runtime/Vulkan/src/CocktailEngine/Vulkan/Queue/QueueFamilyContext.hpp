@@ -2,6 +2,8 @@
 #define COCKTAILENGINE_VULKAN_QUEUE_QUEUEFAMILYCONTEXT_HPP
 
 #include <CocktailEngine/Core/Array.hpp>
+#include <CocktailEngine/Core/Enum.hpp>
+#include <CocktailEngine/Core/Memory/Allocator/SizedLinearAllocator.hpp>
 #include <CocktailEngine/Core/Utility/EnumMap.hpp>
 
 #include <CocktailEngine/Renderer/Command/CommandQueueType.hpp>
@@ -11,6 +13,8 @@
 
 namespace Ck::Vulkan
 {
+    using QueueFamilyIndexList = Array<unsigned int, LinearAllocator<Enum<Renderer::CommandQueueType>::ValueCount>>;
+
     /**
      * \brief
      */
@@ -36,7 +40,7 @@ namespace Ck::Vulkan
          * \param unique
          * \return
          */
-        Array<unsigned int> FindFamilyIndexes(bool unique = true) const;
+        QueueFamilyIndexList FindFamilyIndexes(bool unique = true) const;
 
         /**
          * \brief
@@ -46,9 +50,9 @@ namespace Ck::Vulkan
          * \return
          */
         template <typename Callable>
-        Array<unsigned int> FindFamilyIndexes(Callable&& callable, bool unique = true) const
+        QueueFamilyIndexList FindFamilyIndexes(Callable&& callable, bool unique = true) const
         {
-            Array<unsigned int> queueIndexes;
+            QueueFamilyIndexList queueIndexes;
             for (Renderer::CommandQueueType queueFamilyType : Enum<Renderer::CommandQueueType>::Values)
             {
                 const QueueFamily& family = GetFamily(queueFamilyType);

@@ -35,9 +35,9 @@ namespace Ck::Vulkan
         return mUnified;
     }
 
-    Array<unsigned int> QueueFamilyContext::FindFamilyIndexes(bool unique) const
+    QueueFamilyIndexList QueueFamilyContext::FindFamilyIndexes(bool unique) const
     {
-        Array<unsigned int> queueIndexes;
+        QueueFamilyIndexList queueIndexes;
         for (Renderer::CommandQueueType queueFamilyType : Enum<Renderer::CommandQueueType>::Values)
         {
             const QueueFamily& family = GetFamily(queueFamilyType);

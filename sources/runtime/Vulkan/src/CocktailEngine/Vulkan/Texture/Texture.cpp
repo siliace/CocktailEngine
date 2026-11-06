@@ -15,10 +15,11 @@ namespace Ck::Vulkan
         mMemoryType(createInfo.ResourceMemoryType),
         mMipMapCount(createInfo.MipMapsCount),
         mArrayLayerCount(createInfo.ArrayLayerCount),
-        mAllocationCallbacks(allocationCallbacks)
+        mAllocationCallbacks(allocationCallbacks),
+        mHandle(VK_NULL_HANDLE)
     {
         const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-        Array<unsigned int> queueIndexes = queueFamilyContext.FindFamilyIndexes();
+        QueueFamilyIndexList queueIndexes = queueFamilyContext.FindFamilyIndexes();
 
         const bool hasAttachmentFlag = createInfo.Usage & Renderer::TextureUsageFlagBits::Attachment;
         if (mFormat.IsCompressed() && hasAttachmentFlag)

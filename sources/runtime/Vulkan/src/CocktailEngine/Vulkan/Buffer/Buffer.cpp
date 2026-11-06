@@ -16,7 +16,7 @@ namespace Ck::Vulkan
         mExclusive(createInfo.Exclusive)
     {
         const QueueFamilyContext& queueFamilyContext = mRenderDevice->GetQueueFamilyContext();
-        Array<unsigned int> queueFamilyIndexes = queueFamilyContext.FindFamilyIndexes();
+        QueueFamilyIndexList queueFamilyIndexes = queueFamilyContext.FindFamilyIndexes();
 
         VkBufferCreateInfo vkCreateInfo{ VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, nullptr };
         {
