@@ -14,10 +14,10 @@ namespace Ck
      * This is useful for temporarily overriding a variable in a scoped context
      * (e.g., flags, settings, or configuration values) with exception safety.
      *
-     * \tparam ReferenceType Type of the referenced object to be modified
-     * \tparam OriginalType  Type used to store the original value
+     * \tparam TReferenceType Type of the referenced object to be modified
+     * \tparam TOriginalType  Type used to store the original value
      */
-    template <typename ReferenceType, typename OriginalType>
+    template <typename TReferenceType, typename TOriginalType>
     class ValueGuard
     {
     public:
@@ -30,7 +30,7 @@ namespace Ck
          * \param reference Reference to the value to be temporarily modified
          * \param value Temporary value to assign to the referenced object
          */
-        ValueGuard(ReferenceType& reference, const OriginalType& value) :
+        ValueGuard(TReferenceType& reference, const TOriginalType& value) :
             mReference(reference),
             mOriginalValue(reference)
         {
@@ -60,15 +60,15 @@ namespace Ck
          *
          * \return Constant reference to the original value saved at construction time
          */
-        const OriginalType& GetOriginalValue() const
+        const TOriginalType& GetOriginalValue() const
         {
             return mOriginalValue;
         }
 
     private:
 
-        ReferenceType& mReference; /*!< Reference to the modified object */
-        OriginalType mOriginalValue; /*!< Stored original value restored upon destruction */
+        TReferenceType& mReference; /*!< Reference to the modified object */
+        TOriginalType mOriginalValue; /*!< Stored original value restored upon destruction */
     };
 }
 

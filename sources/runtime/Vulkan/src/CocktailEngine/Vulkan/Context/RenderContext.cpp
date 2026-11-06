@@ -141,7 +141,7 @@ namespace Ck::Vulkan
     void RenderContext::Synchronize()
     {
         Flush();
-        COCKTAIL_VK_CHECK(vkDeviceWaitIdle(mRenderDevice->GetHandle()));
+        mScheduler->Synchronize();
     }
 
     FrameContext* RenderContext::GetCurrentFrameContext() const

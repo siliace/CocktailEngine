@@ -57,7 +57,6 @@ namespace Ck
 
     GraphicEngine::~GraphicEngine()
     {
-        mRenderContext->Flush();
         mRenderContext->Synchronize();
     }
 

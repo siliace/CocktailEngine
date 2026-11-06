@@ -78,6 +78,16 @@ namespace Ck::Vulkan
         mFence = fence;
     }
 
+    Renderer::CommandQueueType QueueSubmitBatch::GetQueueType() const
+    {
+        return mQueue;
+    }
+
+    unsigned int QueueSubmitBatch::GetQueueIndex() const
+    {
+        return mQueueIndex;
+    }
+
     bool QueueSubmitBatch::HasFence() const
     {
         return mFence != nullptr;
@@ -124,6 +134,12 @@ namespace Ck::Vulkan
 
         VkFence fenceHandle = mFence ? mFence->GetHandle() : VK_NULL_HANDLE;
         vkQueueSubmit(queue, mSubmitCount, submitInfos, fenceHandle);
+    }
+
+    void QueueSubmitBatch::Wait()
+    {
+        if (mFence)
+            mFence->Wait();
     }
 
     void QueueSubmitBatch::MarkCompleted()

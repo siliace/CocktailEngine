@@ -450,10 +450,10 @@ namespace Ck
         {
             const TypeKey serviceType(typeid(Abstract));
             BindingRecord* bindingRecord = mResolvingTable.Get(serviceType);
-            if (!bindingRecord || !bindingRecord->Binding->IsCallable())
+            if (!bindingRecord || !bindingRecord->ResolvedBinding->IsCallable())
                 return;
 
-            auto* callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(bindingRecord->Binding.Get());
+            auto* callableBinding = static_cast<Detail::CallableServiceBinding<Abstract>*>(bindingRecord->ResolvedBinding.Get());
             callableBinding->Decorate(Move(extender));
         }
 
@@ -474,7 +474,7 @@ namespace Ck
             const std::type_info& concrete = GetConcrete(abstract);
             return mResolvingTable.TryGet(concrete)
                 .Map([&](const BindingRecord& bindingRecord) -> T* {
-                    void* instance = bindingRecord.Resolver(*bindingRecord.Binding);
+                    void* instance = bindingRecord.Resolver(*bindingRecord.ResolvedBinding);
                     if (!instance)
                         return nullptr;
 
@@ -482,7 +482,7 @@ namespace Ck
                     // GetResolvedType(). Converting that concrete pointer to T requires
                     // the pointer adjustment registered when the alias was declared,
                     // which is the only context where both types are statically known.
-                    return static_cast<T*>(Upcast(instance, bindingRecord.Binding->GetResolvedType(), abstract));
+                    return static_cast<T*>(Upcast(instance, bindingRecord.ResolvedBinding->GetResolvedType(), abstract));
                 })
                 .GetOr(nullptr);
         }
@@ -545,7 +545,7 @@ namespace Ck
          */
         struct BindingRecord
         {
-            SharedPtr<Binding> Binding;
+            SharedPtr<Binding> ResolvedBinding;
             BindingResolver Resolver;
         };
 

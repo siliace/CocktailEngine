@@ -77,7 +77,7 @@ namespace Ck
         const TypeKey dependencyType(GetConcrete(dependency));
         if (BindingRecord* dependencyBinding = mResolvingTable.Get(dependencyType))
         {
-            binding->AddDependency(dependencyBinding->Binding.Get());
+            binding->AddDependency(dependencyBinding->ResolvedBinding.Get());
             return;
         }
 
