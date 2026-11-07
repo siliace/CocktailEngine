@@ -61,8 +61,11 @@ namespace Ck::ImUi
 
         SetupRenderState(context, windowResources, commandList, framebufferSize);
 
+        commandList->BeginDebugLabel("ImGui", LinearColor::Yellow);
         for (ImDrawList* drawList : drawData.CmdLists)
         {
+            commandList->BeginDebugLabel(drawList->_OwnerName, LinearColor::Cyan);
+
             Renderer::BufferAllocator* bufferAllocator =
                 renderContext->GetBufferAllocator(Renderer::BufferUsageFlagBits::Vertex | Renderer::BufferUsageFlagBits::Index, Renderer::MemoryType::Unified);
 
@@ -115,10 +118,13 @@ namespace Ck::ImUi
                     commandList->DrawIndexed(drawCmd.ElemCount, 1, drawCmd.IdxOffset, drawCmd.VtxOffset, 0);
                 }
             }
+
+            commandList->EndDebugLabel();
         }
 
         commandList->EnableVertexBinding(0, false);
         commandList->EndRenderPass();
+        commandList->EndDebugLabel();
         commandList->End();
 
         renderContext->SubmitCommandLists(Renderer::CommandQueueType::Graphic, 1, &commandList, nullptr);

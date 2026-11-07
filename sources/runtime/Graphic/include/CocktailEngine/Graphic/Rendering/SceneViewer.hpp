@@ -4,7 +4,9 @@
 #include <CocktailEngine/Core/Signal/Observable.hpp>
 #include <CocktailEngine/Core/Signal/Signal.hpp>
 
-#include <CocktailEngine/Graphic/Rendering/Queue/RenderQueue.hpp>
+#include <CocktailEngine/Graphic/Rendering/Pipeline/RenderPipeline.hpp>
+#include <CocktailEngine/Graphic/Rendering/Queue/RecordDrawContext.hpp>
+#include <CocktailEngine/Graphic/Rendering/SceneRenderSettings.hpp>
 #include <CocktailEngine/Graphic/Rendering/Viewport.hpp>
 
 #include <CocktailEngine/Renderer/Context/RenderContext.hpp>
@@ -67,6 +69,37 @@ namespace Ck
         SharedPtr<Scene> GetScene() const;
 
         /**
+         * \brief Get the mutable per-frame scene render settings
+         *
+         * \return The scene render settings
+         */
+        SceneRenderSettings& GetRenderSettings();
+
+        /**
+         * \brief Get the per-frame scene render settings
+         *
+         * \return The scene render settings
+         */
+        const SceneRenderSettings& GetRenderSettings() const;
+
+        /**
+         * \brief Replace the render pipeline used to draw the scene
+         *
+         * Allows injecting a custom rendering strategy (deferred, clustered, etc.)
+         * in place of the default forward pipeline.
+         *
+         * \param pipeline The pipeline to use
+         */
+        void SetRenderPipeline(UniquePtr<RenderPipeline> pipeline);
+
+        /**
+         * \brief Get the render pipeline currently in use
+         *
+         * \return The render pipeline
+         */
+        RenderPipeline* GetRenderPipeline() const;
+
+        /**
          * \brief
          * \return
          */
@@ -92,8 +125,8 @@ namespace Ck
         SharedPtr<Scene> mScene;
         RecordDrawContext mDrawContext;
         Array<UniquePtr<Viewport>> mViewports;
-        UniquePtr<RenderQueue> mOpaqueRenderQueue;
-        UniquePtr<RenderQueue> mBlendingRenderQueue;
+        SceneRenderSettings mRenderSettings;
+        UniquePtr<RenderPipeline> mRenderPipeline;
         Signal<Renderer::RenderContext&, Renderer::Framebuffer&> mOnRendered;
     };
 }
