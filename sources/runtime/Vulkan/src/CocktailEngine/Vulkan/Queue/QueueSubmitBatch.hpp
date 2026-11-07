@@ -119,7 +119,7 @@ namespace Ck::Vulkan
          *         so waiting is enough to drive reclamation. It emits nothing once
          *         MarkCompleted has run.
          */
-        void Wait();
+        void Wait() const;
 
         /**
          * \brief

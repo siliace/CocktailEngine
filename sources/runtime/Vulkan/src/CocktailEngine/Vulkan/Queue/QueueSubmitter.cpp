@@ -33,7 +33,7 @@ namespace Ck::Vulkan
         if (!mCurrentBatch || mCurrentBatch && mCurrentBatch->HasFence())
             mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
 
-        mScheduler->ConnectFence(mCurrentBatch, fence);
+        mScheduler->ConnectFence(mCurrentBatch, Move(fence));
     }
 
     void QueueSubmitter::SignalSemaphore(SharedPtr<Semaphore> semaphore)
@@ -41,7 +41,7 @@ namespace Ck::Vulkan
         if (!mCurrentBatch)
             mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
 
-        mCurrentBatch->SignalSemaphore(semaphore);
+        mCurrentBatch->SignalSemaphore(Move(semaphore));
     }
 
     void QueueSubmitter::WaitExternalSemaphore(SharedPtr<Semaphore> semaphore, VkPipelineStageFlags waitStages)
@@ -49,7 +49,7 @@ namespace Ck::Vulkan
         if (!mCurrentBatch)
             mCurrentBatch = mScheduler->ScheduleBatch(mQueueType, mQueueIndex);
 
-        mCurrentBatch->WaitSemaphore(semaphore, waitStages);
+        mCurrentBatch->WaitSemaphore(Move(semaphore), waitStages);
     }
 
     void QueueSubmitter::WaitDependency(const QueueSubmitDependency& dependency, Renderer::CommandQueueType waitedQueue, bool selfDependent)

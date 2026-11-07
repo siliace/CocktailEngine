@@ -43,7 +43,7 @@ namespace Ck::Vulkan
         if (!mCurrentSubmit || mCurrentSubmit->GetWaitSemaphoreCount() == QueueSubmit::MaxWaitSemaphore)
             PushSubmit();
 
-        mCurrentSubmit->WaitSemaphore(semaphore, pipelineWaitStages);
+        mCurrentSubmit->WaitSemaphore(Move(semaphore), pipelineWaitStages);
     }
 
     void QueueSubmitBatch::ExecuteCommandLists(unsigned int commandListCount, CommandList** commandLists)
@@ -62,20 +62,19 @@ namespace Ck::Vulkan
         if (!mCurrentSubmit || mCurrentSubmit->GetWaitSemaphoreCount() == QueueSubmit::MaxWaitSemaphore)
             PushSubmit();
 
-        mCurrentSubmit->SignalSemaphore(semaphore);
+        mCurrentSubmit->SignalSemaphore(Move(semaphore));
     }
 
     void QueueSubmitBatch::AssignFence(SharedPtr<Fence> fence)
     {
-        if (mFence != nullptr)
-            throw std::runtime_error("Cannot assign two fences to the same submit batch");
+        assert(mFence == nullptr);
 
-        Connect(fence->OnSignaled(), [&] {
+        mFence = Move(fence);
+
+        Connect(mFence->OnSignaled(), [&] {
             if (!mCompleted)
                 mOnCompleted.Emit();
         });
-
-        mFence = fence;
     }
 
     Renderer::CommandQueueType QueueSubmitBatch::GetQueueType() const
@@ -136,7 +135,7 @@ namespace Ck::Vulkan
         vkQueueSubmit(queue, mSubmitCount, submitInfos, fenceHandle);
     }
 
-    void QueueSubmitBatch::Wait()
+    void QueueSubmitBatch::Wait() const
     {
         if (mFence)
             mFence->Wait();
